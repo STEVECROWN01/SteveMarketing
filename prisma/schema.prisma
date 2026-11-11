@@ -1,0 +1,32 @@
+// Prisma schema — Plateforme Stevens Akpovi
+// Modèles : Lead (demandes devis/audit) — base de l'espace administrateur.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./db/custom.db"
+}
+
+// Demande commerciale : devis personnalisé ou audit gratuit.
+model Lead {
+  id            String    @id @default(cuid())
+  type          String    // "quote" (devis) | "audit" (audit gratuit)
+  status        String    @default("new") // new | contacted | qualified | won | lost
+  name          String
+  email         String
+  phone         String?
+  company       String?
+  website       String?   // url du site actuel (audit)
+  activity      String?   // secteur / activité
+  serviceType   String?   // site vitrine, multipages, landing, vente, refonte, acquisition
+  budget        String?   // tranche budgétaire
+  timeline      String?   // échéance souhaitée
+  message       String
+  source        String?   // page d'origine
+  emailSent     Boolean   @default(false) // notification email partie
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}

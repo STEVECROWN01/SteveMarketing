@@ -1,0 +1,69 @@
+"use client";
+
+import React from "react";
+import { Hero } from "@/components/home/Hero";
+import { ProblemSection, QuestioningSection } from "@/components/home/ProblemQuestioning";
+import { TransformationSection, SolutionSection } from "@/components/home/TransformationSolution";
+import {
+  ServicesSection,
+  IncludedSection,
+  ComplementarySection,
+} from "@/components/home/ServicesSections";
+import { WorksSection } from "@/components/home/WorksSection";
+import { MethodSection, AboutSection } from "@/components/home/MethodAbout";
+import { FaqSection, FinalCtaSection } from "@/components/home/FaqFinal";
+import { Reveal } from "@/components/motion/Reveal";
+import { TARGETS } from "@/content/site-content";
+
+/** Bandeau « à qui s'adressent les services » — sous le Hero. */
+function AudienceStrip() {
+  return (
+    <section
+      aria-label="À qui s'adressent les services de Stevens Akpovi"
+      className="section-dark border-t border-[#e4e4e4]/10 py-10 sm:py-12"
+    >
+      <div className="container-site">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-10">
+          <Reveal direction="right" className="shrink-0">
+            <p className="text-eyebrow">{TARGETS.eyebrow}</p>
+            <h2 className="text-card-title mt-2 max-w-xs text-white">{TARGETS.title}</h2>
+          </Reveal>
+          <Reveal direction="left" delay={0.1} className="min-w-0 flex-1">
+            <ul className="flex flex-wrap gap-2.5">
+              {TARGETS.items.map((target) => (
+                <li
+                  key={target}
+                  className="inline-flex min-h-[40px] items-center rounded-full border border-[#e4e4e4]/15 bg-[#232323] px-4 py-2 text-[13px] text-[#d9d9d9]"
+                >
+                  {target}
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Page d'accueil — les 13 sections du copywriting de référence. */
+export function HomePage() {
+  return (
+    <>
+      <Hero />
+      <AudienceStrip />
+      <ProblemSection />
+      <QuestioningSection />
+      <TransformationSection />
+      <SolutionSection />
+      <ServicesSection />
+      <IncludedSection />
+      <ComplementarySection />
+      <WorksSection />
+      <MethodSection />
+      <AboutSection />
+      <FaqSection />
+      <FinalCtaSection />
+    </>
+  );
+}

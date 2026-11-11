@@ -1,0 +1,124 @@
+"use client";
+
+import React from "react";
+import { Linkedin, Mail, MessageCircle, ArrowUpRight } from "lucide-react";
+import { useRouter } from "@/components/router-context";
+import { NAV_ITEMS, SITE } from "@/lib/site";
+import { Reveal } from "@/components/motion/Reveal";
+
+const NAV_PAGES: Record<string, string> = {
+  accueil: "accueil",
+  services: "services",
+  realisations: "realisations",
+  aPropos: "a-propos",
+  contact: "contact",
+};
+
+export function Footer() {
+  const router = useRouter();
+
+  return (
+    <footer className="section-deep mt-auto border-t border-[#e4e4e4]/10">
+      <div className="container-site py-16 lg:py-20">
+        <Reveal direction="up" amount={0.15}>
+          <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr] lg:gap-8">
+            {/* Marque */}
+            <div className="max-w-sm">
+              <p className="font-display text-xl font-semibold text-white">Stevens Akpovi</p>
+              <p className="mt-4 text-sm leading-relaxed text-[#c8c8c8]">
+                Je crée des sites web qui génèrent des ventes. Conception de sites web
+                professionnels orientés conversion — copywriting et optimisation SEO de base
+                inclus.
+              </p>
+              <p className="mt-6 text-xs leading-relaxed text-[#c8c8c8]/70">
+                Collaboration à distance, au-delà des frontières.
+              </p>
+            </div>
+
+            {/* Navigation */}
+            <nav aria-label="Navigation de pied de page">
+              <p className="text-eyebrow">Navigation</p>
+              <ul className="mt-5 space-y-3">
+                {NAV_ITEMS.map((item) => (
+                  <li key={item.key}>
+                    <a
+                      href={`#/${NAV_PAGES[item.key]}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        router.navigate(item.key as never);
+                      }}
+                      className="inline-flex min-h-[24px] items-center text-sm text-[#c8c8c8] transition-colors hover:text-[#c9baac]"
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+                <li>
+                  <a
+                    href="#/mentions-legales"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      router.navigate("legal");
+                    }}
+                    className="inline-flex min-h-[24px] items-center text-sm text-[#c8c8c8] transition-colors hover:text-[#c9baac]"
+                  >
+                    Mentions légales
+                  </a>
+                </li>
+              </ul>
+            </nav>
+
+            {/* Contact */}
+            <div>
+              <p className="text-eyebrow">Contact</p>
+              <ul className="mt-5 space-y-3">
+                <li>
+                  <a
+                    href={`mailto:${SITE.email}`}
+                    className="inline-flex min-h-[24px] items-center gap-2.5 text-sm text-[#c8c8c8] transition-colors hover:text-[#c9baac]"
+                  >
+                    <Mail className="h-4 w-4 text-[#c9baac]" aria-hidden="true" />
+                    {SITE.email}
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={SITE.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-[24px] items-center gap-2.5 text-sm text-[#c8c8c8] transition-colors hover:text-[#c9baac]"
+                  >
+                    <Linkedin className="h-4 w-4 text-[#c9baac]" aria-hidden="true" />
+                    LinkedIn
+                    <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href={SITE.whatsapp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex min-h-[24px] items-center gap-2.5 text-sm text-[#c8c8c8] transition-colors hover:text-[#c9baac]"
+                  >
+                    <MessageCircle className="h-4 w-4 text-[#c9baac]" aria-hidden="true" />
+                    WhatsApp
+                    <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                  </a>
+                </li>
+              </ul>
+              <p className="mt-6 inline-flex rounded-full border border-[#c9baac]/30 bg-[#c9baac]/10 px-4 py-1.5 text-xs text-[#c9baac]">
+                {SITE.calendlyMention}
+              </p>
+            </div>
+          </div>
+        </Reveal>
+
+        <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-[#e4e4e4]/10 pt-7 text-xs text-[#c8c8c8]/70 sm:flex-row sm:items-center">
+          <p>© {new Date().getFullYear()} Stevens Akpovi. Tous droits réservés.</p>
+          <p>Conçu et développé avec Next.js — performance, accessibilité, conversion.</p>
+        </div>
+      </div>
+      <div className="h-[env(safe-area-inset-bottom)]" aria-hidden="true" />
+    </footer>
+  );
+}

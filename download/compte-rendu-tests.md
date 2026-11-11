@@ -1,0 +1,163 @@
+# COMPTE RENDU DE TESTS — SITE WEB STEVENS AKPOVI
+
+**Date des tests :** 12 novembre 2026
+**Environnement :** Next.js 16 (App Router, Turbopack, port 3000) — vérification navigateur automatisée (Chromium) + analyse visuelle assistée.
+
+---
+
+## 1. PAGES ET NAVIGATION
+
+| Test | Résultat |
+|---|---|
+| Accueil (`#/accueil`) — 13 sections du copywriting intégrées | ✅ Rendu conforme, zéro erreur console |
+| Services (`#/services`) | ✅ Titre dynamique + contenu complet |
+| Réalisations (`#/realisations`) — 3 projets réels | ✅ Mockups desktop + mobile chargés |
+| À propos (`#/a-propos`) | ✅ Portrait + texte intégral + FAQ extraits |
+| Contact (`#/contact`) + ancres `#/contact/devis` et `#/contact/audit` | ✅ Ancrage fonctionnel aux deux formulaires |
+| Mentions légales (`#/mentions-legales`) | ✅ |
+| Espace admin (`#/admin`) — non listé publiquement | ✅ Connexion, consultation, statuts, export |
+| Navigation retour / suivant du navigateur | ✅ |
+| Menu mobile (ouverture, navigation, fermeture, déblocage du scroll) | ✅ |
+| Titres de page dynamiques par page virtuelle | ✅ |
+
+*Bug détecté et corrigé pendant les tests : correspondance kebab/camelCase entre les fragments d'URL et les clés de page (`#/a-propos`, `#/mentions-legales`) — corrigé par table de correspondance explicite.*
+
+## 2. CTA ET CALENDLY
+
+| Test | Résultat |
+|---|---|
+| Popup Calendly (bouton d'en-tête, CTA hero, CTA tertiaires, menu mobile) | ✅ Ouverture, fermeture (Échap / bouton / clic extérieur) |
+| Embed Calendly inline sur la page Contact | ✅ Iframe officielle chargée |
+| Vraies disponibilités (widget officiel Calendly — aucune simulation) | ✅ « Select a Date & Time » affiché |
+| Mention « Gratuit, 20 minutes et sans engagement » partout | ✅ |
+| Lien CTA → pages demandées (devis, audit) | ✅ |
+
+**Note Calendly :** l'URL `calendly.com/stevensakpovi/20min` indiquée dans le cahier des charges renvoie **404**. L'événement réel du compte est `calendly.com/stevensakpovi/30min` — réunion dont la **durée effective affichée par Calendly est 20 minutes** (« 20 min » sur la page de réservation). Le site intègre cet événement réel ; l'URL est modifiable via la variable d'environnement `NEXT_PUBLIC_CALENDLY_URL`.
+
+## 3. FORMULAIRES ET DEMANDES
+
+| Test | Résultat |
+|---|---|
+| Demande de devis — validation frontend (champs requis, email, URL) | ✅ Messages d'erreur ciblés |
+| Demande de devis — soumission → API → enregistrement SQLite (Prisma) | ✅ Vérifié en base |
+| Demande d'audit — site requis (superRefine) | ✅ |
+| Demande d'audit — enregistrement complet (nom, email, URL, message) | ✅ Vérifié en base |
+| Confirmation après enregistrement effectif (panneau + toast) | ✅ |
+| Accusé de réception au visiteur (UI + email si configuré) | ✅ UI vérifiée |
+| Validation backend (Zod) — rejet des charges invalides (422) | ✅ |
+| Protection anti-spam : honeypot + piège temporel (> 3 s) + limite de débit (6/heure/IP) | ✅ Implémenté et actif |
+| Gestion des erreurs (500, 429, réseau) | ✅ Messages clairs |
+| Données de test | ✅ Purgeées — base livrée vide |
+
+**Notifications email :** le module serveur (Resend, REST) est intégralement codé côté backend (`src/lib/email.ts`) — notification à `stevensakpovi@gmail.com` + accusé au visiteur. Il s'active dès l'ajout de la variable d'environnement `RESEND_API_KEY` (aucune clé n'étant disponible dans l'environnement de démonstration, l'envoi réel ne peut y être exécuté ; les demandes sont alors enregistrées de manière fiable en base et marquées `emailSent=false`). Aucun secret n'est exposé côté client.
+
+## 4. IMAGES ET COMPORTEMENT MONOCHROME
+
+| Test | Résultat |
+|---|---|
+| Images en noir et blanc par défaut sur desktop | ✅ Vérifié (filtre calculé `grayscale(1)` + contrôle visuel) |
+| Retour progressif aux couleurs au survol + zoom léger (1.035) | ✅ Vérifié (filtre calculé `grayscale(0)`) |
+| Survol au niveau de la carte (toute la carte du projet réagit) | ✅ |
+| Icône directionnelle au survol des visuels cliquables | ✅ |
+| Couleur naturelle directe sur mobile/tactile (390 px) | ✅ Vérifié (filtre calculé `grayscale(0)` + contrôle visuel) |
+| Aucun étirement (ratios fixes, `object-cover`) | ✅ |
+| Portrait du hero NON cliquable | ✅ |
+| Lazy loading + dimensions explicites (zéro CLS) | ✅ |
+
+## 5. RÉALISATIONS
+
+| Test | Résultat |
+|---|---|
+| 3 projets réels uniquement (MR STEVE ENGLISH, pré-lancement, AFRIBAYIT) | ✅ |
+| Cartes entièrement cliquables → nouvel onglet (`target="_blank" rel="noopener"`) | ✅ |
+| Mockups navigateur + smartphone avec captures réelles des sites | ✅ |
+| Aucun témoignage, résultat ou donnée inventée | ✅ |
+
+## 6. ANIMATIONS
+
+| Test | Résultat |
+|---|---|
+| Fade-in / translations au scroll, descendant et remontant (`once: false`) | ✅ |
+| Révélation des titres mot à mot | ✅ |
+| Transitions de page fluides (AnimatePresence) | ✅ |
+| Flèches animées, remplissage progressif des boutons | ✅ |
+| Pas de scroll-jacking | ✅ (défilement natif) |
+| `prefers-reduced-motion` : animations désactivées (framer-motion + CSS) | ✅ |
+
+## 7. CONTACT
+
+| Test | Résultat |
+|---|---|
+| Email `stevensakpovi@gmail.com` (mailto) | ✅ |
+| LinkedIn (profil réel) | ✅ |
+| WhatsApp : lien `wa.me` fonctionnel, **numéro jamais affiché en clair** (vérifié par recherche globale dans le code) | ✅ |
+
+## 8. ESPACE ADMINISTRATEUR
+
+| Test | Résultat |
+|---|---|
+| Accès protégé (`#/admin`, absent de la navigation publique) | ✅ |
+| Connexion par mot de passe (comparaison à temps constant) | ✅ |
+| Session par cookie HttpOnly signé HMAC-SHA256 (8 h) | ✅ |
+| API `/api/admin/*` → 401 sans session valide | ✅ |
+| Consultation des demandes + filtres (statut, type) | ✅ |
+| Changement de statut persisté en base | ✅ |
+| Export CSV (UTF-8 BOM, points-virgules) | ✅ |
+| Déconnexion | ✅ |
+
+**Périmètre assumé (conformément au cahier des charges, section 15) :** fonctionnalités opérationnelles = consultation des demandes, gestion des prospects (statuts), export. La génération de devis/factures et le suivi détaillé des projets relèvent de l'architecture prévue (modèle extensible) et ne sont **pas** présentés comme opérationnels — l'interface le mentionne explicitement.
+
+## 9. SEO ET PERFORMANCES
+
+| Test | Résultat |
+|---|---|
+| Titles + meta descriptions par page | ✅ |
+| Canonical, Open Graph, Twitter Card, `og-image.jpg` (1200×630) | ✅ Servie (HTTP 200) |
+| `sitemap.xml` (6 URLs) | ✅ HTTP 200 |
+| `robots.txt` (`/api/` bloqué) | ✅ HTTP 200 — conflit avec le fichier statique du scaffold détecté et résolu |
+| Données structurées JSON-LD (Person + ProfessionalService + WebSite) | ✅ |
+| Hiérarchie H1 unique / H2 / H3 | ✅ |
+| Images WebP optimisées (sources PNG préservées) | ✅ |
+| Fonts Sora + Inter via `next/font` (swap, fallbacks) | ✅ |
+| URLs propres par fragment (`#/services`, …) | ✅ |
+
+## 10. RESPONSIVE
+
+| Test | Résultat |
+|---|---|
+| Desktop large 1440 px | ✅ |
+| Desktop standard | ✅ |
+| Mobile 390 px (hero, portrait couleur, CTA ≥ 44 px, menu) | ✅ |
+| Empilement des colonnes, mockups adaptés, textes lisibles | ✅ |
+
+## 11. ERREURS ET SÉCURITÉ
+
+| Test | Résultat |
+|---|---|
+| Erreurs console sur toutes les pages | ✅ Aucune (une erreur provenait du script tiers Calendly heurtant une classe CSS homonyme — résolue en renommant la classe du point de montage) |
+| Validation backend systématique (Zod) | ✅ |
+| Secrets uniquement côté serveur (`RESEND_API_KEY`, `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET`) | ✅ |
+| Cookies HttpOnly + SameSite | ✅ |
+
+---
+
+## CONFIGURATION AU DÉPLOIEMENT (variables d'environnement)
+
+| Variable | Rôle |
+|---|---|
+| `NEXT_PUBLIC_SITE_URL` | URL canonique du site (metadata, OG, sitemap) |
+| `NEXT_PUBLIC_CALENDLY_URL` | URL de l'événement Calendly (défaut : événement réel 20 min du compte) |
+| `RESEND_API_KEY` | Active l'envoi des notifications et accusés de réception |
+| `ADMIN_PASSWORD` | Mot de passe de l'espace administrateur (défaut à changer : `stevens-admin-2026`) |
+| `ADMIN_SESSION_SECRET` | Secret de signature des sessions admin |
+
+## ÉLÉMENTS À COMPLÉTER PAR L'ÉDITEUR (mentions légales)
+
+- Numéro d'enregistrement / identifiant professionnel.
+- Coordonnées de l'hébergeur définitif en production.
+
+## DÉCISIONS DOCUMENTÉES
+
+1. **Palette :** empruntée exclusivement à sheragency.com (extraite du code réel : `#1c1c1c`, `#070707`, `#232323`, `#2f2f2f`, `#3c3c3c`, `#525252`, `#f5f5f5`, `#ffffff`, `#e4e4e4`, `#c8c8c8`, `#d9d9d9`, `#555555`, accent signature `#c9baac`, erreur `#ea384c`). Aucun autre élément de Sher Agency n'est copié (composition, hiérarchie et interactions propres).
+2. **Architecture :** pages virtuelles dans la route unique visible de la plateforme (`#/services`, `#/realisations`…), avec titres dynamiques, ancrage de sections et transitions. Le modèle de déploiement Next.js permet une migration directe vers des routes physiques si nécessaire.
+3. **Calendly :** URL réelle fonctionnelle utilisée (durée 20 minutes) — voir note section 2.
