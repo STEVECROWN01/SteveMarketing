@@ -3,7 +3,7 @@
 import React from "react";
 import { Linkedin, Mail, MessageCircle, ArrowUpRight } from "lucide-react";
 import { useRouter } from "@/components/router-context";
-import { NAV_ITEMS, SITE } from "@/lib/site";
+import { ASSETS, NAV_ITEMS, SITE } from "@/lib/site";
 import { Reveal } from "@/components/motion/Reveal";
 
 const NAV_PAGES: Record<string, string> = {
@@ -22,10 +22,10 @@ export function Footer() {
       <div className="container-site py-16 lg:py-20">
         <Reveal direction="up" amount={0.15}>
           <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr] lg:gap-8">
-            {/* Marque — logo officiel (version blanche) */}
+            {/* Marque — logo officiel (version blanche, pour fond sombre) */}
             <div className="max-w-sm">
               <img
-                src="/assets/logo-blanc.png"
+                src={ASSETS.logoLight}
                 alt="Stevens Akpovi"
                 width={220}
                 height={176}

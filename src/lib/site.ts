@@ -120,7 +120,7 @@ export const PROJECTS = [
     category: "Site web professionnel pour coach",
     description:
       "Un espace professionnel consacré à la présentation d'une activité de coaching en anglais, de ses programmes et de son accompagnement.",
-    cta: "Voir le site",
+    cta: "Voir Le Site",
     url: "https://mrsteveenglish.vercel.app",
     desktop: "/assets/projects/mrsteveenglish-desktop.webp",
     mobile: "/assets/projects/mrsteveenglish-mobile.webp",
@@ -131,7 +131,7 @@ export const PROJECTS = [
     category: "Page de vente",
     description:
       "Une page commerciale conçue pour présenter une offre de coaching, valoriser ses bénéfices et guider le visiteur vers l'inscription.",
-    cta: "Voir la page de vente",
+    cta: "Voir La Page De Vente",
     url: "https://mrsteveenglish.vercel.app/pre-launch",
     desktop: "/assets/projects/prelaunch-desktop.webp",
     mobile: "/assets/projects/prelaunch-mobile.webp",
@@ -142,7 +142,7 @@ export const PROJECTS = [
     category: "Site web de plateforme immobilière",
     description:
       "Une expérience digitale dédiée au secteur immobilier, pensée pour présenter une plateforme et faciliter la découverte de ses offres.",
-    cta: "Découvrir le projet",
+    cta: "Découvrir Le Projet",
     url: "https://afribayit.vercel.app",
     desktop: "/assets/projects/afribayit-desktop.webp",
     mobile: "/assets/projects/afribayit-mobile.webp",
@@ -158,4 +158,10 @@ export const ASSETS = {
   benefitGrowth: "/assets/benefit-business-growth.webp",
   problemNoWebsite: "/assets/problem-no-website.webp",
   problemIneffective: "/assets/problem-ineffective-website.webp",
+  /** Logo officiel — version blanche (pour fonds noirs/sombres). */
+  logoLight: "/assets/logo-blanc.png",
+  /** Logo officiel — version noire (pour fonds blancs/clairs). */
+  logoDark: "/assets/logo-noir.png",
+  /** Vignette de partage de lien (Open Graph), fournie par l'éditeur. */
+  ogImage: "/assets/OG.png",
 } as const;

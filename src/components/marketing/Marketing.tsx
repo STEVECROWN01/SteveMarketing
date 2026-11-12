@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ArrowRight, ArrowUpRight, CalendarCheck, FileText, SearchCheck } from "lucide-react";
+import { ArrowRight, ArrowUpRight, CalendarCheck, Eye, FileText, SearchCheck } from "lucide-react";
 import { useRouter } from "@/components/router-context";
 import { useCalendly } from "@/components/calendly/CalendlyContext";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
@@ -151,6 +151,7 @@ export const CTAIcons = {
   calendar: <CalendarCheck className="h-[18px] w-[18px]" aria-hidden="true" />,
   quote: <FileText className="h-[18px] w-[18px]" aria-hidden="true" />,
   audit: <SearchCheck className="h-[18px] w-[18px]" aria-hidden="true" />,
+  works: <Eye className="h-[18px] w-[18px]" aria-hidden="true" />,
 };
 
 /* ============================ Réassurance ============================ */

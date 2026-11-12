@@ -11,8 +11,8 @@ export const HERO = {
   h1: "Je crée des sites web qui génèrent des ventes.",
   hook: "Votre entreprise mérite mieux qu'une présence en ligne qui ne vous rapporte rien.",
   text: "Vous n'avez pas encore de site web ? Ou votre site actuel ne vous apporte pas les résultats espérés ? Je conçois des sites web professionnels, élégants et stratégiquement pensés pour valoriser votre activité, attirer des visiteurs qualifiés et transformer leur intérêt en clients.",
-  ctaPrimary: "Réserver un appel (30 min)",
-  ctaTertiary: "Audit gratuit de votre site actuel",
+  ctaPrimary: "Réserver Un Appel (30 Min)",
+  ctaTertiary: "Voir Nos Travaux",
   reassurance: "30 minutes · Gratuit · Sans engagement",
   perks: ["Copywriting inclus", "Optimisation SEO de base incluse"],
   portraitAlt:
@@ -35,7 +35,7 @@ export const PROBLEM = {
   ],
   conclusion:
     "Votre travail mérite d'être vu. Votre expertise mérite d'être valorisée. Votre entreprise mérite une présence digitale à la hauteur de ses ambitions.",
-  cta: "Construire mon site professionnel",
+  cta: "Construire Mon Site Professionnel",
 } as const;
 
 /* ============================ 03 — REMISE EN QUESTION ============================ */
@@ -54,7 +54,7 @@ export const QUESTIONING = {
   ],
   conclusion:
     "Un site web ne devrait pas être une simple décoration numérique. Il devrait être un véritable outil au service de votre entreprise.",
-  cta: "Demander mon audit gratuit",
+  cta: "Demander Mon Audit Gratuit",
 } as const;
 
 /* ============================ 04 — LA TRANSFORMATION ============================ */
@@ -85,7 +85,7 @@ export const TRANSFORMATION = {
       text: "Votre site peut grandir avec votre activité et accompagner vos nouvelles offres et ambitions.",
     },
   ],
-  cta: "Je veux développer ma présence en ligne",
+  cta: "Je Veux Développer Ma Présence En Ligne",
 } as const;
 
 /* ============================ 05 — MA SOLUTION ============================ */
@@ -108,7 +108,7 @@ export const SOLUTION = {
       text: "Construire un parcours qui facilite les prises de contact, les réservations et les demandes commerciales.",
     },
   ],
-  cta: "Parlons de votre projet",
+  cta: "Parlons De Votre Projet",
 } as const;
 
 /* ============================ 06 — SERVICES ============================ */
@@ -142,7 +142,7 @@ export const SERVICES = {
       text: "Associez plusieurs pages et parcours commerciaux pour accompagner les visiteurs de leur première découverte jusqu'à la prise de contact.",
     },
   ],
-  cta: "Trouver la solution adaptée à mon activité",
+  cta: "Trouver La Solution Adaptée À Mon Activité",
 } as const;
 
 /* ============================ 07 — AVANTAGES INCLUS ============================ */
@@ -161,7 +161,7 @@ export const INCLUDED = {
     },
   ],
   conclusion: "Deux éléments essentiels, intégrés à votre projet sans facturation supplémentaire.",
-  cta: "Parlons de mon futur site",
+  cta: "Parlons De Mon Futur Site",
 } as const;
 
 /* ============================ 08 — SERVICES COMPLÉMENTAIRES ============================ */
@@ -179,7 +179,7 @@ export const COMPLEMENTARY = {
       text: "Améliorez votre positionnement sur Google, renforcez votre visibilité et développez une présence organique durable grâce à une stratégie de référencement adaptée à votre marché.",
     },
   ],
-  cta: "Discuter de ma stratégie digitale",
+  cta: "Discuter De Ma Stratégie Digitale",
 } as const;
 
 /* ============================ 09 — RÉALISATIONS ============================ */
@@ -204,7 +204,7 @@ export const METHOD = {
     { name: "Tests et optimisation", text: "Nous vérifions le comportement du site, ses liens, ses formulaires et son affichage sur tous les appareils." },
     { name: "Mise en ligne", text: "Votre site est publié et prêt à accueillir ses premiers visiteurs." },
   ],
-  cta: "Démarrer mon projet",
+  cta: "Démarrer Mon Projet",
 } as const;
 
 /* ============================ 11 — À PROPOS ============================ */
@@ -213,7 +213,7 @@ export const ABOUT = {
   eyebrow: "QUI SUIS-JE ?",
   title: "Je suis Stevens Akpovi. Et je crois qu'un bon site web doit servir le business qu'il représente.",
   text: "Je suis concepteur de sites web professionnels et passionné par la manière dont le numérique peut accompagner le développement des entreprises.\n\nMon travail consiste à transformer les besoins d'un professionnel en une expérience digitale claire, élégante et orientée vers ses objectifs.\n\nJe m'intéresse autant à la présentation visuelle qu'au message transmis et au chemin que suit un visiteur avant de prendre une décision.\n\nParce qu'un site réussi ne se résume pas à son apparence.\n\nIl doit donner une bonne première impression, présenter la valeur de votre activité et faciliter la relation avec vos futurs clients.\n\nJe travaille à distance et accompagne des professionnels et des entreprises au-delà des frontières.",
-  cta: "Faisons connaissance",
+  cta: "Faisons Connaissance",
   facts: [
     { label: "Approche", value: "Stratégie · Design · Conversion" },
     { label: "Inclus dans chaque projet", value: "Copywriting professionnel · SEO de base" },
@@ -268,9 +268,9 @@ export const FINAL_CTA = {
   eyebrow: "IL EST TEMPS DE DONNER UNE NOUVELLE DIMENSION À VOTRE ACTIVITÉ",
   title: "Je crée des sites web qui génèrent des ventes. Et votre prochain projet peut commencer aujourd'hui.",
   text: "Vous avez une activité à développer, une expertise à valoriser ou des services à présenter ?\n\nConstruisons une présence en ligne professionnelle qui donne à votre entreprise les moyens de mieux se présenter, de toucher de nouvelles personnes et de transformer davantage d'intérêt en clients.\n\nPrenons simplement 30 minutes pour en discuter.",
-  cta1: "Réserver mon appel",
-  cta2: "Demander un devis",
-  cta3: "Demander un audit gratuit",
+  cta1: "Réserver Mon Appel",
+  cta2: "Demander Un Devis",
+  cta3: "Demander Un Audit Gratuit",
   mention: "30 minutes · Gratuit · Sans engagement",
 } as const;
 

@@ -37,7 +37,7 @@ export function FaqSection() {
                   className="mt-5"
                   icon={CTAIcons.calendar}
                 >
-                  Réserver un appel
+                  Réserver Un Appel
                 </CTAButton>
                 <p className="mt-4 text-xs font-medium text-[#1c1c1c]/70">
                   30 minutes · Gratuit · Sans engagement.

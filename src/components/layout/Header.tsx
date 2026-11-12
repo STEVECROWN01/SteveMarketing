@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { X, CalendarCheck, ArrowUpRight, Linkedin, Mail, MessageCircle } from "lucide-react";
 import { useRouter } from "@/components/router-context";
 import { useCalendly } from "@/components/calendly/CalendlyContext";
-import { NAV_ITEMS, SITE } from "@/lib/site";
+import { ASSETS, NAV_ITEMS, SITE } from "@/lib/site";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 const NAV_PAGES: Record<string, string> = {
@@ -87,7 +87,7 @@ export function Header() {
       className={`group/cta inline-flex min-h-[52px] items-center gap-3 rounded-full bg-white py-2 pl-6 pr-1.5 transition-colors duration-300 hover:bg-[#efefef] focus-visible:outline-2 focus-visible:outline-offset-4 ${className}`}
     >
       <span className="text-[15px] font-medium tracking-[0.01em] text-[#1c1c1c]">
-        Démarrer un projet
+        Démarrer Un Projet
       </span>
       <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#e4e4e4] transition-colors duration-300 group-hover/cta:bg-[#1c1c1c]">
         <ArrowUpRight
@@ -125,9 +125,9 @@ export function Header() {
           aria-label="Stevens Akpovi — retour à l'accueil"
           className="flex h-14 w-12 items-center justify-center rounded-b-lg bg-[#1c1c1c] transition-colors duration-300 hover:bg-[#232323] lg:h-[98px] lg:w-[94px] lg:rounded-b-[9px]"
         >
-          {/* Logo officiel (version blanche, fond transparent) */}
+          {/* Logo officiel (version blanche, pour fond sombre) */}
           <img
-            src="/assets/logo-blanc.png"
+            src={ASSETS.logoLight}
             alt="Stevens Akpovi"
             width={220}
             height={176}
@@ -225,7 +225,7 @@ export function Header() {
                   className="inline-flex min-h-[52px] items-center gap-2.5 rounded-full border border-white/30 px-6 py-3 text-[15px] font-medium text-white transition-colors duration-300 hover:border-[#c9baac] hover:text-[#c9baac]"
                 >
                   <CalendarCheck className="h-4 w-4" aria-hidden="true" />
-                  Réserver un appel (30 min)
+                  Réserver Un Appel (30 Min)
                 </button>
               </motion.div>
 

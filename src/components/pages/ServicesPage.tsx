@@ -21,10 +21,10 @@ export function ServicesPage() {
       >
         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
-            Réserver un appel
+            Réserver Un Appel
           </CTAButton>
           <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
-            Demander un devis personnalisé
+            Demander Un Devis Personnalisé
           </CTAButton>
         </div>
         <ReassuranceBar className="mt-6" />
@@ -57,7 +57,7 @@ export function ServicesPage() {
                         className="px-4 py-2 text-[13px]"
                         ariaLabel={`Demander un devis pour : ${service.title}`}
                       >
-                        Demander un devis
+                        Demander Un Devis
                       </CTAButton>
                     </div>
                   </div>
@@ -123,10 +123,10 @@ export function ServicesPage() {
           <Reveal direction="up" delay={0.15}>
             <div className="mt-10 rounded-2xl bg-[#c9baac] p-7 sm:p-8">
               <p className="font-display text-lg font-semibold leading-snug text-[#1c1c1c] sm:text-xl">
-                {COMPLEMENTARY.cta}
+                Discuter de ma stratégie digitale
               </p>
               <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="dark" className="mt-5" icon={CTAIcons.quote}>
-                Discuter de ma stratégie digitale
+                Discuter De Ma Stratégie Digitale
               </CTAButton>
             </div>
           </Reveal>
@@ -160,16 +160,16 @@ export function ServicesPage() {
           <Reveal direction="up">
             <p className="text-eyebrow">PARLONS DE VOTRE PROJET</p>
             <h2 className="text-section-title mx-auto mt-4 max-w-2xl text-white">
-              {SERVICES.cta}
+              Trouver la solution adaptée à mon activité
             </h2>
           </Reveal>
           <Reveal direction="up" delay={0.12}>
             <div className="mt-9 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
               <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
-                Réserver un appel
+                Réserver Un Appel
               </CTAButton>
               <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="secondary" size="lg" icon={CTAIcons.quote}>
-                Demander un devis personnalisé
+                Demander Un Devis Personnalisé
               </CTAButton>
             </div>
             <ReassuranceBar className="mt-7 justify-center" />

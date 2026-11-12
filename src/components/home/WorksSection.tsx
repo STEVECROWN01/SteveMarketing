@@ -37,7 +37,7 @@ export function WorksSection() {
               }}
               className="group inline-flex items-center gap-2 rounded-full border border-[#1c1c1c]/20 px-5 py-2.5 text-sm font-medium text-[#1c1c1c] transition-colors duration-300 hover:border-[#1c1c1c] hover:bg-[#1c1c1c] hover:text-white"
             >
-              Voir la page Réalisations
+              Voir La Page Réalisations
               <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </a>
           </Reveal>
@@ -62,7 +62,7 @@ export function WorksSection() {
                 icon={CTAIcons.calendar}
                 className="!text-[#1c1c1c] [&::before]:bg-[#e4e4e4]"
               >
-                Réserver un appel
+                Réserver Un Appel
               </CTAButton>
               <CTAButton
                 action={{ kind: "page", page: "contact", section: "devis" }}
@@ -70,7 +70,7 @@ export function WorksSection() {
                 size="lg"
                 icon={CTAIcons.quote}
               >
-                Demander un devis
+                Demander Un Devis
               </CTAButton>
             </div>
           </div>

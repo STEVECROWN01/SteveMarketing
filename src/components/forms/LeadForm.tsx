@@ -193,7 +193,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
             }}
             className="btn-fill min-h-[44px] rounded-full border border-[#e4e4e4]/30 px-6 py-3 text-sm font-medium text-white [&::before]:bg-[#3c3c3c]"
           >
-            <span className="inline-flex items-center">Envoyer une autre demande</span>
+            <span className="inline-flex items-center">Envoyer Une Autre Demande</span>
           </button>
         </div>
         <p className="mt-6 text-xs text-[#c8c8c8]/70">
@@ -485,7 +485,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
             </span>
           ) : (
             <span className="inline-flex items-center gap-2.5">
-              {isQuote ? "Envoyer ma demande de devis" : "Envoyer ma demande d'audit"}
+              {isQuote ? "Envoyer Ma Demande De Devis" : "Envoyer Ma Demande D'Audit"}
             </span>
           )}
         </button>

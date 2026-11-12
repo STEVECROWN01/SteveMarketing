@@ -47,7 +47,7 @@ export function ServicesSection() {
               }}
               className="group inline-flex items-center gap-2 rounded-full border border-[#1c1c1c]/20 px-5 py-2.5 text-sm font-medium text-[#1c1c1c] transition-colors duration-300 hover:border-[#1c1c1c] hover:bg-[#1c1c1c] hover:text-white"
             >
-              Explorer le détail des services
+              Explorer Le Détail Des Services
               <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </a>
           </Reveal>

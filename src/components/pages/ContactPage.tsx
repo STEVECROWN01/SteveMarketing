@@ -24,10 +24,10 @@ export function ContactPage() {
       >
         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
-            Réserver un appel (30 min)
+            Réserver Un Appel (30 Min)
           </CTAButton>
           <CTAButton action={{ kind: "anchor", sectionId: "devis" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
-            Demander un devis
+            Demander Un Devis
           </CTAButton>
         </div>
         <ReassuranceBar className="mt-6" />

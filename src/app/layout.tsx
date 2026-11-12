@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Inter, Sora } from "next/font/google";
 import "./globals.css";
-import { SITE } from "@/lib/site";
+import { ASSETS, SITE } from "@/lib/site";
 
 /* Polices : Sora (titres) + Inter (texte / interface), chargement optimisé */
 const inter = Inter({
@@ -55,9 +55,9 @@ export const metadata: Metadata = {
       "Sites web professionnels orientés conversion : stratégie, design, copywriting inclus et SEO de base. Appelez Stevens Akpovi — 30 minutes, gratuit, sans engagement.",
     images: [
       {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
+        url: ASSETS.ogImage,
+        width: 1254,
+        height: 1254,
         alt: "Stevens Akpovi — Je crée des sites web qui génèrent des ventes",
       },
     ],
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     title: "Stevens Akpovi — Je crée des sites web qui génèrent des ventes",
     description:
       "Sites web professionnels orientés conversion. Copywriting et SEO de base inclus.",
-    images: ["/og-image.jpg"],
+    images: [ASSETS.ogImage],
   },
   robots: {
     index: true,

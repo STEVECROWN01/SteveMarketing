@@ -132,7 +132,7 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
                 Vérification…
               </>
             ) : (
-              "Ouvrir la session"
+              "Ouvrir La Session"
             )}
           </button>
         </form>
@@ -290,7 +290,7 @@ export function AdminPage() {
             className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[#e4e4e4]/25 px-5 py-2.5 text-sm text-[#c8c8c8] transition-colors hover:border-[#ea384c]/60 hover:text-[#ffdede]"
           >
             <LogOut className="h-4 w-4" aria-hidden="true" />
-            Fermer la session
+            Fermer La Session
           </button>
         </div>
       </div>

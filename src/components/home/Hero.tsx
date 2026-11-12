@@ -16,8 +16,9 @@ import { ASSETS, PROJECTS, SITE } from "@/lib/site";
  * dynamiques mobiles) et son contenu s'adapte en taille à tous les
  * écrans (typographie fluide, portrait dimensionné en svh). Sans
  * scroller, le visiteur comprend : qui est Stevens, ce qu'il propose,
- * le bénéfice principal, comment réserver et comment demander un
- * audit. Mobile : l'image se place entre le hook et la description.
+ * le bénéfice principal, comment réserver et comment découvrir les
+ * réalisations. Mobile : l'image se place entre le hook et la
+ * description.
  */
 export function Hero() {
   const reduce = useReducedMotion();
@@ -148,7 +149,8 @@ export function Hero() {
               </p>
             </Reveal>
 
-            {/* CTA — les deux boutons partagent la même ligne sur desktop */}
+            {/* CTA — les deux boutons partagent la même ligne sur desktop :
+                réservation d'appel + découverte des réalisations. */}
             <Reveal direction="up" delay={0.3}>
               <div className="mt-3.5 flex flex-wrap items-center gap-2.5 sm:mt-6 sm:gap-3 lg:mt-6">
                 <CTAButton
@@ -161,9 +163,9 @@ export function Hero() {
                   {HERO.ctaPrimary}
                 </CTAButton>
                 <CTAButton
-                  action={{ kind: "page", page: "contact", section: "audit" }}
+                  action={{ kind: "page", page: "realisations" }}
                   variant="ghostLight"
-                  icon={CTAIcons.audit}
+                  icon={CTAIcons.works}
                   className="px-3 py-2 text-[12px] sm:px-3.5 sm:py-2.5 sm:text-[13px]"
                 >
                   {HERO.ctaTertiary}
