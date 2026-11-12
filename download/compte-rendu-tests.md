@@ -188,6 +188,14 @@ Exécutés après les corrections de déploiement (build de production standalon
 
 **Tests du correctif** : build complet avec (1) URL sans protocole, (2) URL entre guillemets, (3) valeur aberrante — les trois cas, auparavant fatals, compilent et génèrent les 10 pages ; l'URL normalisée est vérifiée injectée dans le sitemap et les pages statiques.
 
+## INCIDENT RÉSOLU — 404 EN PRODUCTION MALGRÉ DÉPLOIEMENT « READY » (12 novembre 2026)
+
+**Symptôme** : déploiement Vercel « Ready » (commit `4480e65`), domaine `stevensakpovi.vercel.app` en « Valid Configuration », mais la racine du site répondait 404 — avec le corps « The page could not be found / NOT_FOUND », soit la page d'absence de l'application elle-même (prouvé par sondage HTTP direct du domaine).
+
+**Cause** : `output: "standalone"` dans `next.config.ts` — mode conçu pour l'auto-hébergement, incompatible avec le runtime Vercel (build réussi, routes non enregistrées). Ce réglage servait exclusivement à la prévisualisation sur la plateforme de développement.
+
+**Correctif** : `output: process.env.VERCEL ? undefined : "standalone"` — la variable `VERCEL`, positionnée automatiquement par Vercel au build, désactive standalone sur Vercel et le conserve pour l'auto-hébergement. Le domaine de production réel (`https://stevensakpovi.vercel.app`) devient le défaut du code. Vérifications locales : build sans `VERCEL` → standalone produit, serveur autonome HTTP 200 avec hero complet ; build avec `VERCEL=1` → standalone absent (sortie standard attendue par Vercel).
+
 ## CORRECTION POST-LIVRAISON — DURÉE DU RENDEZ-VOUS (12 novembre 2026)
 
 L'éditeur a confirmé que le rendez-vous stratégique Calendly dure **30 minutes** (et non 20 minutes comme rédigé dans le cahier des charges). Correction appliquée partout : hero et CTA « Réserver un appel stratégique (30 min) », éléments de réassurance (« 30 minutes · Gratuit · Sans engagement · À distance »), popup Calendly et aria-labels, page Contact (titre de section et inline), FAQ finale, page À propos, meta description, accusés de réception email, `.env.example` et guides de déploiement. Vérification par recherche globale : plus aucune mention « 20 min » dans le code livré.

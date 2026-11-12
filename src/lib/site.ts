@@ -21,7 +21,8 @@ function normalizeUrl(raw: string | undefined, fallback: string): string {
   }
 }
 
-const DEFAULT_SITE_URL = "https://stevens-akpovi.vercel.app";
+// Domaine de production réel attribué par Vercel (Project Domains).
+const DEFAULT_SITE_URL = "https://stevensakpovi.vercel.app";
 const DEFAULT_CALENDLY_URL = "https://calendly.com/stevensakpovi/30min";
 
 export const SITE = {
