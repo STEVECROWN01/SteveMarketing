@@ -164,7 +164,7 @@ export function ReassuranceBar({
   className?: string;
   mention?: string;
 }) {
-  const items = (mention ?? "20 minutes · Gratuit · Sans engagement · À distance").split(" · ");
+  const items = (mention ?? "30 minutes · Gratuit · Sans engagement · À distance").split(" · ");
   return (
     <ul
       className={`flex flex-wrap items-center gap-x-3 gap-y-2 text-sm ${

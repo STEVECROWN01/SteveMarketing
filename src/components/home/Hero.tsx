@@ -66,7 +66,7 @@ export function Hero() {
                   variant="primary"
                   size="lg"
                   icon={CTAIcons.calendar}
-                  ariaLabel={`Réserver un appel stratégique de 20 minutes sur Calendly — ${SITE.calendlyMention}`}
+                  ariaLabel={`Réserver un appel stratégique de 30 minutes sur Calendly — ${SITE.calendlyMention}`}
                 >
                   {HERO.ctaPrimary}
                 </CTAButton>

@@ -29,7 +29,7 @@ export function FaqSection() {
             <Reveal direction="up" delay={0.18}>
               <div className="mt-9 rounded-2xl bg-[#c9baac] p-6 sm:p-7">
                 <p className="font-display text-base font-semibold leading-snug text-[#1c1c1c]">
-                  Une question spécifique&nbsp;? Prenons 20 minutes pour en discuter.
+                  Une question spécifique&nbsp;? Prenons 30 minutes pour en discuter.
                 </p>
                 <CTAButton
                   action={{ kind: "calendly" }}
@@ -40,7 +40,7 @@ export function FaqSection() {
                   Réserver un appel stratégique
                 </CTAButton>
                 <p className="mt-4 text-xs font-medium text-[#1c1c1c]/70">
-                  20 minutes · Gratuit · Sans engagement · À distance.
+                  30 minutes · Gratuit · Sans engagement · À distance.
                 </p>
               </div>
             </Reveal>
@@ -107,7 +107,7 @@ export function FinalCtaSection() {
               variant="primary"
               size="lg"
               icon={CTAIcons.calendar}
-              ariaLabel="Réserver mon appel stratégique de 20 minutes — gratuit et sans engagement"
+              ariaLabel="Réserver mon appel stratégique de 30 minutes — gratuit et sans engagement"
             >
               {FINAL_CTA.cta1}
             </CTAButton>

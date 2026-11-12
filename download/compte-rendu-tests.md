@@ -29,10 +29,10 @@
 | Popup Calendly (bouton d'en-tête, CTA hero, CTA tertiaires, menu mobile) | ✅ Ouverture, fermeture (Échap / bouton / clic extérieur) |
 | Embed Calendly inline sur la page Contact | ✅ Iframe officielle chargée |
 | Vraies disponibilités (widget officiel Calendly — aucune simulation) | ✅ « Select a Date & Time » affiché |
-| Mention « Gratuit, 20 minutes et sans engagement » partout | ✅ |
+| Mention « Gratuit, 30 minutes et sans engagement » partout | ✅ |
 | Lien CTA → pages demandées (devis, audit) | ✅ |
 
-**Note Calendly :** l'URL `calendly.com/stevensakpovi/20min` indiquée dans le cahier des charges renvoie **404**. L'événement réel du compte est `calendly.com/stevensakpovi/30min` — réunion dont la **durée effective affichée par Calendly est 20 minutes** (« 20 min » sur la page de réservation). Le site intègre cet événement réel ; l'URL est modifiable via la variable d'environnement `NEXT_PUBLIC_CALENDLY_URL`.
+**Note Calendly :** l'URL `calendly.com/stevensakpovi/20min` indiquée dans le cahier des charges renvoie **404**. L'événement réel du compte est `calendly.com/stevensakpovi/30min` — l'éditeur a confirmé que le rendez-vous stratégique dure **30 minutes** : toutes les mentions du site (hero, CTA, contact, FAQ, emails) ont été corrigées de 20 à 30 minutes. L'URL est modifiable via la variable d'environnement `NEXT_PUBLIC_CALENDLY_URL`.
 
 ## 3. FORMULAIRES ET DEMANDES
 
@@ -146,7 +146,7 @@
 | Variable | Rôle |
 |---|---|
 | `NEXT_PUBLIC_SITE_URL` | URL canonique du site (metadata, OG, sitemap) |
-| `NEXT_PUBLIC_CALENDLY_URL` | URL de l'événement Calendly (défaut : événement réel 20 min du compte) |
+| `NEXT_PUBLIC_CALENDLY_URL` | URL de l'événement Calendly (défaut : événement réel 30 min du compte) |
 | `RESEND_API_KEY` | Active l'envoi des notifications et accusés de réception |
 | `ADMIN_PASSWORD` | Mot de passe de l'espace administrateur (défaut à changer : `stevens-admin-2026`) |
 | `ADMIN_SESSION_SECRET` | Secret de signature des sessions admin |
@@ -178,6 +178,10 @@ Exécutés après les corrections de déploiement (build de production standalon
 | Console navigateur sur la page mentions légales (build production) | ✅ Aucune erreur |
 | Server dev relancé après corrections — page d'accueil HTTP 200 | ✅ |
 
+## CORRECTION POST-LIVRAISON — DURÉE DU RENDEZ-VOUS (12 novembre 2026)
+
+L'éditeur a confirmé que le rendez-vous stratégique Calendly dure **30 minutes** (et non 20 minutes comme rédigé dans le cahier des charges). Correction appliquée partout : hero et CTA « Réserver un appel stratégique (30 min) », éléments de réassurance (« 30 minutes · Gratuit · Sans engagement · À distance »), popup Calendly et aria-labels, page Contact (titre de section et inline), FAQ finale, page À propos, meta description, accusés de réception email, `.env.example` et guides de déploiement. Vérification par recherche globale : plus aucune mention « 20 min » dans le code livré.
+
 ## ÉLÉMENTS RESTANT À L'INITIATIVE DE L'ÉDITEUR
 
 - Renseigner `NEXT_PUBLIC_LEGAL_REGISTRATION` (numéro IFU/RCCM) dès qu'il est disponible — sans code à modifier.
@@ -188,4 +192,4 @@ Exécutés après les corrections de déploiement (build de production standalon
 
 1. **Palette :** empruntée exclusivement à sheragency.com (extraite du code réel : `#1c1c1c`, `#070707`, `#232323`, `#2f2f2f`, `#3c3c3c`, `#525252`, `#f5f5f5`, `#ffffff`, `#e4e4e4`, `#c8c8c8`, `#d9d9d9`, `#555555`, accent signature `#c9baac`, erreur `#ea384c`). Aucun autre élément de Sher Agency n'est copié (composition, hiérarchie et interactions propres).
 2. **Architecture :** pages virtuelles dans la route unique visible de la plateforme (`#/services`, `#/realisations`…), avec titres dynamiques, ancrage de sections et transitions. Le modèle de déploiement Next.js permet une migration directe vers des routes physiques si nécessaire.
-3. **Calendly :** URL réelle fonctionnelle utilisée (durée 20 minutes) — voir note section 2.
+3. **Calendly :** URL réelle fonctionnelle utilisée (durée 30 minutes) — voir note section 2.

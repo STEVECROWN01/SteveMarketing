@@ -52,7 +52,7 @@ export const metadata: Metadata = {
     siteName: "Stevens Akpovi",
     title: "Stevens Akpovi — Je crée des sites web qui génèrent des ventes",
     description:
-      "Sites web professionnels orientés conversion : stratégie, design, copywriting inclus et SEO de base. Appelez Stevens Akpovi — 20 minutes, gratuit, sans engagement.",
+      "Sites web professionnels orientés conversion : stratégie, design, copywriting inclus et SEO de base. Appelez Stevens Akpovi — 30 minutes, gratuit, sans engagement.",
     images: [
       {
         url: "/og-image.jpg",

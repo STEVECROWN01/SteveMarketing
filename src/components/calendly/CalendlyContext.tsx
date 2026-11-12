@@ -7,7 +7,7 @@ import { SITE } from "@/lib/site";
 /**
  * Intégration Calendly — embed officiel (widget.js) affichant les
  * VRAIES disponibilités du calendrier (aucune simulation).
- * Mention obligatoire : « Gratuit, 20 minutes et sans engagement. »
+ * Mention obligatoire : « Gratuit, 30 minutes et sans engagement. »
  */
 
 const WIDGET_SRC = "https://assets.calendly.com/assets/external/widget.js";
@@ -86,7 +86,7 @@ export function CalendlyEmbed({ className = "" }: { className?: string }) {
       data-url={`${SITE.calendly}?${CALENDLY_PARAMS}`}
       style={{ minWidth: "280px", width: "100%", height: "100%" }}
       role="region"
-      aria-label="Calendly — Réservation d'un appel stratégique de 20 minutes avec Stevens Akpovi"
+      aria-label="Calendly — Réservation d'un appel stratégique de 30 minutes avec Stevens Akpovi"
     />
   );
 }
@@ -119,7 +119,7 @@ export function CalendlyProvider({ children }: { children: React.ReactNode }) {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Réserver un appel stratégique de 20 minutes avec Stevens Akpovi"
+          aria-label="Réserver un appel stratégique de 30 minutes avec Stevens Akpovi"
           className="fixed inset-0 z-[100] flex items-center justify-center bg-[#070707]/85 p-3 backdrop-blur-sm sm:p-8"
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false);

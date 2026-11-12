@@ -190,7 +190,7 @@ export function Header() {
                   </span>
                 </button>
                 <p className="text-center text-xs text-[#c8c8c8]">
-                  20 minutes · Gratuit · Sans engagement · À distance
+                  30 minutes · Gratuit · Sans engagement · À distance
                 </p>
               </div>
             </nav>

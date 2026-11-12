@@ -204,7 +204,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
             rel="noopener noreferrer"
             className="font-medium text-[#c9baac] underline underline-offset-4"
           >
-            Réservez un appel de 20 minutes
+            Réservez un appel de 30 minutes
           </a>{" "}
           — {SITE.calendlyMention.toLowerCase()}
         </p>

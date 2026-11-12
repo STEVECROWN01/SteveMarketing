@@ -11,10 +11,10 @@ export const HERO = {
   h1: "Je crée des sites web qui génèrent des ventes.",
   hook: "Votre entreprise mérite mieux qu'une présence en ligne qui ne vous rapporte rien.",
   text: "Vous n'avez pas encore de site web ? Ou votre site actuel ne vous apporte pas les résultats espérés ? Je conçois des sites web professionnels, élégants et stratégiquement pensés pour valoriser votre activité, attirer des visiteurs qualifiés et transformer leur intérêt en clients.",
-  ctaPrimary: "Réserver un appel stratégique (20 min)",
+  ctaPrimary: "Réserver un appel stratégique (30 min)",
   ctaSecondary: "Demander un devis personnalisé",
   ctaTertiary: "Déjà un site ? Demander un audit gratuit.",
-  reassurance: "20 minutes · Gratuit · Sans engagement · Collaboration à distance",
+  reassurance: "30 minutes · Gratuit · Sans engagement · Collaboration à distance",
   perks: ["Copywriting inclus", "Optimisation SEO de base incluse"],
   portraitAlt:
     "Portrait professionnel de Stevens Akpovi, concepteur de sites web orientés conversion",
@@ -250,7 +250,7 @@ export const FAQ = {
     },
     {
       q: "Comment réserver un échange ?",
-      a: "Il suffit de choisir un créneau disponible sur Calendly. Le premier échange dure 20 minutes, est gratuit et sans engagement.",
+      a: "Il suffit de choisir un créneau disponible sur Calendly. Le premier échange dure 30 minutes, est gratuit et sans engagement.",
     },
     {
       q: "Combien coûte un site web ?",
@@ -268,11 +268,11 @@ export const FAQ = {
 export const FINAL_CTA = {
   eyebrow: "IL EST TEMPS DE DONNER UNE NOUVELLE DIMENSION À VOTRE ACTIVITÉ",
   title: "Je crée des sites web qui génèrent des ventes. Et votre prochain projet peut commencer aujourd'hui.",
-  text: "Vous avez une activité à développer, une expertise à valoriser ou des services à présenter ?\n\nConstruisons une présence en ligne professionnelle qui donne à votre entreprise les moyens de mieux se présenter, de toucher de nouvelles personnes et de transformer davantage d'intérêt en clients.\n\nPrenons simplement 20 minutes pour en discuter.",
+  text: "Vous avez une activité à développer, une expertise à valoriser ou des services à présenter ?\n\nConstruisons une présence en ligne professionnelle qui donne à votre entreprise les moyens de mieux se présenter, de toucher de nouvelles personnes et de transformer davantage d'intérêt en clients.\n\nPrenons simplement 30 minutes pour en discuter.",
   cta1: "Réserver mon appel stratégique",
   cta2: "Demander un devis",
   cta3: "Demander un audit gratuit",
-  mention: "20 minutes · Gratuit · Sans engagement · À distance",
+  mention: "30 minutes · Gratuit · Sans engagement · À distance",
 } as const;
 
 /* ============================ CIBLES COMMERCIALES ============================ */

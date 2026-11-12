@@ -35,7 +35,7 @@ GitHub `STEVECROWN01/SteveMarketing` (branche `main`).
 | `RESEND_API_KEY` | Recommandée | Active la notification des demandes à `stevensakpovi@gmail.com` **et** l'accusé de réception au visiteur. Clé gratuite sur https://resend.com — domaine d'envoi à vérifier dans Resend, l'expéditeur par défaut `onboarding@resend.dev` permet d'envoyer uniquement vers l'adresse du compte Resend : créer le compte avec `stevensakpovi@gmail.com`. |
 | `ADMIN_PASSWORD` | Oui | Mot de passe de l'espace administrateur `#/admin`. Générer une valeur forte (fournie dans le fichier de configuration remis, ou `openssl rand -base64 18`). |
 | `ADMIN_SESSION_SECRET` | Oui | Secret de signature des sessions admin (HMAC-SHA256). Générer via `openssl rand -hex 32`. |
-| `NEXT_PUBLIC_CALENDLY_URL` | Non | Défaut : événement réel du compte (`https://calendly.com/stevensakpovi/30min`, page affichant « 20 min »). L'URL `/20min` du cahier des charges renvoie 404. |
+| `NEXT_PUBLIC_CALENDLY_URL` | Non | Rendez-vous de 30 minutes confirmé par l'éditeur — défaut : `https://calendly.com/stevensakpovi/30min` (l'URL `/20min` du cahier des charges renvoie 404). |
 | `NEXT_PUBLIC_LEGAL_REGISTRATION` | Non | Identifiant professionnel de l'éditeur (IFU/RCCM) affiché dans les mentions légales dès qu'il est renseigné. |
 | `DATABASE_URL` | Non | Uniquement si une base managée est branchée (voir §5). Sans base, le site fonctionne et les demandes sont relayées par email. |
 
@@ -75,7 +75,7 @@ CSV), brancher une base PostgreSQL managée :
 
 - [ ] Page d'accueil : hero, portrait, CTA « Réserver un appel stratégique ».
 - [ ] Popup Calendly : vraies disponibilités affichées (aucune simulation),
-      mention « Gratuit, 20 minutes et sans engagement ».
+      mention « Gratuit, 30 minutes et sans engagement ».
 - [ ] Soumettre une **vraie demande de test** (devis) → vérifier la réception
       de l'email de notification + l'accusé de réception au visiteur, puis
       supprimer la demande de test.

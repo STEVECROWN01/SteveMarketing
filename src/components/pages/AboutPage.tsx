@@ -81,7 +81,7 @@ export function AboutPage() {
               <Reveal direction="up" delay={0.24}>
                 <div className="mt-9 rounded-2xl bg-[#1c1c1c] px-6 py-6 sm:px-8 sm:py-7">
                   <p className="font-display text-lg font-medium leading-relaxed text-white sm:text-xl">
-                    {ABOUT.cta} — 20 minutes suffisent pour commencer.
+                    {ABOUT.cta} — 30 minutes suffisent pour commencer.
                   </p>
                   <div className="mt-5">
                     <CTAButton action={{ kind: "calendly" }} variant="primary" icon={CTAIcons.calendar}>

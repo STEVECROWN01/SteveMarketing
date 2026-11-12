@@ -10,12 +10,12 @@ export const SITE = {
     "J'accompagne entreprises, PME, agences, coachs, infopreneurs et freelances dans la création de sites web stratégiques qui valorisent leur activité, attirent des visiteurs qualifiés et transforment leur intérêt en clients.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://stevens-akpovi.vercel.app",
   email: "stevensakpovi@gmail.com",
-  // Événement Calendly réel du compte stevensakpovi — durée
-  // effective de la réunion : 20 minutes (vérifié sur la page).
+  // Événement Calendly réel du compte stevensakpovi — rendez-vous
+  // stratégique de 30 minutes (confirmé par l'éditeur).
   // Configurable via NEXT_PUBLIC_CALENDLY_URL.
   calendly:
     process.env.NEXT_PUBLIC_CALENDLY_URL ?? "https://calendly.com/stevensakpovi/30min",
-  calendlyMention: "Gratuit, 20 minutes et sans engagement.",
+  calendlyMention: "Gratuit, 30 minutes et sans engagement.",
   linkedin: "https://www.linkedin.com/in/stevensakpovi",
   whatsapp: "https://wa.me/2290199909258",
   // Mentions légales — identifiant professionnel de l'éditeur (IFU, RCCM…).
@@ -69,7 +69,7 @@ export const PAGES = {
     label: "Contact",
     title: "Contact — Demande de projet | Stevens Akpovi",
     description:
-      "Réservez un appel stratégique de 20 minutes (gratuit, sans engagement), demandez un devis personnalisé ou un audit gratuit de votre site actuel.",
+      "Réservez un appel stratégique de 30 minutes (gratuit, sans engagement), demandez un devis personnalisé ou un audit gratuit de votre site actuel.",
   },
   legal: {
     hash: "#/mentions-legales",

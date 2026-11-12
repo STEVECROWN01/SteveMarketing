@@ -24,7 +24,7 @@ export function ContactPage() {
       >
         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
-            Réserver un appel stratégique (20 min)
+            Réserver un appel stratégique (30 min)
           </CTAButton>
           <CTAButton action={{ kind: "anchor", sectionId: "devis" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
             Demander un devis
@@ -114,7 +114,7 @@ export function ContactPage() {
           <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
             <div>
               <SectionHeading
-                eyebrow="APPEL STRATÉGIQUE · 20 MINUTES"
+                eyebrow="APPEL STRATÉGIQUE · 30 MINUTES"
                 title="Réservez votre créneau en une minute."
                 tone="dark"
               />
@@ -187,7 +187,7 @@ export function ContactPage() {
                       onClick={() => document.getElementById("appel")?.scrollIntoView({ behavior: "smooth" })}
                       className="font-medium text-[#c9baac] underline underline-offset-4"
                     >
-                      Réservez l'appel de 20 minutes
+                      Réservez l'appel de 30 minutes
                     </button>{" "}
                     — {SITE.calendlyMention.toLowerCase()}
                   </p>
