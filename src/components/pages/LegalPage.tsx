@@ -7,9 +7,11 @@ import { SITE } from "@/lib/site";
 
 /**
  * PAGE MENTIONS LÉGALES
- * Les champs factuels non fournis (numéro d'enregistrement,
- * hébergeur du déploiement final) sont explicitement marqués
- * « à compléter » — aucune donnée inventée.
+ * Les deux mentions restées ouvertes en développement sont désormais
+ * complétées pour la production : hébergeur (Vercel — coordonnées
+ * publiques vérifiées) et identifiant professionnel de l'éditeur
+ * (renseignable via NEXT_PUBLIC_LEGAL_REGISTRATION, sans toucher au
+ * code — aucune donnée inventée).
  */
 export function LegalPage() {
   const sections: { title: string; body: React.ReactNode }[] = [
@@ -34,8 +36,7 @@ export function LegalPage() {
               en clair).
             </li>
             <li>
-              Numéro d'enregistrement / identifiant professionnel :{" "}
-              <em>à compléter par l'éditeur lors du déploiement définitif.</em>
+              Numéro d'enregistrement / identifiant professionnel : {SITE.legalRegistration}
             </li>
             <li>
               Pays d'exercice : Bénin — collaboration à distance, au-delà des frontières.
@@ -48,12 +49,16 @@ export function LegalPage() {
       title: "Hébergement",
       body: (
         <p>
-          Le site est une application Next.js. Sur la plateforme de démonstration actuelle, il
-          est servi par l'infrastructure du prestataire d'hébergement de démonstration.{" "}
-          <em>
-            Les coordonnées complètes de l'hébergeur définitif seront précisées lors du
-            déploiement en production.
-          </em>
+          Le site est une application Next.js hébergée en production sur la plateforme Vercel.
+          Hébergeur : <strong>{SITE.host.name}</strong> — {SITE.host.address} —{" "}
+          <a
+            className="mail-link"
+            href={SITE.host.url}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            vercel.com
+          </a>
         </p>
       ),
     },

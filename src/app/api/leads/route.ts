@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
 import { db } from "@/lib/db";
 import { leadSchema } from "@/lib/validation";
 import { notifyOwner, sendReceipt, isEmailServiceConfigured } from "@/lib/email";
@@ -62,11 +63,51 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true, id: "ignored" }, { status: 201 });
     }
 
-    // Enregistrement fiable en base de données
-    const lead = await db.lead.create({
-      data: {
+    // Enregistrement en base de données — tolérant aux environnements sans
+    // base persistante (ex. serverless sans base configurée) : la notification
+    // email au propriétaire fait alors foi d'enregistrement fiable.
+    let lead: {
+      id: string;
+      type: "quote" | "audit";
+      name: string;
+      email: string;
+      phone?: string | null;
+      company?: string | null;
+      website?: string | null;
+      activity?: string | null;
+      serviceType?: string | null;
+      budget?: string | null;
+      timeline?: string | null;
+      message: string;
+    };
+    let dbPersisted = true;
+    try {
+      lead = await db.lead.create({
+        data: {
+          type: data.type,
+          status: "new",
+          name: data.name,
+          email: data.email,
+          phone: data.phone ?? null,
+          company: data.company ?? null,
+          website: data.website ?? null,
+          activity: data.activity ?? null,
+          serviceType: data.serviceType ?? null,
+          budget: data.budget ?? null,
+          timeline: data.timeline ?? null,
+          message: data.message,
+          source: "site web",
+        },
+      });
+    } catch (dbError) {
+      dbPersisted = false;
+      console.warn(
+        "[leads] Base de données indisponible — enregistrement relayé par email :",
+        dbError instanceof Error ? dbError.message : dbError
+      );
+      lead = {
+        id: `email-${crypto.randomUUID().slice(0, 8)}`,
         type: data.type,
-        status: "new",
         name: data.name,
         email: data.email,
         phone: data.phone ?? null,
@@ -77,24 +118,42 @@ export async function POST(req: NextRequest) {
         budget: data.budget ?? null,
         timeline: data.timeline ?? null,
         message: data.message,
-        source: "site web",
-      },
-    });
+      };
+    }
 
     // Notification + accusé de réception (service serveur, si configuré)
     let notified = false;
     if (isEmailServiceConfigured()) {
       const [ownerSent, receiptSent] = await Promise.all([notifyOwner(lead), sendReceipt(lead)]);
       notified = ownerSent;
-      if (ownerSent || receiptSent) {
-        await db.lead.update({
-          where: { id: lead.id },
-          data: { emailSent: ownerSent },
-        });
+      if (dbPersisted && (ownerSent || receiptSent)) {
+        try {
+          await db.lead.update({
+            where: { id: lead.id },
+            data: { emailSent: ownerSent },
+          });
+        } catch {
+          // la mise à jour du marqueur est non bloquante
+        }
       }
-    } else {
+    } else if (dbPersisted) {
       console.info(
         `[leads] Demande ${lead.id} (${lead.type}) enregistrée — destinataire ${SITE.email} — service email non configuré (RESEND_API_KEY absente)`
+      );
+    }
+
+    // Sans base persistante ET sans notification email partie, la demande
+    // ne serait fiablement conservée nulle part : refus honnête vers le visiteur.
+    if (!dbPersisted && !notified) {
+      console.error(
+        "[leads] Rejet : ni base de données ni service email disponibles pour conserver la demande."
+      );
+      return NextResponse.json(
+        {
+          ok: false,
+          error: `L'enregistrement n'a pas pu être finalisé. Merci de réessayer dans quelques instants, de réserver un appel via Calendly, ou de m'écrire directement à ${SITE.email}.`,
+        },
+        { status: 500 }
       );
     }
 

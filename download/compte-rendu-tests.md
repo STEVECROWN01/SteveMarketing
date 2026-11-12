@@ -150,11 +150,39 @@
 | `RESEND_API_KEY` | Active l'envoi des notifications et accusés de réception |
 | `ADMIN_PASSWORD` | Mot de passe de l'espace administrateur (défaut à changer : `stevens-admin-2026`) |
 | `ADMIN_SESSION_SECRET` | Secret de signature des sessions admin |
+| `NEXT_PUBLIC_LEGAL_REGISTRATION` | Identifiant professionnel de l'éditeur (IFU/RCCM), affiché dans les mentions légales dès qu'il est renseigné |
+| `DATABASE_URL` | Base de données (SQLite local ; base managée en production — voir DEPLOIEMENT.md §5) |
 
-## ÉLÉMENTS À COMPLÉTER PAR L'ÉDITEUR (mentions légales)
+Le modèle commenté complet est versionné dans `.env.example` ; les valeurs de production fortes (mot de passe admin, secret de session) sont remises hors dépôt dans `variables-production.txt`. Guide complet : `DEPLOIEMENT.md`.
 
-- Numéro d'enregistrement / identifiant professionnel.
-- Coordonnées de l'hébergeur définitif en production.
+## MENTIONS LÉGALES — COMPLÉTION PRODUCTION
+
+- **Hébergeur** : complété — Vercel Inc., 440 N Barranca Avenue #4133, Covina, CA 91723, États-Unis (coordonnées publiques vérifiées sur vercel.com), la plateforme de déploiement retenue étant Vercel.
+- **Identifiant professionnel de l'éditeur** : la mention n'était pas fournie — aucune donnée inventée. Le site affiche un libellé honnête (« activité exercée à titre indépendant — identifiant professionnel non communiqué par l'éditeur »), remplaçable sans toucher au code via `NEXT_PUBLIC_LEGAL_REGISTRATION` (ex. numéro IFU/RCCM).
+- Vérification navigateur sur build de production : plus aucun marqueur « à compléter » ne subsiste, les deux mentions s'affichent.
+
+## TESTS COMPLÉMENTAIRES DE MISE EN PRODUCTION
+
+Exécutés après les corrections de déploiement (build de production standalone, serveur exact de ce que Vercel exécutera) :
+
+| Test | Résultat |
+|---|---|
+| Build de production (`vercel-build` = `prisma generate && next build`) | ✅ Compilation sans erreur, 10 pages statiques générées |
+| Schéma Prisma piloté par `env("DATABASE_URL")` (corrige la résolution relative SQLite en bundle standalone) | ✅ Le client honore désormais la variable d'environnement |
+| Client Prisma paresseux (proxy) — erreur de base levée dans les try/catch des routes, jamais au chargement | ✅ |
+| POST `/api/leads` avec base disponible → HTTP 201, demande persistée (vérifiée en base) puis purge de test | ✅ |
+| POST `/api/leads` **sans base ni service email** (premier déploiement serverless nu) → refus honnête HTTP 500 avec message clair — aucune demande silencieusement perdue | ✅ |
+| `GET /api/admin/leads` authentifié sans base → HTTP 503 JSON explicite (renvoi vers DEPLOIEMENT.md) | ✅ |
+| `GET /api/admin/leads` sans session valide → HTTP 401 (l'authentification précède l'accès base) | ✅ |
+| Connexion admin (`/api/admin/login`) sur les deux profils d'environnement | ✅ |
+| Console navigateur sur la page mentions légales (build production) | ✅ Aucune erreur |
+| Server dev relancé après corrections — page d'accueil HTTP 200 | ✅ |
+
+## ÉLÉMENTS RESTANT À L'INITIATIVE DE L'ÉDITEUR
+
+- Renseigner `NEXT_PUBLIC_LEGAL_REGISTRATION` (numéro IFU/RCCM) dès qu'il est disponible — sans code à modifier.
+- Créer la clé Resend (`RESEND_API_KEY`) depuis un compte créé avec stevensakpovi@gmail.com.
+- (Recommandé) Brancher une base PostgreSQL managée pour la persistance des demandes dans l'espace admin — procédure pas à pas dans DEPLOIEMENT.md §5.
 
 ## DÉCISIONS DOCUMENTÉES
 

@@ -11,27 +11,39 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "Non autorisé." }, { status: 401 });
   }
 
-  const leads = await db.lead.findMany({
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      type: true,
-      status: true,
-      name: true,
-      email: true,
-      phone: true,
-      company: true,
-      website: true,
-      activity: true,
-      serviceType: true,
-      budget: true,
-      timeline: true,
-      message: true,
-      emailSent: true,
-      source: true,
-      createdAt: true,
-    },
-  });
+  try {
+    const leads = await db.lead.findMany({
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        type: true,
+        status: true,
+        name: true,
+        email: true,
+        phone: true,
+        company: true,
+        website: true,
+        activity: true,
+        serviceType: true,
+        budget: true,
+        timeline: true,
+        message: true,
+        emailSent: true,
+        source: true,
+        createdAt: true,
+      },
+    });
 
-  return NextResponse.json({ ok: true, leads });
+    return NextResponse.json({ ok: true, leads });
+  } catch (error) {
+    console.error("[admin/leads] Base de données indisponible :", error);
+    return NextResponse.json(
+      {
+        ok: false,
+        error:
+          "La base de données est indisponible sur cet environnement. Voir DEPLOIEMENT.md — persistance des demandes (base managée).",
+      },
+      { status: 503 }
+    );
+  }
 }

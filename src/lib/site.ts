@@ -18,6 +18,20 @@ export const SITE = {
   calendlyMention: "Gratuit, 20 minutes et sans engagement.",
   linkedin: "https://www.linkedin.com/in/stevensakpovi",
   whatsapp: "https://wa.me/2290199909258",
+  // Mentions légales — identifiant professionnel de l'éditeur (IFU, RCCM…).
+  // Renseignable sans toucher au code via NEXT_PUBLIC_LEGAL_REGISTRATION
+  // (voir DEPLOIEMENT.md). Tant qu'il n'est pas communiqué par l'éditeur,
+  // la mention affiche un libellé honnête — aucune donnée inventée.
+  legalRegistration:
+    process.env.NEXT_PUBLIC_LEGAL_REGISTRATION ??
+    "Activité exercée à titre indépendant — identifiant professionnel non communiqué par l'éditeur.",
+  // Hébergeur de production (décision de déploiement : Vercel).
+  // Coordonnées publiques de Vercel Inc. (vercel.com/legal/privacy-notice).
+  host: {
+    name: "Vercel Inc.",
+    address: "440 N Barranca Avenue #4133, Covina, CA 91723, États-Unis",
+    url: "https://vercel.com",
+  },
 } as const;
 
 /** Pages du site (routes du routeur applicatif). */
