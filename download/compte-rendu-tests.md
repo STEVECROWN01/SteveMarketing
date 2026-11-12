@@ -178,6 +178,16 @@ Exécutés après les corrections de déploiement (build de production standalon
 | Console navigateur sur la page mentions légales (build production) | ✅ Aucune erreur |
 | Server dev relancé après corrections — page d'accueil HTTP 200 | ✅ |
 
+## INCIDENT DE DÉPLOIEMENT RÉSOLU — VARIABLES D'ENVIRONNEMENT (12 novembre 2026)
+
+**Symptôme** : sur Vercel, trois déploiements consécutifs en « Error » (32-56 s) après l'ajout des variables d'environnement — alors que le même code (commit `f70373f`) avait déployé en « Ready » juste avant.
+
+**Cause (reproduite en local à l'identique)** : `NEXT_PUBLIC_SITE_URL` malformé — typiquement saisi sans protocole (`stevemarketing.vercel.app` au lieu de `https://stevemarketing.vercel.app`), ou avec guillemets/espaces parasites. La ligne `metadataBase: new URL(SITE.url)` de `layout.tsx` s'exécute **au build** (génération des pages statiques) : `TypeError: Invalid URL` → échec du build. Vérifications croisées : `prisma generate` est insensible au contenu de `DATABASE_URL` (testé avec URL Postgres), les variables serveur (`ADMIN_*`, `RESEND_API_KEY`) n'interviennent qu'à l'exécution.
+
+**Correctif (définitif)** : normalisation défensive des URL d'environnement dans `src/lib/site.ts` — protocole manquant ajouté automatiquement (`https://`), guillemets et espaces retirés, valeur vide ou invalide remplacée par le défaut ; idem pour `NEXT_PUBLIC_CALENDLY_URL` ; `NEXT_PUBLIC_LEGAL_REGISTRATION` vide ou blanc replie sur le libellé honnête par défaut. `new URL()` ne peut plus jamais lever au build, quelle que soit la saisie.
+
+**Tests du correctif** : build complet avec (1) URL sans protocole, (2) URL entre guillemets, (3) valeur aberrante — les trois cas, auparavant fatals, compilent et génèrent les 10 pages ; l'URL normalisée est vérifiée injectée dans le sitemap et les pages statiques.
+
 ## CORRECTION POST-LIVRAISON — DURÉE DU RENDEZ-VOUS (12 novembre 2026)
 
 L'éditeur a confirmé que le rendez-vous stratégique Calendly dure **30 minutes** (et non 20 minutes comme rédigé dans le cahier des charges). Correction appliquée partout : hero et CTA « Réserver un appel stratégique (30 min) », éléments de réassurance (« 30 minutes · Gratuit · Sans engagement · À distance »), popup Calendly et aria-labels, page Contact (titre de section et inline), FAQ finale, page À propos, meta description, accusés de réception email, `.env.example` et guides de déploiement. Vérification par recherche globale : plus aucune mention « 20 min » dans le code livré.

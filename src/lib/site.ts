@@ -2,19 +2,40 @@
  * Configuration centrale du site — données réelles du projet.
  */
 
+/**
+ * Normalisation défensive d'une URL d'environnement : le build ne doit
+ * jamais planter sur une valeur mal saisie dans le tableau de bord
+ * (protocole absent, guillemets copiés, espaces parasites, valeur vide
+ * ou invalide). Repli sur le fallback plutôt que crash.
+ */
+function normalizeUrl(raw: string | undefined, fallback: string): string {
+  const value = (raw ?? "").trim().replace(/^["']+|["']+$/g, "");
+  if (!value) return fallback;
+  const withProtocol = /^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(value)
+    ? value
+    : `https://${value}`;
+  try {
+    return new URL(withProtocol).toString().replace(/\/+$/, "");
+  } catch {
+    return fallback;
+  }
+}
+
+const DEFAULT_SITE_URL = "https://stevens-akpovi.vercel.app";
+const DEFAULT_CALENDLY_URL = "https://calendly.com/stevensakpovi/30min";
+
 export const SITE = {
   name: "Stevens Akpovi",
   role: "Concepteur de sites web professionnels orientés conversion",
   positioning: "Je crée des sites web qui génèrent des ventes.",
   description:
     "J'accompagne entreprises, PME, agences, coachs, infopreneurs et freelances dans la création de sites web stratégiques qui valorisent leur activité, attirent des visiteurs qualifiés et transforment leur intérêt en clients.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://stevens-akpovi.vercel.app",
+  url: normalizeUrl(process.env.NEXT_PUBLIC_SITE_URL, DEFAULT_SITE_URL),
   email: "stevensakpovi@gmail.com",
   // Événement Calendly réel du compte stevensakpovi — rendez-vous
   // stratégique de 30 minutes (confirmé par l'éditeur).
   // Configurable via NEXT_PUBLIC_CALENDLY_URL.
-  calendly:
-    process.env.NEXT_PUBLIC_CALENDLY_URL ?? "https://calendly.com/stevensakpovi/30min",
+  calendly: normalizeUrl(process.env.NEXT_PUBLIC_CALENDLY_URL, DEFAULT_CALENDLY_URL),
   calendlyMention: "Gratuit, 30 minutes et sans engagement.",
   linkedin: "https://www.linkedin.com/in/stevensakpovi",
   whatsapp: "https://wa.me/2290199909258",
@@ -23,7 +44,7 @@ export const SITE = {
   // (voir DEPLOIEMENT.md). Tant qu'il n'est pas communiqué par l'éditeur,
   // la mention affiche un libellé honnête — aucune donnée inventée.
   legalRegistration:
-    process.env.NEXT_PUBLIC_LEGAL_REGISTRATION ??
+    process.env.NEXT_PUBLIC_LEGAL_REGISTRATION?.trim() ||
     "Activité exercée à titre indépendant — identifiant professionnel non communiqué par l'éditeur.",
   // Hébergeur de production (décision de déploiement : Vercel).
   // Coordonnées publiques de Vercel Inc. (vercel.com/legal/privacy-notice).

@@ -31,7 +31,7 @@ GitHub `STEVECROWN01/SteveMarketing` (branche `main`).
 
 | Variable | Obligatoire | Rôle |
 |---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | Oui | URL canonique finale (canonical, sitemap, Open Graph, JSON-LD). Ex. : `https://stevemarketing.vercel.app` ou le domaine personnalisé. |
+| `NEXT_PUBLIC_SITE_URL` | Oui | URL canonique finale (canonical, sitemap, Open Graph, JSON-LD). **Format obligatoire : `https://…`** (protocole inclus, sans guillemets ni espaces). Ex. : `https://stevemarketing.vercel.app`. Depuis la correction du 12/11, une valeur mal saisie ne casse plus le build : protocole manquant ajouté automatiquement, guillemets/espaces retirés, valeur invalide remplacée par le défaut. |
 | `RESEND_API_KEY` | Recommandée | Active la notification des demandes à `stevensakpovi@gmail.com` **et** l'accusé de réception au visiteur. Clé gratuite sur https://resend.com — domaine d'envoi à vérifier dans Resend, l'expéditeur par défaut `onboarding@resend.dev` permet d'envoyer uniquement vers l'adresse du compte Resend : créer le compte avec `stevensakpovi@gmail.com`. |
 | `ADMIN_PASSWORD` | Oui | Mot de passe de l'espace administrateur `#/admin`. Générer une valeur forte (fournie dans le fichier de configuration remis, ou `openssl rand -base64 18`). |
 | `ADMIN_SESSION_SECRET` | Oui | Secret de signature des sessions admin (HMAC-SHA256). Générer via `openssl rand -hex 32`. |
