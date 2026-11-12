@@ -91,7 +91,7 @@ export const PAGES = {
     label: "Contact",
     title: "Contact — Demande de projet | Stevens Akpovi",
     description:
-      "Réservez un appel stratégique de 30 minutes (gratuit, sans engagement), demandez un devis personnalisé ou un audit gratuit de votre site actuel.",
+      "Réservez un appel de 30 minutes (gratuit, sans engagement), demandez un devis personnalisé ou un audit gratuit de votre site actuel.",
   },
   legal: {
     hash: "#/mentions-legales",

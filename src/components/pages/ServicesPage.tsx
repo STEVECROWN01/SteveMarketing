@@ -21,7 +21,7 @@ export function ServicesPage() {
       >
         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
-            Réserver un appel stratégique
+            Réserver un appel
           </CTAButton>
           <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
             Demander un devis personnalisé
@@ -166,7 +166,7 @@ export function ServicesPage() {
           <Reveal direction="up" delay={0.12}>
             <div className="mt-9 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
               <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
-                Réserver un appel stratégique
+                Réserver un appel
               </CTAButton>
               <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="secondary" size="lg" icon={CTAIcons.quote}>
                 Demander un devis personnalisé

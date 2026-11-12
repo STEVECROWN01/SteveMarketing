@@ -164,16 +164,16 @@ export function ReassuranceBar({
   className?: string;
   mention?: string;
 }) {
-  const items = (mention ?? "30 minutes · Gratuit · Sans engagement · À distance").split(" · ");
+  const items = (mention ?? "30 minutes · Gratuit · Sans engagement").split(" · ");
   return (
     <ul
       className={`flex flex-wrap items-center gap-x-3 gap-y-2 text-sm ${
         tone === "dark" ? "text-[#c8c8c8]" : "on-paper-soft"
       } ${className}`}
     >
-      {items.map((item) => (
-        <li key={item} className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#c9baac]" aria-hidden="true" />
+      {items.map((item, i) => (
+        <li key={item} className="flex items-center gap-3">
+          {i > 0 && <span className="h-1 w-1 rounded-full bg-[#c9baac]" aria-hidden="true" />}
           {item}
         </li>
       ))}

@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { ChevronDown, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
 import { BrowserMockup, PhoneMockup } from "@/components/media/Media";
@@ -11,10 +11,13 @@ import { ASSETS, PROJECTS, SITE } from "@/lib/site";
 
 /**
  * SECTION 01 — HERO
- * Sans scroller, le visiteur comprend : qui est Stevens, ce qu'il
- * propose, à qui s'adressent ses services, le bénéfice principal,
- * le travail à distance, comment réserver et comment demander un
- * devis. Portrait non cliquable + composition de mockups.
+ * Totalement visible à l'écran, sans défilement : la section occupe
+ * exactement la hauteur du viewport (100svh, y compris barres
+ * dynamiques mobiles) et son contenu s'adapte en taille à tous les
+ * écrans (typographie fluide, portrait dimensionné en svh). Sans
+ * scroller, le visiteur comprend : qui est Stevens, ce qu'il propose,
+ * le bénéfice principal, comment réserver et comment demander un
+ * audit. Mobile : l'image se place entre le hook et la description.
  */
 export function Hero() {
   const reduce = useReducedMotion();
@@ -25,7 +28,7 @@ export function Hero() {
     <section
       id="hero"
       aria-label="Introduction — Stevens Akpovi, conception de sites web orientés conversion"
-      className="section-deep relative overflow-hidden pt-32 pb-20 sm:pt-40 lg:pt-44 lg:pb-28"
+      className="section-deep relative flex min-h-svh flex-col overflow-hidden"
     >
       {/* Décor : grille discrète + halo beige */}
       <div className="bg-grid-dark absolute inset-0" aria-hidden="true" />
@@ -38,20 +41,28 @@ export function Hero() {
         className="pointer-events-none absolute bottom-[-20%] left-[-12%] h-[420px] w-[420px] rounded-full bg-[#c9baac] opacity-[0.05] blur-[110px]"
       />
 
-      <div className="container-site relative">
-        <div className="grid items-center gap-14 lg:grid-cols-[1.08fr_0.92fr] lg:gap-10 xl:gap-16">
+      <div className="container-site relative flex flex-1 flex-col justify-center pb-4 pt-[64px] sm:pb-8 sm:pt-[68px] lg:pb-8 lg:pt-[112px]">
+        <div className="grid items-center gap-4 sm:gap-7 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8 xl:gap-12">
           {/* ---------- Bloc texte haut : eyebrow, titre, hook ---------- */}
           {/* Mobile : eyebrow → H1 → hook, puis image (bloc visuel), puis
               suite du texte. Desktop : colonne gauche, ligne 1. */}
           <div className="order-1 lg:col-start-1 lg:row-start-1">
             <Reveal direction="up">
-              <p className="text-eyebrow">{HERO.eyebrow}</p>
+              <p className="text-eyebrow">
+                {HERO.eyebrow}
+                <span className="hidden sm:inline"> · STRATÉGIE DIGITALE</span>
+              </p>
             </Reveal>
 
-            <RevealText as="h1" text={HERO.h1} delay={0.08} className="text-hero-title mt-6 text-white" />
+            <RevealText
+              as="h1"
+              text={HERO.h1}
+              delay={0.08}
+              className="text-hero-title-viewport mt-4 text-white sm:mt-5"
+            />
 
             <Reveal direction="up" delay={0.18}>
-              <p className="mt-6 max-w-xl font-display text-lg font-medium leading-snug text-[#c9baac] sm:text-xl">
+              <p className="mt-3.5 max-w-xl font-display text-[15px] font-medium leading-snug text-[#c9baac] sm:text-base lg:text-lg xl:text-xl">
                 {HERO.hook}
               </p>
             </Reveal>
@@ -59,15 +70,16 @@ export function Hero() {
 
           {/* ---------- Colonne visuelle : portrait + mockups ---------- */}
           {/* Mobile : placée entre le hook et la description (demande
-              explicite de l'éditeur) ; desktop : colonne droite sur
-              les deux lignes de la grille. */}
+              explicite de l'éditeur) ; desktop : colonne droite sur les
+              deux lignes de la grille, hauteur plafonnée en svh pour
+              que le hero tienne dans l'écran. */}
           <div className="order-2 relative mx-auto w-full max-w-md lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:max-w-none">
             {/* Bloc beige en décalage derrière le portrait */}
             <div
               aria-hidden="true"
               className="absolute -inset-3 rotate-[2.5deg] rounded-[2rem] bg-[#c9baac]/90 opacity-[0.16] sm:rotate-[3deg]"
             />
-            <div className="relative">
+            <div className="relative flex justify-center">
               {/* Portrait professionnel — NON cliquable */}
               <figure className="relative overflow-hidden rounded-[1.75rem] border border-[#e4e4e4]/15 bg-[#232323] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.7)]">
                 <span className="mono-media block">
@@ -79,17 +91,14 @@ export function Hero() {
                     loading="eager"
                     fetchPriority="high"
                     decoding="sync"
-                    className="block aspect-[2/3] w-full object-cover object-top"
+                    className="block h-[min(26svh,240px)] w-full object-cover object-top lg:h-[min(60svh,540px)] lg:w-auto"
                   />
                 </span>
-                <figcaption className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-[#070707]/90 via-[#070707]/40 to-transparent px-5 pb-4 pt-16">
-                  <div>
-                    <p className="font-display text-base font-semibold text-white">Stevens Akpovi</p>
-                    <p className="mt-0.5 text-xs text-[#c8c8c8]">
-                      Concepteur de sites web professionnels
-                    </p>
-                  </div>
-                  <span className="hidden h-2 w-2 rounded-full bg-[#c9baac] sm:block" aria-hidden="true" />
+                <figcaption className="absolute left-4 top-4">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-[#070707]/75 px-3.5 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#c9baac]" aria-hidden="true" />
+                    Stevens Akpovi
+                  </span>
                 </figcaption>
               </figure>
 
@@ -134,57 +143,46 @@ export function Hero() {
           {/* Mobile : succède à l'image ; desktop : colonne gauche, ligne 2. */}
           <div className="order-3 lg:col-start-1 lg:row-start-2">
             <Reveal direction="up" delay={0.24}>
-              <p className="text-body mt-5 max-w-xl on-dark-muted">{HERO.text}</p>
+              <p className="mt-3.5 max-w-xl text-[12.5px] leading-[1.55] text-[#c8c8c8] sm:mt-0 sm:text-[15px] lg:mt-5 lg:text-[15px] xl:text-base">
+                {HERO.text}
+              </p>
             </Reveal>
 
-            {/* CTA */}
+            {/* CTA — les deux boutons partagent la même ligne sur desktop */}
             <Reveal direction="up" delay={0.3}>
-              <div className="mt-9 flex flex-col gap-3.5 sm:flex-row sm:flex-wrap sm:items-center">
+              <div className="mt-3.5 flex flex-wrap items-center gap-2.5 sm:mt-6 sm:gap-3 lg:mt-6">
                 <CTAButton
                   action={{ kind: "calendly" }}
-                  variant="primary"
+                  variant="secondary"
                   size="lg"
                   icon={CTAIcons.calendar}
-                  ariaLabel={`Réserver un appel stratégique de 30 minutes sur Calendly — ${SITE.calendlyMention}`}
+                  ariaLabel={`Réserver un appel de 30 minutes sur Calendly — ${SITE.calendlyMention}`}
                 >
                   {HERO.ctaPrimary}
                 </CTAButton>
                 <CTAButton
-                  action={{ kind: "page", page: "contact", section: "devis" }}
-                  variant="secondary"
-                  size="lg"
-                  icon={CTAIcons.quote}
-                >
-                  {HERO.ctaSecondary}
-                </CTAButton>
-              </div>
-            </Reveal>
-
-            <Reveal direction="up" delay={0.36}>
-              <div className="mt-4">
-                <CTAButton
                   action={{ kind: "page", page: "contact", section: "audit" }}
                   variant="ghostLight"
                   icon={CTAIcons.audit}
-                  className="px-4 py-2 text-sm"
+                  className="px-3 py-2 text-[12px] sm:px-3.5 sm:py-2.5 sm:text-[13px]"
                 >
                   {HERO.ctaTertiary}
                 </CTAButton>
               </div>
             </Reveal>
 
-            <Reveal direction="up" delay={0.42}>
-              <ReassuranceBar mention={HERO.reassurance} className="mt-7" />
+            <Reveal direction="up" delay={0.36}>
+              <ReassuranceBar mention={HERO.reassurance} className="mt-3 sm:mt-4 lg:mt-5" />
             </Reveal>
 
-            <Reveal direction="up" delay={0.48}>
-              <ul className="mt-5 flex flex-wrap gap-2.5">
+            <Reveal direction="up" delay={0.42}>
+              <ul className="mt-2.5 flex flex-wrap gap-2 sm:mt-3.5">
                 {HERO.perks.map((perk) => (
                   <li
                     key={perk}
-                    className="inline-flex items-center gap-2 rounded-full border border-[#c9baac]/25 bg-[#c9baac]/8 px-3.5 py-1.5 text-xs font-medium text-[#c9baac]"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[#c9baac]/25 bg-[#c9baac]/8 px-2.5 py-1 text-[10.5px] font-medium text-[#c9baac] sm:gap-2 sm:px-3.5 sm:py-1.5 sm:text-xs"
                   >
-                    <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                    <Check className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
                     {perk}
                   </li>
                 ))}
@@ -192,28 +190,6 @@ export function Hero() {
             </Reveal>
           </div>
         </div>
-
-        {/* Indicateur de défilement */}
-        <Reveal direction="fade" delay={0.9}>
-          <a
-            href="#probleme"
-            onClick={(e) => {
-              e.preventDefault();
-              document.getElementById("probleme")?.scrollIntoView({ behavior: "smooth" });
-            }}
-            aria-label="Découvrir la suite — le problème"
-            className="mt-16 flex flex-col items-center gap-2 text-xs tracking-widest text-[#c8c8c8] transition-colors hover:text-[#c9baac] sm:mt-20"
-          >
-            DÉCOUVRIR
-            <motion.span
-              animate={reduce ? undefined : { y: [0, 7, 0] }}
-              transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-              aria-hidden="true"
-            >
-              <ChevronDown className="h-4 w-4" />
-            </motion.span>
-          </a>
-        </Reveal>
       </div>
     </section>
   );

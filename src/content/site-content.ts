@@ -7,14 +7,13 @@
 /* ============================ HERO ============================ */
 
 export const HERO = {
-  eyebrow: "CONCEPTION DE SITES WEB PROFESSIONNELS · STRATÉGIE DIGITALE",
+  eyebrow: "CONCEPTION DE SITES WEB PROFESSIONNELS",
   h1: "Je crée des sites web qui génèrent des ventes.",
   hook: "Votre entreprise mérite mieux qu'une présence en ligne qui ne vous rapporte rien.",
   text: "Vous n'avez pas encore de site web ? Ou votre site actuel ne vous apporte pas les résultats espérés ? Je conçois des sites web professionnels, élégants et stratégiquement pensés pour valoriser votre activité, attirer des visiteurs qualifiés et transformer leur intérêt en clients.",
-  ctaPrimary: "Réserver un appel stratégique (30 min)",
-  ctaSecondary: "Demander un devis personnalisé",
-  ctaTertiary: "Déjà un site ? Demander un audit gratuit.",
-  reassurance: "30 minutes · Gratuit · Sans engagement · Collaboration à distance",
+  ctaPrimary: "Réserver un appel (30 min)",
+  ctaTertiary: "Audit gratuit de votre site actuel",
+  reassurance: "30 minutes · Gratuit · Sans engagement",
   perks: ["Copywriting inclus", "Optimisation SEO de base incluse"],
   portraitAlt:
     "Portrait professionnel de Stevens Akpovi, concepteur de sites web orientés conversion",
@@ -269,10 +268,10 @@ export const FINAL_CTA = {
   eyebrow: "IL EST TEMPS DE DONNER UNE NOUVELLE DIMENSION À VOTRE ACTIVITÉ",
   title: "Je crée des sites web qui génèrent des ventes. Et votre prochain projet peut commencer aujourd'hui.",
   text: "Vous avez une activité à développer, une expertise à valoriser ou des services à présenter ?\n\nConstruisons une présence en ligne professionnelle qui donne à votre entreprise les moyens de mieux se présenter, de toucher de nouvelles personnes et de transformer davantage d'intérêt en clients.\n\nPrenons simplement 30 minutes pour en discuter.",
-  cta1: "Réserver mon appel stratégique",
+  cta1: "Réserver mon appel",
   cta2: "Demander un devis",
   cta3: "Demander un audit gratuit",
-  mention: "30 minutes · Gratuit · Sans engagement · À distance",
+  mention: "30 minutes · Gratuit · Sans engagement",
 } as const;
 
 /* ============================ CIBLES COMMERCIALES ============================ */

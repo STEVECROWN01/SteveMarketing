@@ -118,7 +118,7 @@ export async function sendReceipt(lead: LeadPayload): Promise<boolean> {
       </div>
       <div style="padding:28px">
         <p style="color:#1c1c1c;font-family:Arial,sans-serif;font-size:15px;line-height:1.7">${intro}</p>
-        <p style="color:#525252;font-family:Arial,sans-serif;font-size:14px;line-height:1.7">Vous préférez avancer plus vite ? Réservez un appel stratégique de 30 minutes, gratuit et sans engagement, directement en ligne :<br><a href="${SITE.calendly}" style="color:#1c1c1c">${SITE.calendly}</a></p>
+        <p style="color:#525252;font-family:Arial,sans-serif;font-size:14px;line-height:1.7">Vous préférez avancer plus vite ? Réservez un appel de 30 minutes, gratuit et sans engagement, directement en ligne :<br><a href="${SITE.calendly}" style="color:#1c1c1c">${SITE.calendly}</a></p>
         <p style="color:#525252;font-family:Arial,sans-serif;font-size:13px;line-height:1.7">Référence de votre demande : ${lead.id}</p>
         <hr style="border:none;border-top:1px solid #e4e4e4;margin:24px 0">
         <p style="color:#525252;font-family:Arial,sans-serif;font-size:13px">Stevens Akpovi — ${escapeHtml(SITE.positioning)}<br><a href="mailto:${SITE.email}" style="color:#1c1c1c">${SITE.email}</a></p>

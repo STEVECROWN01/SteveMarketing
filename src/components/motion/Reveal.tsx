@@ -5,9 +5,10 @@ import { motion, useReducedMotion, type Variants } from "framer-motion";
 
 /**
  * Animations au scroll — révélation progressive, translations
- * verticales et horizontales légères. Bidirectionnelles : les
- * éléments se révèlent au défilement descendant ET remontant
- * (once: false), sans scroll-jacking. Respect de
+ * verticales et horizontales légères. Unidirectionnelles : chaque
+ * élément révélé une fois reste visible (once: true) — corrige le
+ * défaut où titres et textes disparaissaient après le défilement
+ * et exigeaient un rechargement de la page. Respect de
  * prefers-reduced-motion.
  */
 
@@ -98,7 +99,7 @@ export function Reveal({
       variants={delayed}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: false, amount }}
+      viewport={{ once: true, amount }}
     >
       {children}
     </Comp>
@@ -129,7 +130,7 @@ export function RevealText({
             className="inline-block"
             initial={{ y: "0.9em", opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: false, amount: 0.4 }}
+            viewport={{ once: true, amount: 0.3 }}
             transition={{
               duration: 0.55,
               delay: delay + i * 0.035,

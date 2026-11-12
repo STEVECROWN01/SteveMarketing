@@ -86,7 +86,7 @@ export function CalendlyEmbed({ className = "" }: { className?: string }) {
       data-url={`${SITE.calendly}?${CALENDLY_PARAMS}`}
       style={{ minWidth: "280px", width: "100%", height: "100%" }}
       role="region"
-      aria-label="Calendly — Réservation d'un appel stratégique de 30 minutes avec Stevens Akpovi"
+      aria-label="Calendly — Réservation d'un appel de 30 minutes avec Stevens Akpovi"
     />
   );
 }
@@ -119,7 +119,7 @@ export function CalendlyProvider({ children }: { children: React.ReactNode }) {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Réserver un appel stratégique de 30 minutes avec Stevens Akpovi"
+          aria-label="Réserver un appel de 30 minutes avec Stevens Akpovi"
           className="fixed inset-0 z-[100] flex items-center justify-center bg-[#070707]/85 p-3 backdrop-blur-sm sm:p-8"
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false);
@@ -128,7 +128,7 @@ export function CalendlyProvider({ children }: { children: React.ReactNode }) {
           <div className="relative flex h-full max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-[#e4e4e4]/15 bg-[#1c1c1c] shadow-2xl">
             <div className="flex items-start justify-between gap-4 border-b border-[#e4e4e4]/10 px-5 py-4 sm:px-7">
               <div>
-                <p className="text-eyebrow">Appel stratégique</p>
+                <p className="text-eyebrow">Appel découverte</p>
                 <h2 className="text-card-title mt-1 text-white">Réservez votre créneau</h2>
                 <p className="mt-1 text-sm text-[#c8c8c8]">
                   {SITE.calendlyMention} Les disponibilités affichées sont les vraies

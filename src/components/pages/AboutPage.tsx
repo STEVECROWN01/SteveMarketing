@@ -85,7 +85,7 @@ export function AboutPage() {
                   </p>
                   <div className="mt-5">
                     <CTAButton action={{ kind: "calendly" }} variant="primary" icon={CTAIcons.calendar}>
-                      Réserver un appel stratégique
+                      Réserver un appel
                     </CTAButton>
                   </div>
                   <p className="mt-4 text-xs text-[#c8c8c8]">{SITE.calendlyMention}</p>

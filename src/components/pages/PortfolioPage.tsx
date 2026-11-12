@@ -36,7 +36,7 @@ export function PortfolioPage() {
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
                 <CTAButton action={{ kind: "calendly" }} variant="dark" size="lg" icon={CTAIcons.calendar}>
-                  Réserver un appel stratégique
+                  Réserver un appel
                 </CTAButton>
                 <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="ghostDark" size="lg" icon={CTAIcons.quote}>
                   Demander un devis

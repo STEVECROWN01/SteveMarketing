@@ -37,10 +37,10 @@ export function FaqSection() {
                   className="mt-5"
                   icon={CTAIcons.calendar}
                 >
-                  Réserver un appel stratégique
+                  Réserver un appel
                 </CTAButton>
                 <p className="mt-4 text-xs font-medium text-[#1c1c1c]/70">
-                  30 minutes · Gratuit · Sans engagement · À distance.
+                  30 minutes · Gratuit · Sans engagement.
                 </p>
               </div>
             </Reveal>
@@ -107,7 +107,7 @@ export function FinalCtaSection() {
               variant="primary"
               size="lg"
               icon={CTAIcons.calendar}
-              ariaLabel="Réserver mon appel stratégique de 30 minutes — gratuit et sans engagement"
+              ariaLabel="Réserver mon appel de 30 minutes — gratuit et sans engagement"
             >
               {FINAL_CTA.cta1}
             </CTAButton>

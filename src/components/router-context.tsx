@@ -109,18 +109,28 @@ export function RouterProvider({ children }: { children: React.ReactNode }) {
     if (meta && typeof document !== "undefined") {
       document.title = meta.title;
     }
-    // Laisse le nouveau contenu monter avant l'ancrage
-    const raf = requestAnimationFrame(() => {
+    // Laisse le nouveau contenu monter avant l'ancrage : la transition
+    // de page (AnimatePresence mode="wait") retarde le montage du
+    // composant cible — on réessaie jusqu'à ce que la section existe
+    // (borné ~1 s), sinon retour en haut.
+    let tries = 0;
+    let rafId = 0;
+    const attempt = () => {
       if (state.section) {
         const el = document.getElementById(state.section);
         if (el) {
           el.scrollIntoView({ behavior: "smooth", block: "start" });
           return;
         }
+        if (tries++ < 60) {
+          rafId = requestAnimationFrame(attempt);
+          return;
+        }
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-    return () => cancelAnimationFrame(raf);
+    };
+    rafId = requestAnimationFrame(attempt);
+    return () => cancelAnimationFrame(rafId);
   }, [state.page, state.section]);
 
   const navigate = useCallback((page: AppPage, section: string | null = null) => {

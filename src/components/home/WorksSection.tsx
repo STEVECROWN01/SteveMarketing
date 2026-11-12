@@ -62,7 +62,7 @@ export function WorksSection() {
                 icon={CTAIcons.calendar}
                 className="!text-[#1c1c1c] [&::before]:bg-[#e4e4e4]"
               >
-                Réserver un appel stratégique
+                Réserver un appel
               </CTAButton>
               <CTAButton
                 action={{ kind: "page", page: "contact", section: "devis" }}

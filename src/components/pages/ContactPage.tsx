@@ -20,11 +20,11 @@ export function ContactPage() {
       <PageHero
         eyebrow="CONTACT · DEMANDE DE PROJET"
         title="Votre projet commence par une conversation."
-        intro="Réservez un appel stratégique, demandez un devis personnalisé ou sollicitez un audit gratuit de votre site actuel. À distance, sans engagement."
+        intro="Réservez un appel, demandez un devis personnalisé ou sollicitez un audit gratuit de votre site actuel. Sans engagement."
       >
         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
-            Réserver un appel stratégique (30 min)
+            Réserver un appel (30 min)
           </CTAButton>
           <CTAButton action={{ kind: "anchor", sectionId: "devis" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
             Demander un devis
@@ -222,7 +222,7 @@ export function ContactPage() {
               <Reveal direction="up" delay={0.2}>
                 <div className="mt-7 rounded-2xl bg-[#c9baac] px-6 py-5">
                   <p className="text-sm font-medium leading-relaxed text-[#1c1c1c]">
-                    L'audit est gratuit et sans engagement — comme l'appel stratégique.
+                    L'audit est gratuit et sans engagement — comme l'appel.
                   </p>
                 </div>
               </Reveal>
