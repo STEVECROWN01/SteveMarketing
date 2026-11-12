@@ -113,6 +113,7 @@ export async function sendReceipt(lead: LeadPayload): Promise<boolean> {
   <div style="background:#f5f5f5;padding:32px 0">
     <div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e4e4e4">
       <div style="background:#1c1c1c;padding:24px 28px">
+        <img src="${SITE.url}/assets/logo-blanc.png" alt="Stevens Akpovi" width="110" height="88" style="display:block;margin-bottom:12px">
         <span style="color:#c9baac;font-family:Arial,sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase">Confirmation de réception</span>
         <h1 style="color:#ffffff;font-family:Arial,sans-serif;font-size:22px;margin:8px 0 0">Bonjour ${escapeHtml(lead.name)},</h1>
       </div>

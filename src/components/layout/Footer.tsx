@@ -22,9 +22,16 @@ export function Footer() {
       <div className="container-site py-16 lg:py-20">
         <Reveal direction="up" amount={0.15}>
           <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr] lg:gap-8">
-            {/* Marque */}
+            {/* Marque — logo officiel (version blanche) */}
             <div className="max-w-sm">
-              <p className="font-display text-xl font-semibold text-white">Stevens Akpovi</p>
+              <img
+                src="/assets/logo-blanc.png"
+                alt="Stevens Akpovi"
+                width={220}
+                height={176}
+                loading="lazy"
+                className="h-10 w-auto"
+              />
               <p className="mt-4 text-sm leading-relaxed text-[#c8c8c8]">
                 Je crée des sites web qui génèrent des ventes. Conception de sites web
                 professionnels orientés conversion — copywriting et optimisation SEO de base

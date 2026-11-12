@@ -125,10 +125,15 @@ export function Header() {
           aria-label="Stevens Akpovi — retour à l'accueil"
           className="flex h-14 w-12 items-center justify-center rounded-b-lg bg-[#1c1c1c] transition-colors duration-300 hover:bg-[#232323] lg:h-[98px] lg:w-[94px] lg:rounded-b-[9px]"
         >
-          <span className="flex flex-col items-center leading-[0.92] tracking-tight">
-            <span className="font-display text-[18px] font-semibold text-white lg:text-[26px]">S</span>
-            <span className="font-display text-[18px] font-semibold text-white lg:text-[26px]">A</span>
-          </span>
+          {/* Logo officiel (version blanche, fond transparent) */}
+          <img
+            src="/assets/logo-blanc.png"
+            alt="Stevens Akpovi"
+            width={220}
+            height={176}
+            fetchPriority="high"
+            className="h-9 w-auto lg:h-[58px]"
+          />
         </a>
 
         {/* ---------- 2. Pilule de navigation (bureau) ---------- */}

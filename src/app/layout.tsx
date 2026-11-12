@@ -74,7 +74,7 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
-  icons: { icon: "/favicon.svg" },
+  icons: { icon: "/assets/favicon.png", apple: "/assets/favicon.png" },
 };
 
 export const viewport: Viewport = {
