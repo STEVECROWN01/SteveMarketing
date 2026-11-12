@@ -1,0 +1,1695 @@
+diff --git a/src/app/layout.tsx b/src/app/layout.tsx
+index b9d5812..64438b6 100755
+--- a/src/app/layout.tsx
++++ b/src/app/layout.tsx
+@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
+ import Script from "next/script";
+ import { Inter, Sora } from "next/font/google";
+ import "./globals.css";
+-import { SITE } from "@/lib/site";
++import { ASSETS, SITE } from "@/lib/site";
+ 
+ /* Polices : Sora (titres) + Inter (texte / interface), chargement optimisé */
+ const inter = Inter({
+@@ -55,9 +55,9 @@ export const metadata: Metadata = {
+       "Sites web professionnels orientés conversion : stratégie, design, copywriting inclus et SEO de base. Appelez Stevens Akpovi — 30 minutes, gratuit, sans engagement.",
+     images: [
+       {
+-        url: "/og-image.jpg",
+-        width: 1200,
+-        height: 630,
++        url: ASSETS.ogImage,
++        width: 1254,
++        height: 1254,
+         alt: "Stevens Akpovi — Je crée des sites web qui génèrent des ventes",
+       },
+     ],
+@@ -67,7 +67,7 @@ export const metadata: Metadata = {
+     title: "Stevens Akpovi — Je crée des sites web qui génèrent des ventes",
+     description:
+       "Sites web professionnels orientés conversion. Copywriting et SEO de base inclus.",
+-    images: ["/og-image.jpg"],
++    images: [ASSETS.ogImage],
+   },
+   robots: {
+     index: true,
+diff --git a/src/app/page.tsx b/src/app/page.tsx
+index c3f558d..70e7e92 100755
+--- a/src/app/page.tsx
++++ b/src/app/page.tsx
+@@ -9,11 +9,13 @@ import { Footer } from "@/components/layout/Footer";
+ import { HomePage } from "@/components/home/HomePage";
+ import { ServicesPage } from "@/components/pages/ServicesPage";
+ import { PortfolioPage } from "@/components/pages/PortfolioPage";
++import { ProjectPage } from "@/components/pages/ProjectPage";
+ import { AboutPage } from "@/components/pages/AboutPage";
+ import { ContactPage } from "@/components/pages/ContactPage";
+ import { LegalPage } from "@/components/pages/LegalPage";
+ import { AdminPage } from "@/components/pages/AdminPage";
+ import { Toaster } from "@/components/ui/toaster";
++import { PROJECTS } from "@/lib/site";
+ 
+ /**
+  * Coquille applicative : routeur de pages (URLs propres par
+@@ -22,15 +24,21 @@ import { Toaster } from "@/components/ui/toaster";
+  */
+ 
+ function PageSwitch() {
+-  const { page } = useRouter();
++  const { page, section } = useRouter();
+   const reduce = useReducedMotion();
+ 
++  // Page projet : le fragment porte l'identifiant (#/projet/<id>).
++  // Identifiant inconnu → repli sur la liste des réalisations.
+   const content = (() => {
+     switch (page) {
+       case "services":
+         return <ServicesPage />;
+       case "realisations":
+         return <PortfolioPage />;
++      case "projet": {
++        const known = PROJECTS.some((p) => p.id === section);
++        return known && section ? <ProjectPage projectId={section} /> : <PortfolioPage />;
++      }
+       case "aPropos":
+         return <AboutPage />;
+       case "contact":
+@@ -44,10 +52,14 @@ function PageSwitch() {
+     }
+   })();
+ 
++  // Clé d'animation : les pages projets se distinguent par leur
++  // identifiant pour que la transition se joue entre deux projets.
++  const pageKey = page === "projet" ? `projet-${section}` : page;
++
+   return (
+     <AnimatePresence mode="wait" initial={false}>
+       <motion.main
+-        key={page}
++        key={pageKey}
+         id="contenu-principal"
+         className="flex flex-col"
+         initial={reduce ? { opacity: 0 } : { opacity: 0, y: 14 }}
+diff --git a/src/components/forms/LeadForm.tsx b/src/components/forms/LeadForm.tsx
+index 7c1d962..703df59 100755
+--- a/src/components/forms/LeadForm.tsx
++++ b/src/components/forms/LeadForm.tsx
+@@ -193,7 +193,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
+             }}
+             className="btn-fill min-h-[44px] rounded-full border border-[#e4e4e4]/30 px-6 py-3 text-sm font-medium text-white [&::before]:bg-[#3c3c3c]"
+           >
+-            <span className="inline-flex items-center">Envoyer une autre demande</span>
++            <span className="inline-flex items-center">Envoyer Une Autre Demande</span>
+           </button>
+         </div>
+         <p className="mt-6 text-xs text-[#c8c8c8]/70">
+@@ -485,7 +485,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
+             </span>
+           ) : (
+             <span className="inline-flex items-center gap-2.5">
+-              {isQuote ? "Envoyer ma demande de devis" : "Envoyer ma demande d'audit"}
++              {isQuote ? "Envoyer Ma Demande De Devis" : "Envoyer Ma Demande D'Audit"}
+             </span>
+           )}
+         </button>
+diff --git a/src/components/home/FaqFinal.tsx b/src/components/home/FaqFinal.tsx
+index 50508c7..e0c0f0d 100755
+--- a/src/components/home/FaqFinal.tsx
++++ b/src/components/home/FaqFinal.tsx
+@@ -8,7 +8,7 @@ import {
+   AccordionTrigger,
+ } from "@/components/ui/accordion";
+ import { Reveal } from "@/components/motion/Reveal";
+-import { SectionHeading, CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
++import { SectionHeading, CTAButton, CTAIcons, ReassuranceBar, RichText } from "@/components/marketing/Marketing";
+ import { FAQ, FINAL_CTA } from "@/content/site-content";
+ 
+ /**
+@@ -37,7 +37,7 @@ export function FaqSection() {
+                   className="mt-5"
+                   icon={CTAIcons.calendar}
+                 >
+-                  Réserver un appel
++                  Réserver Un Appel
+                 </CTAButton>
+                 <p className="mt-4 text-xs font-medium text-[#1c1c1c]/70">
+                   30 minutes · Gratuit · Sans engagement.
+@@ -95,9 +95,7 @@ export function FinalCtaSection() {
+         </Reveal>
+ 
+         <Reveal direction="up" delay={0.14}>
+-          <div className="text-body mx-auto mt-6 max-w-2xl whitespace-pre-line on-dark-muted">
+-            {FINAL_CTA.text}
+-          </div>
++          <RichText text={FINAL_CTA.text} className="text-body mx-auto mt-6 max-w-2xl on-dark-muted" />
+         </Reveal>
+ 
+         <Reveal direction="up" delay={0.2}>
+diff --git a/src/components/home/Hero.tsx b/src/components/home/Hero.tsx
+index 14ea675..7fbfc7a 100755
+--- a/src/components/home/Hero.tsx
++++ b/src/components/home/Hero.tsx
+@@ -2,7 +2,6 @@
+ 
+ import React from "react";
+ import { motion, useReducedMotion } from "framer-motion";
+-import { Check } from "lucide-react";
+ import { Reveal, RevealText } from "@/components/motion/Reveal";
+ import { CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
+ import { BrowserMockup, PhoneMockup } from "@/components/media/Media";
+@@ -16,8 +15,11 @@ import { ASSETS, PROJECTS, SITE } from "@/lib/site";
+  * dynamiques mobiles) et son contenu s'adapte en taille à tous les
+  * écrans (typographie fluide, portrait dimensionné en svh). Sans
+  * scroller, le visiteur comprend : qui est Stevens, ce qu'il propose,
+- * le bénéfice principal, comment réserver et comment demander un
+- * audit. Mobile : l'image se place entre le hook et la description.
++ * le bénéfice principal, comment réserver et comment découvrir les
++ * réalisations. Mobile : l'image se place entre le titre et la
++ * description. Les mentions « Copywriting inclus » / « SEO de base »
++ * sont volontairement absentes : elles appartiennent à la section
++ * « Avantages inclus » qui présente l'offre.
+  */
+ export function Hero() {
+   const reduce = useReducedMotion();
+@@ -42,9 +44,9 @@ export function Hero() {
+       />
+ 
+       <div className="container-site relative flex flex-1 flex-col justify-center pb-4 pt-[64px] sm:pb-8 sm:pt-[68px] lg:pb-8 lg:pt-[112px]">
+-        <div className="grid items-center gap-4 sm:gap-7 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8 xl:gap-12">
+-          {/* ---------- Bloc texte haut : eyebrow, titre, hook ---------- */}
+-          {/* Mobile : eyebrow → H1 → hook, puis image (bloc visuel), puis
++        <div className="grid items-center gap-3.5 sm:gap-5 lg:grid-cols-[1.15fr_0.85fr] lg:gap-7 xl:gap-9">
++          {/* ---------- Bloc texte haut : eyebrow, titre ---------- */}
++          {/* Mobile : eyebrow → H1, puis image (bloc visuel), puis
+               suite du texte. Desktop : colonne gauche, ligne 1. */}
+           <div className="order-1 lg:col-start-1 lg:row-start-1">
+             <Reveal direction="up">
+@@ -58,18 +60,12 @@ export function Hero() {
+               as="h1"
+               text={HERO.h1}
+               delay={0.08}
+-              className="text-hero-title-viewport mt-4 text-white sm:mt-5"
++              className="text-hero-title-viewport mt-3 text-white sm:mt-4"
+             />
+-
+-            <Reveal direction="up" delay={0.18}>
+-              <p className="mt-3.5 max-w-xl font-display text-[15px] font-medium leading-snug text-[#c9baac] sm:text-base lg:text-lg xl:text-xl">
+-                {HERO.hook}
+-              </p>
+-            </Reveal>
+           </div>
+ 
+           {/* ---------- Colonne visuelle : portrait + mockups ---------- */}
+-          {/* Mobile : placée entre le hook et la description (demande
++          {/* Mobile : placée entre le titre et la description (demande
+               explicite de l'éditeur) ; desktop : colonne droite sur les
+               deux lignes de la grille, hauteur plafonnée en svh pour
+               que le hero tienne dans l'écran. */}
+@@ -91,7 +87,7 @@ export function Hero() {
+                     loading="eager"
+                     fetchPriority="high"
+                     decoding="sync"
+-                    className="block h-[min(26svh,240px)] w-full object-cover object-top lg:h-[min(60svh,540px)] lg:w-auto"
++                    className="block h-[min(29svh,270px)] w-full object-cover object-top lg:h-[min(64svh,570px)] lg:w-auto"
+                   />
+                 </span>
+                 <figcaption className="absolute left-4 top-4">
+@@ -142,15 +138,16 @@ export function Hero() {
+           {/* ---------- Bloc texte bas : description, CTA, réassurance ---------- */}
+           {/* Mobile : succède à l'image ; desktop : colonne gauche, ligne 2. */}
+           <div className="order-3 lg:col-start-1 lg:row-start-2">
+-            <Reveal direction="up" delay={0.24}>
+-              <p className="mt-3.5 max-w-xl text-[12.5px] leading-[1.55] text-[#c8c8c8] sm:mt-0 sm:text-[15px] lg:mt-5 lg:text-[15px] xl:text-base">
++            <Reveal direction="up" delay={0.18}>
++              <p className="mt-2.5 max-w-xl text-[12.5px] leading-[1.55] text-[#c8c8c8] sm:mt-3 sm:text-[15px] lg:mt-3 lg:text-[15px] xl:text-base">
+                 {HERO.text}
+               </p>
+             </Reveal>
+ 
+-            {/* CTA — les deux boutons partagent la même ligne sur desktop */}
+-            <Reveal direction="up" delay={0.3}>
+-              <div className="mt-3.5 flex flex-wrap items-center gap-2.5 sm:mt-6 sm:gap-3 lg:mt-6">
++            {/* CTA — les deux boutons partagent la même ligne sur desktop :
++                réservation d'appel (blanc) + découverte des réalisations (noir). */}
++            <Reveal direction="up" delay={0.24}>
++              <div className="mt-3 flex flex-wrap items-center gap-2.5 sm:mt-5 sm:gap-3 lg:mt-5">
+                 <CTAButton
+                   action={{ kind: "calendly" }}
+                   variant="secondary"
+@@ -161,33 +158,19 @@ export function Hero() {
+                   {HERO.ctaPrimary}
+                 </CTAButton>
+                 <CTAButton
+-                  action={{ kind: "page", page: "contact", section: "audit" }}
++                  action={{ kind: "page", page: "realisations" }}
+                   variant="ghostLight"
+-                  icon={CTAIcons.audit}
+-                  className="px-3 py-2 text-[12px] sm:px-3.5 sm:py-2.5 sm:text-[13px]"
++                  icon={CTAIcons.works}
++                  className="px-3.5 py-2.5 text-[13px] sm:px-4 sm:py-3 sm:text-sm"
+                 >
+                   {HERO.ctaTertiary}
+                 </CTAButton>
+               </div>
+             </Reveal>
+ 
+-            <Reveal direction="up" delay={0.36}>
++            <Reveal direction="up" delay={0.3}>
+               <ReassuranceBar mention={HERO.reassurance} className="mt-3 sm:mt-4 lg:mt-5" />
+             </Reveal>
+-
+-            <Reveal direction="up" delay={0.42}>
+-              <ul className="mt-2.5 flex flex-wrap gap-2 sm:mt-3.5">
+-                {HERO.perks.map((perk) => (
+-                  <li
+-                    key={perk}
+-                    className="inline-flex items-center gap-1.5 rounded-full border border-[#c9baac]/25 bg-[#c9baac]/8 px-2.5 py-1 text-[10.5px] font-medium text-[#c9baac] sm:gap-2 sm:px-3.5 sm:py-1.5 sm:text-xs"
+-                  >
+-                    <Check className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
+-                    {perk}
+-                  </li>
+-                ))}
+-              </ul>
+-            </Reveal>
+           </div>
+         </div>
+       </div>
+diff --git a/src/components/home/MethodAbout.tsx b/src/components/home/MethodAbout.tsx
+index 060e0d5..31fa695 100755
+--- a/src/components/home/MethodAbout.tsx
++++ b/src/components/home/MethodAbout.tsx
+@@ -2,7 +2,7 @@
+ 
+ import React from "react";
+ import { Reveal } from "@/components/motion/Reveal";
+-import { SectionHeading, CTAButton, CTAIcons } from "@/components/marketing/Marketing";
++import { SectionHeading, CTAButton, CTAIcons, RichText } from "@/components/marketing/Marketing";
+ import { MonoImage } from "@/components/media/Media";
+ import { METHOD, ABOUT } from "@/content/site-content";
+ import { ASSETS } from "@/lib/site";
+@@ -95,9 +95,7 @@ export function AboutSection() {
+           <div className="lg:pt-2">
+             <SectionHeading eyebrow={ABOUT.eyebrow} title={ABOUT.title} tone="light" />
+             <Reveal direction="up" delay={0.15}>
+-              <div className="text-body mt-6 max-w-xl whitespace-pre-line on-paper-muted">
+-                {ABOUT.text}
+-              </div>
++              <RichText text={ABOUT.text} className="text-body mt-6 max-w-xl on-paper-muted" />
+             </Reveal>
+ 
+             <Reveal direction="up" delay={0.2}>
+diff --git a/src/components/home/ProblemQuestioning.tsx b/src/components/home/ProblemQuestioning.tsx
+index b8e4b94..a50bfa5 100755
+--- a/src/components/home/ProblemQuestioning.tsx
++++ b/src/components/home/ProblemQuestioning.tsx
+@@ -3,7 +3,7 @@
+ import React from "react";
+ import { XCircle, HelpCircle } from "lucide-react";
+ import { Reveal, RevealText } from "@/components/motion/Reveal";
+-import { SectionHeading, CTAButton, CTAIcons } from "@/components/marketing/Marketing";
++import { SectionHeading, CTAButton, CTAIcons, RichText } from "@/components/marketing/Marketing";
+ import { MonoImage } from "@/components/media/Media";
+ import { PROBLEM, QUESTIONING } from "@/content/site-content";
+ import { ASSETS } from "@/lib/site";
+@@ -24,9 +24,7 @@ export function ProblemSection() {
+               tone="dark"
+             />
+             <Reveal direction="up" delay={0.15}>
+-              <div className="text-body mt-6 max-w-xl whitespace-pre-line on-dark-muted">
+-                {PROBLEM.text}
+-              </div>
++              <RichText text={PROBLEM.text} className="text-body mt-6 max-w-xl on-dark-muted" />
+             </Reveal>
+ 
+             <Reveal direction="up" delay={0.2}>
+@@ -44,7 +42,10 @@ export function ProblemSection() {
+             </Reveal>
+           </div>
+ 
+-          {/* Visuel : composition des deux illustrations « problème » */}
++            {/* Visuel : composition des deux illustrations « problème » —
++                la deuxième image est volontairement plus grande
++                (58 %) pour affirmer sa présence, à la demande de
++                l'éditeur. */}
+           <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+             <Reveal direction="left" delay={0.1}>
+               <MonoImage
+@@ -55,7 +56,7 @@ export function ProblemSection() {
+                 className="rounded-2xl border border-[#e4e4e4]/12 shadow-[0_30px_70px_-30px_rgba(0,0,0,0.7)]"
+               />
+             </Reveal>
+-            <Reveal direction="right" delay={0.25} className="absolute -bottom-10 -right-2 hidden w-[52%] sm:block lg:-right-6">
++            <Reveal direction="right" delay={0.25} className="absolute -bottom-12 -right-2 hidden w-[58%] sm:block lg:-right-8">
+               <MonoImage
+                 src={ASSETS.problemIneffective}
+                 alt="Illustration : site web inefficace qui n'apporte pas de résultats"
+@@ -99,9 +100,7 @@ export function QuestioningSection() {
+           <div>
+             <SectionHeading eyebrow={QUESTIONING.eyebrow} title={QUESTIONING.title} tone="light" />
+             <Reveal direction="up" delay={0.15}>
+-              <div className="text-body mt-6 max-w-xl whitespace-pre-line on-paper-muted">
+-                {QUESTIONING.text}
+-              </div>
++              <RichText text={QUESTIONING.text} className="text-body mt-6 max-w-xl on-paper-muted" />
+             </Reveal>
+           </div>
+ 
+diff --git a/src/components/home/ServicesSections.tsx b/src/components/home/ServicesSections.tsx
+index ebda807..001279a 100755
+--- a/src/components/home/ServicesSections.tsx
++++ b/src/components/home/ServicesSections.tsx
+@@ -14,7 +14,7 @@ import {
+   BadgeCheck,
+ } from "lucide-react";
+ import { Reveal } from "@/components/motion/Reveal";
+-import { SectionHeading, CTAButton, CTAIcons } from "@/components/marketing/Marketing";
++import { SectionHeading, CTAButton, CTAIcons, RichText } from "@/components/marketing/Marketing";
+ import { SERVICES, INCLUDED, COMPLEMENTARY } from "@/content/site-content";
+ import { useRouter } from "@/components/router-context";
+ 
+@@ -47,7 +47,7 @@ export function ServicesSection() {
+               }}
+               className="group inline-flex items-center gap-2 rounded-full border border-[#1c1c1c]/20 px-5 py-2.5 text-sm font-medium text-[#1c1c1c] transition-colors duration-300 hover:border-[#1c1c1c] hover:bg-[#1c1c1c] hover:text-white"
+             >
+-              Explorer le détail des services
++              Explorer Le Détail Des Services
+               <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+             </a>
+           </Reveal>
+@@ -111,9 +111,10 @@ export function IncludedSection() {
+                     </span>
+                     <h3 className="font-display text-xl font-semibold text-white">{item.title}</h3>
+                   </div>
+-                  <p className="mt-5 whitespace-pre-line text-[15px] leading-relaxed text-[#c8c8c8]">
+-                    {item.text}
+-                  </p>
++                  <RichText
++                    text={item.text}
++                    className="mt-5 text-[15px] leading-relaxed text-[#c8c8c8]"
++                  />
+                   <p className="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-medium tracking-widest text-[#c9baac]">
+                     <BadgeCheck className="h-4 w-4" aria-hidden="true" />
+                     INCLUS SANS FRAIS SUPPLÉMENTAIRES
+diff --git a/src/components/home/TransformationSolution.tsx b/src/components/home/TransformationSolution.tsx
+index 7be2e8b..5c559d3 100755
+--- a/src/components/home/TransformationSolution.tsx
++++ b/src/components/home/TransformationSolution.tsx
+@@ -3,7 +3,7 @@
+ import React from "react";
+ import { Clock, TrendingUp, Users, Home, RefreshCw } from "lucide-react";
+ import { Reveal } from "@/components/motion/Reveal";
+-import { SectionHeading, CTAButton, CTAIcons } from "@/components/marketing/Marketing";
++import { SectionHeading, CTAButton, CTAIcons, RichText } from "@/components/marketing/Marketing";
+ import { MonoImage } from "@/components/media/Media";
+ import { TRANSFORMATION, SOLUTION } from "@/content/site-content";
+ import { ASSETS } from "@/lib/site";
+@@ -44,9 +44,7 @@ export function TransformationSection() {
+           <div className="lg:order-1">
+             <SectionHeading eyebrow={TRANSFORMATION.eyebrow} title={TRANSFORMATION.title} tone="dark" />
+             <Reveal direction="up" delay={0.15}>
+-              <div className="text-body mt-6 max-w-xl whitespace-pre-line on-dark-muted">
+-                {TRANSFORMATION.text}
+-              </div>
++              <RichText text={TRANSFORMATION.text} className="text-body mt-6 max-w-xl on-dark-muted" />
+             </Reveal>
+           </div>
+         </div>
+@@ -102,9 +100,7 @@ export function SolutionSection() {
+           <div>
+             <SectionHeading eyebrow={SOLUTION.eyebrow} title={SOLUTION.title} tone="dark" />
+             <Reveal direction="up" delay={0.15}>
+-              <div className="text-body mt-6 max-w-xl whitespace-pre-line on-dark-muted">
+-                {SOLUTION.text}
+-              </div>
++              <RichText text={SOLUTION.text} className="text-body mt-6 max-w-xl on-dark-muted" />
+             </Reveal>
+             <Reveal direction="up" delay={0.2}>
+               <div className="mt-9 rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-2">
+diff --git a/src/components/home/WorksSection.tsx b/src/components/home/WorksSection.tsx
+index d1bff06..35aa132 100755
+--- a/src/components/home/WorksSection.tsx
++++ b/src/components/home/WorksSection.tsx
+@@ -6,17 +6,18 @@ import { SectionHeading, CTAButton, CTAIcons } from "@/components/marketing/Mark
+ import { ProjectCard } from "@/components/marketing/ProjectCard";
+ import { WORKS } from "@/content/site-content";
+ import { PROJECTS } from "@/lib/site";
+-import { useRouter } from "@/components/router-context";
+ 
+ /**
+  * SECTION 09 — RÉALISATIONS (fond blanc)
+- * Trois réalisations réelles uniquement, présentées sous forme de
+- * mockups professionnels (desktop + mobile), monochrome par défaut
+- * sur desktop, retour aux couleurs au survol, carte cliquable,
+- * ouverture en nouvel onglet.
++ * Présentation calquée sur la section « Websites We Created » de
++ * sheragency.com : titre + double CTA (bouton noir « Demander Un
++ * Devis », bouton contour « Voir La Page Réalisations »), puis
++ * grille de cartes projet — grande capture, nom, catégorie et
++ * bouton « Voir Le Projet » ouvrant la page de présentation du
++ * projet (#/projet/<id>), exactement comme la référence ouvre ses
++ * pages de case study.
+  */
+ export function WorksSection() {
+-  const router = useRouter();
+   return (
+     <section
+       id="realisations"
+@@ -24,57 +25,43 @@ export function WorksSection() {
+       className="section-bright scroll-mt-20 py-20 sm:py-24 lg:py-32"
+     >
+       <div className="container-site">
+-        <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
+-          <div>
+-            <SectionHeading eyebrow={WORKS.eyebrow} title={WORKS.title} intro={WORKS.intro} tone="light" />
+-          </div>
++        {/* Titre + double CTA — comme la colonne gauche de la référence */}
++        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
++          <SectionHeading
++            eyebrow={WORKS.eyebrow}
++            title={WORKS.title}
++            intro={WORKS.intro}
++            tone="light"
++            className="max-w-2xl"
++          />
+           <Reveal direction="up" delay={0.15}>
+-            <a
+-              href="#/realisations"
+-              onClick={(e) => {
+-                e.preventDefault();
+-                router.navigate("realisations");
+-              }}
+-              className="group inline-flex items-center gap-2 rounded-full border border-[#1c1c1c]/20 px-5 py-2.5 text-sm font-medium text-[#1c1c1c] transition-colors duration-300 hover:border-[#1c1c1c] hover:bg-[#1c1c1c] hover:text-white"
+-            >
+-              Voir la page Réalisations
+-              <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+-            </a>
+-          </Reveal>
+-        </div>
+-
+-        <div className="mt-12 flex flex-col gap-6 sm:mt-14">
+-          {PROJECTS.map((project, i) => (
+-            <ProjectCard key={project.id} project={project} index={i} />
+-          ))}
+-        </div>
+-
+-        <Reveal direction="up" delay={0.15}>
+-          <div className="mt-12 rounded-2xl border border-[#e4e4e4] bg-[#f5f5f5] px-7 py-8 text-center sm:px-10 sm:py-10">
+-            <p className="font-display text-xl font-semibold text-[#1c1c1c] sm:text-2xl">
+-              {WORKS.cta}
+-            </p>
+-            <div className="mt-7 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
++            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+               <CTAButton
+-                action={{ kind: "calendly" }}
+-                variant="ghostDark"
++                action={{ kind: "page", page: "contact", section: "devis" }}
++                variant="dark"
+                 size="lg"
+-                icon={CTAIcons.calendar}
+-                className="!text-[#1c1c1c] [&::before]:bg-[#e4e4e4]"
++                icon={CTAIcons.quote}
+               >
+-                Réserver un appel
++                Demander Un Devis
+               </CTAButton>
+               <CTAButton
+-                action={{ kind: "page", page: "contact", section: "devis" }}
++                action={{ kind: "page", page: "realisations" }}
+                 variant="ghostDark"
+                 size="lg"
+-                icon={CTAIcons.quote}
++                icon={CTAIcons.works}
+               >
+-                Demander un devis
++                Voir La Page Réalisations
+               </CTAButton>
+             </div>
+-          </div>
+-        </Reveal>
++          </Reveal>
++        </div>
++
++        {/* Grille des projets — grande capture + nom + « Voir Le Projet » */}
++        <div className="mt-12 grid gap-6 sm:mt-14 md:grid-cols-2">
++          {PROJECTS.map((project, i) => (
++            <ProjectCard key={project.id} project={project} index={i} />
++          ))}
++        </div>
+       </div>
+     </section>
+   );
+diff --git a/src/components/layout/Footer.tsx b/src/components/layout/Footer.tsx
+index dccf88a..a7a760c 100755
+--- a/src/components/layout/Footer.tsx
++++ b/src/components/layout/Footer.tsx
+@@ -3,7 +3,7 @@
+ import React from "react";
+ import { Linkedin, Mail, MessageCircle, ArrowUpRight } from "lucide-react";
+ import { useRouter } from "@/components/router-context";
+-import { NAV_ITEMS, SITE } from "@/lib/site";
++import { ASSETS, NAV_ITEMS, SITE } from "@/lib/site";
+ import { Reveal } from "@/components/motion/Reveal";
+ 
+ const NAV_PAGES: Record<string, string> = {
+@@ -22,10 +22,10 @@ export function Footer() {
+       <div className="container-site py-16 lg:py-20">
+         <Reveal direction="up" amount={0.15}>
+           <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr] lg:gap-8">
+-            {/* Marque — logo officiel (version blanche) */}
++            {/* Marque — logo officiel (version blanche, pour fond sombre) */}
+             <div className="max-w-sm">
+               <img
+-                src="/assets/logo-blanc.png"
++                src={ASSETS.logoLight}
+                 alt="Stevens Akpovi"
+                 width={220}
+                 height={176}
+diff --git a/src/components/layout/Header.tsx b/src/components/layout/Header.tsx
+index bdb00cb..1a0242f 100755
+--- a/src/components/layout/Header.tsx
++++ b/src/components/layout/Header.tsx
+@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
+ import { X, CalendarCheck, ArrowUpRight, Linkedin, Mail, MessageCircle } from "lucide-react";
+ import { useRouter } from "@/components/router-context";
+ import { useCalendly } from "@/components/calendly/CalendlyContext";
+-import { NAV_ITEMS, SITE } from "@/lib/site";
++import { ASSETS, NAV_ITEMS, SITE } from "@/lib/site";
+ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+ 
+ const NAV_PAGES: Record<string, string> = {
+@@ -15,6 +15,41 @@ const NAV_PAGES: Record<string, string> = {
+   contact: "contact",
+ };
+ 
++/** Navigation du header — « Accueil » retiré à la demande de l'éditeur
++ *  (le logo ramène déjà à l'accueil ; le pied de page le conserve). */
++const HEADER_NAV_ITEMS = NAV_ITEMS.filter((item) => item.key !== "accueil");
++
++/**
++ * Bouton blanc « Démarrer Un Projet » — pastille flèche ↗ (style sher).
++ * Style unifié sur le bouton blanc du hero : fond #ffffff, bordure
++ * #e4e4e4 devenue beige au survol, remplissage progressif #e4e4e4,
++ * légère élévation. Composant déclaré hors du rendu (stable).
++ */
++function StartProjectButton({
++  className = "",
++  onClick,
++}: {
++  className?: string;
++  onClick: (e?: React.MouseEvent) => void;
++}) {
++  return (
++    <button
++      type="button"
++      onClick={onClick}
++      aria-label="Démarrer un projet — formulaire de demande de projet"
++      className={`group/cta btn-fill inline-flex min-h-[52px] items-center gap-3 rounded-full border border-[#e4e4e4] bg-white py-2 pl-6 pr-1.5 font-medium tracking-[0.01em] text-[#1c1c1c] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-[#c9baac] focus-visible:outline-2 focus-visible:outline-offset-4 [&::before]:bg-[#e4e4e4] ${className}`}
++    >
++      <span className="text-[15px]">Démarrer Un Projet</span>
++      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#e4e4e4] transition-colors duration-300 group-hover/cta:bg-[#1c1c1c]">
++        <ArrowUpRight
++          className="h-3.5 w-3.5 text-[#1c1c1c] transition-colors duration-300 group-hover/cta:text-white"
++          aria-hidden="true"
++        />
++      </span>
++    </button>
++  );
++}
++
+ /**
+  * EN-TÊTE — présentation calquée sur le header de sheragency.com :
+  * trois blocs sombres #1c1c1c posés sur un bandeau transparent :
+@@ -28,6 +63,11 @@ const NAV_PAGES: Record<string, string> = {
+  *    menu plein écran (liens XL + CTA), comme la référence.
+  * Le bandeau reste fixe : les pastilles étant opaques, la présentation
+  * est identique sur tous les fonds.
++ *
++ * MENU PLEIN ÉCRAN — entièrement visible sans défilement sur tout
++ * écran (hauteur 100svh, contenu compact et adaptatif) + croix de
++ * fermeture dédiée dans le menu, en plus de la pastille hamburger
++ * qui se transforme en croix.
+  */
+ export function Header() {
+   const router = useRouter();
+@@ -78,26 +118,6 @@ export function Header() {
+     router.navigate(key as never);
+   };
+ 
+-  /** Bouton blanc « Démarrer un projet » — pastille flèche ↗ (style sher). */
+-  const StartProjectButton = ({ className = "" }: { className?: string }) => (
+-    <button
+-      type="button"
+-      onClick={startProject}
+-      aria-label="Démarrer un projet — formulaire de demande de projet"
+-      className={`group/cta inline-flex min-h-[52px] items-center gap-3 rounded-full bg-white py-2 pl-6 pr-1.5 transition-colors duration-300 hover:bg-[#efefef] focus-visible:outline-2 focus-visible:outline-offset-4 ${className}`}
+-    >
+-      <span className="text-[15px] font-medium tracking-[0.01em] text-[#1c1c1c]">
+-        Démarrer un projet
+-      </span>
+-      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#e4e4e4] transition-colors duration-300 group-hover/cta:bg-[#1c1c1c]">
+-        <ArrowUpRight
+-          className="h-3.5 w-3.5 text-[#1c1c1c] transition-colors duration-300 group-hover/cta:text-white"
+-          aria-hidden="true"
+-        />
+-      </span>
+-    </button>
+-  );
+-
+   /** Icône hamburger à deux lignes inégales (style sher) / croix si ouvert. */
+   const BurgerIcon = menuOpen ? (
+     <X className="h-5 w-5 text-white" aria-hidden="true" />
+@@ -125,9 +145,9 @@ export function Header() {
+           aria-label="Stevens Akpovi — retour à l'accueil"
+           className="flex h-14 w-12 items-center justify-center rounded-b-lg bg-[#1c1c1c] transition-colors duration-300 hover:bg-[#232323] lg:h-[98px] lg:w-[94px] lg:rounded-b-[9px]"
+         >
+-          {/* Logo officiel (version blanche, fond transparent) */}
++          {/* Logo officiel (version blanche, pour fond sombre) */}
+           <img
+-            src="/assets/logo-blanc.png"
++            src={ASSETS.logoLight}
+             alt="Stevens Akpovi"
+             width={220}
+             height={176}
+@@ -142,7 +162,7 @@ export function Header() {
+           className="mt-[13px] hidden h-[85px] items-center justify-between rounded-[9px] bg-[#1c1c1c] pl-[57px] pr-[7px] lg:flex"
+         >
+           <ul className="flex items-center">
+-            {NAV_ITEMS.map((item) => (
++            {HEADER_NAV_ITEMS.map((item) => (
+               <li key={item.key}>
+                 <a
+                   href={`#/${NAV_PAGES[item.key]}`}
+@@ -160,7 +180,7 @@ export function Header() {
+               </li>
+             ))}
+           </ul>
+-          <StartProjectButton className="ml-6" />
++          <StartProjectButton className="ml-6" onClick={startProject} />
+         </nav>
+ 
+         {/* ---------- 3. Pastille hamburger — collée en haut ---------- */}
+@@ -177,6 +197,10 @@ export function Header() {
+       </div>
+ 
+       {/* ---------- Menu plein écran (comme sheragency) ---------- */}
++      {/* Hauteur 100svh, contenu compact : tout est visible sans
++          défilement, sur tous les écrans. Croix de fermeture dédiée
++          sous la pastille hamburger (qui devient elle aussi une
++          croix). */}
+       <AnimatePresence>
+         {menuOpen && (
+           <motion.div
+@@ -185,12 +209,22 @@ export function Header() {
+             animate={{ opacity: 1 }}
+             exit={reduce ? { opacity: 0 } : { opacity: 0 }}
+             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+-            className="fixed inset-0 z-40 overflow-y-auto bg-[#1c1c1c]"
++            className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-[#1c1c1c]"
+           >
+-            <div className="container-site flex min-h-full flex-col pb-10 pt-[88px] lg:pt-[140px]">
++            <div className="container-site relative flex min-h-0 flex-1 flex-col pb-5 pt-[76px] sm:pb-6 sm:pt-[88px] lg:pb-8 lg:pt-[132px]">
++              {/* Croix de fermeture dédiée — sous la pastille hamburger */}
++              <button
++                type="button"
++                onClick={() => setMenuOpen(false)}
++                aria-label="Fermer le menu"
++                className="absolute right-0 top-0 flex h-12 w-12 items-center justify-center rounded-full border border-[#e4e4e4]/25 bg-[#232323] text-white transition-colors duration-300 hover:border-[#c9baac] hover:text-[#c9baac] focus-visible:outline-2 focus-visible:outline-offset-4 sm:h-14 sm:w-14"
++              >
++                <X className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
++              </button>
++
+               <nav aria-label="Navigation plein écran">
+                 <ul className="flex flex-col">
+-                  {NAV_ITEMS.map((item, i) => (
++                  {HEADER_NAV_ITEMS.map((item, i) => (
+                     <motion.li
+                       key={item.key}
+                       initial={reduce ? undefined : { opacity: 0, x: -18 }}
+@@ -201,7 +235,7 @@ export function Header() {
+                         href={`#/${NAV_PAGES[item.key]}`}
+                         onClick={(e) => goPage(e, item.key)}
+                         aria-current={isActive(item.key) ? "page" : undefined}
+-                        className={`group relative inline-block py-3.5 font-display text-[clamp(1.6rem,6vw,2.5rem)] font-medium leading-tight text-white transition-colors duration-300 hover:text-[#efefef] after:absolute after:bottom-1.5 after:left-1/2 after:h-px after:w-0 after:bg-white after:transition-all after:duration-300 hover:after:left-0 hover:after:w-full ${
++                        className={`group relative inline-block py-1.5 font-display text-[clamp(1.3rem,6vw,2.5rem)] font-medium leading-tight text-white transition-colors duration-300 hover:text-[#efefef] after:absolute after:bottom-1.5 after:left-1/2 after:h-px after:w-0 after:bg-white after:transition-all after:duration-300 hover:after:left-0 hover:after:w-full sm:py-2.5 lg:py-3 ${
+                           isActive(item.key) ? "after:left-0 after:w-full" : ""
+                         }`}
+                       >
+@@ -216,16 +250,20 @@ export function Header() {
+                 initial={reduce ? undefined : { opacity: 0, y: 14 }}
+                 animate={{ opacity: 1, y: 0 }}
+                 transition={{ delay: 0.34, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+-                className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-8 sm:flex-row sm:flex-wrap sm:items-center"
++                className="mt-4 flex flex-col gap-2.5 border-t border-white/10 pt-4 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:pt-6"
+               >
+-                <StartProjectButton />
++                <StartProjectButton
++                  className="min-h-[46px] py-1.5 pl-5 pr-1 sm:min-h-[52px] sm:py-2 sm:pl-6 sm:pr-1.5"
++                  onClick={startProject}
++                />
+                 <button
+                   type="button"
+                   onClick={openCalendly}
+-                  className="inline-flex min-h-[52px] items-center gap-2.5 rounded-full border border-white/30 px-6 py-3 text-[15px] font-medium text-white transition-colors duration-300 hover:border-[#c9baac] hover:text-[#c9baac]"
++                  aria-label="Réserver un appel de 30 minutes sur Calendly — Gratuit, 30 minutes et sans engagement."
++                  className="group/btn btn-fill inline-flex min-h-[46px] items-center justify-center gap-2.5 rounded-full border border-[#e4e4e4]/30 bg-[#000000] px-5 py-2.5 text-[13px] font-medium text-white transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-3 sm:min-h-[52px] sm:px-6 sm:py-3 sm:text-[15px] [&::before]:bg-[#3c3c3c]"
+                 >
+                   <CalendarCheck className="h-4 w-4" aria-hidden="true" />
+-                  Réserver un appel (30 min)
++                  Réserver Un Appel (30 Min)
+                 </button>
+               </motion.div>
+ 
+@@ -233,7 +271,7 @@ export function Header() {
+                 initial={reduce ? undefined : { opacity: 0 }}
+                 animate={{ opacity: 1 }}
+                 transition={{ delay: 0.42, duration: 0.4 }}
+-                className="mt-6 flex flex-wrap items-center gap-x-3 text-sm text-[#c8c8c8]"
++                className="mt-3 flex flex-wrap items-center gap-x-3 text-[13px] text-[#c8c8c8] sm:text-sm"
+               >
+                 <span>30 minutes</span>
+                 <span className="h-1 w-1 rounded-full bg-[#c9baac]" aria-hidden="true" />
+@@ -246,7 +284,7 @@ export function Header() {
+                 initial={reduce ? undefined : { opacity: 0 }}
+                 animate={{ opacity: 1 }}
+                 transition={{ delay: 0.5, duration: 0.4 }}
+-                className="mt-auto flex flex-wrap gap-x-7 gap-y-3 pt-12 text-sm text-[#c8c8c8]"
++                className="mt-auto flex flex-wrap items-center gap-x-6 gap-y-2 pt-4 text-xs text-[#c8c8c8] sm:gap-x-7 sm:text-sm"
+               >
+                 <a
+                   href={`mailto:${SITE.email}`}
+diff --git a/src/components/marketing/Marketing.tsx b/src/components/marketing/Marketing.tsx
+index 83f3427..80aaa04 100755
+--- a/src/components/marketing/Marketing.tsx
++++ b/src/components/marketing/Marketing.tsx
+@@ -1,13 +1,45 @@
+ "use client";
+ 
+ import React from "react";
+-import { ArrowRight, ArrowUpRight, CalendarCheck, FileText, SearchCheck } from "lucide-react";
++import { ArrowRight, ArrowUpRight, CalendarCheck, Eye, FileText, SearchCheck } from "lucide-react";
+ import { useRouter } from "@/components/router-context";
+ import { useCalendly } from "@/components/calendly/CalendlyContext";
+ import { Reveal, RevealText } from "@/components/motion/Reveal";
+ import { SITE } from "@/lib/site";
+ import type { AppPage } from "@/components/router-context";
+ 
++/* ============================ Texte multi-paragraphes ============================ */
++
++/**
++ * Description multi-paragraphes — espacement inter-paragraphe resserré
++ * (mt-3) au lieu du saut de ligne complet hérité de whitespace-pre-line.
++ * Un seul paragraphe : rendu <p> simple ; plusieurs : <div> de <p>.
++ */
++export function RichText({
++  text,
++  className = "",
++}: {
++  text: string;
++  className?: string;
++}) {
++  const paragraphs = text
++    .split(/\n{2,}/)
++    .map((p) => p.trim())
++    .filter(Boolean);
++  if (paragraphs.length <= 1) {
++    return <p className={className}>{paragraphs[0] ?? text}</p>;
++  }
++  return (
++    <div className={className}>
++      {paragraphs.map((paragraph, i) => (
++        <p key={i} className={i > 0 ? "mt-3" : undefined}>
++          {paragraph}
++        </p>
++      ))}
++    </div>
++  );
++}
++
+ /* ============================ En-têtes de section ============================ */
+ 
+ export function SectionHeading({
+@@ -49,6 +81,19 @@ export function SectionHeading({
+ }
+ 
+ /* ============================ Boutons d'action ============================ */
++/*
++ * Deux styles canoniques, conformes à la demande de l'éditeur :
++ * - BLANC : fond #ffffff exact — même design que le bouton hero
++ *   « Réserver Un Appel (30 Min) » : texte #1c1c1c, bordure #e4e4e4
++ *   qui devient beige au survol, remplissage progressif #e4e4e4,
++ *   légère élévation, flèche qui glisse.
++ * - NOIR : fond #000000 exact — même design que le bouton hero
++ *   « Audit gratuit de votre site actuel » : texte blanc, bordure
++ *   claire discrète, remplissage progressif #3c3c3c au survol,
++ *   légère élévation, flèche qui glisse. Les variantes « dark » et
++ *   « ghostLight » (transparent sur fond sombre) portent désormais
++ *   toutes deux ce style noir unifié.
++ */
+ 
+ type CTAAction =
+   | { kind: "calendly" }
+@@ -116,9 +161,9 @@ export function CTAButton({
+       "bg-[#c9baac] text-[#1c1c1c] shadow-[0_14px_34px_-14px_rgba(201,186,172,0.5)] [&::before]:bg-[#e4e4e4]",
+     secondary:
+       "bg-white text-[#1c1c1c] border border-[#e4e4e4] hover:border-[#c9baac] [&::before]:bg-[#e4e4e4]",
+-    dark: "bg-[#3c3c3c] text-white border border-[#3c3c3c] [&::before]:bg-[#525252]",
++    dark: "bg-[#000000] text-white border border-[#e4e4e4]/30 [&::before]:bg-[#3c3c3c]",
+     ghostLight:
+-      "bg-transparent text-white border border-[#e4e4e4]/30 [&::before]:bg-[#3c3c3c]",
++      "bg-[#000000] text-white border border-[#e4e4e4]/30 [&::before]:bg-[#3c3c3c]",
+     ghostDark:
+       "bg-transparent text-[#1c1c1c] border border-[#1c1c1c]/25 [&::before]:bg-[#e4e4e4]",
+   };
+@@ -151,6 +196,7 @@ export const CTAIcons = {
+   calendar: <CalendarCheck className="h-[18px] w-[18px]" aria-hidden="true" />,
+   quote: <FileText className="h-[18px] w-[18px]" aria-hidden="true" />,
+   audit: <SearchCheck className="h-[18px] w-[18px]" aria-hidden="true" />,
++  works: <Eye className="h-[18px] w-[18px]" aria-hidden="true" />,
+ };
+ 
+ /* ============================ Réassurance ============================ */
+diff --git a/src/components/marketing/ProjectCard.tsx b/src/components/marketing/ProjectCard.tsx
+index a3c4c16..39e917d 100755
+--- a/src/components/marketing/ProjectCard.tsx
++++ b/src/components/marketing/ProjectCard.tsx
+@@ -1,15 +1,17 @@
+ "use client";
+ 
+ import React from "react";
+-import { BrowserMockup, PhoneMockup, DirectionalIcon } from "@/components/media/Media";
++import { ArrowRight } from "lucide-react";
++import { useRouter } from "@/components/router-context";
+ import { Reveal } from "@/components/motion/Reveal";
+-import type { PROJECTS } from "@/lib/site";
++import { MonoImage, DirectionalIcon } from "@/components/media/Media";
+ 
+ /**
+- * Carte de réalisation — tout le bloc est cliquable et s'ouvre
+- * dans un nouvel onglet. Aperçus desktop + mobile, monochrome par
+- * défaut sur desktop, retour aux couleurs au survol, icône
+- * directionnelle au survol. Aucune donnée inventée.
++ * Carte de réalisation — présentation calquée sur la section
++ * « Websites We Created » de sheragency.com : grande capture du
++ * site, nom du projet, bouton « Voir Le Projet ». La carte entière
++ * et le bouton mènent à la page de présentation du projet
++ * (route #/projet/<id>), comme les fiches de la référence.
+  */
+ 
+ export interface Project {
+@@ -24,106 +26,52 @@ export interface Project {
+ }
+ 
+ export function ProjectCard({ project, index }: { project: Project; index: number }) {
+-  return (
+-    <Reveal direction="up" delay={index * 0.06} as="article">
+-      <a
+-        href={project.url}
+-        target="_blank"
+-        rel="noopener noreferrer"
+-        aria-label={`${project.cta} — ${project.name} (nouvel onglet)`}
+-        className="group media-group block"
+-      >
+-        <div className="relative overflow-hidden rounded-2xl border border-[#e4e4e4]/15 bg-[#232323] p-4 transition-all duration-500 hover:border-[#c9baac]/40 hover:bg-[#2f2f2f] sm:p-6 lg:p-7">
+-          {/* Zone mockups */}
+-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+-            <div className="min-w-0 flex-1">
+-              <BrowserMockup
+-                src={project.desktop}
+-                alt={`Aperçu desktop du site ${project.name}`}
+-                url={project.url}
+-                width={1440}
+-                height={900}
+-              />
+-            </div>
+-            <div className="hidden w-[26%] shrink-0 sm:block lg:w-[22%]">
+-              <PhoneMockup
+-                src={project.mobile}
+-                alt={`Aperçu mobile du site ${project.name}`}
+-                width={390}
+-                height={844}
+-              />
+-            </div>
+-          </div>
++  const router = useRouter();
+ 
+-          {/* Informations */}
+-          <div className="mt-6 flex items-end justify-between gap-5 sm:mt-7">
+-            <div className="min-w-0">
+-              <p className="text-eyebrow">Projet {String(index + 1).padStart(2, "0")}</p>
+-              <h3 className="text-card-title mt-2 text-white">{project.name}</h3>
+-              <p className="mt-1 text-sm text-[#c9baac]">{project.category}</p>
+-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#c8c8c8]">
+-                {project.description}
+-              </p>
+-              <p className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-white">
+-                <span className="transition-colors duration-300 group-hover:text-[#c9baac]">
+-                  {project.cta}
+-                </span>
+-                <span aria-hidden="true" className="text-[#c9baac]">↗</span>
+-              </p>
+-            </div>
+-            <DirectionalIcon className="hidden shrink-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 sm:flex" />
+-          </div>
+-        </div>
+-      </a>
+-    </Reveal>
+-  );
+-}
++  const goProject = (e: React.MouseEvent) => {
++    e.preventDefault();
++    router.navigate("projet", project.id);
++  };
+ 
+-/** Variante complète pour la page Réalisations — carte entièrement cliquable. */
+-export function ProjectDetail({ project, index }: { project: Project; index: number }) {
+   return (
+-    <Reveal direction="up" delay={0.05} as="article" className="scroll-mt-28">
++    <Reveal direction="up" delay={index * 0.06} as="article" className="h-full">
+       <a
+-        href={project.url}
+-        target="_blank"
+-        rel="noopener noreferrer"
+-        aria-label={`${project.cta} — ${project.name} (nouvel onglet)`}
+-        className="group media-group block rounded-2xl border border-[#e4e4e4]/15 bg-[#232323] p-5 transition-all duration-500 hover:border-[#c9baac]/40 hover:bg-[#2f2f2f] sm:p-7 lg:p-9"
++        href={`#/projet/${project.id}`}
++        onClick={goProject}
++        aria-label={`Voir Le Projet — ${project.name}`}
++        className="group media-group flex h-full flex-col rounded-2xl border border-[#e4e4e4] bg-white p-4 transition-all duration-300 hover:border-[#1c1c1c]/25 hover:shadow-[0_30px_60px_-35px_rgba(28,28,28,0.35)] sm:p-5"
+       >
+-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-10">
+-          <div className="min-w-0 flex-1">
+-            <BrowserMockup
+-              src={project.desktop}
+-              alt={`Aperçu desktop du site ${project.name}`}
+-              url={project.url}
+-              width={1440}
+-              height={900}
+-            />
+-          </div>
+-          <div className="w-full shrink-0 sm:w-1/3 lg:w-[24%]">
+-            <PhoneMockup
+-              src={project.mobile}
+-              alt={`Aperçu mobile du site ${project.name}`}
+-              width={390}
+-              height={844}
+-            />
+-          </div>
+-        </div>
+-        <div className="mt-7 flex flex-wrap items-end justify-between gap-4">
+-          <div className="max-w-2xl">
++        {/* Capture du site — couleur au survol (desktop), directe sur mobile */}
++        <MonoImage
++          src={project.desktop}
++          alt={`Aperçu du site ${project.name}`}
++          width={1440}
++          height={900}
++          className="rounded-xl border border-[#e4e4e4]"
++        />
++
++        {/* Nom du projet */}
++        <div className="mt-5 flex items-end justify-between gap-4">
++          <div className="min-w-0">
+             <p className="text-eyebrow">Projet {String(index + 1).padStart(2, "0")}</p>
+-            <h3 className="text-card-title mt-2 text-white">{project.name}</h3>
+-            <p className="mt-1 text-sm text-[#c9baac]">{project.category}</p>
+-            <p className="mt-3 text-sm leading-relaxed text-[#c8c8c8]">{project.description}</p>
+-            <p className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-white">
+-              <span className="transition-colors duration-300 group-hover:text-[#c9baac]">
+-                {project.cta}
+-              </span>
+-              <span aria-hidden="true" className="text-[#c9baac]">↗</span>
+-            </p>
++            <h3 className="text-card-title mt-2 text-[#1c1c1c]">{project.name}</h3>
++            <p className="mt-1 text-sm text-[#525252]">{project.category}</p>
+           </div>
+           <DirectionalIcon className="hidden shrink-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 sm:flex" />
+         </div>
++
++        {/* Bouton « Voir Le Projet » — même style que le bouton blanc du hero */}
++        <div className="mt-auto pt-6">
++          <span
++            aria-hidden="true"
++            className="group/btn btn-fill inline-flex min-h-[48px] items-center justify-center gap-2.5 rounded-full border border-[#e4e4e4] bg-white px-6 py-3.5 text-sm font-medium tracking-[0.01em] text-[#1c1c1c] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-[#c9baac] [&::before]:bg-[#e4e4e4]"
++          >
++            Voir Le Projet
++            <ArrowRight
++              className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1"
++            />
++          </span>
++        </div>
+       </a>
+     </Reveal>
+   );
+diff --git a/src/components/pages/AboutPage.tsx b/src/components/pages/AboutPage.tsx
+index 07f9235..ad4e123 100755
+--- a/src/components/pages/AboutPage.tsx
++++ b/src/components/pages/AboutPage.tsx
+@@ -1,7 +1,7 @@
+ "use client";
+ 
+ import React from "react";
+-import { PageHero, SectionHeading, CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
++import { PageHero, SectionHeading, CTAButton, CTAIcons, ReassuranceBar, RichText } from "@/components/marketing/Marketing";
+ import { Reveal } from "@/components/motion/Reveal";
+ import { MonoImage } from "@/components/media/Media";
+ import { ABOUT, SOLUTION, METHOD, FAQ } from "@/content/site-content";
+@@ -27,7 +27,7 @@ export function AboutPage() {
+             {ABOUT.cta}
+           </CTAButton>
+           <CTAButton action={{ kind: "page", page: "contact" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
+-            Me contacter
++            Me Contacter
+           </CTAButton>
+         </div>
+         <ReassuranceBar className="mt-6" />
+@@ -62,9 +62,7 @@ export function AboutPage() {
+             <div>
+               <SectionHeading eyebrow={ABOUT.eyebrow} title="Une conviction simple." tone="light" />
+               <Reveal direction="up" delay={0.12}>
+-                <div className="text-body mt-6 max-w-xl whitespace-pre-line on-paper-muted">
+-                  {ABOUT.text}
+-                </div>
++                <RichText text={ABOUT.text} className="text-body mt-6 max-w-xl on-paper-muted" />
+               </Reveal>
+               <Reveal direction="up" delay={0.18}>
+                 <dl className="mt-9 grid gap-3 sm:grid-cols-3">
+@@ -81,11 +79,11 @@ export function AboutPage() {
+               <Reveal direction="up" delay={0.24}>
+                 <div className="mt-9 rounded-2xl bg-[#1c1c1c] px-6 py-6 sm:px-8 sm:py-7">
+                   <p className="font-display text-lg font-medium leading-relaxed text-white sm:text-xl">
+-                    {ABOUT.cta} — 30 minutes suffisent pour commencer.
++                    Faisons connaissance — 30 minutes suffisent pour commencer.
+                   </p>
+                   <div className="mt-5">
+                     <CTAButton action={{ kind: "calendly" }} variant="primary" icon={CTAIcons.calendar}>
+-                      Réserver un appel
++                      Réserver Un Appel
+                     </CTAButton>
+                   </div>
+                   <p className="mt-4 text-xs text-[#c8c8c8]">{SITE.calendlyMention}</p>
+diff --git a/src/components/pages/AdminPage.tsx b/src/components/pages/AdminPage.tsx
+index 0d0164d..0cfc740 100755
+--- a/src/components/pages/AdminPage.tsx
++++ b/src/components/pages/AdminPage.tsx
+@@ -132,7 +132,7 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
+                 Vérification…
+               </>
+             ) : (
+-              "Ouvrir la session"
++              "Ouvrir La Session"
+             )}
+           </button>
+         </form>
+@@ -290,7 +290,7 @@ export function AdminPage() {
+             className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[#e4e4e4]/25 px-5 py-2.5 text-sm text-[#c8c8c8] transition-colors hover:border-[#ea384c]/60 hover:text-[#ffdede]"
+           >
+             <LogOut className="h-4 w-4" aria-hidden="true" />
+-            Fermer la session
++            Fermer La Session
+           </button>
+         </div>
+       </div>
+diff --git a/src/components/pages/ContactPage.tsx b/src/components/pages/ContactPage.tsx
+index a7ab31f..7264864 100755
+--- a/src/components/pages/ContactPage.tsx
++++ b/src/components/pages/ContactPage.tsx
+@@ -24,10 +24,10 @@ export function ContactPage() {
+       >
+         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
+           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
+-            Réserver un appel (30 min)
++            Réserver Un Appel (30 Min)
+           </CTAButton>
+           <CTAButton action={{ kind: "anchor", sectionId: "devis" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
+-            Demander un devis
++            Demander Un Devis
+           </CTAButton>
+         </div>
+         <ReassuranceBar className="mt-6" />
+diff --git a/src/components/pages/PortfolioPage.tsx b/src/components/pages/PortfolioPage.tsx
+index ab797b1..bf51622 100755
+--- a/src/components/pages/PortfolioPage.tsx
++++ b/src/components/pages/PortfolioPage.tsx
+@@ -2,12 +2,17 @@
+ 
+ import React from "react";
+ import { PageHero, CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
+-import { ProjectDetail } from "@/components/marketing/ProjectCard";
++import { ProjectCard } from "@/components/marketing/ProjectCard";
+ import { Reveal } from "@/components/motion/Reveal";
+ import { WORKS } from "@/content/site-content";
+ import { PROJECTS } from "@/lib/site";
+ 
+-/** PAGE RÉALISATIONS — les trois réalisations réelles uniquement. */
++/**
++ * PAGE RÉALISATIONS — les trois réalisations réelles uniquement,
++ * présentées comme la section « Websites We Created » de la
++ * référence : grille de cartes (grande capture, nom, « Voir Le
++ * Projet ») menant chacune à la page de présentation du projet.
++ */
+ export function PortfolioPage() {
+   return (
+     <>
+@@ -16,16 +21,16 @@ export function PortfolioPage() {
+         title={WORKS.title}
+         intro={WORKS.intro}
+       >
+-        <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="primary" size="lg" icon={CTAIcons.quote}>
+-          Discuter de mon projet
++        <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="secondary" size="lg" icon={CTAIcons.quote}>
++          Discuter De Mon Projet
+         </CTAButton>
+       </PageHero>
+ 
+-      <section aria-label="Réalisations de Stevens Akpovi" className="section-dark py-20 sm:py-24 lg:py-28">
++      <section aria-label="Réalisations de Stevens Akpovi" className="section-bright py-20 sm:py-24 lg:py-28">
+         <div className="container-site">
+-          <div className="flex flex-col gap-8 lg:gap-10">
++          <div className="grid gap-6 md:grid-cols-2">
+             {PROJECTS.map((project, i) => (
+-              <ProjectDetail key={project.id} project={project} index={i} />
++              <ProjectCard key={project.id} project={project} index={i} />
+             ))}
+           </div>
+ 
+@@ -36,10 +41,10 @@ export function PortfolioPage() {
+               </p>
+               <div className="mt-8 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
+                 <CTAButton action={{ kind: "calendly" }} variant="dark" size="lg" icon={CTAIcons.calendar}>
+-                  Réserver un appel
++                  Réserver Un Appel
+                 </CTAButton>
+                 <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="ghostDark" size="lg" icon={CTAIcons.quote}>
+-                  Demander un devis
++                  Demander Un Devis
+                 </CTAButton>
+               </div>
+               <ReassuranceBar tone="light" className="mt-6 justify-center" />
+diff --git a/src/components/pages/ProjectPage.tsx b/src/components/pages/ProjectPage.tsx
+new file mode 100644
+index 0000000..216e66c
+--- /dev/null
++++ b/src/components/pages/ProjectPage.tsx
+@@ -0,0 +1,176 @@
++"use client";
++
++import React from "react";
++import { PageHero, SectionHeading, CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
++import { Reveal } from "@/components/motion/Reveal";
++import { BrowserMockup, PhoneMockup } from "@/components/media/Media";
++import { ProjectCard } from "@/components/marketing/ProjectCard";
++import { PROJECTS, SITE } from "@/lib/site";
++
++/**
++ * PAGE DE PRÉSENTATION D'UN PROJET (#/projet/<id>)
++ * Structure inspirée des pages de cas client de sheragency.com :
++ * titre du projet + « Voir le site en direct », section « Le Site »
++ * avec les aperçus desktop et mobile, section « Autres Projets »,
++ * et appel à l'action final. Contenu strictement factuel —
++ * uniquement les données réelles du projet.
++ */
++export function ProjectPage({ projectId }: { projectId: string }) {
++  const index = PROJECTS.findIndex((p) => p.id === projectId);
++  if (index === -1) return null;
++  const project = PROJECTS[index];
++  const others = PROJECTS.filter((p) => p.id !== projectId);
++
++  return (
++    <>
++      {/* ---------- En-tête du projet ---------- */}
++      <PageHero
++        eyebrow={`PROJETS RÉALISÉS · PROJET ${String(index + 1).padStart(2, "0")}`}
++        title={project.name}
++        intro={project.description}
++      >
++        <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
++          <CTAButton
++            action={{ kind: "external", url: project.url }}
++            variant="secondary"
++            size="lg"
++            icon={CTAIcons.works}
++            ariaLabel={`${project.cta} — ${project.name} (nouvel onglet)`}
++          >
++            {project.cta}
++          </CTAButton>
++          <CTAButton
++            action={{ kind: "page", page: "contact", section: "devis" }}
++            variant="ghostLight"
++            size="lg"
++            icon={CTAIcons.quote}
++          >
++            Demander Un Devis
++          </CTAButton>
++        </div>
++        <ReassuranceBar className="mt-6" />
++      </PageHero>
++
++      {/* ---------- Le site : aperçus ---------- */}
++      <section
++        id="le-site"
++        aria-labelledby="le-site-titre"
++        className="section-light bg-grid-light scroll-mt-20 py-16 sm:py-20 lg:py-24"
++      >
++        <div className="container-site">
++          <SectionHeading
++            eyebrow="LE SITE"
++            title="Le site, tel qu'il est en ligne."
++            tone="light"
++          />
++          <Reveal direction="up" delay={0.15}>
++            <p className="text-body mt-6 max-w-2xl on-paper-muted">
++              {project.category}. Voici les aperçus de la version publiée —
++              l'aperçu bureau et l'aperçu mobile, côte à côte.
++            </p>
++          </Reveal>
++
++          <div className="mt-12 flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
++            <Reveal direction="up" delay={0.1} className="min-w-0 flex-1">
++              <BrowserMockup
++                src={project.desktop}
++                alt={`Aperçu desktop du site ${project.name}`}
++                url={project.url}
++                width={1440}
++                height={900}
++                priority
++              />
++            </Reveal>
++            <Reveal direction="left" delay={0.2} className="w-full shrink-0 sm:w-1/3 lg:w-[24%]">
++              <PhoneMockup
++                src={project.mobile}
++                alt={`Aperçu mobile du site ${project.name}`}
++                width={390}
++                height={844}
++              />
++            </Reveal>
++          </div>
++
++          <Reveal direction="up" delay={0.25}>
++            <div className="mt-12">
++              <CTAButton
++                action={{ kind: "external", url: project.url }}
++                variant="secondary"
++                size="lg"
++                icon={CTAIcons.works}
++                ariaLabel={`${project.cta} — ${project.name} (nouvel onglet)`}
++              >
++                {project.cta}
++              </CTAButton>
++            </div>
++          </Reveal>
++        </div>
++      </section>
++
++      {/* ---------- Autres projets ---------- */}
++      <section
++        aria-labelledby="autres-projets-titre"
++        className="section-bright py-16 sm:py-20 lg:py-24"
++      >
++        <div className="container-site">
++          <SectionHeading
++            eyebrow="PROJETS RÉALISÉS"
++            title="Découvrez les autres réalisations."
++            tone="light"
++          />
++          <div className="mt-12 grid gap-6 md:grid-cols-2">
++            {others.map((other) => (
++              <ProjectCard key={other.id} project={other} index={PROJECTS.indexOf(other)} />
++            ))}
++          </div>
++        </div>
++      </section>
++
++      {/* ---------- Conversion finale ---------- */}
++      <section
++        aria-labelledby="projet-cta-titre"
++        className="section-deep relative overflow-hidden py-20 sm:py-24 lg:py-28"
++      >
++        <div className="bg-grid-dark absolute inset-0" aria-hidden="true" />
++        <div
++          aria-hidden="true"
++          className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[760px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#c9baac] opacity-[0.08] blur-[130px]"
++        />
++        <div className="container-site relative text-center">
++          <Reveal direction="up">
++            <p className="text-eyebrow">IL EST TEMPS DE DONNER UNE NOUVELLE DIMENSION À VOTRE ACTIVITÉ</p>
++          </Reveal>
++          <Reveal direction="up" delay={0.08}>
++            <h2 id="projet-cta-titre" className="text-section-title mx-auto mt-5 max-w-3xl text-white">
++              Votre projet peut être la prochaine réalisation.
++            </h2>
++          </Reveal>
++          <Reveal direction="up" delay={0.16}>
++            <div className="mt-10 flex flex-col items-center justify-center gap-3.5 sm:flex-row sm:flex-wrap">
++              <CTAButton
++                action={{ kind: "calendly" }}
++                variant="secondary"
++                size="lg"
++                icon={CTAIcons.calendar}
++                ariaLabel={`Réserver un appel de 30 minutes sur Calendly — ${SITE.calendlyMention}`}
++              >
++                Réserver Un Appel (30 Min)
++              </CTAButton>
++              <CTAButton
++                action={{ kind: "page", page: "contact", section: "devis" }}
++                variant="ghostLight"
++                size="lg"
++                icon={CTAIcons.quote}
++              >
++                Demander Un Devis
++              </CTAButton>
++            </div>
++          </Reveal>
++          <Reveal direction="fade" delay={0.24}>
++            <ReassuranceBar className="mt-8 justify-center" />
++          </Reveal>
++        </div>
++      </section>
++    </>
++  );
++}
+diff --git a/src/components/pages/ServicesPage.tsx b/src/components/pages/ServicesPage.tsx
+index 696f4c4..7a0bed7 100755
+--- a/src/components/pages/ServicesPage.tsx
++++ b/src/components/pages/ServicesPage.tsx
+@@ -2,7 +2,7 @@
+ 
+ import React from "react";
+ import { Building2, LayoutGrid, MousePointerClick, ShoppingCart, RefreshCcw, Network, PenTool, Search, Megaphone, Check } from "lucide-react";
+-import { PageHero, SectionHeading, CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
++import { PageHero, SectionHeading, CTAButton, CTAIcons, ReassuranceBar, RichText } from "@/components/marketing/Marketing";
+ import { Reveal } from "@/components/motion/Reveal";
+ import { SERVICES, INCLUDED, COMPLEMENTARY, METHOD, FAQ } from "@/content/site-content";
+ 
+@@ -21,10 +21,10 @@ export function ServicesPage() {
+       >
+         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
+           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
+-            Réserver un appel
++            Réserver Un Appel
+           </CTAButton>
+           <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
+-            Demander un devis personnalisé
++            Demander Un Devis Personnalisé
+           </CTAButton>
+         </div>
+         <ReassuranceBar className="mt-6" />
+@@ -57,7 +57,7 @@ export function ServicesPage() {
+                         className="px-4 py-2 text-[13px]"
+                         ariaLabel={`Demander un devis pour : ${service.title}`}
+                       >
+-                        Demander un devis
++                        Demander Un Devis
+                       </CTAButton>
+                     </div>
+                   </div>
+@@ -84,7 +84,10 @@ export function ServicesPage() {
+                       </span>
+                       <h3 className="font-display text-xl font-semibold text-white">{item.title}</h3>
+                     </div>
+-                    <p className="mt-5 whitespace-pre-line text-[15px] leading-relaxed text-[#c8c8c8]">{item.text}</p>
++                    <RichText
++                      text={item.text}
++                      className="mt-5 text-[15px] leading-relaxed text-[#c8c8c8]"
++                    />
+                   </div>
+                 </Reveal>
+               );
+@@ -123,10 +126,10 @@ export function ServicesPage() {
+           <Reveal direction="up" delay={0.15}>
+             <div className="mt-10 rounded-2xl bg-[#c9baac] p-7 sm:p-8">
+               <p className="font-display text-lg font-semibold leading-snug text-[#1c1c1c] sm:text-xl">
+-                {COMPLEMENTARY.cta}
++                Discuter de ma stratégie digitale
+               </p>
+               <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="dark" className="mt-5" icon={CTAIcons.quote}>
+-                Discuter de ma stratégie digitale
++                Discuter De Ma Stratégie Digitale
+               </CTAButton>
+             </div>
+           </Reveal>
+@@ -160,16 +163,16 @@ export function ServicesPage() {
+           <Reveal direction="up">
+             <p className="text-eyebrow">PARLONS DE VOTRE PROJET</p>
+             <h2 className="text-section-title mx-auto mt-4 max-w-2xl text-white">
+-              {SERVICES.cta}
++              Trouver la solution adaptée à mon activité
+             </h2>
+           </Reveal>
+           <Reveal direction="up" delay={0.12}>
+             <div className="mt-9 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
+               <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
+-                Réserver un appel
++                Réserver Un Appel
+               </CTAButton>
+               <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="secondary" size="lg" icon={CTAIcons.quote}>
+-                Demander un devis personnalisé
++                Demander Un Devis Personnalisé
+               </CTAButton>
+             </div>
+             <ReassuranceBar className="mt-7 justify-center" />
+diff --git a/src/components/router-context.tsx b/src/components/router-context.tsx
+index 3586622..508b358 100755
+--- a/src/components/router-context.tsx
++++ b/src/components/router-context.tsx
+@@ -9,12 +9,13 @@ import React, {
+   useRef,
+   useSyncExternalStore,
+ } from "react";
+-import { PAGES, type PageKey } from "@/lib/site";
++import { PAGES, PROJECTS, type PageKey } from "@/lib/site";
+ 
+ /**
+  * Routeur applicatif du site (pages virtuelles dans la route `/`).
+  * URLs propres par fragment : #/services, #/realisations, #/a-propos,
+- * #/contact, #/mentions-legales — ancrage de section possible :
++ * #/contact, #/mentions-legales, #/projet/<id> (page de présentation
++ * d'une réalisation) — ancrage de section possible :
+  * #/contact/devis, #/accueil/portfolio…
+  */
+ 
+@@ -22,6 +23,7 @@ export type AppPage =
+   | "accueil"
+   | "services"
+   | "realisations"
++  | "projet"
+   | "aPropos"
+   | "contact"
+   | "legal"
+@@ -43,6 +45,7 @@ const PAGE_KEYS: Record<AppPage, keyof typeof PAGES | "admin"> = {
+   accueil: "accueil",
+   services: "services",
+   realisations: "realisations",
++  projet: "realisations",
+   aPropos: "aPropos",
+   contact: "contact",
+   legal: "legal",
+@@ -56,6 +59,7 @@ const HASH_TO_PAGE: Record<string, AppPage> = {
+   accueil: "accueil",
+   services: "services",
+   realisations: "realisations",
++  projet: "projet",
+   "a-propos": "aPropos",
+   contact: "contact",
+   "mentions-legales": "legal",
+@@ -89,6 +93,7 @@ const PAGE_TO_HASH: Record<AppPage, string> = {
+   accueil: "accueil",
+   services: "services",
+   realisations: "realisations",
++  projet: "projet",
+   aPropos: "a-propos",
+   contact: "contact",
+   legal: "mentions-legales",
+@@ -102,6 +107,19 @@ export function RouterProvider({ children }: { children: React.ReactNode }) {
+ 
+   // Titre dynamique + défilement après changement de page.
+   useEffect(() => {
++    // Page projet : le fragment porte l'identifiant du projet (ex.
++    // #/projet/mrsteveenglish) — titre dédié, retour en haut sans
++    // tentative d'ancrage.
++    if (state.page === "projet") {
++      const project = PROJECTS.find((p) => p.id === state.section);
++      if (typeof document !== "undefined") {
++        document.title = project
++          ? `${project.name} — Projet web | Stevens Akpovi`
++          : "Réalisations — Projets web | Stevens Akpovi";
++      }
++      window.scrollTo({ top: 0, behavior: "smooth" });
++      return;
++    }
+     const meta =
+       state.page !== "admin"
+         ? PAGES[PAGE_KEYS[state.page] as keyof typeof PAGES]
+diff --git a/src/content/site-content.ts b/src/content/site-content.ts
+index aa2ddd4..fd928de 100755
+--- a/src/content/site-content.ts
++++ b/src/content/site-content.ts
+@@ -9,12 +9,10 @@
+ export const HERO = {
+   eyebrow: "CONCEPTION DE SITES WEB PROFESSIONNELS",
+   h1: "Je crée des sites web qui génèrent des ventes.",
+-  hook: "Votre entreprise mérite mieux qu'une présence en ligne qui ne vous rapporte rien.",
+   text: "Vous n'avez pas encore de site web ? Ou votre site actuel ne vous apporte pas les résultats espérés ? Je conçois des sites web professionnels, élégants et stratégiquement pensés pour valoriser votre activité, attirer des visiteurs qualifiés et transformer leur intérêt en clients.",
+-  ctaPrimary: "Réserver un appel (30 min)",
+-  ctaTertiary: "Audit gratuit de votre site actuel",
++  ctaPrimary: "Réserver Un Appel (30 Min)",
++  ctaTertiary: "Voir Nos Travaux",
+   reassurance: "30 minutes · Gratuit · Sans engagement",
+-  perks: ["Copywriting inclus", "Optimisation SEO de base incluse"],
+   portraitAlt:
+     "Portrait professionnel de Stevens Akpovi, concepteur de sites web orientés conversion",
+ } as const;
+@@ -35,7 +33,7 @@ export const PROBLEM = {
+   ],
+   conclusion:
+     "Votre travail mérite d'être vu. Votre expertise mérite d'être valorisée. Votre entreprise mérite une présence digitale à la hauteur de ses ambitions.",
+-  cta: "Construire mon site professionnel",
++  cta: "Construire Mon Site Professionnel",
+ } as const;
+ 
+ /* ============================ 03 — REMISE EN QUESTION ============================ */
+@@ -54,7 +52,7 @@ export const QUESTIONING = {
+   ],
+   conclusion:
+     "Un site web ne devrait pas être une simple décoration numérique. Il devrait être un véritable outil au service de votre entreprise.",
+-  cta: "Demander mon audit gratuit",
++  cta: "Demander Mon Audit Gratuit",
+ } as const;
+ 
+ /* ============================ 04 — LA TRANSFORMATION ============================ */
+@@ -85,7 +83,7 @@ export const TRANSFORMATION = {
+       text: "Votre site peut grandir avec votre activité et accompagner vos nouvelles offres et ambitions.",
+     },
+   ],
+-  cta: "Je veux développer ma présence en ligne",
++  cta: "Je Veux Développer Ma Présence En Ligne",
+ } as const;
+ 
+ /* ============================ 05 — MA SOLUTION ============================ */
+@@ -108,7 +106,7 @@ export const SOLUTION = {
+       text: "Construire un parcours qui facilite les prises de contact, les réservations et les demandes commerciales.",
+     },
+   ],
+-  cta: "Parlons de votre projet",
++  cta: "Parlons De Votre Projet",
+ } as const;
+ 
+ /* ============================ 06 — SERVICES ============================ */
+@@ -142,7 +140,7 @@ export const SERVICES = {
+       text: "Associez plusieurs pages et parcours commerciaux pour accompagner les visiteurs de leur première découverte jusqu'à la prise de contact.",
+     },
+   ],
+-  cta: "Trouver la solution adaptée à mon activité",
++  cta: "Trouver La Solution Adaptée À Mon Activité",
+ } as const;
+ 
+ /* ============================ 07 — AVANTAGES INCLUS ============================ */
+@@ -161,7 +159,7 @@ export const INCLUDED = {
+     },
+   ],
+   conclusion: "Deux éléments essentiels, intégrés à votre projet sans facturation supplémentaire.",
+-  cta: "Parlons de mon futur site",
++  cta: "Parlons De Mon Futur Site",
+ } as const;
+ 
+ /* ============================ 08 — SERVICES COMPLÉMENTAIRES ============================ */
+@@ -179,7 +177,7 @@ export const COMPLEMENTARY = {
+       text: "Améliorez votre positionnement sur Google, renforcez votre visibilité et développez une présence organique durable grâce à une stratégie de référencement adaptée à votre marché.",
+     },
+   ],
+-  cta: "Discuter de ma stratégie digitale",
++  cta: "Discuter De Ma Stratégie Digitale",
+ } as const;
+ 
+ /* ============================ 09 — RÉALISATIONS ============================ */
+@@ -204,7 +202,7 @@ export const METHOD = {
+     { name: "Tests et optimisation", text: "Nous vérifions le comportement du site, ses liens, ses formulaires et son affichage sur tous les appareils." },
+     { name: "Mise en ligne", text: "Votre site est publié et prêt à accueillir ses premiers visiteurs." },
+   ],
+-  cta: "Démarrer mon projet",
++  cta: "Démarrer Mon Projet",
+ } as const;
+ 
+ /* ============================ 11 — À PROPOS ============================ */
+@@ -213,7 +211,7 @@ export const ABOUT = {
+   eyebrow: "QUI SUIS-JE ?",
+   title: "Je suis Stevens Akpovi. Et je crois qu'un bon site web doit servir le business qu'il représente.",
+   text: "Je suis concepteur de sites web professionnels et passionné par la manière dont le numérique peut accompagner le développement des entreprises.\n\nMon travail consiste à transformer les besoins d'un professionnel en une expérience digitale claire, élégante et orientée vers ses objectifs.\n\nJe m'intéresse autant à la présentation visuelle qu'au message transmis et au chemin que suit un visiteur avant de prendre une décision.\n\nParce qu'un site réussi ne se résume pas à son apparence.\n\nIl doit donner une bonne première impression, présenter la valeur de votre activité et faciliter la relation avec vos futurs clients.\n\nJe travaille à distance et accompagne des professionnels et des entreprises au-delà des frontières.",
+-  cta: "Faisons connaissance",
++  cta: "Faisons Connaissance",
+   facts: [
+     { label: "Approche", value: "Stratégie · Design · Conversion" },
+     { label: "Inclus dans chaque projet", value: "Copywriting professionnel · SEO de base" },
+@@ -268,9 +266,9 @@ export const FINAL_CTA = {
+   eyebrow: "IL EST TEMPS DE DONNER UNE NOUVELLE DIMENSION À VOTRE ACTIVITÉ",
+   title: "Je crée des sites web qui génèrent des ventes. Et votre prochain projet peut commencer aujourd'hui.",
+   text: "Vous avez une activité à développer, une expertise à valoriser ou des services à présenter ?\n\nConstruisons une présence en ligne professionnelle qui donne à votre entreprise les moyens de mieux se présenter, de toucher de nouvelles personnes et de transformer davantage d'intérêt en clients.\n\nPrenons simplement 30 minutes pour en discuter.",
+-  cta1: "Réserver mon appel",
+-  cta2: "Demander un devis",
+-  cta3: "Demander un audit gratuit",
++  cta1: "Réserver Mon Appel",
++  cta2: "Demander Un Devis",
++  cta3: "Demander Un Audit Gratuit",
+   mention: "30 minutes · Gratuit · Sans engagement",
+ } as const;
+ 
+diff --git a/src/lib/email.ts b/src/lib/email.ts
+index 6b074b6..2260141 100755
+--- a/src/lib/email.ts
++++ b/src/lib/email.ts
+@@ -1,4 +1,4 @@
+-import { SITE } from "@/lib/site";
++import { ASSETS, SITE } from "@/lib/site";
+ 
+ /**
+  * Service d'envoi d'emails côté serveur (API Resend, REST via fetch).
+@@ -113,7 +113,7 @@ export async function sendReceipt(lead: LeadPayload): Promise<boolean> {
+   <div style="background:#f5f5f5;padding:32px 0">
+     <div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e4e4e4">
+       <div style="background:#1c1c1c;padding:24px 28px">
+-        <img src="${SITE.url}/assets/logo-blanc.png" alt="Stevens Akpovi" width="110" height="88" style="display:block;margin-bottom:12px">
++        <img src="${SITE.url}${ASSETS.logoLight}" alt="Stevens Akpovi" width="110" height="88" style="display:block;margin-bottom:12px">
+         <span style="color:#c9baac;font-family:Arial,sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase">Confirmation de réception</span>
+         <h1 style="color:#ffffff;font-family:Arial,sans-serif;font-size:22px;margin:8px 0 0">Bonjour ${escapeHtml(lead.name)},</h1>
+       </div>
+diff --git a/src/lib/site.ts b/src/lib/site.ts
+index 02df7cd..76f83f5 100755
+--- a/src/lib/site.ts
++++ b/src/lib/site.ts
+@@ -120,7 +120,7 @@ export const PROJECTS = [
+     category: "Site web professionnel pour coach",
+     description:
+       "Un espace professionnel consacré à la présentation d'une activité de coaching en anglais, de ses programmes et de son accompagnement.",
+-    cta: "Voir le site",
++    cta: "Voir Le Site",
+     url: "https://mrsteveenglish.vercel.app",
+     desktop: "/assets/projects/mrsteveenglish-desktop.webp",
+     mobile: "/assets/projects/mrsteveenglish-mobile.webp",
+@@ -131,7 +131,7 @@ export const PROJECTS = [
+     category: "Page de vente",
+     description:
+       "Une page commerciale conçue pour présenter une offre de coaching, valoriser ses bénéfices et guider le visiteur vers l'inscription.",
+-    cta: "Voir la page de vente",
++    cta: "Voir La Page De Vente",
+     url: "https://mrsteveenglish.vercel.app/pre-launch",
+     desktop: "/assets/projects/prelaunch-desktop.webp",
+     mobile: "/assets/projects/prelaunch-mobile.webp",
+@@ -142,7 +142,7 @@ export const PROJECTS = [
+     category: "Site web de plateforme immobilière",
+     description:
+       "Une expérience digitale dédiée au secteur immobilier, pensée pour présenter une plateforme et faciliter la découverte de ses offres.",
+-    cta: "Découvrir le projet",
++    cta: "Découvrir Le Projet",
+     url: "https://afribayit.vercel.app",
+     desktop: "/assets/projects/afribayit-desktop.webp",
+     mobile: "/assets/projects/afribayit-mobile.webp",
+@@ -158,4 +158,10 @@ export const ASSETS = {
+   benefitGrowth: "/assets/benefit-business-growth.webp",
+   problemNoWebsite: "/assets/problem-no-website.webp",
+   problemIneffective: "/assets/problem-ineffective-website.webp",
++  /** Logo officiel — version blanche (pour fonds noirs/sombres). */
++  logoLight: "/assets/logo-blanc.png",
++  /** Logo officiel — version noire (pour fonds blancs/clairs). */
++  logoDark: "/assets/logo-noir.png",
++  /** Vignette de partage de lien (Open Graph), fournie par l'éditeur. */
++  ogImage: "/assets/OG.png",
+ } as const;
