@@ -88,11 +88,21 @@ CSV), brancher une base PostgreSQL managée :
 
 ## 6 bis. Incident résolu — 404 après déploiement réussi (12 novembre 2026)
 
-**Symptôme** : déploiement « Ready » et domaine valide (`stevensakpovi.vercel.app`), mais toutes les URL répondaient 404 — la page « The page could not be found / NOT_FOUND » de l'application elle-même.
+**Symptôme** : déploiements « Ready » et domaine valide (`stevensakpovi.vercel.app`), mais toutes les URL du site répondaient 404 — page « The page could not be found / NOT_FOUND » émise par la plateforme Vercel.
 
-**Cause** : `output: "standalone"` dans `next.config.ts`. Ce mode est destiné à l'auto-hébergement (prévisualisation locale) et est incompatible avec le runtime Vercel : le build réussit mais les routes ne sont pas enregistrées côté plateforme.
+**Diagnostic (sondage HTTP direct du domaine)** : les fichiers statiques du dossier `public/` répondent 200 (`/favicon.svg`, `/og-image.jpg`) tandis que toutes les routes produites par le build Next.js répondent 404 (`/`, `/robots.txt`, `/sitemap.xml`, `/api/leads`). Signature d'un déploiement 100 % statique.
 
-**Correctif** : `output: process.env.VERCEL ? undefined : "standalone"` — standalone reste actif pour l'auto-hébergement local, désactivé automatiquement sur Vercel (la variable `VERCEL` est positionnée par la plateforme au build). Le domaine de production réel est désormais le défaut du code : `https://stevensakpovi.vercel.app`.
+**Cause racine** : le projet Vercel a été importé alors que le dépôt GitHub ne contenait que les images (`public/assets`, sans `package.json`) — Vercel l'a donc classé « Other / statique » et ne publie que le dossier `public/`, ignorant la sortie Next.js. Les builds ultérieurs exécutaient bien `next build` (d'où les « Ready » et les erreurs du 12/11 sur l'URL invalide), mais sa sortie n'était jamais servie comme application.
+
+**Correctif (tableau de bord Vercel — aucune modification de code)** :
+1. Projet **stevemarketing** → **Settings → Build & Development Settings** ;
+2. **Framework Preset : Next.js** (au lieu de « Other ») ;
+3. **Output Directory : laisser VIDE** (surtout pas « public ») ;
+4. Sauvegarder, puis **Deployments → ⋯ → Redeploy** du dernier déploiement.
+
+**Vérification** : `/` affiche le site, `/robots.txt` et `/sitemap.xml` répondent 200, `POST /api/leads` répond (422 sur charge invalide).
+
+**Nota** : le durcissement `output: process.env.VERCEL ? undefined : "standalone"` (standalone réservé à l'auto-hébergement local) est conservé — c'est une sécurité complémentaire, pas la cause de l'incident.
 
 ## 7. Mises à jour ultérieures
 

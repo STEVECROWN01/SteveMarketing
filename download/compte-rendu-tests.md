@@ -190,6 +190,28 @@ Exécutés après les corrections de déploiement (build de production standalon
 
 ## INCIDENT RÉSOLU — 404 EN PRODUCTION MALGRÉ DÉPLOIEMENT « READY » (12 novembre 2026)
 
+**Symptôme** : déploiements Vercel « Ready », domaine `stevensakpovi.vercel.app` en « Valid Configuration », mais toutes les URL du site répondaient 404 — page « The page could not be found / NOT_FOUND » émise par la plateforme Vercel (prouvé par sondage HTTP direct).
+
+**Diagnostic (sondage du domaine en production)** : les fichiers statiques du dossier `public/` répondent 200 (`/favicon.svg`, `/og-image.jpg`) tandis que toutes les routes produites par le build Next.js répondent 404 (`/`, `/robots.txt`, `/sitemap.xml`, `/api/leads`) — signature d'un déploiement 100 % statique.
+
+**Cause racine** : le projet Vercel avait été importé alors que le dépôt GitHub ne contenait que les images (`public/assets`, sans `package.json`) — Vercel l'a classé « Other / statique » et ne publie que le dossier `public/`, ignorant la sortie Next.js. Les builds exécutaient bien `next build` (d'où les statuts « Ready » et les erreurs du même jour sur l'URL invalide), mais sa sortie n'était jamais servie comme application.
+
+**Correctif (côté tableau de bord Vercel, sans code)** : Settings → Build & Development Settings → Framework Preset **Next.js** (au lieu de « Other »), Output Directory **vide**, puis Redeploy. Le durcissement `output: standalone` conditionné à la variable `VERCEL` est conservé comme sécurité complémentaire (standalone réservé à l'auto-hébergement local — pas la cause de l'incident).
+
+**Vérifications attendues après correctif** : `/` affiche le site ; `/robots.txt` et `/sitemap.xml` répondent 200 ; `POST /api/leads` répond 422 sur charge invalide (route API enregistrée).
+
+## INCIDENT DE DÉPLOIEMENT RÉSOLU — VARIABLES D'ENVIRONNEMENT (12 novembre 2026)
+
+**Symptôme** : sur Vercel, trois déploiements consécutifs en « Error » (32-56 s) après l'ajout des variables d'environnement — alors que le même code (commit `f70373f`) avait déployé en « Ready » juste avant.
+
+**Cause (reproduite en local à l'identique)** : `NEXT_PUBLIC_SITE_URL` malformé — typiquement saisi sans protocole (`stevemarketing.vercel.app` au lieu de `https://stevemarketing.vercel.app`), ou avec guillemets/espaces parasites. La ligne `metadataBase: new URL(SITE.url)` de `layout.tsx` s'exécute **au build** (génération des pages statiques) : `TypeError: Invalid URL` → échec du build. Vérifications croisées : `prisma generate` est insensible au contenu de `DATABASE_URL` (testé avec URL Postgres), les variables serveur (`ADMIN_*`, `RESEND_API_KEY`) n'interviennent qu'à l'exécution.
+
+**Correctif (définitif)** : normalisation défensive des URL d'environnement dans `src/lib/site.ts` — protocole manquant ajouté automatiquement (`https://`), guillemets et espaces retirés, valeur vide ou invalide remplacée par le défaut ; idem pour `NEXT_PUBLIC_CALENDLY_URL` ; `NEXT_PUBLIC_LEGAL_REGISTRATION` vide ou blanc replie sur le libellé honnête par défaut. `new URL()` ne peut plus jamais lever au build, quelle que soit la saisie.
+
+**Tests du correctif** : build complet avec (1) URL sans protocole, (2) URL entre guillemets, (3) valeur aberrante — les trois cas, auparavant fatals, compilent et génèrent les 10 pages ; l'URL normalisée est vérifiée injectée dans le sitemap et les pages statiques.
+
+## INCIDENT RÉSOLU — 404 EN PRODUCTION MALGRÉ DÉPLOIEMENT « READY » (12 novembre 2026)
+
 **Symptôme** : déploiement Vercel « Ready » (commit `4480e65`), domaine `stevensakpovi.vercel.app` en « Valid Configuration », mais la racine du site répondait 404 — avec le corps « The page could not be found / NOT_FOUND », soit la page d'absence de l'application elle-même (prouvé par sondage HTTP direct du domaine).
 
 **Cause** : `output: "standalone"` dans `next.config.ts` — mode conçu pour l'auto-hébergement, incompatible avec le runtime Vercel (build réussi, routes non enregistrées). Ce réglage servait exclusivement à la prévisualisation sur la plateforme de développement.
