@@ -1,0 +1,598 @@
+From b237262719f60cd8cbc062b0c1dd1a76ef826e62 Mon Sep 17 00:00:00 2001
+From: Z User <z@container>
+Date: Thu, 12 Nov 2026 17:06:42 +0000
+Subject: [PATCH] =?UTF-8?q?Assets=20officiels=20+=20CTA=20hero=20=C2=AB=20?=
+ =?UTF-8?q?Voir=20Nos=20Travaux=20=C2=BB=20+=20Title=20Case=20de=20tous=20?=
+ =?UTF-8?q?les=20boutons?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+- Vignette de partage de lien : OG.png de l'éditeur (1254×1254) remplace
+  l'ancienne image Open Graph dans les métadonnées (OG + Twitter)
+- Logos centralisés dans ASSETS : logo-blanc (fonds noirs/sombres — pastille
+  header, footer, bannière email) et logo-noir (fonds blancs/clairs),
+  favicon PNG confirmé
+- Hero : le bouton secondaire « Audit gratuit de votre site actuel » devient
+  « Voir Nos Travaux » et mène à la page Réalisations ; les deux CTA restent
+  sur la même ligne, le hero tient toujours exactement dans le viewport
+- Première lettre de chaque mot en majuscule sur tous les boutons du site
+  (hero, header, menu plein écran, sections, pages, formulaires, projets,
+  admin) ; titres et phrases d'accroche conservent la casse normale
+---
+ src/app/layout.tsx                       | 10 ++++-----
+ src/components/forms/LeadForm.tsx        |  4 ++--
+ src/components/home/FaqFinal.tsx         |  2 +-
+ src/components/home/Hero.tsx             | 12 +++++-----
+ src/components/home/ServicesSections.tsx |  2 +-
+ src/components/home/WorksSection.tsx     |  6 ++---
+ src/components/layout/Footer.tsx         |  6 ++---
+ src/components/layout/Header.tsx         | 10 ++++-----
+ src/components/marketing/Marketing.tsx   |  3 ++-
+ src/components/pages/AboutPage.tsx       |  4 ++--
+ src/components/pages/AdminPage.tsx       |  4 ++--
+ src/components/pages/ContactPage.tsx     |  4 ++--
+ src/components/pages/PortfolioPage.tsx   |  6 ++---
+ src/components/pages/ServicesPage.tsx    | 16 +++++++-------
+ src/content/site-content.ts              | 28 ++++++++++++------------
+ src/lib/email.ts                         |  4 ++--
+ src/lib/site.ts                          | 12 +++++++---
+ 17 files changed, 71 insertions(+), 62 deletions(-)
+
+diff --git a/src/app/layout.tsx b/src/app/layout.tsx
+index b9d5812..64438b6 100755
+--- a/src/app/layout.tsx
++++ b/src/app/layout.tsx
+@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
+ import Script from "next/script";
+ import { Inter, Sora } from "next/font/google";
+ import "./globals.css";
+-import { SITE } from "@/lib/site";
++import { ASSETS, SITE } from "@/lib/site";
+ 
+ /* Polices : Sora (titres) + Inter (texte / interface), chargement optimisé */
+ const inter = Inter({
+@@ -55,9 +55,9 @@ export const metadata: Metadata = {
+       "Sites web professionnels orientés conversion : stratégie, design, copywriting inclus et SEO de base. Appelez Stevens Akpovi — 30 minutes, gratuit, sans engagement.",
+     images: [
+       {
+-        url: "/og-image.jpg",
+-        width: 1200,
+-        height: 630,
++        url: ASSETS.ogImage,
++        width: 1254,
++        height: 1254,
+         alt: "Stevens Akpovi — Je crée des sites web qui génèrent des ventes",
+       },
+     ],
+@@ -67,7 +67,7 @@ export const metadata: Metadata = {
+     title: "Stevens Akpovi — Je crée des sites web qui génèrent des ventes",
+     description:
+       "Sites web professionnels orientés conversion. Copywriting et SEO de base inclus.",
+-    images: ["/og-image.jpg"],
++    images: [ASSETS.ogImage],
+   },
+   robots: {
+     index: true,
+diff --git a/src/components/forms/LeadForm.tsx b/src/components/forms/LeadForm.tsx
+index 7c1d962..703df59 100755
+--- a/src/components/forms/LeadForm.tsx
++++ b/src/components/forms/LeadForm.tsx
+@@ -193,7 +193,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
+             }}
+             className="btn-fill min-h-[44px] rounded-full border border-[#e4e4e4]/30 px-6 py-3 text-sm font-medium text-white [&::before]:bg-[#3c3c3c]"
+           >
+-            <span className="inline-flex items-center">Envoyer une autre demande</span>
++            <span className="inline-flex items-center">Envoyer Une Autre Demande</span>
+           </button>
+         </div>
+         <p className="mt-6 text-xs text-[#c8c8c8]/70">
+@@ -485,7 +485,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
+             </span>
+           ) : (
+             <span className="inline-flex items-center gap-2.5">
+-              {isQuote ? "Envoyer ma demande de devis" : "Envoyer ma demande d'audit"}
++              {isQuote ? "Envoyer Ma Demande De Devis" : "Envoyer Ma Demande D'Audit"}
+             </span>
+           )}
+         </button>
+diff --git a/src/components/home/FaqFinal.tsx b/src/components/home/FaqFinal.tsx
+index 50508c7..992ff08 100755
+--- a/src/components/home/FaqFinal.tsx
++++ b/src/components/home/FaqFinal.tsx
+@@ -37,7 +37,7 @@ export function FaqSection() {
+                   className="mt-5"
+                   icon={CTAIcons.calendar}
+                 >
+-                  Réserver un appel
++                  Réserver Un Appel
+                 </CTAButton>
+                 <p className="mt-4 text-xs font-medium text-[#1c1c1c]/70">
+                   30 minutes · Gratuit · Sans engagement.
+diff --git a/src/components/home/Hero.tsx b/src/components/home/Hero.tsx
+index 14ea675..694f9b8 100755
+--- a/src/components/home/Hero.tsx
++++ b/src/components/home/Hero.tsx
+@@ -16,8 +16,9 @@ import { ASSETS, PROJECTS, SITE } from "@/lib/site";
+  * dynamiques mobiles) et son contenu s'adapte en taille à tous les
+  * écrans (typographie fluide, portrait dimensionné en svh). Sans
+  * scroller, le visiteur comprend : qui est Stevens, ce qu'il propose,
+- * le bénéfice principal, comment réserver et comment demander un
+- * audit. Mobile : l'image se place entre le hook et la description.
++ * le bénéfice principal, comment réserver et comment découvrir les
++ * réalisations. Mobile : l'image se place entre le hook et la
++ * description.
+  */
+ export function Hero() {
+   const reduce = useReducedMotion();
+@@ -148,7 +149,8 @@ export function Hero() {
+               </p>
+             </Reveal>
+ 
+-            {/* CTA — les deux boutons partagent la même ligne sur desktop */}
++            {/* CTA — les deux boutons partagent la même ligne sur desktop :
++                réservation d'appel + découverte des réalisations. */}
+             <Reveal direction="up" delay={0.3}>
+               <div className="mt-3.5 flex flex-wrap items-center gap-2.5 sm:mt-6 sm:gap-3 lg:mt-6">
+                 <CTAButton
+@@ -161,9 +163,9 @@ export function Hero() {
+                   {HERO.ctaPrimary}
+                 </CTAButton>
+                 <CTAButton
+-                  action={{ kind: "page", page: "contact", section: "audit" }}
++                  action={{ kind: "page", page: "realisations" }}
+                   variant="ghostLight"
+-                  icon={CTAIcons.audit}
++                  icon={CTAIcons.works}
+                   className="px-3 py-2 text-[12px] sm:px-3.5 sm:py-2.5 sm:text-[13px]"
+                 >
+                   {HERO.ctaTertiary}
+diff --git a/src/components/home/ServicesSections.tsx b/src/components/home/ServicesSections.tsx
+index ebda807..44d6894 100755
+--- a/src/components/home/ServicesSections.tsx
++++ b/src/components/home/ServicesSections.tsx
+@@ -47,7 +47,7 @@ export function ServicesSection() {
+               }}
+               className="group inline-flex items-center gap-2 rounded-full border border-[#1c1c1c]/20 px-5 py-2.5 text-sm font-medium text-[#1c1c1c] transition-colors duration-300 hover:border-[#1c1c1c] hover:bg-[#1c1c1c] hover:text-white"
+             >
+-              Explorer le détail des services
++              Explorer Le Détail Des Services
+               <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+             </a>
+           </Reveal>
+diff --git a/src/components/home/WorksSection.tsx b/src/components/home/WorksSection.tsx
+index d1bff06..1e79aa0 100755
+--- a/src/components/home/WorksSection.tsx
++++ b/src/components/home/WorksSection.tsx
+@@ -37,7 +37,7 @@ export function WorksSection() {
+               }}
+               className="group inline-flex items-center gap-2 rounded-full border border-[#1c1c1c]/20 px-5 py-2.5 text-sm font-medium text-[#1c1c1c] transition-colors duration-300 hover:border-[#1c1c1c] hover:bg-[#1c1c1c] hover:text-white"
+             >
+-              Voir la page Réalisations
++              Voir La Page Réalisations
+               <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1">→</span>
+             </a>
+           </Reveal>
+@@ -62,7 +62,7 @@ export function WorksSection() {
+                 icon={CTAIcons.calendar}
+                 className="!text-[#1c1c1c] [&::before]:bg-[#e4e4e4]"
+               >
+-                Réserver un appel
++                Réserver Un Appel
+               </CTAButton>
+               <CTAButton
+                 action={{ kind: "page", page: "contact", section: "devis" }}
+@@ -70,7 +70,7 @@ export function WorksSection() {
+                 size="lg"
+                 icon={CTAIcons.quote}
+               >
+-                Demander un devis
++                Demander Un Devis
+               </CTAButton>
+             </div>
+           </div>
+diff --git a/src/components/layout/Footer.tsx b/src/components/layout/Footer.tsx
+index dccf88a..a7a760c 100755
+--- a/src/components/layout/Footer.tsx
++++ b/src/components/layout/Footer.tsx
+@@ -3,7 +3,7 @@
+ import React from "react";
+ import { Linkedin, Mail, MessageCircle, ArrowUpRight } from "lucide-react";
+ import { useRouter } from "@/components/router-context";
+-import { NAV_ITEMS, SITE } from "@/lib/site";
++import { ASSETS, NAV_ITEMS, SITE } from "@/lib/site";
+ import { Reveal } from "@/components/motion/Reveal";
+ 
+ const NAV_PAGES: Record<string, string> = {
+@@ -22,10 +22,10 @@ export function Footer() {
+       <div className="container-site py-16 lg:py-20">
+         <Reveal direction="up" amount={0.15}>
+           <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr] lg:gap-8">
+-            {/* Marque — logo officiel (version blanche) */}
++            {/* Marque — logo officiel (version blanche, pour fond sombre) */}
+             <div className="max-w-sm">
+               <img
+-                src="/assets/logo-blanc.png"
++                src={ASSETS.logoLight}
+                 alt="Stevens Akpovi"
+                 width={220}
+                 height={176}
+diff --git a/src/components/layout/Header.tsx b/src/components/layout/Header.tsx
+index bdb00cb..117a0aa 100755
+--- a/src/components/layout/Header.tsx
++++ b/src/components/layout/Header.tsx
+@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
+ import { X, CalendarCheck, ArrowUpRight, Linkedin, Mail, MessageCircle } from "lucide-react";
+ import { useRouter } from "@/components/router-context";
+ import { useCalendly } from "@/components/calendly/CalendlyContext";
+-import { NAV_ITEMS, SITE } from "@/lib/site";
++import { ASSETS, NAV_ITEMS, SITE } from "@/lib/site";
+ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+ 
+ const NAV_PAGES: Record<string, string> = {
+@@ -87,7 +87,7 @@ export function Header() {
+       className={`group/cta inline-flex min-h-[52px] items-center gap-3 rounded-full bg-white py-2 pl-6 pr-1.5 transition-colors duration-300 hover:bg-[#efefef] focus-visible:outline-2 focus-visible:outline-offset-4 ${className}`}
+     >
+       <span className="text-[15px] font-medium tracking-[0.01em] text-[#1c1c1c]">
+-        Démarrer un projet
++        Démarrer Un Projet
+       </span>
+       <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#e4e4e4] transition-colors duration-300 group-hover/cta:bg-[#1c1c1c]">
+         <ArrowUpRight
+@@ -125,9 +125,9 @@ export function Header() {
+           aria-label="Stevens Akpovi — retour à l'accueil"
+           className="flex h-14 w-12 items-center justify-center rounded-b-lg bg-[#1c1c1c] transition-colors duration-300 hover:bg-[#232323] lg:h-[98px] lg:w-[94px] lg:rounded-b-[9px]"
+         >
+-          {/* Logo officiel (version blanche, fond transparent) */}
++          {/* Logo officiel (version blanche, pour fond sombre) */}
+           <img
+-            src="/assets/logo-blanc.png"
++            src={ASSETS.logoLight}
+             alt="Stevens Akpovi"
+             width={220}
+             height={176}
+@@ -225,7 +225,7 @@ export function Header() {
+                   className="inline-flex min-h-[52px] items-center gap-2.5 rounded-full border border-white/30 px-6 py-3 text-[15px] font-medium text-white transition-colors duration-300 hover:border-[#c9baac] hover:text-[#c9baac]"
+                 >
+                   <CalendarCheck className="h-4 w-4" aria-hidden="true" />
+-                  Réserver un appel (30 min)
++                  Réserver Un Appel (30 Min)
+                 </button>
+               </motion.div>
+ 
+diff --git a/src/components/marketing/Marketing.tsx b/src/components/marketing/Marketing.tsx
+index 83f3427..add628c 100755
+--- a/src/components/marketing/Marketing.tsx
++++ b/src/components/marketing/Marketing.tsx
+@@ -1,7 +1,7 @@
+ "use client";
+ 
+ import React from "react";
+-import { ArrowRight, ArrowUpRight, CalendarCheck, FileText, SearchCheck } from "lucide-react";
++import { ArrowRight, ArrowUpRight, CalendarCheck, Eye, FileText, SearchCheck } from "lucide-react";
+ import { useRouter } from "@/components/router-context";
+ import { useCalendly } from "@/components/calendly/CalendlyContext";
+ import { Reveal, RevealText } from "@/components/motion/Reveal";
+@@ -151,6 +151,7 @@ export const CTAIcons = {
+   calendar: <CalendarCheck className="h-[18px] w-[18px]" aria-hidden="true" />,
+   quote: <FileText className="h-[18px] w-[18px]" aria-hidden="true" />,
+   audit: <SearchCheck className="h-[18px] w-[18px]" aria-hidden="true" />,
++  works: <Eye className="h-[18px] w-[18px]" aria-hidden="true" />,
+ };
+ 
+ /* ============================ Réassurance ============================ */
+diff --git a/src/components/pages/AboutPage.tsx b/src/components/pages/AboutPage.tsx
+index 07f9235..d88b690 100755
+--- a/src/components/pages/AboutPage.tsx
++++ b/src/components/pages/AboutPage.tsx
+@@ -81,11 +81,11 @@ export function AboutPage() {
+               <Reveal direction="up" delay={0.24}>
+                 <div className="mt-9 rounded-2xl bg-[#1c1c1c] px-6 py-6 sm:px-8 sm:py-7">
+                   <p className="font-display text-lg font-medium leading-relaxed text-white sm:text-xl">
+-                    {ABOUT.cta} — 30 minutes suffisent pour commencer.
++                    Faisons connaissance — 30 minutes suffisent pour commencer.
+                   </p>
+                   <div className="mt-5">
+                     <CTAButton action={{ kind: "calendly" }} variant="primary" icon={CTAIcons.calendar}>
+-                      Réserver un appel
++                      Réserver Un Appel
+                     </CTAButton>
+                   </div>
+                   <p className="mt-4 text-xs text-[#c8c8c8]">{SITE.calendlyMention}</p>
+diff --git a/src/components/pages/AdminPage.tsx b/src/components/pages/AdminPage.tsx
+index 0d0164d..0cfc740 100755
+--- a/src/components/pages/AdminPage.tsx
++++ b/src/components/pages/AdminPage.tsx
+@@ -132,7 +132,7 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
+                 Vérification…
+               </>
+             ) : (
+-              "Ouvrir la session"
++              "Ouvrir La Session"
+             )}
+           </button>
+         </form>
+@@ -290,7 +290,7 @@ export function AdminPage() {
+             className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[#e4e4e4]/25 px-5 py-2.5 text-sm text-[#c8c8c8] transition-colors hover:border-[#ea384c]/60 hover:text-[#ffdede]"
+           >
+             <LogOut className="h-4 w-4" aria-hidden="true" />
+-            Fermer la session
++            Fermer La Session
+           </button>
+         </div>
+       </div>
+diff --git a/src/components/pages/ContactPage.tsx b/src/components/pages/ContactPage.tsx
+index a7ab31f..7264864 100755
+--- a/src/components/pages/ContactPage.tsx
++++ b/src/components/pages/ContactPage.tsx
+@@ -24,10 +24,10 @@ export function ContactPage() {
+       >
+         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
+           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
+-            Réserver un appel (30 min)
++            Réserver Un Appel (30 Min)
+           </CTAButton>
+           <CTAButton action={{ kind: "anchor", sectionId: "devis" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
+-            Demander un devis
++            Demander Un Devis
+           </CTAButton>
+         </div>
+         <ReassuranceBar className="mt-6" />
+diff --git a/src/components/pages/PortfolioPage.tsx b/src/components/pages/PortfolioPage.tsx
+index ab797b1..598000f 100755
+--- a/src/components/pages/PortfolioPage.tsx
++++ b/src/components/pages/PortfolioPage.tsx
+@@ -17,7 +17,7 @@ export function PortfolioPage() {
+         intro={WORKS.intro}
+       >
+         <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="primary" size="lg" icon={CTAIcons.quote}>
+-          Discuter de mon projet
++          Discuter De Mon Projet
+         </CTAButton>
+       </PageHero>
+ 
+@@ -36,10 +36,10 @@ export function PortfolioPage() {
+               </p>
+               <div className="mt-8 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
+                 <CTAButton action={{ kind: "calendly" }} variant="dark" size="lg" icon={CTAIcons.calendar}>
+-                  Réserver un appel
++                  Réserver Un Appel
+                 </CTAButton>
+                 <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="ghostDark" size="lg" icon={CTAIcons.quote}>
+-                  Demander un devis
++                  Demander Un Devis
+                 </CTAButton>
+               </div>
+               <ReassuranceBar tone="light" className="mt-6 justify-center" />
+diff --git a/src/components/pages/ServicesPage.tsx b/src/components/pages/ServicesPage.tsx
+index 696f4c4..b65a7f9 100755
+--- a/src/components/pages/ServicesPage.tsx
++++ b/src/components/pages/ServicesPage.tsx
+@@ -21,10 +21,10 @@ export function ServicesPage() {
+       >
+         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
+           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
+-            Réserver un appel
++            Réserver Un Appel
+           </CTAButton>
+           <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
+-            Demander un devis personnalisé
++            Demander Un Devis Personnalisé
+           </CTAButton>
+         </div>
+         <ReassuranceBar className="mt-6" />
+@@ -57,7 +57,7 @@ export function ServicesPage() {
+                         className="px-4 py-2 text-[13px]"
+                         ariaLabel={`Demander un devis pour : ${service.title}`}
+                       >
+-                        Demander un devis
++                        Demander Un Devis
+                       </CTAButton>
+                     </div>
+                   </div>
+@@ -123,10 +123,10 @@ export function ServicesPage() {
+           <Reveal direction="up" delay={0.15}>
+             <div className="mt-10 rounded-2xl bg-[#c9baac] p-7 sm:p-8">
+               <p className="font-display text-lg font-semibold leading-snug text-[#1c1c1c] sm:text-xl">
+-                {COMPLEMENTARY.cta}
++                Discuter de ma stratégie digitale
+               </p>
+               <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="dark" className="mt-5" icon={CTAIcons.quote}>
+-                Discuter de ma stratégie digitale
++                Discuter De Ma Stratégie Digitale
+               </CTAButton>
+             </div>
+           </Reveal>
+@@ -160,16 +160,16 @@ export function ServicesPage() {
+           <Reveal direction="up">
+             <p className="text-eyebrow">PARLONS DE VOTRE PROJET</p>
+             <h2 className="text-section-title mx-auto mt-4 max-w-2xl text-white">
+-              {SERVICES.cta}
++              Trouver la solution adaptée à mon activité
+             </h2>
+           </Reveal>
+           <Reveal direction="up" delay={0.12}>
+             <div className="mt-9 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
+               <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
+-                Réserver un appel
++                Réserver Un Appel
+               </CTAButton>
+               <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="secondary" size="lg" icon={CTAIcons.quote}>
+-                Demander un devis personnalisé
++                Demander Un Devis Personnalisé
+               </CTAButton>
+             </div>
+             <ReassuranceBar className="mt-7 justify-center" />
+diff --git a/src/content/site-content.ts b/src/content/site-content.ts
+index aa2ddd4..ee142f1 100755
+--- a/src/content/site-content.ts
++++ b/src/content/site-content.ts
+@@ -11,8 +11,8 @@ export const HERO = {
+   h1: "Je crée des sites web qui génèrent des ventes.",
+   hook: "Votre entreprise mérite mieux qu'une présence en ligne qui ne vous rapporte rien.",
+   text: "Vous n'avez pas encore de site web ? Ou votre site actuel ne vous apporte pas les résultats espérés ? Je conçois des sites web professionnels, élégants et stratégiquement pensés pour valoriser votre activité, attirer des visiteurs qualifiés et transformer leur intérêt en clients.",
+-  ctaPrimary: "Réserver un appel (30 min)",
+-  ctaTertiary: "Audit gratuit de votre site actuel",
++  ctaPrimary: "Réserver Un Appel (30 Min)",
++  ctaTertiary: "Voir Nos Travaux",
+   reassurance: "30 minutes · Gratuit · Sans engagement",
+   perks: ["Copywriting inclus", "Optimisation SEO de base incluse"],
+   portraitAlt:
+@@ -35,7 +35,7 @@ export const PROBLEM = {
+   ],
+   conclusion:
+     "Votre travail mérite d'être vu. Votre expertise mérite d'être valorisée. Votre entreprise mérite une présence digitale à la hauteur de ses ambitions.",
+-  cta: "Construire mon site professionnel",
++  cta: "Construire Mon Site Professionnel",
+ } as const;
+ 
+ /* ============================ 03 — REMISE EN QUESTION ============================ */
+@@ -54,7 +54,7 @@ export const QUESTIONING = {
+   ],
+   conclusion:
+     "Un site web ne devrait pas être une simple décoration numérique. Il devrait être un véritable outil au service de votre entreprise.",
+-  cta: "Demander mon audit gratuit",
++  cta: "Demander Mon Audit Gratuit",
+ } as const;
+ 
+ /* ============================ 04 — LA TRANSFORMATION ============================ */
+@@ -85,7 +85,7 @@ export const TRANSFORMATION = {
+       text: "Votre site peut grandir avec votre activité et accompagner vos nouvelles offres et ambitions.",
+     },
+   ],
+-  cta: "Je veux développer ma présence en ligne",
++  cta: "Je Veux Développer Ma Présence En Ligne",
+ } as const;
+ 
+ /* ============================ 05 — MA SOLUTION ============================ */
+@@ -108,7 +108,7 @@ export const SOLUTION = {
+       text: "Construire un parcours qui facilite les prises de contact, les réservations et les demandes commerciales.",
+     },
+   ],
+-  cta: "Parlons de votre projet",
++  cta: "Parlons De Votre Projet",
+ } as const;
+ 
+ /* ============================ 06 — SERVICES ============================ */
+@@ -142,7 +142,7 @@ export const SERVICES = {
+       text: "Associez plusieurs pages et parcours commerciaux pour accompagner les visiteurs de leur première découverte jusqu'à la prise de contact.",
+     },
+   ],
+-  cta: "Trouver la solution adaptée à mon activité",
++  cta: "Trouver La Solution Adaptée À Mon Activité",
+ } as const;
+ 
+ /* ============================ 07 — AVANTAGES INCLUS ============================ */
+@@ -161,7 +161,7 @@ export const INCLUDED = {
+     },
+   ],
+   conclusion: "Deux éléments essentiels, intégrés à votre projet sans facturation supplémentaire.",
+-  cta: "Parlons de mon futur site",
++  cta: "Parlons De Mon Futur Site",
+ } as const;
+ 
+ /* ============================ 08 — SERVICES COMPLÉMENTAIRES ============================ */
+@@ -179,7 +179,7 @@ export const COMPLEMENTARY = {
+       text: "Améliorez votre positionnement sur Google, renforcez votre visibilité et développez une présence organique durable grâce à une stratégie de référencement adaptée à votre marché.",
+     },
+   ],
+-  cta: "Discuter de ma stratégie digitale",
++  cta: "Discuter De Ma Stratégie Digitale",
+ } as const;
+ 
+ /* ============================ 09 — RÉALISATIONS ============================ */
+@@ -204,7 +204,7 @@ export const METHOD = {
+     { name: "Tests et optimisation", text: "Nous vérifions le comportement du site, ses liens, ses formulaires et son affichage sur tous les appareils." },
+     { name: "Mise en ligne", text: "Votre site est publié et prêt à accueillir ses premiers visiteurs." },
+   ],
+-  cta: "Démarrer mon projet",
++  cta: "Démarrer Mon Projet",
+ } as const;
+ 
+ /* ============================ 11 — À PROPOS ============================ */
+@@ -213,7 +213,7 @@ export const ABOUT = {
+   eyebrow: "QUI SUIS-JE ?",
+   title: "Je suis Stevens Akpovi. Et je crois qu'un bon site web doit servir le business qu'il représente.",
+   text: "Je suis concepteur de sites web professionnels et passionné par la manière dont le numérique peut accompagner le développement des entreprises.\n\nMon travail consiste à transformer les besoins d'un professionnel en une expérience digitale claire, élégante et orientée vers ses objectifs.\n\nJe m'intéresse autant à la présentation visuelle qu'au message transmis et au chemin que suit un visiteur avant de prendre une décision.\n\nParce qu'un site réussi ne se résume pas à son apparence.\n\nIl doit donner une bonne première impression, présenter la valeur de votre activité et faciliter la relation avec vos futurs clients.\n\nJe travaille à distance et accompagne des professionnels et des entreprises au-delà des frontières.",
+-  cta: "Faisons connaissance",
++  cta: "Faisons Connaissance",
+   facts: [
+     { label: "Approche", value: "Stratégie · Design · Conversion" },
+     { label: "Inclus dans chaque projet", value: "Copywriting professionnel · SEO de base" },
+@@ -268,9 +268,9 @@ export const FINAL_CTA = {
+   eyebrow: "IL EST TEMPS DE DONNER UNE NOUVELLE DIMENSION À VOTRE ACTIVITÉ",
+   title: "Je crée des sites web qui génèrent des ventes. Et votre prochain projet peut commencer aujourd'hui.",
+   text: "Vous avez une activité à développer, une expertise à valoriser ou des services à présenter ?\n\nConstruisons une présence en ligne professionnelle qui donne à votre entreprise les moyens de mieux se présenter, de toucher de nouvelles personnes et de transformer davantage d'intérêt en clients.\n\nPrenons simplement 30 minutes pour en discuter.",
+-  cta1: "Réserver mon appel",
+-  cta2: "Demander un devis",
+-  cta3: "Demander un audit gratuit",
++  cta1: "Réserver Mon Appel",
++  cta2: "Demander Un Devis",
++  cta3: "Demander Un Audit Gratuit",
+   mention: "30 minutes · Gratuit · Sans engagement",
+ } as const;
+ 
+diff --git a/src/lib/email.ts b/src/lib/email.ts
+index 6b074b6..2260141 100755
+--- a/src/lib/email.ts
++++ b/src/lib/email.ts
+@@ -1,4 +1,4 @@
+-import { SITE } from "@/lib/site";
++import { ASSETS, SITE } from "@/lib/site";
+ 
+ /**
+  * Service d'envoi d'emails côté serveur (API Resend, REST via fetch).
+@@ -113,7 +113,7 @@ export async function sendReceipt(lead: LeadPayload): Promise<boolean> {
+   <div style="background:#f5f5f5;padding:32px 0">
+     <div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e4e4e4">
+       <div style="background:#1c1c1c;padding:24px 28px">
+-        <img src="${SITE.url}/assets/logo-blanc.png" alt="Stevens Akpovi" width="110" height="88" style="display:block;margin-bottom:12px">
++        <img src="${SITE.url}${ASSETS.logoLight}" alt="Stevens Akpovi" width="110" height="88" style="display:block;margin-bottom:12px">
+         <span style="color:#c9baac;font-family:Arial,sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase">Confirmation de réception</span>
+         <h1 style="color:#ffffff;font-family:Arial,sans-serif;font-size:22px;margin:8px 0 0">Bonjour ${escapeHtml(lead.name)},</h1>
+       </div>
+diff --git a/src/lib/site.ts b/src/lib/site.ts
+index 02df7cd..76f83f5 100755
+--- a/src/lib/site.ts
++++ b/src/lib/site.ts
+@@ -120,7 +120,7 @@ export const PROJECTS = [
+     category: "Site web professionnel pour coach",
+     description:
+       "Un espace professionnel consacré à la présentation d'une activité de coaching en anglais, de ses programmes et de son accompagnement.",
+-    cta: "Voir le site",
++    cta: "Voir Le Site",
+     url: "https://mrsteveenglish.vercel.app",
+     desktop: "/assets/projects/mrsteveenglish-desktop.webp",
+     mobile: "/assets/projects/mrsteveenglish-mobile.webp",
+@@ -131,7 +131,7 @@ export const PROJECTS = [
+     category: "Page de vente",
+     description:
+       "Une page commerciale conçue pour présenter une offre de coaching, valoriser ses bénéfices et guider le visiteur vers l'inscription.",
+-    cta: "Voir la page de vente",
++    cta: "Voir La Page De Vente",
+     url: "https://mrsteveenglish.vercel.app/pre-launch",
+     desktop: "/assets/projects/prelaunch-desktop.webp",
+     mobile: "/assets/projects/prelaunch-mobile.webp",
+@@ -142,7 +142,7 @@ export const PROJECTS = [
+     category: "Site web de plateforme immobilière",
+     description:
+       "Une expérience digitale dédiée au secteur immobilier, pensée pour présenter une plateforme et faciliter la découverte de ses offres.",
+-    cta: "Découvrir le projet",
++    cta: "Découvrir Le Projet",
+     url: "https://afribayit.vercel.app",
+     desktop: "/assets/projects/afribayit-desktop.webp",
+     mobile: "/assets/projects/afribayit-mobile.webp",
+@@ -158,4 +158,10 @@ export const ASSETS = {
+   benefitGrowth: "/assets/benefit-business-growth.webp",
+   problemNoWebsite: "/assets/problem-no-website.webp",
+   problemIneffective: "/assets/problem-ineffective-website.webp",
++  /** Logo officiel — version blanche (pour fonds noirs/sombres). */
++  logoLight: "/assets/logo-blanc.png",
++  /** Logo officiel — version noire (pour fonds blancs/clairs). */
++  logoDark: "/assets/logo-noir.png",
++  /** Vignette de partage de lien (Open Graph), fournie par l'éditeur. */
++  ogImage: "/assets/OG.png",
+ } as const;
+-- 
+2.47.3
+
