@@ -200,6 +200,8 @@ Exécutés après les corrections de déploiement (build de production standalon
 
 **Vérifications attendues après correctif** : `/` affiche le site ; `/robots.txt` et `/sitemap.xml` répondent 200 ; `POST /api/leads` répond 422 sur charge invalide (route API enregistrée).
 
+**Résolution confirmée en production (12/11)** : sondage direct de `https://stevensakpovi.vercel.app` — `/` → 200 (hero « Je crée des sites web qui génèrent des ventes » rendu), `/robots.txt` → 200, `/sitemap.xml` → 200 avec URLs canoniques correctes, `POST /api/leads` (charge vide) → 422 (route API et validation serveur opérationnelles), `/favicon.svg` → 200. Le premier Redeploy effectué après le changement de preset n'avait pas reconstruit (option « existing Build Artifacts ») ; un déploiement complet déclenché par push sur `main` a confirmé le fonctionnement.
+
 ## INCIDENT DE DÉPLOIEMENT RÉSOLU — VARIABLES D'ENVIRONNEMENT (12 novembre 2026)
 
 **Symptôme** : sur Vercel, trois déploiements consécutifs en « Error » (32-56 s) après l'ajout des variables d'environnement — alors que le même code (commit `f70373f`) avait déployé en « Ready » juste avant.

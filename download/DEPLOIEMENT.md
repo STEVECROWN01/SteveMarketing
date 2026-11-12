@@ -102,6 +102,8 @@ CSV), brancher une base PostgreSQL managée :
 
 **Vérification** : `/` affiche le site, `/robots.txt` et `/sitemap.xml` répondent 200, `POST /api/leads` répond (422 sur charge invalide).
 
+**Résolution confirmée en production (12/11, sondage direct de `https://stevensakpovi.vercel.app`)** : `/` → 200 avec le hero complet ; `/robots.txt` → 200 ; `/sitemap.xml` → 200 (URLs canoniques correctes) ; `POST /api/leads` avec charge vide → 422 (route API active, validation serveur opérationnelle) ; `/favicon.svg` → 200. Note : si un « Redeploy » ne semble rien changer, vérifier qu'il ne s'agit pas de l'option « Redeploy with existing Build Artifacts » (qui ne relance pas le build) — un push sur `main` déclenche toujours un déploiement complet.
+
 **Nota** : le durcissement `output: process.env.VERCEL ? undefined : "standalone"` (standalone réservé à l'auto-hébergement local) est conservé — c'est une sécurité complémentaire, pas la cause de l'incident.
 
 ## 7. Mises à jour ultérieures
