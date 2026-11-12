@@ -220,6 +220,14 @@ Exécutés après les corrections de déploiement (build de production standalon
 
 **Correctif** : `output: process.env.VERCEL ? undefined : "standalone"` — la variable `VERCEL`, positionnée automatiquement par Vercel au build, désactive standalone sur Vercel et le conserve pour l'auto-hébergement. Le domaine de production réel (`https://stevensakpovi.vercel.app`) devient le défaut du code. Vérifications locales : build sans `VERCEL` → standalone produit, serveur autonome HTTP 200 avec hero complet ; build avec `VERCEL=1` → standalone absent (sortie standard attendue par Vercel).
 
+## AJUSTEMENT HERO MOBILE (12 novembre 2026) — demande de l'éditeur
+
+**Demande** : sur mobile, placer le portrait entre le hook et la description.
+
+**Mise en œuvre** : le hero est restructuré en trois blocs dans la grille — bloc texte haut (eyebrow + H1 + hook), bloc visuel (portrait + mockups), bloc texte bas (description + CTA + réassurance + badges). Placement explicite par `lg:col-start/lg:row-start` : sur desktop, la composition deux colonnes est inchangée (texte à gauche empilé, visuel à droite sur les deux lignes) ; sur mobile (ordre naturel), l'image s'insère entre le hook (« Votre entreprise mérite mieux… ») et la description (« Vous n'avez pas encore de site web ? … Je conçois des sites web professionnels… »), suivie des CTA.
+
+**Vérifications (navigateur, viewport 390×844)** : positions mesurées — H1 187px < hook 330px < portrait 461px < description 1060px < CTA 1282px (ordre exact demandé) ; inspection visuelle de la capture : aucun chevauchement ni coupure anormale, décor de fond intact. Desktop 1440px : titre à gauche (x=136), portrait à droite (x=797), CTA sous le titre dans la colonne gauche — composition inchangée. Console : aucune erreur.
+
 ## CORRECTION POST-LIVRAISON — DURÉE DU RENDEZ-VOUS (12 novembre 2026)
 
 L'éditeur a confirmé que le rendez-vous stratégique Calendly dure **30 minutes** (et non 20 minutes comme rédigé dans le cahier des charges). Correction appliquée partout : hero et CTA « Réserver un appel stratégique (30 min) », éléments de réassurance (« 30 minutes · Gratuit · Sans engagement · À distance »), popup Calendly et aria-labels, page Contact (titre de section et inline), FAQ finale, page À propos, meta description, accusés de réception email, `.env.example` et guides de déploiement. Vérification par recherche globale : plus aucune mention « 20 min » dans le code livré.

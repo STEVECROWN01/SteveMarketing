@@ -40,8 +40,10 @@ export function Hero() {
 
       <div className="container-site relative">
         <div className="grid items-center gap-14 lg:grid-cols-[1.08fr_0.92fr] lg:gap-10 xl:gap-16">
-          {/* ---------- Colonne texte ---------- */}
-          <div className="order-1">
+          {/* ---------- Bloc texte haut : eyebrow, titre, hook ---------- */}
+          {/* Mobile : eyebrow → H1 → hook, puis image (bloc visuel), puis
+              suite du texte. Desktop : colonne gauche, ligne 1. */}
+          <div className="order-1 lg:col-start-1 lg:row-start-1">
             <Reveal direction="up">
               <p className="text-eyebrow">{HERO.eyebrow}</p>
             </Reveal>
@@ -53,68 +55,13 @@ export function Hero() {
                 {HERO.hook}
               </p>
             </Reveal>
-
-            <Reveal direction="up" delay={0.24}>
-              <p className="text-body mt-5 max-w-xl on-dark-muted">{HERO.text}</p>
-            </Reveal>
-
-            {/* CTA */}
-            <Reveal direction="up" delay={0.3}>
-              <div className="mt-9 flex flex-col gap-3.5 sm:flex-row sm:flex-wrap sm:items-center">
-                <CTAButton
-                  action={{ kind: "calendly" }}
-                  variant="primary"
-                  size="lg"
-                  icon={CTAIcons.calendar}
-                  ariaLabel={`Réserver un appel stratégique de 30 minutes sur Calendly — ${SITE.calendlyMention}`}
-                >
-                  {HERO.ctaPrimary}
-                </CTAButton>
-                <CTAButton
-                  action={{ kind: "page", page: "contact", section: "devis" }}
-                  variant="secondary"
-                  size="lg"
-                  icon={CTAIcons.quote}
-                >
-                  {HERO.ctaSecondary}
-                </CTAButton>
-              </div>
-            </Reveal>
-
-            <Reveal direction="up" delay={0.36}>
-              <div className="mt-4">
-                <CTAButton
-                  action={{ kind: "page", page: "contact", section: "audit" }}
-                  variant="ghostLight"
-                  icon={CTAIcons.audit}
-                  className="px-4 py-2 text-sm"
-                >
-                  {HERO.ctaTertiary}
-                </CTAButton>
-              </div>
-            </Reveal>
-
-            <Reveal direction="up" delay={0.42}>
-              <ReassuranceBar mention={HERO.reassurance} className="mt-7" />
-            </Reveal>
-
-            <Reveal direction="up" delay={0.48}>
-              <ul className="mt-5 flex flex-wrap gap-2.5">
-                {HERO.perks.map((perk) => (
-                  <li
-                    key={perk}
-                    className="inline-flex items-center gap-2 rounded-full border border-[#c9baac]/25 bg-[#c9baac]/8 px-3.5 py-1.5 text-xs font-medium text-[#c9baac]"
-                  >
-                    <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                    {perk}
-                  </li>
-                ))}
-              </ul>
-            </Reveal>
           </div>
 
           {/* ---------- Colonne visuelle : portrait + mockups ---------- */}
-          <div className="order-2 relative mx-auto w-full max-w-md lg:max-w-none">
+          {/* Mobile : placée entre le hook et la description (demande
+              explicite de l'éditeur) ; desktop : colonne droite sur
+              les deux lignes de la grille. */}
+          <div className="order-2 relative mx-auto w-full max-w-md lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:max-w-none">
             {/* Bloc beige en décalage derrière le portrait */}
             <div
               aria-hidden="true"
@@ -181,6 +128,68 @@ export function Hero() {
                 </motion.div>
               </motion.div>
             </div>
+          </div>
+
+          {/* ---------- Bloc texte bas : description, CTA, réassurance ---------- */}
+          {/* Mobile : succède à l'image ; desktop : colonne gauche, ligne 2. */}
+          <div className="order-3 lg:col-start-1 lg:row-start-2">
+            <Reveal direction="up" delay={0.24}>
+              <p className="text-body mt-5 max-w-xl on-dark-muted">{HERO.text}</p>
+            </Reveal>
+
+            {/* CTA */}
+            <Reveal direction="up" delay={0.3}>
+              <div className="mt-9 flex flex-col gap-3.5 sm:flex-row sm:flex-wrap sm:items-center">
+                <CTAButton
+                  action={{ kind: "calendly" }}
+                  variant="primary"
+                  size="lg"
+                  icon={CTAIcons.calendar}
+                  ariaLabel={`Réserver un appel stratégique de 30 minutes sur Calendly — ${SITE.calendlyMention}`}
+                >
+                  {HERO.ctaPrimary}
+                </CTAButton>
+                <CTAButton
+                  action={{ kind: "page", page: "contact", section: "devis" }}
+                  variant="secondary"
+                  size="lg"
+                  icon={CTAIcons.quote}
+                >
+                  {HERO.ctaSecondary}
+                </CTAButton>
+              </div>
+            </Reveal>
+
+            <Reveal direction="up" delay={0.36}>
+              <div className="mt-4">
+                <CTAButton
+                  action={{ kind: "page", page: "contact", section: "audit" }}
+                  variant="ghostLight"
+                  icon={CTAIcons.audit}
+                  className="px-4 py-2 text-sm"
+                >
+                  {HERO.ctaTertiary}
+                </CTAButton>
+              </div>
+            </Reveal>
+
+            <Reveal direction="up" delay={0.42}>
+              <ReassuranceBar mention={HERO.reassurance} className="mt-7" />
+            </Reveal>
+
+            <Reveal direction="up" delay={0.48}>
+              <ul className="mt-5 flex flex-wrap gap-2.5">
+                {HERO.perks.map((perk) => (
+                  <li
+                    key={perk}
+                    className="inline-flex items-center gap-2 rounded-full border border-[#c9baac]/25 bg-[#c9baac]/8 px-3.5 py-1.5 text-xs font-medium text-[#c9baac]"
+                  >
+                    <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                    {perk}
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
           </div>
         </div>
 
