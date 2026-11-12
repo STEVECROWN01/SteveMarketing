@@ -3,7 +3,7 @@
 import React from "react";
 import { XCircle, HelpCircle } from "lucide-react";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
-import { SectionHeading, CTAButton, CTAIcons } from "@/components/marketing/Marketing";
+import { SectionHeading, CTAButton, CTAIcons, RichText } from "@/components/marketing/Marketing";
 import { MonoImage } from "@/components/media/Media";
 import { PROBLEM, QUESTIONING } from "@/content/site-content";
 import { ASSETS } from "@/lib/site";
@@ -24,9 +24,7 @@ export function ProblemSection() {
               tone="dark"
             />
             <Reveal direction="up" delay={0.15}>
-              <div className="text-body mt-6 max-w-xl whitespace-pre-line on-dark-muted">
-                {PROBLEM.text}
-              </div>
+              <RichText text={PROBLEM.text} className="text-body mt-6 max-w-xl on-dark-muted" />
             </Reveal>
 
             <Reveal direction="up" delay={0.2}>
@@ -44,7 +42,10 @@ export function ProblemSection() {
             </Reveal>
           </div>
 
-          {/* Visuel : composition des deux illustrations « problème » */}
+            {/* Visuel : composition des deux illustrations « problème » —
+                la deuxième image est volontairement plus grande
+                (58 %) pour affirmer sa présence, à la demande de
+                l'éditeur. */}
           <div className="relative mx-auto w-full max-w-md lg:max-w-none">
             <Reveal direction="left" delay={0.1}>
               <MonoImage
@@ -55,7 +56,7 @@ export function ProblemSection() {
                 className="rounded-2xl border border-[#e4e4e4]/12 shadow-[0_30px_70px_-30px_rgba(0,0,0,0.7)]"
               />
             </Reveal>
-            <Reveal direction="right" delay={0.25} className="absolute -bottom-10 -right-2 hidden w-[52%] sm:block lg:-right-6">
+            <Reveal direction="right" delay={0.25} className="absolute -bottom-12 -right-2 hidden w-[58%] sm:block lg:-right-8">
               <MonoImage
                 src={ASSETS.problemIneffective}
                 alt="Illustration : site web inefficace qui n'apporte pas de résultats"
@@ -99,9 +100,7 @@ export function QuestioningSection() {
           <div>
             <SectionHeading eyebrow={QUESTIONING.eyebrow} title={QUESTIONING.title} tone="light" />
             <Reveal direction="up" delay={0.15}>
-              <div className="text-body mt-6 max-w-xl whitespace-pre-line on-paper-muted">
-                {QUESTIONING.text}
-              </div>
+              <RichText text={QUESTIONING.text} className="text-body mt-6 max-w-xl on-paper-muted" />
             </Reveal>
           </div>
 

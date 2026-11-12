@@ -14,7 +14,7 @@ import {
   BadgeCheck,
 } from "lucide-react";
 import { Reveal } from "@/components/motion/Reveal";
-import { SectionHeading, CTAButton, CTAIcons } from "@/components/marketing/Marketing";
+import { SectionHeading, CTAButton, CTAIcons, RichText } from "@/components/marketing/Marketing";
 import { SERVICES, INCLUDED, COMPLEMENTARY } from "@/content/site-content";
 import { useRouter } from "@/components/router-context";
 
@@ -111,9 +111,10 @@ export function IncludedSection() {
                     </span>
                     <h3 className="font-display text-xl font-semibold text-white">{item.title}</h3>
                   </div>
-                  <p className="mt-5 whitespace-pre-line text-[15px] leading-relaxed text-[#c8c8c8]">
-                    {item.text}
-                  </p>
+                  <RichText
+                    text={item.text}
+                    className="mt-5 text-[15px] leading-relaxed text-[#c8c8c8]"
+                  />
                   <p className="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-medium tracking-widest text-[#c9baac]">
                     <BadgeCheck className="h-4 w-4" aria-hidden="true" />
                     INCLUS SANS FRAIS SUPPLÉMENTAIRES

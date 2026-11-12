@@ -2,7 +2,6 @@
 
 import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Check } from "lucide-react";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
 import { BrowserMockup, PhoneMockup } from "@/components/media/Media";
@@ -17,8 +16,10 @@ import { ASSETS, PROJECTS, SITE } from "@/lib/site";
  * écrans (typographie fluide, portrait dimensionné en svh). Sans
  * scroller, le visiteur comprend : qui est Stevens, ce qu'il propose,
  * le bénéfice principal, comment réserver et comment découvrir les
- * réalisations. Mobile : l'image se place entre le hook et la
- * description.
+ * réalisations. Mobile : l'image se place entre le titre et la
+ * description. Les mentions « Copywriting inclus » / « SEO de base »
+ * sont volontairement absentes : elles appartiennent à la section
+ * « Avantages inclus » qui présente l'offre.
  */
 export function Hero() {
   const reduce = useReducedMotion();
@@ -43,9 +44,9 @@ export function Hero() {
       />
 
       <div className="container-site relative flex flex-1 flex-col justify-center pb-4 pt-[64px] sm:pb-8 sm:pt-[68px] lg:pb-8 lg:pt-[112px]">
-        <div className="grid items-center gap-4 sm:gap-7 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8 xl:gap-12">
-          {/* ---------- Bloc texte haut : eyebrow, titre, hook ---------- */}
-          {/* Mobile : eyebrow → H1 → hook, puis image (bloc visuel), puis
+        <div className="grid items-center gap-3.5 sm:gap-5 lg:grid-cols-[1.15fr_0.85fr] lg:gap-7 xl:gap-9">
+          {/* ---------- Bloc texte haut : eyebrow, titre ---------- */}
+          {/* Mobile : eyebrow → H1, puis image (bloc visuel), puis
               suite du texte. Desktop : colonne gauche, ligne 1. */}
           <div className="order-1 lg:col-start-1 lg:row-start-1">
             <Reveal direction="up">
@@ -59,18 +60,12 @@ export function Hero() {
               as="h1"
               text={HERO.h1}
               delay={0.08}
-              className="text-hero-title-viewport mt-4 text-white sm:mt-5"
+              className="text-hero-title-viewport mt-3 text-white sm:mt-4"
             />
-
-            <Reveal direction="up" delay={0.18}>
-              <p className="mt-3.5 max-w-xl font-display text-[15px] font-medium leading-snug text-[#c9baac] sm:text-base lg:text-lg xl:text-xl">
-                {HERO.hook}
-              </p>
-            </Reveal>
           </div>
 
           {/* ---------- Colonne visuelle : portrait + mockups ---------- */}
-          {/* Mobile : placée entre le hook et la description (demande
+          {/* Mobile : placée entre le titre et la description (demande
               explicite de l'éditeur) ; desktop : colonne droite sur les
               deux lignes de la grille, hauteur plafonnée en svh pour
               que le hero tienne dans l'écran. */}
@@ -92,7 +87,7 @@ export function Hero() {
                     loading="eager"
                     fetchPriority="high"
                     decoding="sync"
-                    className="block h-[min(26svh,240px)] w-full object-cover object-top lg:h-[min(60svh,540px)] lg:w-auto"
+                    className="block h-[min(29svh,270px)] w-full object-cover object-top lg:h-[min(64svh,570px)] lg:w-auto"
                   />
                 </span>
                 <figcaption className="absolute left-4 top-4">
@@ -143,16 +138,16 @@ export function Hero() {
           {/* ---------- Bloc texte bas : description, CTA, réassurance ---------- */}
           {/* Mobile : succède à l'image ; desktop : colonne gauche, ligne 2. */}
           <div className="order-3 lg:col-start-1 lg:row-start-2">
-            <Reveal direction="up" delay={0.24}>
-              <p className="mt-3.5 max-w-xl text-[12.5px] leading-[1.55] text-[#c8c8c8] sm:mt-0 sm:text-[15px] lg:mt-5 lg:text-[15px] xl:text-base">
+            <Reveal direction="up" delay={0.18}>
+              <p className="mt-2.5 max-w-xl text-[12.5px] leading-[1.55] text-[#c8c8c8] sm:mt-3 sm:text-[15px] lg:mt-3 lg:text-[15px] xl:text-base">
                 {HERO.text}
               </p>
             </Reveal>
 
             {/* CTA — les deux boutons partagent la même ligne sur desktop :
-                réservation d'appel + découverte des réalisations. */}
-            <Reveal direction="up" delay={0.3}>
-              <div className="mt-3.5 flex flex-wrap items-center gap-2.5 sm:mt-6 sm:gap-3 lg:mt-6">
+                réservation d'appel (blanc) + découverte des réalisations (noir). */}
+            <Reveal direction="up" delay={0.24}>
+              <div className="mt-3 flex flex-wrap items-center gap-2.5 sm:mt-5 sm:gap-3 lg:mt-5">
                 <CTAButton
                   action={{ kind: "calendly" }}
                   variant="secondary"
@@ -166,29 +161,15 @@ export function Hero() {
                   action={{ kind: "page", page: "realisations" }}
                   variant="ghostLight"
                   icon={CTAIcons.works}
-                  className="px-3 py-2 text-[12px] sm:px-3.5 sm:py-2.5 sm:text-[13px]"
+                  className="px-3.5 py-2.5 text-[13px] sm:px-4 sm:py-3 sm:text-sm"
                 >
                   {HERO.ctaTertiary}
                 </CTAButton>
               </div>
             </Reveal>
 
-            <Reveal direction="up" delay={0.36}>
+            <Reveal direction="up" delay={0.3}>
               <ReassuranceBar mention={HERO.reassurance} className="mt-3 sm:mt-4 lg:mt-5" />
-            </Reveal>
-
-            <Reveal direction="up" delay={0.42}>
-              <ul className="mt-2.5 flex flex-wrap gap-2 sm:mt-3.5">
-                {HERO.perks.map((perk) => (
-                  <li
-                    key={perk}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[#c9baac]/25 bg-[#c9baac]/8 px-2.5 py-1 text-[10.5px] font-medium text-[#c9baac] sm:gap-2 sm:px-3.5 sm:py-1.5 sm:text-xs"
-                  >
-                    <Check className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden="true" />
-                    {perk}
-                  </li>
-                ))}
-              </ul>
             </Reveal>
           </div>
         </div>

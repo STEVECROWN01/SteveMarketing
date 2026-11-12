@@ -9,11 +9,13 @@ import { Footer } from "@/components/layout/Footer";
 import { HomePage } from "@/components/home/HomePage";
 import { ServicesPage } from "@/components/pages/ServicesPage";
 import { PortfolioPage } from "@/components/pages/PortfolioPage";
+import { ProjectPage } from "@/components/pages/ProjectPage";
 import { AboutPage } from "@/components/pages/AboutPage";
 import { ContactPage } from "@/components/pages/ContactPage";
 import { LegalPage } from "@/components/pages/LegalPage";
 import { AdminPage } from "@/components/pages/AdminPage";
 import { Toaster } from "@/components/ui/toaster";
+import { PROJECTS } from "@/lib/site";
 
 /**
  * Coquille applicative : routeur de pages (URLs propres par
@@ -22,15 +24,21 @@ import { Toaster } from "@/components/ui/toaster";
  */
 
 function PageSwitch() {
-  const { page } = useRouter();
+  const { page, section } = useRouter();
   const reduce = useReducedMotion();
 
+  // Page projet : le fragment porte l'identifiant (#/projet/<id>).
+  // Identifiant inconnu → repli sur la liste des réalisations.
   const content = (() => {
     switch (page) {
       case "services":
         return <ServicesPage />;
       case "realisations":
         return <PortfolioPage />;
+      case "projet": {
+        const known = PROJECTS.some((p) => p.id === section);
+        return known && section ? <ProjectPage projectId={section} /> : <PortfolioPage />;
+      }
       case "aPropos":
         return <AboutPage />;
       case "contact":
@@ -44,10 +52,14 @@ function PageSwitch() {
     }
   })();
 
+  // Clé d'animation : les pages projets se distinguent par leur
+  // identifiant pour que la transition se joue entre deux projets.
+  const pageKey = page === "projet" ? `projet-${section}` : page;
+
   return (
     <AnimatePresence mode="wait" initial={false}>
       <motion.main
-        key={page}
+        key={pageKey}
         id="contenu-principal"
         className="flex flex-col"
         initial={reduce ? { opacity: 0 } : { opacity: 0, y: 14 }}

@@ -3,7 +3,7 @@
 import React from "react";
 import { Clock, TrendingUp, Users, Home, RefreshCw } from "lucide-react";
 import { Reveal } from "@/components/motion/Reveal";
-import { SectionHeading, CTAButton, CTAIcons } from "@/components/marketing/Marketing";
+import { SectionHeading, CTAButton, CTAIcons, RichText } from "@/components/marketing/Marketing";
 import { MonoImage } from "@/components/media/Media";
 import { TRANSFORMATION, SOLUTION } from "@/content/site-content";
 import { ASSETS } from "@/lib/site";
@@ -44,9 +44,7 @@ export function TransformationSection() {
           <div className="lg:order-1">
             <SectionHeading eyebrow={TRANSFORMATION.eyebrow} title={TRANSFORMATION.title} tone="dark" />
             <Reveal direction="up" delay={0.15}>
-              <div className="text-body mt-6 max-w-xl whitespace-pre-line on-dark-muted">
-                {TRANSFORMATION.text}
-              </div>
+              <RichText text={TRANSFORMATION.text} className="text-body mt-6 max-w-xl on-dark-muted" />
             </Reveal>
           </div>
         </div>
@@ -102,9 +100,7 @@ export function SolutionSection() {
           <div>
             <SectionHeading eyebrow={SOLUTION.eyebrow} title={SOLUTION.title} tone="dark" />
             <Reveal direction="up" delay={0.15}>
-              <div className="text-body mt-6 max-w-xl whitespace-pre-line on-dark-muted">
-                {SOLUTION.text}
-              </div>
+              <RichText text={SOLUTION.text} className="text-body mt-6 max-w-xl on-dark-muted" />
             </Reveal>
             <Reveal direction="up" delay={0.2}>
               <div className="mt-9 rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-2">

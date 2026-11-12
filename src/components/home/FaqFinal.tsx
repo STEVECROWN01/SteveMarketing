@@ -8,7 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Reveal } from "@/components/motion/Reveal";
-import { SectionHeading, CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
+import { SectionHeading, CTAButton, CTAIcons, ReassuranceBar, RichText } from "@/components/marketing/Marketing";
 import { FAQ, FINAL_CTA } from "@/content/site-content";
 
 /**
@@ -95,9 +95,7 @@ export function FinalCtaSection() {
         </Reveal>
 
         <Reveal direction="up" delay={0.14}>
-          <div className="text-body mx-auto mt-6 max-w-2xl whitespace-pre-line on-dark-muted">
-            {FINAL_CTA.text}
-          </div>
+          <RichText text={FINAL_CTA.text} className="text-body mx-auto mt-6 max-w-2xl on-dark-muted" />
         </Reveal>
 
         <Reveal direction="up" delay={0.2}>

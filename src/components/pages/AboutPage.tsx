@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { PageHero, SectionHeading, CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
+import { PageHero, SectionHeading, CTAButton, CTAIcons, ReassuranceBar, RichText } from "@/components/marketing/Marketing";
 import { Reveal } from "@/components/motion/Reveal";
 import { MonoImage } from "@/components/media/Media";
 import { ABOUT, SOLUTION, METHOD, FAQ } from "@/content/site-content";
@@ -27,7 +27,7 @@ export function AboutPage() {
             {ABOUT.cta}
           </CTAButton>
           <CTAButton action={{ kind: "page", page: "contact" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
-            Me contacter
+            Me Contacter
           </CTAButton>
         </div>
         <ReassuranceBar className="mt-6" />
@@ -62,9 +62,7 @@ export function AboutPage() {
             <div>
               <SectionHeading eyebrow={ABOUT.eyebrow} title="Une conviction simple." tone="light" />
               <Reveal direction="up" delay={0.12}>
-                <div className="text-body mt-6 max-w-xl whitespace-pre-line on-paper-muted">
-                  {ABOUT.text}
-                </div>
+                <RichText text={ABOUT.text} className="text-body mt-6 max-w-xl on-paper-muted" />
               </Reveal>
               <Reveal direction="up" delay={0.18}>
                 <dl className="mt-9 grid gap-3 sm:grid-cols-3">

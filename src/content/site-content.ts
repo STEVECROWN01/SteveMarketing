@@ -9,12 +9,10 @@
 export const HERO = {
   eyebrow: "CONCEPTION DE SITES WEB PROFESSIONNELS",
   h1: "Je crée des sites web qui génèrent des ventes.",
-  hook: "Votre entreprise mérite mieux qu'une présence en ligne qui ne vous rapporte rien.",
   text: "Vous n'avez pas encore de site web ? Ou votre site actuel ne vous apporte pas les résultats espérés ? Je conçois des sites web professionnels, élégants et stratégiquement pensés pour valoriser votre activité, attirer des visiteurs qualifiés et transformer leur intérêt en clients.",
   ctaPrimary: "Réserver Un Appel (30 Min)",
   ctaTertiary: "Voir Nos Travaux",
   reassurance: "30 minutes · Gratuit · Sans engagement",
-  perks: ["Copywriting inclus", "Optimisation SEO de base incluse"],
   portraitAlt:
     "Portrait professionnel de Stevens Akpovi, concepteur de sites web orientés conversion",
 } as const;

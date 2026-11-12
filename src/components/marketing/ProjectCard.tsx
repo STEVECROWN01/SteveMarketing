@@ -1,15 +1,17 @@
 "use client";
 
 import React from "react";
-import { BrowserMockup, PhoneMockup, DirectionalIcon } from "@/components/media/Media";
+import { ArrowRight } from "lucide-react";
+import { useRouter } from "@/components/router-context";
 import { Reveal } from "@/components/motion/Reveal";
-import type { PROJECTS } from "@/lib/site";
+import { MonoImage, DirectionalIcon } from "@/components/media/Media";
 
 /**
- * Carte de réalisation — tout le bloc est cliquable et s'ouvre
- * dans un nouvel onglet. Aperçus desktop + mobile, monochrome par
- * défaut sur desktop, retour aux couleurs au survol, icône
- * directionnelle au survol. Aucune donnée inventée.
+ * Carte de réalisation — présentation calquée sur la section
+ * « Websites We Created » de sheragency.com : grande capture du
+ * site, nom du projet, bouton « Voir Le Projet ». La carte entière
+ * et le bouton mènent à la page de présentation du projet
+ * (route #/projet/<id>), comme les fiches de la référence.
  */
 
 export interface Project {
@@ -24,105 +26,51 @@ export interface Project {
 }
 
 export function ProjectCard({ project, index }: { project: Project; index: number }) {
-  return (
-    <Reveal direction="up" delay={index * 0.06} as="article">
-      <a
-        href={project.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`${project.cta} — ${project.name} (nouvel onglet)`}
-        className="group media-group block"
-      >
-        <div className="relative overflow-hidden rounded-2xl border border-[#e4e4e4]/15 bg-[#232323] p-4 transition-all duration-500 hover:border-[#c9baac]/40 hover:bg-[#2f2f2f] sm:p-6 lg:p-7">
-          {/* Zone mockups */}
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-            <div className="min-w-0 flex-1">
-              <BrowserMockup
-                src={project.desktop}
-                alt={`Aperçu desktop du site ${project.name}`}
-                url={project.url}
-                width={1440}
-                height={900}
-              />
-            </div>
-            <div className="hidden w-[26%] shrink-0 sm:block lg:w-[22%]">
-              <PhoneMockup
-                src={project.mobile}
-                alt={`Aperçu mobile du site ${project.name}`}
-                width={390}
-                height={844}
-              />
-            </div>
-          </div>
+  const router = useRouter();
 
-          {/* Informations */}
-          <div className="mt-6 flex items-end justify-between gap-5 sm:mt-7">
-            <div className="min-w-0">
-              <p className="text-eyebrow">Projet {String(index + 1).padStart(2, "0")}</p>
-              <h3 className="text-card-title mt-2 text-white">{project.name}</h3>
-              <p className="mt-1 text-sm text-[#c9baac]">{project.category}</p>
-              <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#c8c8c8]">
-                {project.description}
-              </p>
-              <p className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-white">
-                <span className="transition-colors duration-300 group-hover:text-[#c9baac]">
-                  {project.cta}
-                </span>
-                <span aria-hidden="true" className="text-[#c9baac]">↗</span>
-              </p>
-            </div>
-            <DirectionalIcon className="hidden shrink-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 sm:flex" />
-          </div>
-        </div>
-      </a>
-    </Reveal>
-  );
-}
+  const goProject = (e: React.MouseEvent) => {
+    e.preventDefault();
+    router.navigate("projet", project.id);
+  };
 
-/** Variante complète pour la page Réalisations — carte entièrement cliquable. */
-export function ProjectDetail({ project, index }: { project: Project; index: number }) {
   return (
-    <Reveal direction="up" delay={0.05} as="article" className="scroll-mt-28">
+    <Reveal direction="up" delay={index * 0.06} as="article" className="h-full">
       <a
-        href={project.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`${project.cta} — ${project.name} (nouvel onglet)`}
-        className="group media-group block rounded-2xl border border-[#e4e4e4]/15 bg-[#232323] p-5 transition-all duration-500 hover:border-[#c9baac]/40 hover:bg-[#2f2f2f] sm:p-7 lg:p-9"
+        href={`#/projet/${project.id}`}
+        onClick={goProject}
+        aria-label={`Voir Le Projet — ${project.name}`}
+        className="group media-group flex h-full flex-col rounded-2xl border border-[#e4e4e4] bg-white p-4 transition-all duration-300 hover:border-[#1c1c1c]/25 hover:shadow-[0_30px_60px_-35px_rgba(28,28,28,0.35)] sm:p-5"
       >
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-10">
-          <div className="min-w-0 flex-1">
-            <BrowserMockup
-              src={project.desktop}
-              alt={`Aperçu desktop du site ${project.name}`}
-              url={project.url}
-              width={1440}
-              height={900}
-            />
-          </div>
-          <div className="w-full shrink-0 sm:w-1/3 lg:w-[24%]">
-            <PhoneMockup
-              src={project.mobile}
-              alt={`Aperçu mobile du site ${project.name}`}
-              width={390}
-              height={844}
-            />
-          </div>
-        </div>
-        <div className="mt-7 flex flex-wrap items-end justify-between gap-4">
-          <div className="max-w-2xl">
+        {/* Capture du site — couleur au survol (desktop), directe sur mobile */}
+        <MonoImage
+          src={project.desktop}
+          alt={`Aperçu du site ${project.name}`}
+          width={1440}
+          height={900}
+          className="rounded-xl border border-[#e4e4e4]"
+        />
+
+        {/* Nom du projet */}
+        <div className="mt-5 flex items-end justify-between gap-4">
+          <div className="min-w-0">
             <p className="text-eyebrow">Projet {String(index + 1).padStart(2, "0")}</p>
-            <h3 className="text-card-title mt-2 text-white">{project.name}</h3>
-            <p className="mt-1 text-sm text-[#c9baac]">{project.category}</p>
-            <p className="mt-3 text-sm leading-relaxed text-[#c8c8c8]">{project.description}</p>
-            <p className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-white">
-              <span className="transition-colors duration-300 group-hover:text-[#c9baac]">
-                {project.cta}
-              </span>
-              <span aria-hidden="true" className="text-[#c9baac]">↗</span>
-            </p>
+            <h3 className="text-card-title mt-2 text-[#1c1c1c]">{project.name}</h3>
+            <p className="mt-1 text-sm text-[#525252]">{project.category}</p>
           </div>
           <DirectionalIcon className="hidden shrink-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100 sm:flex" />
+        </div>
+
+        {/* Bouton « Voir Le Projet » — même style que le bouton blanc du hero */}
+        <div className="mt-auto pt-6">
+          <span
+            aria-hidden="true"
+            className="group/btn btn-fill inline-flex min-h-[48px] items-center justify-center gap-2.5 rounded-full border border-[#e4e4e4] bg-white px-6 py-3.5 text-sm font-medium tracking-[0.01em] text-[#1c1c1c] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-[#c9baac] [&::before]:bg-[#e4e4e4]"
+          >
+            Voir Le Projet
+            <ArrowRight
+              className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1"
+            />
+          </span>
         </div>
       </a>
     </Reveal>

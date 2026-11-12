@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Building2, LayoutGrid, MousePointerClick, ShoppingCart, RefreshCcw, Network, PenTool, Search, Megaphone, Check } from "lucide-react";
-import { PageHero, SectionHeading, CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
+import { PageHero, SectionHeading, CTAButton, CTAIcons, ReassuranceBar, RichText } from "@/components/marketing/Marketing";
 import { Reveal } from "@/components/motion/Reveal";
 import { SERVICES, INCLUDED, COMPLEMENTARY, METHOD, FAQ } from "@/content/site-content";
 
@@ -84,7 +84,10 @@ export function ServicesPage() {
                       </span>
                       <h3 className="font-display text-xl font-semibold text-white">{item.title}</h3>
                     </div>
-                    <p className="mt-5 whitespace-pre-line text-[15px] leading-relaxed text-[#c8c8c8]">{item.text}</p>
+                    <RichText
+                      text={item.text}
+                      className="mt-5 text-[15px] leading-relaxed text-[#c8c8c8]"
+                    />
                   </div>
                 </Reveal>
               );

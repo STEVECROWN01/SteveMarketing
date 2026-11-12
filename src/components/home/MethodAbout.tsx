@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Reveal } from "@/components/motion/Reveal";
-import { SectionHeading, CTAButton, CTAIcons } from "@/components/marketing/Marketing";
+import { SectionHeading, CTAButton, CTAIcons, RichText } from "@/components/marketing/Marketing";
 import { MonoImage } from "@/components/media/Media";
 import { METHOD, ABOUT } from "@/content/site-content";
 import { ASSETS } from "@/lib/site";
@@ -95,9 +95,7 @@ export function AboutSection() {
           <div className="lg:pt-2">
             <SectionHeading eyebrow={ABOUT.eyebrow} title={ABOUT.title} tone="light" />
             <Reveal direction="up" delay={0.15}>
-              <div className="text-body mt-6 max-w-xl whitespace-pre-line on-paper-muted">
-                {ABOUT.text}
-              </div>
+              <RichText text={ABOUT.text} className="text-body mt-6 max-w-xl on-paper-muted" />
             </Reveal>
 
             <Reveal direction="up" delay={0.2}>

@@ -8,6 +8,38 @@ import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { SITE } from "@/lib/site";
 import type { AppPage } from "@/components/router-context";
 
+/* ============================ Texte multi-paragraphes ============================ */
+
+/**
+ * Description multi-paragraphes — espacement inter-paragraphe resserré
+ * (mt-3) au lieu du saut de ligne complet hérité de whitespace-pre-line.
+ * Un seul paragraphe : rendu <p> simple ; plusieurs : <div> de <p>.
+ */
+export function RichText({
+  text,
+  className = "",
+}: {
+  text: string;
+  className?: string;
+}) {
+  const paragraphs = text
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (paragraphs.length <= 1) {
+    return <p className={className}>{paragraphs[0] ?? text}</p>;
+  }
+  return (
+    <div className={className}>
+      {paragraphs.map((paragraph, i) => (
+        <p key={i} className={i > 0 ? "mt-3" : undefined}>
+          {paragraph}
+        </p>
+      ))}
+    </div>
+  );
+}
+
 /* ============================ En-têtes de section ============================ */
 
 export function SectionHeading({
@@ -49,6 +81,19 @@ export function SectionHeading({
 }
 
 /* ============================ Boutons d'action ============================ */
+/*
+ * Deux styles canoniques, conformes à la demande de l'éditeur :
+ * - BLANC : fond #ffffff exact — même design que le bouton hero
+ *   « Réserver Un Appel (30 Min) » : texte #1c1c1c, bordure #e4e4e4
+ *   qui devient beige au survol, remplissage progressif #e4e4e4,
+ *   légère élévation, flèche qui glisse.
+ * - NOIR : fond #000000 exact — même design que le bouton hero
+ *   « Audit gratuit de votre site actuel » : texte blanc, bordure
+ *   claire discrète, remplissage progressif #3c3c3c au survol,
+ *   légère élévation, flèche qui glisse. Les variantes « dark » et
+ *   « ghostLight » (transparent sur fond sombre) portent désormais
+ *   toutes deux ce style noir unifié.
+ */
 
 type CTAAction =
   | { kind: "calendly" }
@@ -116,9 +161,9 @@ export function CTAButton({
       "bg-[#c9baac] text-[#1c1c1c] shadow-[0_14px_34px_-14px_rgba(201,186,172,0.5)] [&::before]:bg-[#e4e4e4]",
     secondary:
       "bg-white text-[#1c1c1c] border border-[#e4e4e4] hover:border-[#c9baac] [&::before]:bg-[#e4e4e4]",
-    dark: "bg-[#3c3c3c] text-white border border-[#3c3c3c] [&::before]:bg-[#525252]",
+    dark: "bg-[#000000] text-white border border-[#e4e4e4]/30 [&::before]:bg-[#3c3c3c]",
     ghostLight:
-      "bg-transparent text-white border border-[#e4e4e4]/30 [&::before]:bg-[#3c3c3c]",
+      "bg-[#000000] text-white border border-[#e4e4e4]/30 [&::before]:bg-[#3c3c3c]",
     ghostDark:
       "bg-transparent text-[#1c1c1c] border border-[#1c1c1c]/25 [&::before]:bg-[#e4e4e4]",
   };

@@ -9,12 +9,13 @@ import React, {
   useRef,
   useSyncExternalStore,
 } from "react";
-import { PAGES, type PageKey } from "@/lib/site";
+import { PAGES, PROJECTS, type PageKey } from "@/lib/site";
 
 /**
  * Routeur applicatif du site (pages virtuelles dans la route `/`).
  * URLs propres par fragment : #/services, #/realisations, #/a-propos,
- * #/contact, #/mentions-legales — ancrage de section possible :
+ * #/contact, #/mentions-legales, #/projet/<id> (page de présentation
+ * d'une réalisation) — ancrage de section possible :
  * #/contact/devis, #/accueil/portfolio…
  */
 
@@ -22,6 +23,7 @@ export type AppPage =
   | "accueil"
   | "services"
   | "realisations"
+  | "projet"
   | "aPropos"
   | "contact"
   | "legal"
@@ -43,6 +45,7 @@ const PAGE_KEYS: Record<AppPage, keyof typeof PAGES | "admin"> = {
   accueil: "accueil",
   services: "services",
   realisations: "realisations",
+  projet: "realisations",
   aPropos: "aPropos",
   contact: "contact",
   legal: "legal",
@@ -56,6 +59,7 @@ const HASH_TO_PAGE: Record<string, AppPage> = {
   accueil: "accueil",
   services: "services",
   realisations: "realisations",
+  projet: "projet",
   "a-propos": "aPropos",
   contact: "contact",
   "mentions-legales": "legal",
@@ -89,6 +93,7 @@ const PAGE_TO_HASH: Record<AppPage, string> = {
   accueil: "accueil",
   services: "services",
   realisations: "realisations",
+  projet: "projet",
   aPropos: "a-propos",
   contact: "contact",
   legal: "mentions-legales",
@@ -102,6 +107,19 @@ export function RouterProvider({ children }: { children: React.ReactNode }) {
 
   // Titre dynamique + défilement après changement de page.
   useEffect(() => {
+    // Page projet : le fragment porte l'identifiant du projet (ex.
+    // #/projet/mrsteveenglish) — titre dédié, retour en haut sans
+    // tentative d'ancrage.
+    if (state.page === "projet") {
+      const project = PROJECTS.find((p) => p.id === state.section);
+      if (typeof document !== "undefined") {
+        document.title = project
+          ? `${project.name} — Projet web | Stevens Akpovi`
+          : "Réalisations — Projets web | Stevens Akpovi";
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     const meta =
       state.page !== "admin"
         ? PAGES[PAGE_KEYS[state.page] as keyof typeof PAGES]
