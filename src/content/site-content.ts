@@ -23,8 +23,8 @@ export const HERO = {
 
 export const PROBLEM = {
   eyebrow: "VOTRE ACTIVITÉ MÉRITE D'ÊTRE DAVANTAGE VISIBLE",
-  title: "Vous avez une activité à développer. Mais disposez-vous réellement d'un site web capable de vous y aider ?",
-  text: "Vos compétences, vos services et votre expérience ont de la valeur.\n\nMais combien de personnes peuvent réellement découvrir ce que vous faites, comprendre vos offres et vous contacter facilement ?\n\nAujourd'hui, votre présence sur les réseaux sociaux ne suffit pas toujours à présenter toute la valeur de votre activité.\n\nSans un véritable espace professionnel sur Internet, vous limitez les possibilités de présenter vos services, de rassurer vos futurs clients et de recevoir de nouvelles demandes.",
+  title: "Disposez-vous réellement d'un site web capable d'aider votre activité ?",
+  text: "Vos compétences, vos services et votre expérience ont de la valeur.\n\nMais combien de personnes peuvent réellement découvrir votre activité, comprendre vos offres et vous contacter facilement ?\n\nSans un véritable espace professionnel sur Internet, vous limitez les possibilités de présenter vos services, de rassurer vos futurs clients et de recevoir de nouvelles demandes.\n\nCar votre présence sur les réseaux sociaux ne suffit pas toujours à présenter toute la valeur de votre activité.",
   pains: [
     "Aucune vitrine professionnelle pour présenter votre activité.",
     "Une dépendance excessive aux réseaux sociaux.",
@@ -61,7 +61,7 @@ export const QUESTIONING = {
 
 export const TRANSFORMATION = {
   eyebrow: "ET SI VOTRE SITE DEVENAIT UN VÉRITABLE ATOUT ?",
-  title: "Imaginez une présence professionnelle qui travaille pour votre activité, même lorsque vous êtes occupé ailleurs.",
+  title: "Imaginez une présence professionnelle qui travaille pour votre activité, même en votre absence.",
   text: "Un visiteur découvre votre entreprise. Il consulte vos services, comprend votre proposition, découvre votre expertise et peut facilement vous contacter.\n\nVoilà ce qu'un site professionnel bien pensé peut rendre possible.",
   benefits: [
     {
@@ -88,12 +88,50 @@ export const TRANSFORMATION = {
   cta: "Je Veux Développer Ma Présence En Ligne",
 } as const;
 
-/* ============================ 05 — MA SOLUTION ============================ */
+/* ============================ 05 — COMMENT ÇA FONCTIONNE ? ============================ */
 
+/** Section processus (ex-« UNE APPROCHE QUI VA AU-DELÀ DU DESIGN »),
+ *  renommée et refondée en six étapes à accordéons « + »/« − » à la
+ *  demande de l'éditeur (13/11/2026). */
 export const SOLUTION = {
-  eyebrow: "UNE APPROCHE QUI VA AU-DELÀ DU DESIGN",
+  eyebrow: "Comment ça fonctionne ?",
+  title: "Un processus clair. Une collaboration structurée",
+  text: "Je ne crée pas simplement des sites web. Je conçois des sites pensés pour convaincre et convertir.",
+  steps: [
+    {
+      name: "Échange & Compréhension",
+      text: "Chaque projet commence par une compréhension réelle de votre activité.\n\nJe cherche à comprendre votre marché, vos services, vos clients et vos objectifs pour construire un site qui présente clairement votre valeur et facilite la prise de décision de vos visiteurs.",
+    },
+    {
+      name: "Planification du Parcours Utilisateur",
+      text: "Le premier élément, et le plus important à prendre en compte, est le parcours que suit un visiteur sur votre site web.\n\nQuelles questions se pose-t-il lorsqu'il arrive sur votre site ? Quelles hésitations ou objections devons-nous lever ? Comment instaurer un climat de confiance avec lui ?\n\nNous abordons toutes ces questions dès le premier jour de nos projets, lors d'un atelier d'environ 1h, au cours duquel nous présentons la structure du site web et échangeons nos idées.",
+    },
+    {
+      name: "Conception Visuelle",
+      text: "En fonction du public que nous ciblons, plusieurs styles esthétiques peuvent être envisagés pour mieux correspondre à ses goûts et renforcer sa confiance.\n\nDans la troisième phase de notre projet, nous explorerons plusieurs pistes créatives et retiendrons la plus adaptée.\n\nNous pouvons réaliser ce travail tout en respectant votre charte graphique et vos contraintes existantes — ou choisir de les repenser entièrement.",
+    },
+    {
+      name: "Rédaction de Contenu",
+      text: "La clé d'une rédaction web efficace réside dans la concision et la pertinence de votre contenu.\n\nNous rédigeons les textes des sites web que nous concevons et, lorsque cela est pertinent, nous les optimisons pour les moteurs de recherche (SEO).",
+    },
+    {
+      name: "Développement & Mise en Ligne",
+      text: "Durant cette phase, nous transformons les maquettes graphiques que nous avons conçues en un site web fonctionnel, grâce au code.\n\nNous veillons à ce que votre site web offre un rendu impeccable sur tous les formats d'écran : ordinateurs, tablettes et smartphones.\n\nUne fois le développement initial terminé, nous vous présentons le site pour recueillir vos retours et intégrer les éventuels ajustements ou personnalisations souhaités. Après validation et finalisation, nous procédons à sa mise en ligne afin de le rendre accessible à vos visiteurs sur Internet.",
+    },
+    {
+      name: "Génération de trafic",
+      text: "Maintenant que votre site web est optimisé, il est temps d'attirer des visiteurs.\n\nNous optimisons votre site pour les moteurs de recherche (SEO) et générons du trafic grâce aux campagnes publicitaires Meta Ads.",
+    },
+  ],
+  cta1: "Démarrons Votre Projet",
+  cta2: "Voir Nos Travaux",
+} as const;
+
+/* Résumé de l'ancienne approche — conservé pour la page « À propos »
+   (section « MON APPROCHE », trois piliers). */
+export const ABOUT_APPROACH = {
+  eyebrow: "MON APPROCHE",
   title: "Je ne crée pas simplement des sites web. Je conçois des sites pensés pour convaincre et convertir.",
-  text: "Chaque projet commence par une compréhension réelle de votre activité.\n\nJe cherche à comprendre votre marché, vos services, vos clients et vos objectifs pour construire un site qui présente clairement votre valeur et facilite la prise de décision de vos visiteurs.",
   pillars: [
     {
       name: "Stratégie",
@@ -108,7 +146,29 @@ export const SOLUTION = {
       text: "Construire un parcours qui facilite les prises de contact, les réservations et les demandes commerciales.",
     },
   ],
-  cta: "Parlons De Votre Projet",
+} as const;
+
+/* Résumé « trois cartes » de la section DES SOLUTIONS ADAPTÉES À VOS
+   OBJECTIFS (page d'accueil) — la page Services conserve le détail
+   complet des six offres. */
+export const SERVICES_SUMMARY = {
+  eyebrow: "DES SOLUTIONS ADAPTÉES À VOS OBJECTIFS",
+  title: "Le bon site web pour le bon objectif commercial.",
+  items: [
+    {
+      title: "Site Web Professionnel",
+      text: "Présentez votre entreprise, vos services et votre identité avec une véritable présence professionnelle sur Internet.",
+    },
+    {
+      title: "Page de vente",
+      text: "Présentez votre offre, valorisez ses bénéfices, répondez aux hésitations et facilitez le passage à l'action.",
+    },
+    {
+      title: "Refonte de Site Web",
+      text: "Modernisez votre site, améliorez son expérience et donnez une nouvelle dimension à votre présence digitale.",
+    },
+  ],
+  cta: "Trouver La Solution Adaptée À Mon Activité",
 } as const;
 
 /* ============================ 06 — SERVICES ============================ */

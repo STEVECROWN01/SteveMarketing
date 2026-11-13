@@ -1,9 +1,11 @@
 "use client";
 
-import React from "react";
-import { Clock, TrendingUp, Users, Home, RefreshCw } from "lucide-react";
+import React, { useState } from "react";
+import { Clock, TrendingUp, Users, Home, RefreshCw, Plus, Minus } from "lucide-react";
 import { Reveal } from "@/components/motion/Reveal";
 import { SectionHeading, CTAButton, CTAIcons, RichText } from "@/components/marketing/Marketing";
+import { StartProjectButton } from "@/components/marketing/StartProjectButton";
+import { useRouter } from "@/components/router-context";
 import { MonoImage } from "@/components/media/Media";
 import { TRANSFORMATION, SOLUTION } from "@/content/site-content";
 import { ASSETS } from "@/lib/site";
@@ -73,7 +75,7 @@ export function TransformationSection() {
           <Reveal direction="up" delay={0.15}>
             <div className="mt-12">
               <CTAButton
-                action={{ kind: "page", page: "contact", section: "devis" }}
+                action={{ kind: "page", page: "devis" }}
                 variant="primary"
                 size="lg"
                 icon={CTAIcons.quote}
@@ -88,71 +90,129 @@ export function TransformationSection() {
   );
 }
 
+/** SECTION 05 — « COMMENT ÇA FONCTIONNE ? » (fond sombre)
+ *  Ex-« UNE APPROCHE QUI VA AU-DELÀ DU DESIGN », renommée et
+ *  refondée à la demande de l'éditeur (13/11/2026) :
+ *  à gauche, titre « Un processus clair. Une collaboration
+ *  structurée », texte « Je ne crée pas simplement des sites web… »
+ *  et deux boutons (« Démarrons Votre Projet » blanc style header,
+ *  « Voir Nos Travaux » noir) ; à droite, SIX cartes à accordéon
+ *  « + »/« − » — numéros stylisés en angle supérieur GAUCHE, plus
+ *  de mention « Pilier 01 », et la carte « Comprendre votre
+ *  activité avant de concevoir votre site. » a été supprimée. */
 export function SolutionSection() {
+  const router = useRouter();
+  // Une seule étape ouverte à la fois — la première par défaut,
+  // comme le déroulé de lecture de la référence.
+  const [open, setOpen] = useState<number | null>(0);
+
+  const goToDevis = () => router.navigate("devis");
+
   return (
     <section
       id="solution"
-      aria-labelledby="solution-titre"
+      aria-label="Comment ça fonctionne — processus de collaboration"
       className="section-dark border-t border-[#e4e4e4]/10 scroll-mt-20 py-20 sm:py-24 lg:py-32"
     >
       <div className="container-site">
-        <div className="grid gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:gap-20">
-          <div>
+        <div className="grid gap-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-20">
+          {/* Colonne gauche : titre, texte, boutons */}
+          <div className="lg:sticky lg:top-28 lg:self-start">
             <SectionHeading eyebrow={SOLUTION.eyebrow} title={SOLUTION.title} tone="dark" />
             <Reveal direction="up" delay={0.15}>
               <RichText text={SOLUTION.text} className="text-body mt-6 max-w-xl on-dark-muted" />
             </Reveal>
             <Reveal direction="up" delay={0.2}>
-              <div className="mt-9 rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-2">
-                <MonoImage
-                  src={ASSETS.strategyWork}
-                  alt="Illustration : travail de stratégie et de conception web orientés conversion"
-                  width={1280}
-                  height={853}
-                  className="rounded-xl"
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                {/* Bouton blanc « Démarrons Votre Projet » — exactement
+                    comme celui du header (pastille flèche ↗) ; mène à la
+                    page de demande de devis. */}
+                <StartProjectButton
+                  label={SOLUTION.cta1}
+                  onClick={goToDevis}
+                  className="min-h-[52px]"
                 />
-              </div>
-            </Reveal>
-          </div>
-
-          {/* Trois piliers */}
-          <div className="flex flex-col gap-5 lg:pt-4">
-            {SOLUTION.pillars.map((pillar, i) => (
-              <Reveal key={pillar.name} direction="left" delay={0.1 + i * 0.08} as="article">
-                <div className="group relative overflow-hidden rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-7 transition-colors duration-300 hover:border-[#e4e4e4]/35 sm:p-8">
-                  <span
-                    aria-hidden="true"
-                    className="font-display absolute -right-2 -top-5 select-none text-[7rem] font-bold leading-none text-[#e4e4e4]/10 transition-colors duration-300 group-hover:text-[#e4e4e4]/16"
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <p className="text-eyebrow">Pilier {String(i + 1).padStart(2, "0")}</p>
-                  <h3 className="mt-3 font-display text-2xl font-semibold text-white">
-                    {pillar.name}
-                  </h3>
-                  <p className="relative mt-3 max-w-md text-[15px] leading-relaxed text-[#c8c8c8]">
-                    {pillar.text}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
-
-            <Reveal direction="up" delay={0.35}>
-              <div className="rounded-2xl bg-[#e4e4e4] p-7 sm:p-8">
-                <p className="font-display text-lg font-semibold leading-snug text-[#1c1c1c] sm:text-xl">
-                  Comprendre votre activité avant de concevoir votre site.
-                </p>
+                {/* Bouton noir « Voir Nos Travaux » — exactement comme le
+                    bouton « Parlons De Votre Projet » (pastille noire,
+                    remplissage #3c3c3c au survol) ; mène aux réalisations. */}
                 <CTAButton
-                  action={{ kind: "calendly" }}
+                  action={{ kind: "page", page: "realisations" }}
                   variant="dark"
-                  className="mt-5"
-                  icon={CTAIcons.calendar}
+                  size="lg"
                 >
-                  {SOLUTION.cta}
+                  {SOLUTION.cta2}
                 </CTAButton>
               </div>
             </Reveal>
           </div>
+
+          {/* Colonne droite : six cartes à accordéon « + »/« − » */}
+          <ol className="flex flex-col gap-4">
+            {SOLUTION.steps.map((step, i) => {
+              const isOpen = open === i;
+              return (
+                <Reveal key={step.name} direction="left" delay={0.06 * i} as="li">
+                  <div
+                    className={`relative overflow-hidden rounded-2xl border bg-[#232323] transition-colors duration-300 ${
+                      isOpen ? "border-[#e4e4e4]/35" : "border-[#e4e4e4]/12"
+                    }`}
+                  >
+                    {/* Numérotation stylisée — angle supérieur GAUCHE
+                        (demande de l'éditeur ; elle était à droite). */}
+                    <span
+                      aria-hidden="true"
+                      className="font-display pointer-events-none absolute -left-2 -top-6 select-none text-[5.5rem] font-bold leading-none text-[#e4e4e4]/10"
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+
+                    <button
+                      type="button"
+                      onClick={() => setOpen(isOpen ? null : i)}
+                      aria-expanded={isOpen}
+                      aria-controls={`etape-panneau-${i}`}
+                      id={`etape-bouton-${i}`}
+                      className="relative flex w-full items-center justify-between gap-4 px-6 py-6 text-left focus-visible:outline-2 focus-visible:outline-offset-4 sm:px-8"
+                    >
+                      <span className="font-display text-xl font-semibold leading-snug text-white sm:text-2xl">
+                        {step.name}
+                      </span>
+                      {/* Bascule « + »/« − » à droite de la carte */}
+                      <span
+                        aria-hidden="true"
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors duration-300 ${
+                          isOpen
+                            ? "border-[#e4e4e4] bg-[#e4e4e4] text-[#1c1c1c]"
+                            : "border-[#e4e4e4]/25 text-[#e4e4e4]"
+                        }`}
+                      >
+                        {isOpen ? <Minus className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                      </span>
+                    </button>
+
+                    {/* Panneau : hauteur animée via grid-template-rows */}
+                    <div
+                      id={`etape-panneau-${i}`}
+                      role="region"
+                      aria-labelledby={`etape-bouton-${i}`}
+                      className={`grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                        isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+                      }`}
+                    >
+                      <div className="overflow-hidden">
+                        <div className="px-6 pb-7 sm:px-8">
+                          <RichText
+                            text={step.text}
+                            className="max-w-xl text-[15px] leading-relaxed text-[#c8c8c8]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Reveal>
+              );
+            })}
+          </ol>
         </div>
       </div>
     </section>

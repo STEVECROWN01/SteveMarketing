@@ -1,13 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Star } from "lucide-react";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
 import { BrowserMockup, PhoneMockup } from "@/components/media/Media";
 import { HERO } from "@/content/site-content";
-import { ASSETS, PROJECTS, SITE } from "@/lib/site";
+import { ASSETS, PROJECTS } from "@/lib/site";
 
 /**
  * SECTION 01 — HERO
@@ -26,6 +26,57 @@ export function Hero() {
   const reduce = useReducedMotion();
 
   const floatTransition = { duration: 5.5, repeat: Infinity, repeatType: "mirror" as const, ease: "easeInOut" as const };
+
+  /* Équilibre vertical de la description (bureau uniquement) :
+     même espace au-dessus et au-dessous de la description — la
+     description seule est déplacée verticalement, le titre et les
+     boutons restent strictement immobiles (demande de l'éditeur,
+     13/11/2026). L'écart dépend de la hauteur du viewport (le
+     portrait dimensionne les rangées de la grille), d'où un ajustement
+     mesuré plutôt qu'une marge fixe. Mesure après les animations de
+     révélation (~1,05 s) puis à chaque redimensionnement. */
+  const descRef = useRef<HTMLParagraphElement>(null);
+  const ctaRowRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let raf = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const adjust = () => {
+      const p = descRef.current;
+      const row = ctaRowRef.current;
+      const h1 = p?.closest("section")?.querySelector("h1");
+      if (!p || !row || !h1) return;
+      if (!window.matchMedia("(min-width: 1024px)").matches) {
+        p.style.top = "0px";
+        return;
+      }
+      // Décalage éventuellement déjà appliqué : les mesures le
+      // contiennent, on le neutralise pour obtenir le vrai écart.
+      const currentShift = Math.max(0, -parseFloat(p.style.top) || 0);
+      const gapAbove = p.getBoundingClientRect().top - h1.getBoundingClientRect().bottom;
+      const gapBelow = row.getBoundingClientRect().top - p.getBoundingClientRect().bottom;
+      // Titre et boutons immobiles : la description est centrée dans
+      // l'espace disponible — autant d'air au-dessus qu'au-dessous.
+      const naturalAbove = gapAbove + currentShift;
+      const naturalBelow = gapBelow - currentShift;
+      const newShift = Math.round((naturalAbove - naturalBelow) / 2);
+      p.style.top = newShift > 0 ? `${-newShift}px` : "0px";
+    };
+    const schedule = (delay: number) => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        raf = requestAnimationFrame(adjust);
+      }, delay);
+    };
+    schedule(1150);
+    const onResize = () => schedule(140);
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      if (timer) clearTimeout(timer);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
 
   return (
     <section
@@ -163,24 +214,34 @@ export function Hero() {
           </div>
 
           {/* ---------- Bloc texte bas : description, CTA, réassurance ---------- */}
-          {/* Mobile : succède à l'image ; desktop : colonne gauche, ligne 2. */}
+          {/* Mobile : succède à l'image ; desktop : colonne gauche, ligne 2.
+              Bureau : l'effet « descriptionEquilibree » place la description
+              pour qu'il y ait autant d'espace au-dessus qu'au-dessous — sans
+              bouger le titre ni les boutons. */}
           <div className="order-3 lg:col-start-1 lg:row-start-2">
             <Reveal direction="up" delay={0.18}>
-              <p className="mt-2.5 max-w-xl text-[12.5px] leading-[1.55] text-[#c8c8c8] sm:mt-3 sm:text-[15px] lg:mt-3 lg:text-[15px] xl:text-base">
+              <p
+                ref={descRef}
+                className="relative mt-2.5 max-w-xl text-[12.5px] leading-[1.55] text-[#c8c8c8] transition-[top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] sm:mt-3 sm:text-[15px] lg:text-[15px] xl:text-base"
+              >
                 {HERO.text}
               </p>
             </Reveal>
 
             {/* CTA — les deux boutons partagent la même ligne sur desktop :
-                réservation d'appel (blanc) + découverte des réalisations (noir). */}
+                réservation d'appel (blanc, sans icône à gauche — mène à la
+                page de demande de devis) + découverte des réalisations
+                (noir, sans flèche à droite). */}
             <Reveal direction="up" delay={0.24}>
-              <div className="mt-3 flex flex-wrap items-center gap-2.5 sm:mt-5 sm:gap-3 lg:mt-5">
+              <div
+                ref={ctaRowRef}
+                className="mt-3 flex flex-wrap items-center gap-2.5 sm:mt-5 sm:gap-3 lg:mt-5"
+              >
                 <CTAButton
-                  action={{ kind: "calendly" }}
+                  action={{ kind: "page", page: "devis" }}
                   variant="secondary"
                   size="lg"
-                  icon={CTAIcons.calendar}
-                  ariaLabel={`Réserver un appel de 30 minutes sur Calendly — ${SITE.calendlyMention}`}
+                  ariaLabel="Réserver un appel — page de demande de devis personnalisé"
                 >
                   {HERO.ctaPrimary}
                 </CTAButton>
@@ -188,6 +249,7 @@ export function Hero() {
                   action={{ kind: "page", page: "realisations" }}
                   variant="ghostLight"
                   icon={CTAIcons.works}
+                  hideArrow
                   className="px-3.5 py-2.5 text-[13px] sm:px-4 sm:py-3 sm:text-sm"
                 >
                   {HERO.ctaTertiary}
@@ -201,6 +263,15 @@ export function Hero() {
           </div>
         </div>
       </div>
+
+      {/* Fondu progressif vers la section suivante : plus de trait de
+          séparation — le fond du hero (#070707) se fond dans celui de la
+          section suivante (#1c1c1c) sur ~112 px, sans limite nette
+          (demande de l'éditeur, 13/11/2026). */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-[#1c1c1c] sm:h-28"
+      />
     </section>
   );
 }

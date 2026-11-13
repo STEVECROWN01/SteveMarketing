@@ -68,13 +68,14 @@ export async function POST(req: NextRequest) {
     // email au propriétaire fait alors foi d'enregistrement fiable.
     let lead: {
       id: string;
-      type: "quote" | "audit";
+      type: "quote" | "audit" | "contact";
       name: string;
       email: string;
       phone?: string | null;
       company?: string | null;
       website?: string | null;
       activity?: string | null;
+      discovery?: string | null;
       serviceType?: string | null;
       budget?: string | null;
       timeline?: string | null;
@@ -82,7 +83,9 @@ export async function POST(req: NextRequest) {
     };
     let dbPersisted = true;
     try {
-      lead = await db.lead.create({
+      // NB : Lead.type est une chaîne libre en base — le résultat est
+      // restreint au union vérifié par le schéma ci-dessus.
+      lead = (await db.lead.create({
         data: {
           type: data.type,
           status: "new",
@@ -98,7 +101,7 @@ export async function POST(req: NextRequest) {
           message: data.message,
           source: "site web",
         },
-      });
+      })) as typeof lead;
     } catch (dbError) {
       dbPersisted = false;
       console.warn(
@@ -114,12 +117,17 @@ export async function POST(req: NextRequest) {
         company: data.company ?? null,
         website: data.website ?? null,
         activity: data.activity ?? null,
+        discovery: data.discovery ?? null,
         serviceType: data.serviceType ?? null,
         budget: data.budget ?? null,
         timeline: data.timeline ?? null,
         message: data.message,
       };
     }
+
+    // Canal de découverte (formulaire de contact) : joint à la notification
+    // email même lorsqu'il n'est pas persisté en base.
+    lead.discovery = data.discovery ?? null;
 
     // Notification + accusé de réception (service serveur, si configuré)
     let notified = false;

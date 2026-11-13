@@ -12,6 +12,8 @@ import { PortfolioPage } from "@/components/pages/PortfolioPage";
 import { ProjectPage } from "@/components/pages/ProjectPage";
 import { AboutPage } from "@/components/pages/AboutPage";
 import { ContactPage } from "@/components/pages/ContactPage";
+import { DevisPage } from "@/components/pages/DevisPage";
+import { CallBookingPage } from "@/components/pages/CallBookingPage";
 import { LegalPage } from "@/components/pages/LegalPage";
 import { AdminPage } from "@/components/pages/AdminPage";
 import { Toaster } from "@/components/ui/toaster";
@@ -43,6 +45,10 @@ function PageSwitch() {
         return <AboutPage />;
       case "contact":
         return <ContactPage />;
+      case "devis":
+        return <DevisPage />;
+      case "appel":
+        return <CallBookingPage />;
       case "legal":
         return <LegalPage />;
       case "admin":

@@ -23,7 +23,7 @@ export function ServicesPage() {
           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
             Réserver Un Appel
           </CTAButton>
-          <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
+          <CTAButton action={{ kind: "page", page: "devis" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
             Demander Un Devis Personnalisé
           </CTAButton>
         </div>
@@ -52,7 +52,7 @@ export function ServicesPage() {
                     <p className="mt-3 text-sm leading-relaxed text-[#555555]">{service.text}</p>
                     <div className="mt-auto pt-5">
                       <CTAButton
-                        action={{ kind: "page", page: "contact", section: "devis" }}
+                        action={{ kind: "page", page: "devis" }}
                         variant="ghostDark"
                         className="px-4 py-2 text-[13px]"
                         ariaLabel={`Demander un devis pour : ${service.title}`}
@@ -128,7 +128,7 @@ export function ServicesPage() {
               <p className="font-display text-lg font-semibold leading-snug text-[#1c1c1c] sm:text-xl">
                 Discuter de ma stratégie digitale
               </p>
-              <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="dark" className="mt-5" icon={CTAIcons.quote}>
+              <CTAButton action={{ kind: "page", page: "devis" }} variant="dark" className="mt-5" icon={CTAIcons.quote}>
                 Discuter De Ma Stratégie Digitale
               </CTAButton>
             </div>
@@ -171,7 +171,7 @@ export function ServicesPage() {
               <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
                 Réserver Un Appel
               </CTAButton>
-              <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="secondary" size="lg" icon={CTAIcons.quote}>
+              <CTAButton action={{ kind: "page", page: "devis" }} variant="secondary" size="lg" icon={CTAIcons.quote}>
                 Demander Un Devis Personnalisé
               </CTAButton>
             </div>

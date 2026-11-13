@@ -40,7 +40,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
             {project.cta}
           </CTAButton>
           <CTAButton
-            action={{ kind: "page", page: "contact", section: "devis" }}
+            action={{ kind: "page", page: "devis" }}
             variant="ghostLight"
             size="lg"
             icon={CTAIcons.quote}
@@ -157,7 +157,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
                 Réserver Un Appel
               </CTAButton>
               <CTAButton
-                action={{ kind: "page", page: "contact", section: "devis" }}
+                action={{ kind: "page", page: "devis" }}
                 variant="ghostLight"
                 size="lg"
                 icon={CTAIcons.quote}

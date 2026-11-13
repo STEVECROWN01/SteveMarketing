@@ -4,7 +4,7 @@ import React from "react";
 import { PageHero, SectionHeading, CTAButton, CTAIcons, ReassuranceBar, RichText } from "@/components/marketing/Marketing";
 import { Reveal } from "@/components/motion/Reveal";
 import { MonoImage } from "@/components/media/Media";
-import { ABOUT, SOLUTION, METHOD, FAQ } from "@/content/site-content";
+import { ABOUT, ABOUT_APPROACH, METHOD, FAQ } from "@/content/site-content";
 import { ASSETS, SITE } from "@/lib/site";
 import {
   Accordion,
@@ -37,9 +37,11 @@ export function AboutPage() {
       <section aria-labelledby="a-propos-texte" className="section-light py-20 sm:py-24 lg:py-28">
         <div className="container-site">
           <div className="grid gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16 xl:gap-20">
-      {/* Portrait éditeur (APROPOS-PORTRAIT) + aperçu de travail épinglé
-              par-dessus, en bas, de façon oblique — seconde image
-              agrandie et espace quasi supprimé (demande de l'éditeur). */}
+      {/* Portrait éditeur (APROPOS-PORTRAIT) + espace de travail épinglé
+              par-dessus, en bas, de façon oblique — image remplacée par
+              stevens-akpovi-workspace.png (version webp optimisée) et
+              ENCORE agrandie (72 % de la largeur) à la demande de
+              l'éditeur, 13/11/2026. */}
           <div className="relative mx-auto w-full max-w-md lg:max-w-none lg:self-start">
               <div aria-hidden="true" className="absolute -inset-3 rotate-[2deg] rounded-[2rem] bg-[#e4e4e4] opacity-25" />
               <Reveal direction="right">
@@ -51,12 +53,12 @@ export function AboutPage() {
                   className="relative rounded-2xl border border-[#e4e4e4] shadow-[0_30px_60px_-30px_rgba(28,28,28,0.4)]"
                 />
               </Reveal>
-              <Reveal direction="up" delay={0.2} className="absolute -bottom-10 -right-3 w-[58%] sm:-right-6 lg:-right-8">
+              <Reveal direction="up" delay={0.2} className="absolute -bottom-12 -right-3 w-[72%] sm:-right-6 lg:-right-8">
                 <MonoImage
-                  src={ASSETS.strategyWork}
-                  alt="Illustration du travail de stratégie web de Stevens Akpovi"
-                  width={1280}
-                  height={853}
+                  src={ASSETS.workspace}
+                  alt="Espace de travail de Stevens Akpovi — conception de sites web professionnels"
+                  width={1536}
+                  height={1024}
                   className="rotate-[3deg] rounded-2xl border border-[#e4e4e4] bg-white shadow-[0_25px_50px_-20px_rgba(28,28,28,0.5)]"
                 />
               </Reveal>
@@ -100,9 +102,9 @@ export function AboutPage() {
       {/* Trois piliers (rappel de l'approche) */}
       <section aria-labelledby="a-propos-piliers" className="section-dark py-20 sm:py-24 lg:py-28">
         <div className="container-site">
-          <SectionHeading eyebrow="MON APPROCHE" title={SOLUTION.title} tone="dark" align="center" className="mx-auto" />
+          <SectionHeading eyebrow={ABOUT_APPROACH.eyebrow} title={ABOUT_APPROACH.title} tone="dark" align="center" className="mx-auto" />
           <div className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-3">
-            {SOLUTION.pillars.map((pillar, i) => (
+            {ABOUT_APPROACH.pillars.map((pillar, i) => (
               <Reveal key={pillar.name} direction="up" delay={i * 0.08} as="article">
                 <div className="h-full rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-7">
                   <p className="text-eyebrow">Pilier {String(i + 1).padStart(2, "0")}</p>

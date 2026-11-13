@@ -110,7 +110,7 @@ export function FinalCtaSection() {
               {FINAL_CTA.cta1}
             </CTAButton>
             <CTAButton
-              action={{ kind: "page", page: "contact", section: "devis" }}
+              action={{ kind: "page", page: "devis" }}
               variant="secondary"
               size="lg"
               icon={CTAIcons.quote}
@@ -118,7 +118,7 @@ export function FinalCtaSection() {
               {FINAL_CTA.cta2}
             </CTAButton>
             <CTAButton
-              action={{ kind: "page", page: "contact", section: "audit" }}
+              action={{ kind: "page", page: "contact" }}
               variant="ghostLight"
               size="lg"
               icon={CTAIcons.audit}

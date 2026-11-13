@@ -188,3 +188,95 @@ git push origin main             # déploiement Vercel automatique
     « Réserver Un Appel » (sans « 30 Min ») partout.
 12. **Assets mis à jour depuis GitHub** : APROPOS-PORTRAIT.png (converti
     WebP), problem-no-website.png (WebP régénéré depuis la nouvelle version).
+
+---
+
+## Complément 6 — Second lot du 13/11/2026 (soir) : pages Devis / Réservation / Contact + restructuration accueil
+
+**Vérifications effectuées** : build Next 10/10 pages, zéro erreur console,
+E2E formulaire de contact (redirection + enregistrement base constatés),
+équilibrage hero mesuré (61/61 px à 1440×900, 50/50 à 1280×800, 58/59 à
+1536×960), accordéons testés au clic, aucun débordement mobile
+(scrollWidth = 390 px).
+
+### Hero
+1. **Équilibrage vertical de la description** : autant d'espace au-dessus
+   qu'au-dessous de la description, sans bouger le titre ni les boutons —
+   la description seule se déplace (ajustement mesuré côté client, car
+   l'écart dépend de la hauteur du viewport qui dimensionne le portrait).
+2. **« Réserver Un Appel »** : icône de gauche supprimée ; le bouton mène à
+   la nouvelle page **Demander Un Devis** (comme « Démarrer Un Projet » du
+   header). **« Voir Nos Travaux »** : flèche de droite supprimée.
+3. **Fondu hero → section suivante** : le trait de séparation est remplacé
+   par un dégradé (#070707 → #1c1c1c) sur ~112 px — plus de limite nette.
+
+### Accueil
+4. **VOTRE ACTIVITÉ MÉRITE…** : titre « Disposez-vous réellement d'un site
+   web capable d'aider votre activité ? » + description réécrite (4
+   paragraphes, conclusion « Car votre présence sur les réseaux sociaux… ») ;
+   image épinglée agrandie (74 % de la largeur).
+5. **Six bandes de questions** : sans le bloc-titre « VOUS AVEZ DÉJÀ UN
+   SITE ? », présentées en **deux colonnes — trois rangées** (dès 640 px ;
+   en dessous, une colonne pour rester lisible), puis bloc conclusion + CTA.
+6. **ET SI VOTRE SITE DEVENAIT…** : « …même en votre absence. ».
+7. **DES SOLUTIONS ADAPTÉES À VOS OBJECTIFS** : déplacée entre « ET SI… » et
+   « COMMENT ÇA FONCTIONNE ? » ; résumée à **trois cartes** (Site Web
+   Professionnel, Page de vente, Refonte de Site Web) sur une seule rangée —
+   la page Services conserve le détail des six offres.
+8. **« COMMENT ÇA FONCTIONNE ? »** (ex-UNE APPROCHE…) : titre « Un processus
+   clair. Une collaboration structurée », texte « Je ne crée pas simplement
+   des sites web… », **six cartes à accordéon « + »/« − »** (Échange &
+   Compréhension, Planification du Parcours Utilisateur, Conception
+   Visuelle, Rédaction de Contenu, Développement & Mise en Ligne,
+   Génération de trafic) avec numéros stylisés en **haut-gauche**, plus de
+   mention « Pilier 01 », suppression de la carte « Comprendre votre
+   activité… » ; boutons « **Démarrons Votre Projet** » (blanc, identique au
+   header) et « **Voir Nos Travaux** » (noir, identique à « Parlons De Votre
+   Projet »).
+9. **Sections supprimées** : « DÉVELOPPER VOTRE VISIBILITÉ » et « COMMENT
+   NOUS ALLONS TRAVAILLER ENSEMBLE » (leurs contenus restent détaillés sur
+   les pages Services et À propos).
+10. **Images épinglées** (toutes, sauf hero) : encore agrandies (72-74 %).
+    Page À propos : épingle remplacée par **stevens-akpovi-workspace.png**
+    (convertie en WebP optimisé, 75 Ko).
+11. **favicon.png** régénérée depuis le nouveau « Logo Favicon.png » (512 px).
+
+### Nouvelles pages (routes par fragment)
+12. **#/demander-un-devis** — calquée sur « /request-a-quote » de
+    sheragency.com : page claire, grand titre centré « Parlons de votre
+    futur site. », sous-texte, trois pastilles de bénéfices, badge 4,9/5
+    (5 étoiles, la 5ᵉ à moitié remplie), formulaire devis en deux colonnes
+    avec bouton noir pleine largeur (pas de vidéo : aucun asset disponible).
+13. **#/reserver-un-appel** — la section « APPEL STRATÉGIQUE · 30 MINUTES »
+    de l'ancienne page contact, présentée telle quelle (Calendly inline,
+    vraies disponibilités).
+14. **#/contact** — calquée sur « /contact-us » de sheragency.com : fond
+    sombre + orbes lumineux ; à gauche titre « Contact », bouton blanc
+    « Demander Un Devis » (vers la page dédiée) et note 4,9/5 ; à droite
+    trois accordéons (Clients existants / Nouveaux clients / Vous avez
+    déjà un site ?) puis « Laissez-moi un message » et le formulaire.
+    **Le bouton du formulaire transmet les informations à
+    stevensakpovi@gmail.com puis redirige vers #/reserver-un-appel.**
+
+### Technique
+15. **Envoi email automatique** : l'API /api/leads existante est réutilisée
+    (notification Resend vers stevensakpovi@gmail.com + accusé de réception
+    au visiteur). **Rappel : renseigner RESEND_API_KEY dans les variables
+    d'environnement Vercel** (clé gratuite sur resend.com) pour que les
+    envois partent — sans la clé, les demandes restent enregistrées en base
+    et visibles dans l'espace admin (#/admin), qui affiche désormais aussi
+    les messages de contact (filtres + export CSV mis à jour).
+16. **Nouveau type « contact »** (validation Zod + email + admin) avec
+    champ « Comment m'avez-vous découvert ? » (TikTok, Instagram, LinkedIn,
+    YouTube, Google, WhatsApp, bouche à oreille, autre).
+17. **Liens** : tous les boutons « Demander Un Devis » / « Démarrer Un
+    Projet » / « Discuter De Mon Projet » mènent à #/demander-un-devis ;
+    les CTA « audit » mènent à la page contact (formulaire de message).
+    Correction du href des CTAButton (fragments réels via router.href).
+18. **Sitemap** : #/demander-un-devis et #/reserver-un-appel ajoutées.
+
+### Non applicable / choix d'interprétation
+- La vidéo de présentation de la page « Request a quote » de la référence
+  n'a pas d'équivalent (aucun asset) — remplacée par le badge de note.
+- Les six bandes restent sur une colonne sous 640 px de large (lisibilité) ;
+  dire si tu les veux aussi en deux colonnes sur mobile.

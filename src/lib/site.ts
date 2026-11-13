@@ -89,9 +89,23 @@ export const PAGES = {
   contact: {
     hash: "#/contact",
     label: "Contact",
-    title: "Contact — Demande de projet | Stevens Akpovi",
+    title: "Contact — Stevens Akpovi",
     description:
-      "Réservez un appel de 30 minutes (gratuit, sans engagement), demandez un devis personnalisé ou un audit gratuit de votre site actuel.",
+      "Contactez Stevens Akpovi : laissez un message, demandez un devis personnalisé ou réservez un appel stratégique de 30 minutes — gratuit et sans engagement.",
+  },
+  devis: {
+    hash: "#/demander-un-devis",
+    label: "Demander Un Devis",
+    title: "Demander Un Devis — Stevens Akpovi",
+    description:
+      "Décrivez votre activité et votre projet : Stevens Akpovi vous répond avec un devis personnalisé, établi à partir de votre besoin.",
+  },
+  appel: {
+    hash: "#/reserver-un-appel",
+    label: "Réserver Un Appel",
+    title: "Réserver Un Appel — 30 minutes | Stevens Akpovi",
+    description:
+      "Réservez votre créneau d'appel stratégique de 30 minutes avec Stevens Akpovi — gratuit et sans engagement, en visioconférence.",
   },
   legal: {
     hash: "#/mentions-legales",
@@ -154,6 +168,9 @@ export const ASSETS = {
   portrait: "/assets/stevens-akpovi-portrait.webp",
   workspaceDesktop: "/assets/stevens-akpovi-workspace-desktop.webp",
   workspaceMobile: "/assets/stevens-akpovi-workspace-mobile.webp",
+  /** Espace de travail (version webp optimisée du PNG fourni par
+   *  l'éditeur) — image épinglée de la page « À propos ». */
+  workspace: "/assets/stevens-akpovi-workspace.webp",
   strategyWork: "/assets/stevens-strategy-work.webp",
   benefitGrowth: "/assets/benefit-business-growth.webp",
   problemNoWebsite: "/assets/problem-no-website.webp",

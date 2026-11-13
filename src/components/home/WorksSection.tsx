@@ -38,7 +38,7 @@ export function WorksSection() {
           <Reveal direction="up" delay={0.15}>
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <CTAButton
-                action={{ kind: "page", page: "contact", section: "devis" }}
+                action={{ kind: "page", page: "devis" }}
                 variant="dark"
                 size="lg"
                 icon={CTAIcons.quote}

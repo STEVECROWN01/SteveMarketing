@@ -4,23 +4,21 @@ import React from "react";
 import { Hero } from "@/components/home/Hero";
 import { ProblemSection, QuestioningSection } from "@/components/home/ProblemQuestioning";
 import { TransformationSection, SolutionSection } from "@/components/home/TransformationSolution";
-import {
-  ServicesSection,
-  IncludedSection,
-  ComplementarySection,
-} from "@/components/home/ServicesSections";
+import { ServicesSection, IncludedSection } from "@/components/home/ServicesSections";
 import { WorksSection } from "@/components/home/WorksSection";
-import { MethodSection, AboutSection } from "@/components/home/MethodAbout";
+import { AboutSection } from "@/components/home/MethodAbout";
 import { FaqSection, FinalCtaSection } from "@/components/home/FaqFinal";
 import { Reveal } from "@/components/motion/Reveal";
 import { TARGETS } from "@/content/site-content";
 
-/** Bandeau « à qui s'adressent les services » — sous le Hero. */
+/** Bandeau « à qui s'adressent les services » — sous le Hero.
+ *  Plus de trait supérieur : le hero se fond dans cette section par un
+ *  dégradé (demande de l'éditeur, 13/11/2026). */
 function AudienceStrip() {
   return (
     <section
       aria-label="À qui s'adressent les services de Stevens Akpovi"
-      className="section-dark border-t border-[#e4e4e4]/10 py-10 sm:py-12"
+      className="section-dark py-10 sm:py-12"
     >
       <div className="container-site">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:gap-10">
@@ -46,7 +44,11 @@ function AudienceStrip() {
   );
 }
 
-/** Page d'accueil — les 13 sections du copywriting de référence. */
+/** Page d'accueil — composition des sections (13/11/2026 :
+ *  « DES SOLUTIONS ADAPTÉES » entre « ET SI VOTRE SITE DEVENAIT… » et
+ *  « COMMENT ÇA FONCTIONNE ? » ; sections « DÉVELOPPER VOTRE
+ *  VISIBILITÉ » et « COMMENT NOUS ALLONS TRAVAILLER ENSEMBLE »
+ *  supprimées à la demande de l'éditeur). */
 export function HomePage() {
   return (
     <>
@@ -55,12 +57,10 @@ export function HomePage() {
       <ProblemSection />
       <QuestioningSection />
       <TransformationSection />
-      <SolutionSection />
       <ServicesSection />
+      <SolutionSection />
       <IncludedSection />
-      <ComplementarySection />
       <WorksSection />
-      <MethodSection />
       <AboutSection />
       <FaqSection />
       <FinalCtaSection />

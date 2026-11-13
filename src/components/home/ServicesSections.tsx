@@ -10,22 +10,27 @@ import {
   Network,
   PenTool,
   Search,
-  Megaphone,
   BadgeCheck,
 } from "lucide-react";
 import { Reveal } from "@/components/motion/Reveal";
 import { SectionHeading, CTAButton, CTAIcons, RichText } from "@/components/marketing/Marketing";
-import { SERVICES, INCLUDED, COMPLEMENTARY } from "@/content/site-content";
+import { SERVICES_SUMMARY, INCLUDED } from "@/content/site-content";
 import { useRouter } from "@/components/router-context";
 
 const SERVICE_ICONS = [Building2, LayoutGrid, MousePointerClick, ShoppingCart, RefreshCcw, Network];
 const INCLUDED_ICONS = [PenTool, Search];
-const COMPLEMENTARY_ICONS = [Megaphone, Search];
 
 /**
- * SECTION 06 — SERVICES (fond clair)
+ * SECTION 06 — DES SOLUTIONS ADAPTÉES À VOS OBJECTIFS (fond clair)
+ *  Résumé à TROIS cartes (Site Web Professionnel, Page de vente,
+ *  Refonte de Site Web) alignées sur une seule rangée — demande de
+ *  l'éditeur (13/11/2026) ; la page Services conserve le détail
+ *  complet des six offres.
  * SECTION 07 — AVANTAGES INCLUS (fond sombre)
- * SECTION 08 — SERVICES COMPLÉMENTAIRES (fond sombre relevé)
+ *  NB : la section « DÉVELOPPER VOTRE VISIBILITÉ » (services
+ *  complémentaires) a été supprimée de l'accueil à la demande de
+ *  l'éditeur (13/11/2026) — elle reste détaillée sur la page
+ *  Services.
  */
 export function ServicesSection() {
   const router = useRouter();
@@ -37,7 +42,7 @@ export function ServicesSection() {
     >
       <div className="container-site">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
-          <SectionHeading eyebrow={SERVICES.eyebrow} title={SERVICES.title} tone="light" className="max-w-2xl" />
+          <SectionHeading eyebrow={SERVICES_SUMMARY.eyebrow} title={SERVICES_SUMMARY.title} tone="light" className="max-w-2xl" />
           <Reveal direction="up" delay={0.15}>
             <a
               href="#/services"
@@ -53,8 +58,9 @@ export function ServicesSection() {
           </Reveal>
         </div>
 
+        {/* Trois cartes — une seule rangée (bureau) */}
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 sm:mt-14">
-          {SERVICES.items.map((service, i) => {
+          {SERVICES_SUMMARY.items.map((service, i) => {
             const Icon = SERVICE_ICONS[i] ?? Building2;
             return (
               <Reveal key={service.title} direction="up" delay={i * 0.05} as="article">
@@ -75,12 +81,12 @@ export function ServicesSection() {
         <Reveal direction="up" delay={0.15}>
           <div className="mt-12 sm:mt-14">
             <CTAButton
-              action={{ kind: "page", page: "contact", section: "devis" }}
+              action={{ kind: "page", page: "devis" }}
               variant="ghostDark"
               size="lg"
               icon={CTAIcons.quote}
             >
-              {SERVICES.cta}
+              {SERVICES_SUMMARY.cta}
             </CTAButton>
           </div>
         </Reveal>
@@ -140,58 +146,6 @@ export function IncludedSection() {
             </CTAButton>
           </div>
         </Reveal>
-      </div>
-    </section>
-  );
-}
-
-export function ComplementarySection() {
-  return (
-    <section
-      id="services-complementaires"
-      aria-labelledby="complementaires-titre"
-      className="bg-[#232323] scroll-mt-20 py-20 text-white sm:py-24 lg:py-32"
-    >
-      <div className="container-site">
-        <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
-          <div className="lg:sticky lg:top-28 lg:self-start">
-            <SectionHeading eyebrow={COMPLEMENTARY.eyebrow} title={COMPLEMENTARY.title} tone="dark" />
-            <Reveal direction="up" delay={0.18}>
-              <div className="mt-9">
-                <CTAButton
-                  action={{ kind: "page", page: "contact", section: "devis" }}
-                  variant="secondary"
-                  size="lg"
-                  icon={CTAIcons.quote}
-                >
-                  {COMPLEMENTARY.cta}
-                </CTAButton>
-              </div>
-            </Reveal>
-          </div>
-
-          <ul className="flex flex-col gap-5">
-            {COMPLEMENTARY.items.map((item, i) => {
-              const Icon = COMPLEMENTARY_ICONS[i] ?? Megaphone;
-              return (
-                <Reveal key={item.title} direction="left" delay={0.1 * i} as="li">
-                  <div className="group rounded-2xl border border-[#e4e4e4]/12 bg-[#1c1c1c] p-7 transition-colors duration-300 hover:border-[#e4e4e4]/35 sm:p-9">
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#e4e4e4]/12 text-[#e4e4e4]">
-                        <Icon className="h-5.5 w-5.5" aria-hidden="true" />
-                      </span>
-                      <span className="text-eyebrow">Prestation complémentaire</span>
-                    </div>
-                    <h3 className="mt-6 font-display text-xl font-semibold text-white sm:text-2xl">
-                      {item.title}
-                    </h3>
-                    <p className="mt-3.5 text-[15px] leading-relaxed text-[#c8c8c8]">{item.text}</p>
-                  </div>
-                </Reveal>
-              );
-            })}
-          </ul>
-        </div>
       </div>
     </section>
   );

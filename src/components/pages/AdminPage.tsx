@@ -19,7 +19,7 @@ import { LEAD_STATUSES } from "@/lib/validation";
 
 interface Lead {
   id: string;
-  type: "quote" | "audit";
+  type: "quote" | "audit" | "contact";
   status: string;
   name: string;
   email: string;
@@ -211,7 +211,7 @@ export function AdminPage() {
   function exportCsv() {
     const rows = filtered.map((l) => [
       l.createdAt,
-      l.type === "audit" ? "Audit gratuit" : "Devis",
+      l.type === "audit" ? "Audit gratuit" : l.type === "contact" ? "Message de contact" : "Devis",
       STATUS_LABELS[l.status] ?? l.status,
       l.name,
       l.email,
@@ -317,9 +317,10 @@ export function AdminPage() {
         ))}
         <span className="mx-2 hidden h-4 w-px bg-[#e4e4e4]/20 sm:block" aria-hidden="true" />
         {[
-          { key: "all", label: "Devis + Audits" },
+          { key: "all", label: "Devis + Audits + Messages" },
           { key: "quote", label: "Devis" },
           { key: "audit", label: "Audits" },
+          { key: "contact", label: "Messages" },
         ].map((f) => (
           <button
             key={f.key}
@@ -365,7 +366,7 @@ export function AdminPage() {
                     </td>
                     <td className="px-5 py-4">
                       <span className="rounded-full bg-[#e4e4e4]/12 px-3 py-1 text-xs font-medium text-[#e4e4e4]">
-                        {lead.type === "audit" ? "Audit" : "Devis"}
+                        {lead.type === "audit" ? "Audit" : lead.type === "contact" ? "Message" : "Devis"}
                       </span>
                     </td>
                     <td className="max-w-[220px] px-5 py-4 text-[#c8c8c8]">

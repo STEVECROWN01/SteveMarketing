@@ -5,7 +5,7 @@ import { z } from "zod";
  * l'API (sécurité). Validation backend systématique.
  */
 
-export const LEAD_TYPES = ["quote", "audit"] as const;
+export const LEAD_TYPES = ["quote", "audit", "contact"] as const;
 export const SERVICE_TYPES = [
   "Site vitrine professionnel",
   "Site web multipages",
@@ -14,6 +14,18 @@ export const SERVICE_TYPES = [
   "Refonte de site web",
   "Système d'acquisition client",
   "Autre / je ne sais pas encore",
+] as const;
+/** Comment le visiteur a découvert Stevens Akpovi (formulaire de
+ *  contact, style sheragency) — canaux réels de l'éditeur. */
+export const DISCOVERY_SOURCES = [
+  "TikTok",
+  "Instagram",
+  "LinkedIn",
+  "YouTube",
+  "Google",
+  "WhatsApp",
+  "Bouche à oreille",
+  "Autre",
 ] as const;
 export const BUDGET_RANGES = [
   "À définir ensemble",
@@ -66,6 +78,13 @@ export const leadSchema = z
       .optional()
       .or(z.literal(""))
       .transform((v) => (v && v.length > 0 ? v : null)),
+    discovery: z
+      .string()
+      .trim()
+      .max(80)
+      .optional()
+      .or(z.literal(""))
+      .transform((v) => (v && v.length > 0 ? v : null)),
     serviceType: z
       .string()
       .trim()
@@ -98,6 +117,31 @@ export const leadSchema = z
         path: ["website"],
         message: "L'URL de votre site actuel est nécessaire pour l'audit",
       });
+    }
+    // Message de contact (style sheragency) : téléphone, entreprise et
+    // canal de découverte sont requis, comme sur la page de référence.
+    if (data.type === "contact") {
+      if (!data.phone || data.phone.replace(/\D/g, "").length < 6) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["phone"],
+          message: "Indiquez votre numéro de téléphone.",
+        });
+      }
+      if (!data.company || data.company.length < 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["company"],
+          message: "Indiquez le nom de votre entreprise ou activité.",
+        });
+      }
+      if (!data.discovery || data.discovery.length < 2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["discovery"],
+          message: "Indiquez comment vous m'avez découvert.",
+        });
+      }
     }
   });
 

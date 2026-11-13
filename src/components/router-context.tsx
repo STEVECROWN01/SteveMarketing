@@ -14,9 +14,10 @@ import { PAGES, PROJECTS, type PageKey } from "@/lib/site";
 /**
  * Routeur applicatif du site (pages virtuelles dans la route `/`).
  * URLs propres par fragment : #/services, #/realisations, #/a-propos,
- * #/contact, #/mentions-legales, #/projet/<id> (page de présentation
+ * #/contact, #/demander-un-devis, #/reserver-un-appel,
+ * #/mentions-legales, #/projet/<id> (page de présentation
  * d'une réalisation) — ancrage de section possible :
- * #/contact/devis, #/accueil/portfolio…
+ * #/accueil/portfolio…
  */
 
 export type AppPage =
@@ -26,6 +27,8 @@ export type AppPage =
   | "projet"
   | "aPropos"
   | "contact"
+  | "devis"
+  | "appel"
   | "legal"
   | "admin";
 
@@ -48,6 +51,8 @@ const PAGE_KEYS: Record<AppPage, keyof typeof PAGES | "admin"> = {
   projet: "realisations",
   aPropos: "aPropos",
   contact: "contact",
+  devis: "devis",
+  appel: "appel",
   legal: "legal",
   admin: "admin",
 };
@@ -62,6 +67,8 @@ const HASH_TO_PAGE: Record<string, AppPage> = {
   projet: "projet",
   "a-propos": "aPropos",
   contact: "contact",
+  "demander-un-devis": "devis",
+  "reserver-un-appel": "appel",
   "mentions-legales": "legal",
   admin: "admin",
 };
@@ -96,6 +103,8 @@ const PAGE_TO_HASH: Record<AppPage, string> = {
   projet: "projet",
   aPropos: "a-propos",
   contact: "contact",
+  devis: "demander-un-devis",
+  appel: "reserver-un-appel",
   legal: "mentions-legales",
   admin: "admin",
 };

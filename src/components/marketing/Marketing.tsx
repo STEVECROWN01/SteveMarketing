@@ -112,6 +112,7 @@ export function CTAButton({
   className = "",
   size = "md",
   ariaLabel,
+  hideArrow = false,
 }: {
   action: CTAAction;
   variant?: Variant;
@@ -120,6 +121,9 @@ export function CTAButton({
   className?: string;
   size?: "md" | "lg";
   ariaLabel?: string;
+  /** Masque la flèche droite (demande de l'éditeur : « Voir Nos Travaux »
+   *  du hero sans icône flèche à droite, 13/11/2026). */
+  hideArrow?: boolean;
 }) {
   const router = useRouter();
   const calendly = useCalendly();
@@ -144,11 +148,14 @@ export function CTAButton({
     // external : comportement natif (nouvel onglet)
   };
 
+  // Le href passe par router.href : les fragments réels peuvent différer
+  // de la clé applicative (ex. aPropos → #/a-propos, devis →
+  // #/demander-un-devis) — un lien direct reste copiable/ouvrable.
   const href =
     action.kind === "calendly"
       ? SITE.calendly
       : action.kind === "page"
-        ? `#/${action.page}${action.section ? `/${action.section}` : ""}`
+        ? router.href(action.page, action.section ?? null)
         : action.kind === "external"
           ? action.url
           : `#${action.sectionId}`;
@@ -182,10 +189,12 @@ export function CTAButton({
       <span className="inline-flex items-center gap-2.5">
         {icon}
         {children}
-        <ArrowRight
-          className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1"
-          aria-hidden="true"
-        />
+        {!hideArrow && (
+          <ArrowRight
+            className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1"
+            aria-hidden="true"
+          />
+        )}
       </span>
     </a>
   );

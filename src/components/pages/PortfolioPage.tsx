@@ -35,7 +35,7 @@ export function PortfolioPage() {
         title={WORKS.title}
         intro={WORKS.intro}
       >
-        <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="secondary" size="lg" icon={CTAIcons.quote}>
+        <CTAButton action={{ kind: "page", page: "devis" }} variant="secondary" size="lg" icon={CTAIcons.quote}>
           Discuter De Mon Projet
         </CTAButton>
       </PageHero>
@@ -119,7 +119,7 @@ export function PortfolioPage() {
                 <CTAButton action={{ kind: "calendly" }} variant="dark" size="lg" icon={CTAIcons.calendar}>
                   Réserver Un Appel
                 </CTAButton>
-                <CTAButton action={{ kind: "page", page: "contact", section: "devis" }} variant="ghostDark" size="lg" icon={CTAIcons.quote}>
+                <CTAButton action={{ kind: "page", page: "devis" }} variant="ghostDark" size="lg" icon={CTAIcons.quote}>
                   Demander Un Devis
                 </CTAButton>
               </div>

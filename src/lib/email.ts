@@ -16,13 +16,14 @@ const FROM_LABEL = "Site Stevens Akpovi <onboarding@resend.dev>";
 
 export interface LeadPayload {
   id: string;
-  type: "quote" | "audit";
+  type: "quote" | "audit" | "contact";
   name: string;
   email: string;
   phone?: string | null;
   company?: string | null;
   website?: string | null;
   activity?: string | null;
+  discovery?: string | null;
   serviceType?: string | null;
   budget?: string | null;
   timeline?: string | null;
@@ -67,7 +68,8 @@ function fieldRow(label: string, value?: string | null): string {
 
 /** Notification interne : la demande est transmise à stevensakpovi@gmail.com */
 export async function notifyOwner(lead: LeadPayload): Promise<boolean> {
-  const typeLabel = lead.type === "audit" ? "Audit gratuit" : "Demande de devis";
+  const typeLabel =
+    lead.type === "audit" ? "Audit gratuit" : lead.type === "contact" ? "Message de contact" : "Demande de devis";
   const subject = `[Site web] ${typeLabel} — ${lead.name}`;
   const html = `
   <div style="background:#f5f5f5;padding:32px 0">
@@ -83,6 +85,7 @@ export async function notifyOwner(lead: LeadPayload): Promise<boolean> {
         ${fieldRow("Entreprise", lead.company)}
         ${fieldRow("Site actuel", lead.website)}
         ${fieldRow("Activité", lead.activity)}
+        ${fieldRow("Découvert via", lead.discovery)}
         ${fieldRow("Service", lead.serviceType)}
         ${fieldRow("Budget", lead.budget)}
         ${fieldRow("Échéance", lead.timeline)}
@@ -104,11 +107,15 @@ export async function sendReceipt(lead: LeadPayload): Promise<boolean> {
   const subject =
     lead.type === "audit"
       ? "Votre demande d'audit gratuit — Stevens Akpovi"
-      : "Votre demande de devis — Stevens Akpovi";
+      : lead.type === "contact"
+        ? "Votre message est bien envoyé — Stevens Akpovi"
+        : "Votre demande de devis — Stevens Akpovi";
   const intro =
     lead.type === "audit"
       ? "Votre demande d'audit gratuit a bien été enregistrée. Je reviens vers vous très rapidement avec mes premières observations sur votre site actuel."
-      : "Votre demande de devis personnalisé a bien été enregistrée. Je reviens vers vous très rapidement pour en discuter.";
+      : lead.type === "contact"
+        ? "Votre message a bien été transmis. Je reviens vers vous très rapidement."
+        : "Votre demande de devis personnalisé a bien été enregistrée. Je reviens vers vous très rapidement pour en discuter.";
   const html = `
   <div style="background:#f5f5f5;padding:32px 0">
     <div style="max-width:640px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e4e4e4">
