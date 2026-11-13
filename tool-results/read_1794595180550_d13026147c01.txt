@@ -1,0 +1,780 @@
+     1→"use client";
+     2→
+     3→import React, { useRef, useState } from "react";
+     4→import { CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+     5→import { useToast } from "@/hooks/use-toast";
+     6→import {
+     7→  BUDGET_RANGES,
+     8→  DISCOVERY_SOURCES,
+     9→  SERVICE_TYPES,
+    10→  TIMELINES,
+    11→  type LeadInput,
+    12→} from "@/lib/validation";
+    13→import { SITE } from "@/lib/site";
+    14→import { useRouter } from "@/components/router-context";
+    15→
+    16→/**
+    17→ * Formulaire de demande — trois variantes (13/11/2026) :
+    18→ * - « quote » (page #/demander-un-devis) : thème CLAIR, présentation
+    19→ *   calquée sur la page « Request a quote » de sheragency.com — champs
+    20→ *   d'identité en deux colonnes, message pleine largeur, bouton noir
+    21→ *   pleine largeur. Confirmation inline.
+    22→ * - « contact » (page #/contact) : thème SOMBRE, présentation calquée
+    23→ *   sur « Contact Us » de sheragency.com — champs pleine largeur aux
+    24→ *   entrées BLANCHES empilées, bouton blanc demi-largeur
+    25→ *   « Envoyer Le Message ». Après envoi (email automatique à
+    26→ *   stevensakpovi@gmail.com), redirection vers la page dédiée à la
+    27→ *   réservation d'appel (#/reserver-un-appel).
+    28→ * - « audit » (variante historique sombre, conservée pour référence).
+    29→ * Validation frontend (contrôles) + backend (API), protection
+    30→ * anti-spam (honeypot + délai), enregistrement fiable et accusé de
+    31→ * réception. Aucun secret côté client.
+    32→ */
+    33→
+    34→type FormKind = "quote" | "audit" | "contact";
+    35→
+    36→interface FormState {
+    37→  name: string;
+    38→  email: string;
+    39→  phone: string;
+    40→  company: string;
+    41→  website: string;
+    42→  activity: string;
+    43→  discovery: string;
+    44→  serviceType: string;
+    45→  budget: string;
+    46→  timeline: string;
+    47→  message: string;
+    48→  honeypot: string;
+    49→}
+    50→
+    51→const EMPTY: FormState = {
+    52→  name: "",
+    53→  email: "",
+    54→  phone: "",
+    55→  company: "",
+    56→  website: "",
+    57→  activity: "",
+    58→  discovery: "",
+    59→  serviceType: "",
+    60→  budget: "",
+    61→  timeline: "",
+    62→  message: "",
+    63→  honeypot: "",
+    64→};
+    65→
+    66→export function LeadForm({ kind }: { kind: FormKind }) {
+    67→  const isQuote = kind === "quote";
+    68→  const isContact = kind === "contact";
+    69→  const isLight = isQuote;
+    70→  const [form, setForm] = useState<FormState>(EMPTY);
+    71→  const [errors, setErrors] = useState<Record<string, string>>({});
+    72→  const [submitting, setSubmitting] = useState(false);
+    73→  const [done, setDone] = useState(false);
+    74→  const formRef = useRef<HTMLFormElement>(null);
+    75→  const mountedAt = useRef<number>(Date.now());
+    76→  const { toast } = useToast();
+    77→  const router = useRouter();
+    78→
+    79→  const set = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    80→    setForm((f) => ({ ...f, [key]: e.target.value }));
+    81→    setErrors((prev) => {
+    82→      if (!prev[key]) return prev;
+    83→      const next = { ...prev };
+    84→      delete next[key];
+    85→      return next;
+    86→    });
+    87→  };
+    88→
+    89→  function validate(): Record<string, string> {
+    90→    const errs: Record<string, string> = {};
+    91→    if (form.name.trim().length < 2) errs.name = "Indiquez votre nom complet.";
+    92→    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(form.email.trim()))
+    93→      errs.email = "Indiquez une adresse email valide.";
+    94→    if (!isQuote && !isContact && form.website.trim().length < 4)
+    95→      errs.website = "L'URL de votre site actuel est nécessaire pour l'audit.";
+    96→    if (form.phone.trim() && !/^[+\d][\d\s().-]{5,}$/.test(form.phone.trim()))
+    97→      errs.phone = "Numéro de téléphone invalide.";
+    98→    if (isContact && form.phone.trim().length < 6)
+    99→      errs.phone = "Indiquez votre numéro de téléphone.";
+   100→    if (isContact && form.company.trim().length < 2)
+   101→      errs.company = "Indiquez le nom de votre entreprise ou activité.";
+   102→    if (isContact && form.discovery === "")
+   103→      errs.discovery = "Indiquez comment vous m'avez découvert.";
+   104→    if (form.message.trim().length < 10)
+   105→      errs.message = "Décrivez votre besoin en quelques mots (10 caractères minimum).";
+   106→    if (isQuote && form.serviceType === "") errs.serviceType = "Choisissez le service souhaité.";
+   107→    return errs;
+   108→  }
+   109→
+   110→  async function handleSubmit(e: React.FormEvent) {
+   111→    e.preventDefault();
+   112→    if (submitting) return;
+   113→
+   114→    // Anti-spam : leurre invisible
+   115→    if (form.honeypot) return;
+   116→
+   117→    // Anti-spam : soumission trop rapide (< 3 secondes)
+   118→    if (Date.now() - mountedAt.current < 3000) {
+   119→      setErrors({ form: "Prenez quelques instants pour compléter votre message, puis renvoyez." });
+   120→      return;
+   121→    }
+   122→
+   123→    const clientErrors = validate();
+   124→    if (Object.keys(clientErrors).length > 0) {
+   125→      setErrors(clientErrors);
+   126→      const first = document.getElementById(`${kind}-field-${Object.keys(clientErrors)[0]}`);
+   127→      first?.focus();
+   128→      return;
+   129→    }
+   130→
+   131→    setSubmitting(true);
+   132→    setErrors({});
+   133→
+   134→    const payload: Partial<LeadInput> = {
+   135→      type: kind,
+   136→      name: form.name.trim(),
+   137→      email: form.email.trim(),
+   138→      phone: form.phone.trim() || undefined,
+   139→      company: form.company.trim() || undefined,
+   140→      website: form.website.trim() || undefined,
+   141→      activity: form.activity.trim() || undefined,
+   142→      discovery: isContact ? form.discovery : undefined,
+   143→      serviceType: isQuote ? form.serviceType : undefined,
+   144→      budget: isQuote ? form.budget || undefined : undefined,
+   145→      timeline: isQuote ? form.timeline || undefined : undefined,
+   146→      message: form.message.trim(),
+   147→      honeypot: "",
+   148→    };
+   149→
+   150→    try {
+   151→      const res = await fetch("/api/leads", {
+   152→        method: "POST",
+   153→        headers: { "Content-Type": "application/json" },
+   154→        body: JSON.stringify(payload),
+   155→      });
+   156→      const data = (await res.json().catch(() => null)) as
+   157→        | { ok: boolean; id?: string; error?: string; fieldErrors?: Record<string, string> }
+   158→        | null;
+   159→
+   160→      if (!res.ok || !data?.ok) {
+   161→        if (data?.fieldErrors) setErrors(data.fieldErrors);
+   162→        throw new Error(data?.error ?? "Erreur inconnue");
+   163→      }
+   164→
+   165→      setForm(EMPTY);
+   166→
+   167→      if (isContact) {
+   168→        // Message de contact : redirection vers la page dédiée à la
+   169→        // réservation d'appel (demande de l'éditeur, 13/11/2026) —
+   170→        // les informations ont déjà été transmises par email.
+   171→        toast({
+   172→          title: "Message envoyé",
+   173→          description:
+   174→            "Merci ! Votre message est bien parti. Réservez maintenant votre créneau d'appel stratégique.",
+   175→        });
+   176→        router.navigate("appel");
+   177→        return;
+   178→      }
+   179→
+   180→      setDone(true);
+   181→      toast({
+   182→        title: "Demande enregistrée",
+   183→        description:
+   184→          "Votre demande a bien été envoyée. Un accusé de réception vous est adressé par email.",
+   185→      });
+   186→      // Confirmation visible après enregistrement effectif
+   187→      document
+   188→        .getElementById(`${kind}-confirmation`)
+   189→        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+   190→    } catch (err) {
+   191→      const message =
+   192→        err instanceof Error && err.message !== "Erreur inconnue"
+   193→          ? err.message
+   194→          : `Une erreur est survenue pendant l'envoi. Merci de réessayer ou de m'écrire directement à ${SITE.email}.`;
+   195→      setErrors({ form: message });
+   196→      toast({
+   197→        title: "Envoi impossible",
+   198→        description: message,
+   199→        variant: "destructive",
+   200→      });
+   201→    } finally {
+   202→      setSubmitting(false);
+   203→    }
+   204→  }
+   205→
+   206→  /* ---------- Styles par thème ---------- */
+   207→  const inputBase = isLight
+   208→    ? "min-h-[48px] w-full rounded-lg border border-[#e4e4e4] bg-white px-4 py-3 text-[15px] text-[#1c1c1c] placeholder:text-[#525252]/60 transition-colors focus:border-[#1c1c1c] focus:outline-none"
+   209→    : isContact
+   210→      ? "min-h-[50px] w-full rounded-md bg-white px-4 py-3 text-[15px] text-[#1c1c1c] placeholder:text-[#525252]/70 transition-shadow duration-200 focus:outline-none focus:shadow-[0_0_0_2px_rgba(228,228,228,0.55)]"
+   211→      : "min-h-[48px] w-full rounded-lg border border-[#e4e4e4]/18 bg-[#1c1c1c] px-4 py-3 text-[15px] text-white placeholder:text-[#c8c8c8]/50 transition-colors focus:border-[#e4e4e4] focus:outline-none";
+   212→  const labelBase = isLight
+   213→    ? "mb-1.5 block text-sm font-medium text-[#1c1c1c]"
+   214→    : "mb-1.5 block text-sm font-medium text-white";
+   215→  const errorBase = "mt-1.5 text-xs text-[#ea384c]";
+   216→
+   217→  /* ---------- Confirmation (devis / audit) ---------- */
+   218→  if (done) {
+   219→    return (
+   220→      <div
+   221→        id={`${kind}-confirmation`}
+   222→        className={
+   223→          isLight
+   224→            ? "rounded-2xl border border-[#e4e4e4] bg-white p-8 text-center sm:p-10"
+   225→            : "rounded-2xl border border-[#e4e4e4]/40 bg-[#232323] p-8 text-center sm:p-10"
+   226→        }
+   227→      >
+   228→        <span
+   229→          className={
+   230→            isLight
+   231→              ? "mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#1c1c1c] text-white"
+   232→              : "mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#e4e4e4] text-[#1c1c1c]"
+   233→          }
+   234→        >
+   235→          <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
+   236→        </span>
+   237→        <h3
+   238→          className={`mt-6 font-display text-2xl font-semibold ${isLight ? "text-[#1c1c1c]" : "text-white"}`}
+   239→        >
+   240→          Votre demande a bien été enregistrée.
+   241→        </h3>
+   242→        <p className={`mx-auto mt-4 max-w-md text-[15px] leading-relaxed ${isLight ? "text-[#525252]" : "text-[#c8c8c8]"}`}>
+   243→          {isQuote
+   244→            ? "Merci pour votre confiance. Je reviens vers vous très rapidement pour préparer votre devis personnalisé."
+   245→            : "Merci pour votre confiance. Je reviens vers vous très rapidement avec les premières observations sur votre site."}
+   246→        </p>
+   247→        <p className={`mt-4 text-sm ${isLight ? "text-[#525252]" : "text-[#c8c8c8]"}`}>
+   248→          Un accusé de réception vous est adressé par email.
+   249→        </p>
+   250→        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+   251→          <button
+   252→            type="button"
+   253→            onClick={() => {
+   254→              setDone(false);
+   255→              mountedAt.current = Date.now();
+   256→            }}
+   257→            className={
+   258→              isLight
+   259→                ? "btn-fill min-h-[44px] rounded-full border border-[#1c1c1c]/25 bg-transparent px-6 py-3 text-sm font-medium text-[#1c1c1c] [&::before]:bg-[#e4e4e4]"
+   260→                : "btn-fill min-h-[44px] rounded-full border border-[#e4e4e4]/30 px-6 py-3 text-sm font-medium text-white [&::before]:bg-[#3c3c3c]"
+   261→            }
+   262→          >
+   263→            <span className="inline-flex items-center">Envoyer Une Autre Demande</span>
+   264→          </button>
+   265→        </div>
+   266→        <p className={`mt-6 text-xs ${isLight ? "text-[#525252]/80" : "text-[#c8c8c8]/70"}`}>
+   267→          Vous préférez avancer plus vite&nbsp;?{" "}
+   268→          <a
+   269→            href={SITE.calendly}
+   270→            target="_blank"
+   271→            rel="noopener noreferrer"
+   272→            className={`font-medium underline underline-offset-4 ${isLight ? "text-[#1c1c1c]" : "text-[#e4e4e4]"}`}
+   273→          >
+   274→            Réservez un appel de 30 minutes
+   275→          </a>{" "}
+   276→          — {SITE.calendlyMention.toLowerCase()}
+   277→        </p>
+   278→      </div>
+   279→    );
+   280→  }
+   281→
+   282→  /* ---------- Formulaire ---------- */
+   283→  return (
+   284→    <form
+   285→      ref={formRef}
+   286→      onSubmit={handleSubmit}
+   287→      noValidate
+   288→      aria-label={
+   289→        isContact
+   290→          ? "Formulaire de contact — laissez un message"
+   291→          : isQuote
+   292→            ? "Formulaire de demande de devis personnalisé"
+   293→            : "Formulaire de demande d'audit gratuit"
+   294→      }
+   295→      className={
+   296→        isQuote
+   297→          ? // Page claire (#/demander-un-devis) : champs posés directement
+   298→            // sur le fond blanc, façon sheragency.
+   299→            "relative"
+   300→          : isContact
+   301→            ? // Page sombre (#/contact) : champs posés directement sur le
+   302→              // fond sombre, entrées blanches, façon sheragency.
+   303→              "relative"
+   304→            : "rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-6 sm:p-8 lg:p-9"
+   305→      }
+   306→    >
+   307→      {/* Piège anti-robots (invisible) */}
+   308→      <input
+   309→        type="text"
+   310→        name="societe_verification"
+   311→        value={form.honeypot}
+   312→        onChange={set("honeypot")}
+   313→        tabIndex={-1}
+   314→        autoComplete="off"
+   315→        aria-hidden="true"
+   316→        className="pointer-events-none absolute left-[-9999px] h-0 w-0 opacity-0"
+   317→      />
+   318→
+   319→      {/* ------- Variante « contact » : champs empilés (sheragency) ------- */}
+   320→      {isContact ? (
+   321→        <div className="flex flex-col gap-5">
+   322→          <div>
+   323→            <label htmlFor={`${kind}-field-name`} className={labelBase}>
+   324→              Nom complet <span className={isLight ? "text-[#1c1c1c]" : "text-[#e4e4e4]"}>*</span>
+   325→            </label>
+   326→            <input
+   327→              id={`${kind}-field-name`}
+   328→              name="name"
+   329→              autoComplete="name"
+   330→              required
+   331→              value={form.name}
+   332→              onChange={set("name")}
+   333→              aria-invalid={Boolean(errors.name)}
+   334→              aria-describedby={errors.name ? `${kind}-error-name` : undefined}
+   335→              className={inputBase}
+   336→              placeholder="Votre nom et prénom"
+   337→            />
+   338→            {errors.name && (
+   339→              <p id={`${kind}-error-name`} className={errorBase}>
+   340→                {errors.name}
+   341→              </p>
+   342→            )}
+   343→          </div>
+   344→
+   345→          <div>
+   346→            <label htmlFor={`${kind}-field-phone`} className={labelBase}>
+   347→              Téléphone <span className={isLight ? "text-[#1c1c1c]" : "text-[#e4e4e4]"}>*</span>
+   348→            </label>
+   349→            <input
+   350→              id={`${kind}-field-phone`}
+   351→              name="phone"
+   352→              type="tel"
+   353→              inputMode="tel"
+   354→              autoComplete="tel"
+   355→              required
+   356→              value={form.phone}
+   357→              onChange={set("phone")}
+   358→              aria-invalid={Boolean(errors.phone)}
+   359→              aria-describedby={errors.phone ? `${kind}-error-phone` : undefined}
+   360→              className={inputBase}
+   361→              placeholder="+229 …"
+   362→            />
+   363→            {errors.phone && (
+   364→              <p id={`${kind}-error-phone`} className={errorBase}>
+   365→                {errors.phone}
+   366→              </p>
+   367→            )}
+   368→          </div>
+   369→
+   370→          <div>
+   371→            <label htmlFor={`${kind}-field-email`} className={labelBase}>
+   372→              Email <span className={isLight ? "text-[#1c1c1c]" : "text-[#e4e4e4]"}>*</span>
+   373→            </label>
+   374→            <input
+   375→              id={`${kind}-field-email`}
+   376→              name="email"
+   377→              type="email"
+   378→              inputMode="email"
+   379→              autoComplete="email"
+   380→              required
+   381→              value={form.email}
+   382→              onChange={set("email")}
+   383→              aria-invalid={Boolean(errors.email)}
+   384→              aria-describedby={errors.email ? `${kind}-error-email` : undefined}
+   385→              className={inputBase}
+   386→              placeholder="vous@exemple.com"
+   387→            />
+   388→            {errors.email && (
+   389→              <p id={`${kind}-error-email`} className={errorBase}>
+   390→                {errors.email}
+   391→              </p>
+   392→            )}
+   393→          </div>
+   394→
+   395→          <div>
+   396→            <label htmlFor={`${kind}-field-company`} className={labelBase}>
+   397→              Entreprise <span className={isLight ? "text-[#1c1c1c]" : "text-[#e4e4e4]"}>*</span>
+   398→            </label>
+   399→            <input
+   400→              id={`${kind}-field-company`}
+   401→              name="company"
+   402→              autoComplete="organization"
+   403→              required
+   404→              value={form.company}
+   405→              onChange={set("company")}
+   406→              aria-invalid={Boolean(errors.company)}
+   407→              aria-describedby={errors.company ? `${kind}-error-company` : undefined}
+   408→              className={inputBase}
+   409→              placeholder="Nom de votre entreprise ou activité"
+   410→            />
+   411→            {errors.company && (
+   412→              <p id={`${kind}-error-company`} className={errorBase}>
+   413→                {errors.company}
+   414→              </p>
+   415→            )}
+   416→          </div>
+   417→
+   418→          <div>
+   419→            <label htmlFor={`${kind}-field-discovery`} className={labelBase}>
+   420→              Comment m'avez-vous découvert&nbsp;?{" "}
+   421→              <span className={isLight ? "text-[#1c1c1c]" : "text-[#e4e4e4]"}>*</span>
+   422→            </label>
+   423→            <select
+   424→              id={`${kind}-field-discovery`}
+   425→              name="discovery"
+   426→              required
+   427→              value={form.discovery}
+   428→              onChange={set("discovery")}
+   429→              aria-invalid={Boolean(errors.discovery)}
+   430→              className={`${inputBase} appearance-none`}
+   431→            >
+   432→              <option value="">— Choisir —</option>
+   433→              {DISCOVERY_SOURCES.map((s) => (
+   434→                <option key={s} value={s}>
+   435→                  {s}
+   436→                </option>
+   437→              ))}
+   438→            </select>
+   439→            {errors.discovery && (
+   440→              <p id={`${kind}-error-discovery`} className={errorBase}>
+   441→                {errors.discovery}
+   442→              </p>
+   443→            )}
+   444→          </div>
+   445→
+   446→          <div>
+   447→            <label htmlFor={`${kind}-field-message`} className={labelBase}>
+   448→              Comment puis-je vous aider&nbsp;?{" "}
+   449→              <span className={isLight ? "text-[#1c1c1c]" : "text-[#e4e4e4]"}>*</span>
+   450→            </label>
+   451→            <textarea
+   452→              id={`${kind}-field-message`}
+   453→              name="message"
+   454→              required
+   455→              rows={5}
+   456→              value={form.message}
+   457→              onChange={set("message")}
+   458→              aria-invalid={Boolean(errors.message)}
+   459→              aria-describedby={errors.message ? `${kind}-error-message` : undefined}
+   460→              className={`${inputBase} min-h-[140px] resize-y py-3.5`}
+   461→              placeholder="Décrivez votre demande…"
+   462→            />
+   463→            {errors.message && (
+   464→              <p id={`${kind}-error-message`} className={errorBase}>
+   465→                {errors.message}
+   466→              </p>
+   467→            )}
+   468→          </div>
+   469→        </div>
+   470→      ) : (
+   471→        /* ------- Variante « devis » / « audit » : grille deux colonnes ------- */
+   472→        <div className="grid gap-5 sm:grid-cols-2">
+   473→          <div>
+   474→            <label htmlFor={`${kind}-field-name`} className={labelBase}>
+   475→              Nom complet{" "}
+   476→              <span className={isLight ? "text-[#1c1c1c]" : "text-[#e4e4e4]"}>*</span>
+   477→            </label>
+   478→            <input
+   479→              id={`${kind}-field-name`}
+   480→              name="name"
+   481→              autoComplete="name"
+   482→              required
+   483→              value={form.name}
+   484→              onChange={set("name")}
+   485→              aria-invalid={Boolean(errors.name)}
+   486→              aria-describedby={errors.name ? `${kind}-error-name` : undefined}
+   487→              className={inputBase}
+   488→              placeholder="Votre nom et prénom"
+   489→            />
+   490→            {errors.name && (
+   491→              <p id={`${kind}-error-name`} className={errorBase}>
+   492→                {errors.name}
+   493→              </p>
+   494→            )}
+   495→          </div>
+   496→
+   497→          <div>
+   498→            <label htmlFor={`${kind}-field-email`} className={labelBase}>
+   499→              Email <span className={isLight ? "text-[#1c1c1c]" : "text-[#e4e4e4]"}>*</span>
+   500→            </label>
+   501→            <input
+   502→              id={`${kind}-field-email`}
+   503→              name="email"
+   504→              type="email"
+   505→              inputMode="email"
+   506→              autoComplete="email"
+   507→              required
+   508→              value={form.email}
+   509→              onChange={set("email")}
+   510→              aria-invalid={Boolean(errors.email)}
+   511→              aria-describedby={errors.email ? `${kind}-error-email` : undefined}
+   512→              className={inputBase}
+   513→              placeholder="vous@exemple.com"
+   514→            />
+   515→            {errors.email && (
+   516→              <p id={`${kind}-error-email`} className={errorBase}>
+   517→                {errors.email}
+   518→              </p>
+   519→            )}
+   520→          </div>
+   521→
+   522→          <div>
+   523→            <label htmlFor={`${kind}-field-phone`} className={labelBase}>
+   524→              Téléphone <span className={isLight ? "text-[#525252]" : "text-[#c8c8c8]/60"}>(optionnel)</span>
+   525→            </label>
+   526→            <input
+   527→              id={`${kind}-field-phone`}
+   528→              name="phone"
+   529→              type="tel"
+   530→              inputMode="tel"
+   531→              autoComplete="tel"
+   532→              value={form.phone}
+   533→              onChange={set("phone")}
+   534→              aria-invalid={Boolean(errors.phone)}
+   535→              aria-describedby={errors.phone ? `${kind}-error-phone` : undefined}
+   536→              className={inputBase}
+   537→              placeholder="+229 …"
+   538→            />
+   539→            {errors.phone && (
+   540→              <p id={`${kind}-error-phone`} className={errorBase}>
+   541→                {errors.phone}
+   542→              </p>
+   543→            )}
+   544→          </div>
+   545→
+   546→          {isQuote ? (
+   547→            <div>
+   548→              <label htmlFor={`${kind}-field-company`} className={labelBase}>
+   549→                Entreprise <span className={isLight ? "text-[#525252]" : "text-[#c8c8c8]/60"}>(optionnel)</span>
+   550→              </label>
+   551→              <input
+   552→                id={`${kind}-field-company`}
+   553→                name="company"
+   554→                autoComplete="organization"
+   555→                value={form.company}
+   556→                onChange={set("company")}
+   557→                className={inputBase}
+   558→                placeholder="Nom de votre entreprise"
+   559→              />
+   560→            </div>
+   561→          ) : (
+   562→            <div>
+   563→              <label htmlFor={`${kind}-field-website`} className={labelBase}>
+   564→                URL de votre site actuel{" "}
+   565→                <span className={isLight ? "text-[#1c1c1c]" : "text-[#e4e4e4]"}>*</span>
+   566→              </label>
+   567→              <input
+   568→                id={`${kind}-field-website`}
+   569→                name="website"
+   570→                type="url"
+   571→                inputMode="url"
+   572→                required
+   573→                value={form.website}
+   574→                onChange={set("website")}
+   575→                aria-invalid={Boolean(errors.website)}
+   576→                aria-describedby={errors.website ? `${kind}-error-website` : undefined}
+   577→                className={inputBase}
+   578→                placeholder="https://votre-site.com"
+   579→              />
+   580→              {errors.website && (
+   581→                <p id={`${kind}-error-website`} className={errorBase}>
+   582→                  {errors.website}
+   583→                </p>
+   584→              )}
+   585→            </div>
+   586→          )}
+   587→
+   588→          {isQuote && (
+   589→            <>
+   590→              <div>
+   591→                <label htmlFor={`${kind}-field-service`} className={labelBase}>
+   592→                  Service souhaité <span className={isLight ? "text-[#1c1c1c]" : "text-[#e4e4e4]"}>*</span>
+   593→                </label>
+   594→                <select
+   595→                  id={`${kind}-field-service`}
+   596→                  name="serviceType"
+   597→                  required
+   598→                  value={form.serviceType}
+   599→                  onChange={set("serviceType")}
+   600→                  aria-invalid={Boolean(errors.serviceType)}
+   601→                  className={`${inputBase} appearance-none`}
+   602→                >
+   603→                  <option value="">— Choisir —</option>
+   604→                  {SERVICE_TYPES.map((s) => (
+   605→                    <option key={s} value={s}>
+   606→                      {s}
+   607→                    </option>
+   608→                  ))}
+   609→                </select>
+   610→                {errors.serviceType && <p className={errorBase}>{errors.serviceType}</p>}
+   611→              </div>
+   612→
+   613→              <div>
+   614→                <label htmlFor={`${kind}-field-activity`} className={labelBase}>
+   615→                  Votre activité{" "}
+   616→                  <span className={isLight ? "text-[#525252]" : "text-[#c8c8c8]/60"}>(optionnel)</span>
+   617→                </label>
+   618→                <input
+   619→                  id={`${kind}-field-activity`}
+   620→                  name="activity"
+   621→                  value={form.activity}
+   622→                  onChange={set("activity")}
+   623→                  className={inputBase}
+   624→                  placeholder="Secteur, métier, offre principale"
+   625→                />
+   626→              </div>
+   627→
+   628→              <div>
+   629→                <label htmlFor={`${kind}-field-budget`} className={labelBase}>
+   630→                  Budget envisagé{" "}
+   631→                  <span className={isLight ? "text-[#525252]" : "text-[#c8c8c8]/60"}>(optionnel)</span>
+   632→                </label>
+   633→                <select
+   634→                  id={`${kind}-field-budget`}
+   635→                  name="budget"
+   636→                  value={form.budget}
+   637→                  onChange={set("budget")}
+   638→                  className={`${inputBase} appearance-none`}
+   639→                >
+   640→                  <option value="">— Choisir —</option>
+   641→                  {BUDGET_RANGES.map((b) => (
+   642→                    <option key={b} value={b}>
+   643→                      {b}
+   644→                    </option>
+   645→                  ))}
+   646→                </select>
+   647→              </div>
+   648→
+   649→              <div>
+   650→                <label htmlFor={`${kind}-field-timeline`} className={labelBase}>
+   651→                  Échéance souhaitée{" "}
+   652→                  <span className={isLight ? "text-[#525252]" : "text-[#c8c8c8]/60"}>(optionnel)</span>
+   653→                </label>
+   654→                <select
+   655→                  id={`${kind}-field-timeline`}
+   656→                  name="timeline"
+   657→                  value={form.timeline}
+   658→                  onChange={set("timeline")}
+   659→                  className={`${inputBase} appearance-none`}
+   660→                >
+   661→                  <option value="">— Choisir —</option>
+   662→                  {TIMELINES.map((t) => (
+   663→                    <option key={t} value={t}>
+   664→                      {t}
+   665→                    </option>
+   666→                  ))}
+   667→                </select>
+   668→              </div>
+   669→            </>
+   670→          )}
+   671→
+   672→          <div className="sm:col-span-2">
+   673→            <label htmlFor={`${kind}-field-message`} className={labelBase}>
+   674→              {isQuote ? "Votre projet" : "Votre site et vos objectifs"}{" "}
+   675→              <span className={isLight ? "text-[#1c1c1c]" : "text-[#e4e4e4]"}>*</span>
+   676→            </label>
+   677→            <textarea
+   678→              id={`${kind}-field-message`}
+   679→              name="message"
+   680→              required
+   681→              rows={5}
+   682→              value={form.message}
+   683→              onChange={set("message")}
+   684→              aria-invalid={Boolean(errors.message)}
+   685→              aria-describedby={errors.message ? `${kind}-error-message` : undefined}
+   686→              className={`${inputBase} min-h-[140px] resize-y py-3.5`}
+   687→              placeholder={
+   688→                isQuote
+   689→                  ? "Présentez votre activité et ce que vous attendez de votre futur site…"
+   690→                  : "Indiquez l'adresse de votre site et ce qui vous préoccupe aujourd'hui…"
+   691→              }
+   692→            />
+   693→            {errors.message && (
+   694→              <p id={`${kind}-error-message`} className={errorBase}>
+   695→                {errors.message}
+   696→              </p>
+   697→            )}
+   698→          </div>
+   699→        </div>
+   700→      )}
+   701→
+   702→      {errors.form && (
+   703→        <p
+   704→          role="alert"
+   705→          className="mt-5 flex items-start gap-2.5 rounded-lg border border-[#ea384c]/40 bg-[#ea384c]/10 px-4 py-3 text-sm text-[#ffdede]"
+   706→        >
+   707→          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+   708→          {errors.form}
+   709→        </p>
+   710→      )}
+   711→
+   712→      {/* ------- Bouton d'envoi ------- */}
+   713→      {isContact ? (
+   714→        <div className="mt-7">
+   715→          <p className={`text-xs leading-relaxed ${isLight ? "text-[#525252]" : "text-[#c8c8c8]/80"}`}>
+   716→            Vos informations sont transmises automatiquement à {SITE.email} et servent
+   717→            uniquement à traiter votre demande — elles ne sont jamais partagées.
+   718→          </p>
+   719→          <button
+   720→            type="submit"
+   721→            disabled={submitting}
+   722→            className="btn-fill group/btn mt-5 inline-flex min-h-[56px] w-full items-center justify-center gap-2.5 rounded-full border border-[#e4e4e4] bg-white px-7 py-4 font-medium tracking-[0.01em] text-[#1c1c1c] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-[#c9baac] focus-visible:outline-2 focus-visible:outline-offset-3 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 [&::before]:bg-[#e4e4e4] sm:w-1/2"
+   723→          >
+   724→            {submitting ? (
+   725→              <span className="inline-flex items-center gap-2.5">
+   726→                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+   727→                Envoi en cours…
+   728→              </span>
+   729→            ) : (
+   730→              <span className="inline-flex items-center gap-2.5">Envoyer Le Message</span>
+   731→            )}
+   732→          </button>
+   733→        </div>
+   734→      ) : isQuote ? (
+   735→        <div className="mt-7">
+   736→          <p className="text-xs leading-relaxed text-[#525252]">
+   737→            Vos informations servent uniquement à préparer votre devis et ne sont
+   738→            jamais partagées.
+   739→          </p>
+   740→          <button
+   741→            type="submit"
+   742→            disabled={submitting}
+   743→            className="btn-fill group/btn mt-5 inline-flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-full border border-[#e4e4e4]/30 bg-[#000000] px-7 py-4 font-medium tracking-[0.01em] text-white transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-3 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 [&::before]:bg-[#3c3c3c]"
+   744→          >
+   745→            {submitting ? (
+   746→              <span className="inline-flex items-center gap-2.5">
+   747→                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+   748→                Envoi en cours…
+   749→              </span>
+   750→            ) : (
+   751→              <span className="inline-flex items-center gap-2.5">Envoyer Ma Demande De Devis</span>
+   752→            )}
+   753→          </button>
+   754→        </div>
+   755→      ) : (
+   756→        <div className="mt-7 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+   757→          <p className="text-xs leading-relaxed text-[#c8c8c8]/80">
+   758→            Vos informations servent uniquement à traiter votre demande d'audit et ne
+   759→            sont jamais partagées.
+   760→          </p>
+   761→          <button
+   762→            type="submit"
+   763→            disabled={submitting}
+   764→            className="btn-fill group/btn inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full border border-[#e4e4e4] bg-white px-7 py-4 font-medium tracking-[0.01em] text-[#1c1c1c] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-[#c9baac] focus-visible:outline-2 focus-visible:outline-offset-3 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 [&::before]:bg-[#e4e4e4]"
+   765→          >
+   766→            {submitting ? (
+   767→              <span className="inline-flex items-center gap-2.5">
+   768→                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+   769→                Envoi en cours…
+   770→              </span>
+   771→            ) : (
+   772→              <span className="inline-flex items-center gap-2.5">Envoyer Ma Demande D'Audit</span>
+   773→            )}
+   774→          </button>
+   775→        </div>
+   776→      )}
+   777→    </form>
+   778→  );
+   779→}
+   780→
