@@ -13,6 +13,11 @@ import { ArrowUpRight } from "lucide-react";
 
 interface MonoImageProps {
   src: string;
+  /** Variante haute densité (dérivé @2x régénéré en vrais pixels
+   *  Retina) — le navigateur la choisit sur écrans 2x/3x, où une
+   *  source 1x serait agrandie et donc floue (netteté des mockups
+   *  et captures, demande de l'éditeur, 14/11/2026). */
+  src2x?: string;
   alt: string;
   width: number;
   height: number;
@@ -24,6 +29,7 @@ interface MonoImageProps {
 
 export function MonoImage({
   src,
+  src2x,
   alt,
   width,
   height,
@@ -36,6 +42,7 @@ export function MonoImage({
     <span className={`mono-media block ${className}`}>
       <img
         src={src}
+        srcSet={src2x ? `${src} 1x, ${src2x} 2x` : undefined}
         alt={decorative ? "" : alt}
         aria-hidden={decorative ? "true" : undefined}
         width={width}
@@ -56,6 +63,7 @@ export function MonoImage({
  *  à petite échelle dans le hero (demande de l'éditeur, 14/11/2026). */
 export function BrowserMockup({
   src,
+  src2x,
   alt,
   url,
   className = "",
@@ -65,6 +73,8 @@ export function BrowserMockup({
   forceMono = false,
 }: {
   src: string;
+  /** Variante haute densité @2x (voir MonoImage). */
+  src2x?: string;
   alt: string;
   url: string;
   className?: string;
@@ -93,6 +103,7 @@ export function BrowserMockup({
       <span className={`mono-media block ${forceMono ? "mono-locked" : ""}`}>
         <img
           src={src}
+          srcSet={src2x ? `${src} 1x, ${src2x} 2x` : undefined}
           alt={alt}
           width={width}
           height={height}
@@ -114,6 +125,7 @@ export function BrowserMockup({
  *  haut-parleur qui ne masque plus l'en-tête du site capturé. */
 export function PhoneMockup({
   src,
+  src2x,
   alt,
   className = "",
   width = 390,
@@ -121,6 +133,8 @@ export function PhoneMockup({
   forceMono = false,
 }: {
   src: string;
+  /** Variante haute densité @2x (voir MonoImage). */
+  src2x?: string;
   alt: string;
   className?: string;
   width?: number;
@@ -140,6 +154,7 @@ export function PhoneMockup({
       <span className={`mono-media block overflow-hidden rounded-[7px] ${forceMono ? "mono-locked" : ""}`}>
         <img
           src={src}
+          srcSet={src2x ? `${src} 1x, ${src2x} 2x` : undefined}
           alt={alt}
           width={width}
           height={height}

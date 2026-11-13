@@ -189,6 +189,7 @@ export function Hero() {
                 <motion.div animate={reduce ? undefined : { y: [0, -7, 0] }} transition={floatTransition}>
                   <BrowserMockup
                     src={PROJECTS[0].desktop}
+                    src2x={PROJECTS[0].desktop2x}
                     alt={`Aperçu du site ${PROJECTS[0].name}`}
                     url={PROJECTS[0].url}
                     width={1440}
@@ -210,6 +211,7 @@ export function Hero() {
                 <motion.div animate={reduce ? undefined : { y: [0, 8, 0] }} transition={{ ...floatTransition, delay: 1.2 }}>
                   <PhoneMockup
                     src={PROJECTS[2].mobile}
+                    src2x={PROJECTS[2].mobile2x}
                     alt={`Aperçu mobile du site ${PROJECTS[2].name}`}
                     width={390}
                     height={844}

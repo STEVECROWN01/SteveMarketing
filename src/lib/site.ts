@@ -137,7 +137,9 @@ export const PROJECTS = [
     cta: "Voir Le Site",
     url: "https://mrsteveenglish.vercel.app",
     desktop: "/assets/projects/mrsteveenglish-desktop.webp",
+    desktop2x: "/assets/projects/mrsteveenglish-desktop@2x.webp",
     mobile: "/assets/projects/mrsteveenglish-mobile.webp",
+    mobile2x: "/assets/projects/mrsteveenglish-mobile@2x.webp",
   },
   {
     id: "prelaunch",
@@ -148,7 +150,9 @@ export const PROJECTS = [
     cta: "Voir La Page De Vente",
     url: "https://mrsteveenglish.vercel.app/pre-launch",
     desktop: "/assets/projects/prelaunch-desktop.webp",
+    desktop2x: "/assets/projects/prelaunch-desktop@2x.webp",
     mobile: "/assets/projects/prelaunch-mobile.webp",
+    mobile2x: "/assets/projects/prelaunch-mobile@2x.webp",
   },
   {
     id: "afribayit",
@@ -159,7 +163,9 @@ export const PROJECTS = [
     cta: "Découvrir Le Projet",
     url: "https://afribayit.vercel.app",
     desktop: "/assets/projects/afribayit-desktop.webp",
+    desktop2x: "/assets/projects/afribayit-desktop@2x.webp",
     mobile: "/assets/projects/afribayit-mobile.webp",
+    mobile2x: "/assets/projects/afribayit-mobile@2x.webp",
   },
 ] as const;
 

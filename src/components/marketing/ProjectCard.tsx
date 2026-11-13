@@ -22,7 +22,9 @@ export interface Project {
   cta: string;
   url: string;
   desktop: string;
+  desktop2x: string;
   mobile: string;
+  mobile2x: string;
 }
 
 export function ProjectCard({ project, index }: { project: Project; index: number }) {
@@ -45,6 +47,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
             couleur au survol, sur aucun écran) — demande de l'éditeur. */}
         <MonoImage
           src={project.desktop}
+          src2x={project.desktop2x}
           alt={`Aperçu du site ${project.name}`}
           width={1440}
           height={900}

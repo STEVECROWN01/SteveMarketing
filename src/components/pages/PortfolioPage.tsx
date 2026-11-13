@@ -99,6 +99,7 @@ export function PortfolioPage() {
                   >
                     <MonoImage
                       src={project.desktop}
+                      src2x={project.desktop2x}
                       alt={`Aperçu du site ${project.name}`}
                       width={1440}
                       height={900}

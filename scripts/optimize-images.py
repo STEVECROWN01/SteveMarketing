@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 """Optimisation des images : conversion WebP + dimensions adaptées.
 Les fichiers sources PNG sont préservés ; les versions WebP sont créées à côté.
+
+ATTENTION (14/11/2026) — ce script est le point d'entrée HISTORIQUE ;
+la génération courante des dérivés est faite par regen-images-hd.py
+(qualité 90 pour les photos, 95 pour les captures, dérivés @2x pour
+les écrans Retina). Ne JAMAIS repasser en qualité < 90 : la qualité
+82-84 d'origine est la cause du manque de netteté constaté par
+l'éditeur (« les images ne sont pas aussi nettes que les originales,
+mobile/desktop »). Les valeurs ci-dessous ont été relevées en
+conséquence.
 """
 import os
 from PIL import Image
@@ -28,7 +37,7 @@ for name, max_w in GITHUB_ASSETS.items():
     if im.width > max_w:
         h = round(im.height * max_w / im.width)
         im = im.resize((max_w, h), Image.LANCZOS)
-    im.save(dst, "WEBP", quality=84, method=6)
+    im.save(dst, "WEBP", quality=90, method=6)
     print(f"{name} -> {os.path.basename(dst)} {im.size} {round(os.path.getsize(dst)/1024)}KB")
 
 # --- 2. Captures projets : conversion WebP ---
@@ -50,7 +59,7 @@ for raw, (out, max_w) in CAPTURES.items():
     if im.width > max_w:
         h = round(im.height * max_w / im.width)
         im = im.resize((max_w, h), Image.LANCZOS)
-    im.save(dst, "WEBP", quality=82, method=6)
+    im.save(dst, "WEBP", quality=95, method=6)
     print(f"{raw} -> {out} {im.size} {round(os.path.getsize(dst)/1024)}KB")
 
 print("\nRépertoire final :")

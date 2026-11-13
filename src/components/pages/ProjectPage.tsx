@@ -74,6 +74,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
             <Reveal direction="up" delay={0.1} className="min-w-0 flex-1">
               <BrowserMockup
                 src={project.desktop}
+                src2x={project.desktop2x}
                 alt={`Aperçu desktop du site ${project.name}`}
                 url={project.url}
                 width={1440}
@@ -84,6 +85,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
             <Reveal direction="left" delay={0.2} className="w-full shrink-0 sm:w-1/3 lg:w-[24%]">
               <PhoneMockup
                 src={project.mobile}
+                src2x={project.mobile2x}
                 alt={`Aperçu mobile du site ${project.name}`}
                 width={390}
                 height={844}
