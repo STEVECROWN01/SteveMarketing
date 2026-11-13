@@ -1,0 +1,142 @@
+diff --git a/download/compte-rendu-refonte-ui.md b/download/compte-rendu-refonte-ui.md
+index c09ac20..78e62c6 100755
+--- a/download/compte-rendu-refonte-ui.md
++++ b/download/compte-rendu-refonte-ui.md
+@@ -332,3 +332,21 @@ E2E formulaire de contact (redirection + enregistrement base constatés),
+   360×640 → 640px ; 320×568 → 568px ; CTA 2 lignes (115px) → 1 ligne
+   (48px) ; mention 44px/2 lignes → 25px/1 ligne ; desktop hero 900px,
+   portrait 570px → 640px.
++
++## Complément 8 — 14/11/2026 (2e session) : fond noir retiré du favicon
++
++1. **Favicon transparent** : le « Logo Favicon.png » est un glyphe blanc
++   sur fond noir ; le fond est retiré proprement (script
++   `scripts/prepare-favicon-transparent.py`) :
++   - alpha de couverture extrait par dé-prémultiplication (alpha =
++     canal le plus clair — bords anti-aliasés conservés, aucun halo
++     sombre) ; QA : recompositing sur noir → diff moyenne 0,27/255 ;
++   - glyphe recadré sur son enveloppe + marge 6 %, recentré sur canevas
++     carré transparent → il occupe ~88 % du canevas (48 % avant) ;
++   - `favicon.png` 512×512 RGBA, 90 Ko, coins alpha 0.
++2. **Cache navigateur** : URL déclarée dans `layout.tsx` bumpée en
++   `?v=2026-11-14-2`.
++3. Note : le glyphe étant blanc, il sera discret sur un onglet de
++   navigateur à thème clair (invisible sur fond blanc) ; parfait sur
++   thème sombre. Variante inversée (glyphe sombre) disponible sur
++   demande.
+diff --git a/public/assets/favicon.png b/public/assets/favicon.png
+index b9c4c08..03b827c 100755
+Binary files a/public/assets/favicon.png and b/public/assets/favicon.png differ
+diff --git a/scripts/prepare-favicon-transparent.py b/scripts/prepare-favicon-transparent.py
+new file mode 100644
+index 0000000..e87a34a
+--- /dev/null
++++ b/scripts/prepare-favicon-transparent.py
+@@ -0,0 +1,88 @@
++#!/usr/bin/env python3
++"""Favicon transparent — 14/11/2026 (complément 8) :
++Le « Logo Favicon.png » (1254×1254) est un glyphe blanc posé sur un
++fond noir. Le fond doit disparaître : le favicon servi devient un PNG
++RGBA transparent.
++
++Méthode (retrait propre d'un fond noir d'un contenu clair) :
++1. alpha = max(R,G,B) du pixel — le fichier est un compositing du
++   glyphe sur du noir pur, donc l'alpha de couverture est exactement
++   la valeur du canal le plus clair (les bords anti-aliasés gardent
++   ainsi leur dégradé de couverture, sans halo sombre).
++2. Couleur dé-prémultipliée : RGB × 255/alpha → blanc pur à couverture
++   partielle (rendu identique sur fond noir, propre sur fond clair).
++3. Recadrage sur l'enveloppe du glyphe + marge 6 %, recentrage sur
++   canevas carré transparent → le glyphe occupe ~88 % du canevas au
++   lieu de ~48 % avant recadrage.
++4. Rééchantillonnage 512×512 Lanczos, PNG optimisé.
++"""
++from PIL import Image
++import numpy as np
++import os
++import hashlib
++
++ROOT = "/home/z/my-project/public/assets"
++SRC = os.path.join(ROOT, "Logo Favicon.png")
++DST = os.path.join(ROOT, "favicon.png")
++
++a = np.array(Image.open(SRC).convert("RGB")).astype(np.float64)
++h, w, _ = a.shape
++
++# 1. Alpha de couverture (glyph clair sur noir : alpha = canal max)
++alpha = a.max(axis=2)
++
++# 2. Dé-prémultiplication (alpha nul → couleur sans importance)
++safe = alpha > 6
++rgb = np.zeros_like(a)
++rgb[safe] = a[safe] * 255.0 / alpha[safe][:, None]
++rgb = np.clip(rgb, 0, 255)
++
++out = np.dstack([rgb, alpha]).astype(np.uint8)
++
++# 3. Recadrage sur l'enveloppe du glyphe + marge, puis canevas carré
++ys, xs = np.where(out[:, :, 3] > 24)
++x0, x1, y0, y1 = xs.min(), xs.max(), ys.min(), ys.max()
++bw, bh = x1 - x0 + 1, y1 - y0 + 1
++m = round(max(bw, bh) * 0.06)
++x0m, y0m = max(0, x0 - m), max(0, y0 - m)
++x1m, y1m = min(w, x1 + m + 1), min(h, y1 + m + 1)
++crop = out[y0m:y1m, x0m:x1m]
++ch, cw = crop.shape[:2]
++side = max(cw, ch)
++square = np.zeros((side, side, 4), dtype=np.uint8)
++square[(side - ch) // 2 : (side - ch) // 2 + ch, (side - cw) // 2 : (side - cw) // 2 + cw] = crop
++
++# 4. favicon 512×512
++fav = Image.fromarray(square).resize((512, 512), Image.LANCZOS)
++fav.save(DST, "PNG", optimize=True)
++
++# --- Vérifications ---
++f = np.array(Image.open(DST))
++im_out = Image.open(DST)
++print("favicon.png :", im_out.size, im_out.mode, os.path.getsize(DST) // 1024, "KB")
++print("glyphe (bbox source) :", f"({x0},{y0})–({x1},{y1}) soit {bw}×{bh}px ; marge {m}px")
++cov = (f[:, :, 3] > 128).mean() * 100
++print("couverture opaque :", round(cov, 1), "% du canevas 512")
++corners = [tuple(f[p][3] for p in [(3, 3), (3, -4), (-4, 3), (-4, -4)])]
++print("alpha des 4 coins (0 attendu) :", corners[0])
++print("md5 :", hashlib.md5(f.tobytes()).hexdigest()[:12])
++
++# QA : recompositing sur noir → doit reproduire le recadrage carré de
++# l'ORIGINAL avec les mêmes marges (et non l'image pleine, que le
++# recadrage décale fatalement).
++comp = np.array(im_out.convert("RGB"))
++al = f[:, :, 3:4].astype(float) / 255.0
++dark = (comp * al).astype(np.uint8)
++ref_square = np.zeros((side, side, 3), dtype=np.uint8)
++ref_crop = a[y0m:y1m, x0m:x1m].astype(np.uint8)
++ref_square[(side - ch) // 2 : (side - ch) // 2 + ch, (side - cw) // 2 : (side - cw) // 2 + cw] = ref_crop
++ref = np.array(
++    Image.fromarray(ref_square).resize((512, 512), Image.LANCZOS)
++).astype(int)
++mask = f[:, :, 3] > 200
++diff = np.abs(dark.astype(int) - ref)[mask]
++print(
++    "QA recompositing noir — diff moyenne sur le glyphe :",
++    round(diff.mean(), 2),
++    "/255 (attendu ≈ 0 : dé-prémultiplication exacte, resampling AA mis à part)",
++)
+diff --git a/src/app/layout.tsx b/src/app/layout.tsx
+index 6f5aabb..a8caa4f 100755
+--- a/src/app/layout.tsx
++++ b/src/app/layout.tsx
+@@ -76,10 +76,10 @@ export const metadata: Metadata = {
+   },
+   icons: {
+     // Paramètre de version : force les navigateurs (cache favicon très
+-    // rétentif) à recharger l'icône régénérée depuis le « Logo
+-    // Favicon.png » mis à jour par l'éditeur (14/11/2026).
+-    icon: "/assets/favicon.png?v=2026-11-14",
+-    apple: "/assets/favicon.png?v=2026-11-14",
++    // rétentif) à recharger l'icône. Version 2026-11-14-2 : fond noir
++    // retiré (PNG RGBA transparent, glyphe recadré sur son enveloppe).
++    icon: "/assets/favicon.png?v=2026-11-14-2",
++    apple: "/assets/favicon.png?v=2026-11-14-2",
+   },
+ };
+ 
