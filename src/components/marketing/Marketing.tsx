@@ -162,7 +162,13 @@ export function CTAButton({
 
   const base =
     "group/btn btn-fill inline-flex items-center justify-center gap-2.5 rounded-full font-medium tracking-[0.01em] transition-[transform,box-shadow,border-color] duration-300 focus-visible:outline-2 focus-visible:outline-offset-3 hover:-translate-y-0.5";
-  const sizes = size === "lg" ? "px-7 py-4 text-[15px] min-h-[52px]" : "px-6 py-3.5 text-sm min-h-[48px]";
+  // Taille « lg » compacte sur téléphone (44 px, texte 12 px) : les deux
+  // CTA du hero tiennent ainsi sur une seule ligne et la section reste
+  // entièrement visible à l'écran sans défilement ; pleine taille dès 640 px.
+  const sizes =
+    size === "lg"
+      ? "px-3 py-2.5 text-[12px] min-h-[44px] sm:px-7 sm:py-4 sm:text-[15px] sm:min-h-[52px]"
+      : "px-6 py-3.5 text-sm min-h-[48px]";
 
   const variants: Record<Variant, string> = {
     primary:

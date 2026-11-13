@@ -11,16 +11,18 @@ import { ASSETS, PROJECTS } from "@/lib/site";
 
 /**
  * SECTION 01 — HERO
- * Totalement visible à l'écran, sans défilement : la section occupe
- * exactement la hauteur du viewport (100svh, y compris barres
- * dynamiques mobiles) et son contenu s'adapte en taille à tous les
- * écrans (typographie fluide, portrait dimensionné en svh). Sans
- * scroller, le visiteur comprend : qui est Stevens, ce qu'il propose,
- * le bénéfice principal, comment réserver et comment découvrir les
+ * Totalement visible à l'écran, sans défilement, sur TOUTES les
+ * tailles : la section occupe exactement la hauteur du viewport
+ * (100svh, y compris barres dynamiques mobiles) et son contenu
+ * s'adapte en taille à tous les écrans (typographie fluide, portrait
+ * dimensionné en svh, CTA compacts sur téléphone, media query
+ * « téléphones courts » dans globals.css). Sans scroller, le
+ * visiteur comprend : qui est Stevens, ce qu'il propose, le bénéfice
+ * principal, comment réserver et comment découvrir les
  * réalisations. Mobile : l'image se place entre le titre et la
- * description. Les mentions « Copywriting inclus » / « SEO de base »
- * sont volontairement absentes : elles appartiennent à la section
- * « Avantages inclus » qui présente l'offre.
+ * description. Les mentions « Copywriting inclus » / « SEO de
+ * base » sont volontairement absentes : elles appartiennent à la
+ * section « Avantages inclus » qui présente l'offre.
  */
 export function Hero() {
   const reduce = useReducedMotion();
@@ -95,8 +97,8 @@ export function Hero() {
         className="pointer-events-none absolute bottom-[-20%] left-[-12%] h-[420px] w-[420px] rounded-full bg-[#e4e4e4] opacity-[0.05] blur-[110px]"
       />
 
-      <div className="container-site relative flex flex-1 flex-col justify-center pb-4 pt-[64px] sm:pb-8 sm:pt-[68px] lg:pb-8 lg:pt-[112px]">
-        <div className="grid items-center gap-3.5 sm:gap-5 lg:grid-cols-[1.15fr_0.85fr] lg:gap-7 xl:gap-9">
+      <div className="container-site relative flex flex-1 flex-col justify-center pb-2 pt-[60px] sm:pb-8 sm:pt-[68px] lg:pb-8 lg:pt-[112px]">
+        <div className="grid items-center gap-2.5 sm:gap-5 lg:grid-cols-[1.15fr_0.85fr] lg:gap-7 xl:gap-9">
           {/* ---------- Bloc texte haut : note 5 étoiles, titre ---------- */}
           {/* Mobile : note → H1, puis image (bloc visuel), puis
               suite du texte. Desktop : colonne gauche, ligne 1. */}
@@ -129,18 +131,19 @@ export function Hero() {
               text={HERO.h1}
               boldText={HERO.h1Bold}
               delay={0.08}
-              className="text-hero-title-viewport mt-3 text-white sm:mt-4"
+              className="text-hero-title-viewport mt-1.5 text-white sm:mt-4"
             />
           </div>
 
           {/* ---------- Colonne visuelle : portrait + mockups ---------- */}
           {/* Mobile : placée entre le titre et la description (demande
-              explicite de l'éditeur), avec un espace accru entre le
-              titre et l'image, et une réserve sous le portrait pour les
+              explicite de l'éditeur), portrait agrandi (34svh, 38svh en
+              tablette) et marges resserrées pour tenir tout le hero à
+              l'écran ; une réserve sous le portrait laisse place aux
               mockups flottants (présents aussi sur mobile) ; desktop :
               colonne droite sur les deux lignes de la grille, hauteur
               plafonnée en svh pour que le hero tienne dans l'écran. */}
-          <div className="order-2 relative mx-auto mt-9 mb-14 w-full max-w-md sm:mb-36 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:mb-0 lg:max-w-none">
+          <div className="order-2 hero-visual relative mx-auto mt-5 mb-6 w-full max-w-md sm:mt-9 sm:mb-36 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:mb-0 lg:max-w-none">
             {/* Bloc neutre en décalage derrière le portrait */}
             <div
               aria-hidden="true"
@@ -158,13 +161,17 @@ export function Hero() {
                     loading="eager"
                     fetchPriority="high"
                     decoding="sync"
-                    className="block h-[min(29svh,270px)] w-full object-cover object-top lg:h-[min(64svh,570px)] lg:w-auto"
+                    className="block h-[min(35svh,320px)] w-full object-cover object-top sm:h-[min(38svh,320px)] lg:h-[min(72svh,640px)] lg:w-auto"
                   />
                 </span>
-                <figcaption className="absolute left-4 top-4">
-                  <span className="inline-flex items-center gap-2 rounded-full bg-[#070707]/75 px-3.5 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#e4e4e4]" aria-hidden="true" />
-                    Stevens Akpovi
+                {/* Mention épinglée « Stevens Akpovi » : bas-droit du
+                    portrait — le visage est en haut (object-top) et ne
+                    doit pas être masqué ; une seule ligne, taille
+                    réduite (demande de l'éditeur, 14/11/2026). */}
+                <figcaption className="absolute bottom-3 right-3">
+                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#070707]/75 px-2.5 py-1 text-[10px] font-medium leading-none text-white backdrop-blur-sm">
+                    <span className="h-1 w-1 shrink-0 rounded-full bg-[#e4e4e4]" aria-hidden="true" />
+                    <span>Stevens Akpovi</span>
                   </span>
                 </figcaption>
               </figure>
@@ -174,7 +181,7 @@ export function Hero() {
                   Exclusivement noir et blanc (forceMono) — aucune
                   couleur au survol. */}
               <motion.div
-                className="absolute -bottom-5 -left-1 w-[46%] sm:-bottom-8 sm:-left-4 sm:w-[58%] lg:-left-14 lg:w-[62%]"
+                className="absolute -bottom-4 -left-1 w-[46%] sm:-bottom-8 sm:-left-4 sm:w-[58%] lg:-left-14 lg:w-[62%]"
                 initial={reduce ? undefined : { opacity: 0, y: 26, rotate: -5 }}
                 animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotate: -3 }}
                 transition={{ delay: 0.6, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -195,7 +202,7 @@ export function Hero() {
                   sur mobile. Exclusivement noir et blanc (forceMono) —
                   aucune couleur au survol. */}
               <motion.div
-                className="absolute -right-1 -top-5 w-[22%] sm:-right-2 sm:-top-10 sm:w-[26%] lg:-right-8 lg:w-[28%]"
+                className="absolute -right-1 -top-3 w-[22%] sm:-right-2 sm:-top-10 sm:w-[26%] lg:-right-8 lg:w-[28%]"
                 initial={reduce ? undefined : { opacity: 0, y: 26, rotate: 5 }}
                 animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotate: 2 }}
                 transition={{ delay: 0.75, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -222,7 +229,7 @@ export function Hero() {
             <Reveal direction="up" delay={0.18}>
               <p
                 ref={descRef}
-                className="relative mt-2.5 max-w-xl text-[12.5px] leading-[1.55] text-[#c8c8c8] transition-[top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] sm:mt-3 sm:text-[15px] lg:text-[15px] xl:text-base"
+                className="hero-desc relative max-w-xl text-[12px] leading-[1.5] text-[#c8c8c8] transition-[top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] sm:mt-3 sm:text-[15px] lg:text-[15px] xl:text-base"
               >
                 {HERO.text}
               </p>
@@ -235,7 +242,7 @@ export function Hero() {
             <Reveal direction="up" delay={0.24}>
               <div
                 ref={ctaRowRef}
-                className="mt-3 flex flex-wrap items-center gap-2.5 sm:mt-5 sm:gap-3 lg:mt-5"
+                className="mt-2.5 flex flex-wrap items-center gap-2 sm:mt-5 sm:gap-3 lg:mt-5"
               >
                 <CTAButton
                   action={{ kind: "page", page: "devis" }}
@@ -248,9 +255,14 @@ export function Hero() {
                 <CTAButton
                   action={{ kind: "page", page: "realisations" }}
                   variant="ghostLight"
-                  icon={CTAIcons.works}
+                  icon={
+                    /* Icône « œil » masquée sous 640 px : le libellé reste
+                       seul et les deux CTA tiennent sur une seule ligne —
+                       condition du hero entièrement visible sans défilement. */
+                    <span className="hidden sm:inline-flex">{CTAIcons.works}</span>
+                  }
                   hideArrow
-                  className="px-3.5 py-2.5 text-[13px] sm:px-4 sm:py-3 sm:text-sm"
+                  className="px-2.5 py-2.5 text-[12px] sm:px-4 sm:py-3 sm:text-sm"
                 >
                   {HERO.ctaTertiary}
                 </CTAButton>
@@ -258,7 +270,7 @@ export function Hero() {
             </Reveal>
 
             <Reveal direction="up" delay={0.3}>
-              <ReassuranceBar mention={HERO.reassurance} className="mt-3 sm:mt-4 lg:mt-5" />
+              <ReassuranceBar mention={HERO.reassurance} className="mt-2 sm:mt-4 lg:mt-5" />
             </Reveal>
           </div>
         </div>

@@ -280,3 +280,55 @@ E2E formulaire de contact (redirection + enregistrement base constatés),
   n'a pas d'équivalent (aucun asset) — remplacée par le badge de note.
 - Les six bandes restent sur une colonne sous 640 px de large (lisibilité) ;
   dire si tu les veux aussi en deux colonnes sur mobile.
+
+## Complément 7 — 14/11/2026 : favicon + hero entièrement visible sur mobile
+
+### Changements appliqués
+1. **Favicon** : `public/assets/favicon.png` régénérée depuis le « Logo
+   Favicon.png » actuel du dépôt (512×512 RGBA, Lanczos — script
+   `scripts/prepare-favicon-2026-11-14.py`). Vérification : le fichier
+   régénéré est identique à l'octet près à celui déjà en ligne (le
+   favicon servi était déjà dérivé du dernier logo) ; pour contourner
+   le cache tenace des navigateurs, l'URL déclarée dans `layout.tsx`
+   porte désormais un paramètre de version
+   `/assets/favicon.png?v=2026-11-14` (icône + apple-touch). L'ancien
+   `public/favicon.svg` (marque « S. » beige, non référencée) est
+   supprimé.
+2. **Hero visible à 100 % sans défilement sur tout mobile** (mesuré au
+   navigateur, headless) : 320×568, 360×640, 375×667, 390×844,
+   412×915, 414×736 — la section mesure exactement la hauteur du
+   viewport (100svh) et le contenu reste au-dessus de la ligne de flot
+   dans chaque cas. Leviers : CTA « lg » compacts sous 640 px
+   (44 px, texte 12 px, une seule ligne — l'icône œil de « Voir Nos
+   Travaux » est masquée sous 640 px), titre h1 resserré
+   (clamp min 1,6rem), espacements et paddings réduits, et deux paliers
+   CSS « téléphones courts » (≤ 660 px puis ≤ 620 px de haut) qui
+   resserrent encore portrait, description, marges et CTA (jusqu'à
+   320 px de large).
+3. **Portrait épinglé agrandi** : mobile 29svh/270px → 35svh/320px
+   (+17 % de hauteur visible), tablette 38svh, desktop
+   64svh/570px → 72svh/640px (image 427×640 à 1440×900, hero toujours
+   exactement 900px — vérifié aussi à 1280×720 et 1024×768).
+4. **Mention épinglée « Stevens Akpovi »** : déplacée en bas-droit du
+   portrait (le visage, en haut de l'image via object-top, n'est plus
+   masqué) ; une seule ligne garantie (`whitespace-nowrap` + texte
+   isolé dans un span) ; taille réduite : pastille 25px de haut
+   (contre 44px, sur 2 lignes, avant), texte 10px (contre 12px),
+   padding et point indicateur réduits.
+5. **Espace ensemble d'images → description réduit** : 70px → 34px sur
+   mobile (30px à 360px, 26px à 320px) ; le débord du mockup
+   navigateur passe de 20px à 16px sous le portrait.
+6. **Mockups moins arrondis et plus fins** : navigateur
+   `rounded-xl` → `rounded-md`, barre chrome allégée (py-1.5, points
+   8px, URL 9px) ; smartphone `rounded-[2rem]/p-6px` →
+   `rounded-[10px]/p-2.5px`, écran interne `rounded-[1.6rem]` →
+   `rounded-[7px]`, encoche réduite à une fente 34×5px qui ne masque
+   plus l'en-tête du site capturé. Appliqué aussi aux pages projet
+   (même composant), pour cohérence.
+
+### Vérifications
+- Dev + build de production : OK (10/10 pages générées, aucune erreur).
+- Mesures navigateur (avant → après) : 375×667 hero 799px → 667px ;
+  360×640 → 640px ; 320×568 → 568px ; CTA 2 lignes (115px) → 1 ligne
+  (48px) ; mention 44px/2 lignes → 25px/1 ligne ; desktop hero 900px,
+  portrait 570px → 640px.

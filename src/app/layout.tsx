@@ -74,7 +74,13 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
-  icons: { icon: "/assets/favicon.png", apple: "/assets/favicon.png" },
+  icons: {
+    // Paramètre de version : force les navigateurs (cache favicon très
+    // rétentif) à recharger l'icône régénérée depuis le « Logo
+    // Favicon.png » mis à jour par l'éditeur (14/11/2026).
+    icon: "/assets/favicon.png?v=2026-11-14",
+    apple: "/assets/favicon.png?v=2026-11-14",
+  },
 };
 
 export const viewport: Viewport = {

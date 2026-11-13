@@ -50,7 +50,10 @@ export function MonoImage({
   );
 }
 
-/** Mockup navigateur (aperçu desktop des réalisations). */
+/** Mockup navigateur (aperçu desktop des réalisations).
+ *  Arrondi volontairement discret (rounded-md) et barre chrome fine :
+ *  le contenu du site capturé doit rester pleinement lisible, y compris
+ *  à petite échelle dans le hero (demande de l'éditeur, 14/11/2026). */
 export function BrowserMockup({
   src,
   alt,
@@ -75,15 +78,15 @@ export function BrowserMockup({
 }) {
   const shortUrl = url.replace(/^https?:\/\//, "");
   return (
-    <figure className={`group/mockup overflow-hidden rounded-xl border border-[#e4e4e4]/25 bg-[#232323] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] ${className}`}>
-      <figcaption className="flex items-center gap-2 border-b border-[#e4e4e4]/12 px-3.5 py-2.5 sm:px-4">
-        <span className="flex gap-1.5" aria-hidden="true">
-          <span className="h-2.5 w-2.5 rounded-full bg-[#3c3c3c]" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#3c3c3c]" />
-          <span className="h-2.5 w-2.5 rounded-full bg-[#3c3c3c]" />
+    <figure className={`group/mockup overflow-hidden rounded-md border border-[#e4e4e4]/25 bg-[#232323] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] ${className}`}>
+      <figcaption className="flex items-center gap-2 border-b border-[#e4e4e4]/12 px-2.5 py-1.5 sm:px-3.5 sm:py-2.5">
+        <span className="flex gap-1" aria-hidden="true">
+          <span className="h-2 w-2 rounded-full bg-[#3c3c3c]" />
+          <span className="h-2 w-2 rounded-full bg-[#3c3c3c]" />
+          <span className="h-2 w-2 rounded-full bg-[#3c3c3c]" />
         </span>
-        <span className="mx-auto flex max-w-[70%] items-center gap-1.5 truncate rounded-md bg-[#1c1c1c] px-3 py-1 text-[10px] text-[#c8c8c8] sm:text-[11px]" aria-hidden="true">
-          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#e4e4e4]" />
+        <span className="mx-auto flex max-w-[70%] items-center gap-1.5 truncate rounded-md bg-[#1c1c1c] px-2 py-0.5 text-[9px] text-[#c8c8c8] sm:text-[10px]" aria-hidden="true">
+          <span className="h-1 w-1 shrink-0 rounded-full bg-[#e4e4e4]" />
           {shortUrl}
         </span>
       </figcaption>
@@ -103,7 +106,12 @@ export function BrowserMockup({
   );
 }
 
-/** Mockup smartphone (aperçu mobile des réalisations). */
+/** Mockup smartphone (aperçu mobile des réalisations).
+ *  Cadre très fin (2,5 px) et coins à peine cassés (10 px) : l'écran du
+ *  site occupe quasiment tout le mockup et son contenu reste visible
+ *  en entier, même à petite largeur dans le hero (demande de
+ *  l'éditeur, 14/11/2026). La fente « encoche » se réduit à un fin
+ *  haut-parleur qui ne masque plus l'en-tête du site capturé. */
 export function PhoneMockup({
   src,
   alt,
@@ -123,13 +131,13 @@ export function PhoneMockup({
 }) {
   return (
     <figure
-      className={`group/mockup relative overflow-hidden rounded-[2rem] border border-[#e4e4e4]/25 bg-[#232323] p-[6px] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] ${className}`}
+      className={`group/mockup relative overflow-hidden rounded-[10px] border border-[#e4e4e4]/25 bg-[#232323] p-[2.5px] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] ${className}`}
     >
       <span
-        className="absolute left-1/2 top-[10px] z-10 h-4 w-16 -translate-x-1/2 rounded-full bg-[#1c1c1c]"
+        className="absolute left-1/2 top-[4px] z-10 h-[5px] w-[34px] -translate-x-1/2 rounded-full bg-[#1c1c1c]"
         aria-hidden="true"
       />
-      <span className={`mono-media block overflow-hidden rounded-[1.6rem] ${forceMono ? "mono-locked" : ""}`}>
+      <span className={`mono-media block overflow-hidden rounded-[7px] ${forceMono ? "mono-locked" : ""}`}>
         <img
           src={src}
           alt={alt}
