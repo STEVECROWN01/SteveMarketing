@@ -183,10 +183,15 @@ export const ASSETS = {
   problemIneffective: "/assets/problem-ineffective-website.webp",
   /** Portrait dédié de la page « À propos » (fourni par l'éditeur). */
   aboutPortrait: "/assets/apropos-portrait.webp",
-  /** Logo officiel — version blanche (pour fonds noirs/sombres). */
-  logoLight: "/assets/logo-blanc.png",
-  /** Logo officiel — version noire (pour fonds blancs/clairs). */
-  logoDark: "/assets/logo-noir.png",
+  /** Logo officiel — version blanche sur fond TRANSPARENT (RGBA,
+   *  fond noir supprimé du fichier, 15/11/2026) pour en-tête, pied de
+   *  page et emails sur fonds sombres. Paramètre de version : force le
+   *  rechargement par les navigateurs qui ont mis l'ancien PNG (avec
+   *  fond) en cache. */
+  logoLight: "/assets/logo-blanc.png?v=2026-11-15",
+  /** Logo officiel — version noire sur fond TRANSPARENT (RGBA, fond
+   *  blanc supprimé du fichier, 15/11/2026) pour fonds clairs. */
+  logoDark: "/assets/logo-noir.png?v=2026-11-15",
   /** Vignette de partage de lien (Open Graph), fournie par l'éditeur. */
   ogImage: "/assets/OG.png",
 } as const;

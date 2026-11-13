@@ -80,6 +80,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
                 width={1440}
                 height={900}
                 priority
+                sizes="(max-width: 640px) 92vw, (max-width: 1024px) 80vw, 820px"
               />
             </Reveal>
             <Reveal direction="left" delay={0.2} className="w-full shrink-0 sm:w-1/3 lg:w-[24%]">
@@ -89,6 +90,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
                 alt={`Aperçu mobile du site ${project.name}`}
                 width={390}
                 height={844}
+                sizes="(max-width: 640px) 92vw, 240px"
               />
             </Reveal>
           </div>

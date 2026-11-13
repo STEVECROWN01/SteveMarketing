@@ -51,6 +51,8 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
           alt={`Aperçu du site ${project.name}`}
           width={1440}
           height={900}
+          sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 400px"
+          src2xWidth={1920}
           className="mono-locked rounded-xl border border-[#e4e4e4]"
         />
 

@@ -18,8 +18,18 @@ export function Footer() {
   const router = useRouter();
 
   return (
-    <footer className="section-deep mt-auto border-t border-[#e4e4e4]/10">
-      <div className="container-site py-16 lg:py-20">
+    <footer className="section-deep relative mt-auto overflow-hidden">
+      {/* Fondu au sommet du pied de page (comme le fondu bas du hero,
+          demande de l'éditeur, 15/11/2026) : la lueur circulante est
+          remplacée par un dégradé statique — un voile blanc doux né
+          sur la limite avec la section précédente (« IL EST TEMPS… »),
+          qui s'estompe progressivement vers le bas, sans ligne dure
+          ni animation. Pur décor, rogné par overflow-hidden. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-[#ffffff]/[0.08] to-transparent sm:h-14"
+      />
+      <div className="container-site relative py-16 lg:py-20">
         <Reveal direction="up" amount={0.15}>
           <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr] lg:gap-8">
             {/* Marque — logo officiel (version blanche, pour fond sombre) */}

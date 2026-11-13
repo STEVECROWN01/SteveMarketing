@@ -104,6 +104,8 @@ export function PortfolioPage() {
                       width={1440}
                       height={900}
                       eager={i === 0}
+                      sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 560px"
+                      src2xWidth={1920}
                     />
                   </a>
                 </Reveal>

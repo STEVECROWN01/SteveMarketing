@@ -58,7 +58,9 @@ export function HomePage() {
     <>
       <Hero />
       <AudienceStrip />
-      <FadeSeparator />
+      {/* Demi-largeur à la demande de l'éditeur (15/11/2026) : ce
+          trait-là était trop long — réduit de moitié, centré. */}
+      <FadeSeparator className="separator-fade-half" />
       <ProblemSection />
       <QuestioningSection />
       <TransformationSection />

@@ -20,11 +20,13 @@ import { SITE } from "@/lib/site";
  * fond sombre + deux orbes lumineux ; à gauche le grand titre
  * « Contact » et le bouton blanc « Demander Un Devis » (vers la page
  * dédiée) ; à droite trois accordéons puis « Laissez-moi un
- * message » et le formulaire. Le bouton du formulaire transmet
- * automatiquement les informations à stevensakpovi@gmail.com puis
- * dirige vers la page dédiée à la réservation d'appel
- * (#/reserver-un-appel). Les sections « Demande de devis » et
- * « Appel stratégique » qui vivaient ici ont leurs pages propres.
+ * message » et le formulaire — refait EXACTEMENT comme le widget
+ * « Website Contact Form » de la référence (15/11/2026) : libellés
+ * blancs, rangées deux colonnes, entrées blanches, bouton pilule
+ * blanche demi-largeur « Entrer En Contact ». Le formulaire
+ * transmet automatiquement les informations à
+ * stevensakpovi@gmail.com puis dirige vers la page dédiée à la
+ * réservation d'appel (#/reserver-un-appel).
  */
 export function ContactPage() {
   const router = useRouter();
@@ -212,7 +214,7 @@ export function ContactPage() {
             </Reveal>
 
             <Reveal direction="up" delay={0.16}>
-              <div className="mt-9 max-w-2xl">
+              <div className="mt-9 max-w-[720px]">
                 <LeadForm kind="contact" />
               </div>
             </Reveal>

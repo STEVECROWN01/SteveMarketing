@@ -14,10 +14,10 @@ import { FAQ, FINAL_CTA } from "@/content/site-content";
 /**
  * SECTION 12 — FAQ (fond sombre)
  * SECTION 13 — CONVERSION FINALE (fond profond, halo beige)
- * Sur la limite avec le pied de page : une lueur blanche #ffffff
- * circule continuellement de gauche à droite (fade-in/out,
- * 7 s — demande de l'éditeur, 14/11/2026) — voir .glow-boundary-*
- * dans globals.css.
+ * Sur la limite avec le pied de page : un fondu statique (voile blanc
+ * dégradé, comme le fondu bas du hero) remplace l'ancienne lueur
+ * circulante — suppression à la demande de l'éditeur, 15/11/2026
+ * (le voile lui-même vit dans le composant Footer).
  */
 export function FaqSection() {
   return (
@@ -135,14 +135,6 @@ export function FinalCtaSection() {
         <Reveal direction="fade" delay={0.28}>
           <ReassuranceBar mention={FINAL_CTA.mention} className="mt-8 justify-center" />
         </Reveal>
-      </div>
-
-      {/* Lueur blanche circulante — posée exactement sur la limite avec
-          le pied de page : elle parcourt la ligne de gauche à droite en
-          continu, avec fade-in à l'apparition et fade-out à la
-          disparition (demande de l'éditeur, 14/11/2026). */}
-      <div className="glow-boundary-track" aria-hidden="true">
-        <div className="glow-boundary-sweep" />
       </div>
     </section>
   );

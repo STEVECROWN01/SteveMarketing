@@ -1,21 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { Suspense, useEffect } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { RouterProvider, useRouter } from "@/components/router-context";
 import { CalendlyProvider } from "@/components/calendly/CalendlyContext";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HomePage } from "@/components/home/HomePage";
-import { ServicesPage } from "@/components/pages/ServicesPage";
-import { PortfolioPage } from "@/components/pages/PortfolioPage";
-import { ProjectPage } from "@/components/pages/ProjectPage";
-import { AboutPage } from "@/components/pages/AboutPage";
-import { ContactPage } from "@/components/pages/ContactPage";
-import { DevisPage } from "@/components/pages/DevisPage";
-import { CallBookingPage } from "@/components/pages/CallBookingPage";
-import { LegalPage } from "@/components/pages/LegalPage";
-import { AdminPage } from "@/components/pages/AdminPage";
 import { Toaster } from "@/components/ui/toaster";
 import { PROJECTS } from "@/lib/site";
 
@@ -23,7 +14,58 @@ import { PROJECTS } from "@/lib/site";
  * Coquille applicative : routeur de pages (URLs propres par
  * fragment dans la route unique visible), transitions de page
  * fluides, en-tête, pied de page et popup Calendly global.
+ *
+ * PERFORMANCE (15/11/2026 — « le site est trop lent ») : seule la
+ * page d'accueil est dans le paquet JavaScript initial. Toutes les
+ * autres pages (services, réalisations, projet, à propos, contact,
+ * devis, appel, mentions, admin) sont découpées en morceaux chargés
+ * à la demande (React.lazy) — puis PRÉCHARGÉES dès que le navigateur
+ * est inactif : la première visite n'emporte plus le code des pages
+ * non consultées, et les navigations restent instantanées.
  */
+
+/* Pages secondaires — morceaux séparés, préchargés à l'inactivité. */
+const ServicesPage = React.lazy(() =>
+  import("@/components/pages/ServicesPage").then((m) => ({ default: m.ServicesPage })),
+);
+const PortfolioPage = React.lazy(() =>
+  import("@/components/pages/PortfolioPage").then((m) => ({ default: m.PortfolioPage })),
+);
+const ProjectPage = React.lazy(() =>
+  import("@/components/pages/ProjectPage").then((m) => ({ default: m.ProjectPage })),
+);
+const AboutPage = React.lazy(() =>
+  import("@/components/pages/AboutPage").then((m) => ({ default: m.AboutPage })),
+);
+const ContactPage = React.lazy(() =>
+  import("@/components/pages/ContactPage").then((m) => ({ default: m.ContactPage })),
+);
+const DevisPage = React.lazy(() =>
+  import("@/components/pages/DevisPage").then((m) => ({ default: m.DevisPage })),
+);
+const CallBookingPage = React.lazy(() =>
+  import("@/components/pages/CallBookingPage").then((m) => ({ default: m.CallBookingPage })),
+);
+const LegalPage = React.lazy(() =>
+  import("@/components/pages/LegalPage").then((m) => ({ default: m.LegalPage })),
+);
+const AdminPage = React.lazy(() =>
+  import("@/components/pages/AdminPage").then((m) => ({ default: m.AdminPage })),
+);
+
+/** Préchargement à l'inactivité : le visiteur qui reste sur la page
+ *  d'accueil récupère en arrière-plan les morceaux des autres pages —
+ *  navigations instantanées sans rien ajouter au chargement initial. */
+const PREFETCH_PAGES = [
+  () => import("@/components/pages/ServicesPage"),
+  () => import("@/components/pages/PortfolioPage"),
+  () => import("@/components/pages/ProjectPage"),
+  () => import("@/components/pages/AboutPage"),
+  () => import("@/components/pages/ContactPage"),
+  () => import("@/components/pages/DevisPage"),
+  () => import("@/components/pages/CallBookingPage"),
+  () => import("@/components/pages/LegalPage"),
+];
 
 function PageSwitch() {
   const { page, section } = useRouter();
@@ -73,7 +115,18 @@ function PageSwitch() {
         exit={reduce ? { opacity: 0 } : { opacity: 0, y: -10 }}
         transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
       >
-        {content}
+        {/* Attente discrète pendant le (rare) chargement d'un morceau :
+            les morceaux sont préchargés à l'inactivité, la navigation
+            normale reste instantanée. */}
+        <Suspense
+          fallback={
+            <div className="flex min-h-[70vh] items-center justify-center" aria-hidden="true">
+              <span className="h-8 w-8 animate-spin rounded-full border-2 border-[#e4e4e4]/30 border-t-[#e4e4e4]" />
+            </div>
+          }
+        >
+          {content}
+        </Suspense>
       </motion.main>
     </AnimatePresence>
   );
@@ -81,6 +134,23 @@ function PageSwitch() {
 
 function Shell() {
   const { page } = useRouter();
+
+  // Préchargement des pages secondaires une fois le navigateur inactif
+  // (après le rendu initial) — sans bloquer le chargement en cours.
+  useEffect(() => {
+    const idle =
+      (window as unknown as { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback ??
+      ((cb: () => void) => window.setTimeout(cb, 2500) as unknown as number);
+    const cancel =
+      (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback ??
+      ((id: number) => window.clearTimeout(id));
+    const id = idle(() => {
+      PREFETCH_PAGES.forEach((load) => {
+        load().catch(() => undefined);
+      });
+    });
+    return () => cancel(id);
+  }, []);
 
   // L'espace administrateur se présente sans navigation publique
   if (page === "admin") {

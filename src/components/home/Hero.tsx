@@ -195,6 +195,8 @@ export function Hero() {
                     width={1440}
                     height={900}
                     forceMono
+                    priority
+                    sizes="(max-width: 640px) 46vw, (max-width: 1023px) 58vw, 340px"
                   />
                 </motion.div>
               </motion.div>
@@ -216,6 +218,8 @@ export function Hero() {
                     width={390}
                     height={844}
                     forceMono
+                    priority
+                    sizes="(max-width: 640px) 24vw, 150px"
                   />
                 </motion.div>
               </motion.div>
@@ -280,12 +284,12 @@ export function Hero() {
 
       {/* Fondu progressif vers la section suivante : plus de trait de
           séparation — le fond du hero (#070707) se fond dans celui de la
-          section suivante (#1c1c1c), sur ~48-56 px seulement (réduit à la
-          demande de l'éditeur, 14/11/2026 : l'effet entrait trop profond
-          dans le hero), sans limite nette. */}
+          section suivante (#1c1c1c), sur ~36-44 px seulement (réduit à
+          nouveau à la demande de l'éditeur, 15/11/2026 : l'effet entrait
+          encore trop profond dans le hero), sans limite nette. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-[#1c1c1c] sm:h-14"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-9 bg-gradient-to-b from-transparent to-[#1c1c1c] sm:h-11"
       />
     </section>
   );

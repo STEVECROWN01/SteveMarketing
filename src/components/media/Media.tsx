@@ -25,6 +25,15 @@ interface MonoImageProps {
   imgClassName?: string;
   eager?: boolean;
   decorative?: boolean;
+  /** Tailles d'affichage CSS (attribut sizes) — combinée au srcset
+   *  en descripteurs de largeur, elle évite aux mobiles de
+   *  télécharger la variante @2x surdimensionnée (performance,
+   *  15/11/2026). Ex. « (max-width: 640px) 92vw, 760px ». */
+  sizes?: string;
+  /** Largeur réelle en pixels du fichier @2x — nécessaire au srcset
+   *  en descripteurs de largeur (ex. 1920 pour les captures desktop
+   *  @2x réelles). Sans lui, repli DPR 1x/2x. */
+  src2xWidth?: number;
 }
 
 export function MonoImage({
@@ -37,12 +46,26 @@ export function MonoImage({
   imgClassName = "",
   eager = false,
   decorative = false,
+  sizes,
+  src2xWidth,
 }: MonoImageProps) {
+  // Srcset en descripteurs de LARGEUR (pas DPR) lorsque la taille
+  // d'affichage est connue : le navigateur choisit le plus petit
+  // fichier suffisant pour la densité réelle de l'écran — les
+  // mobiles n'emmènent plus les variantes @2x de 340 Ko (demande
+  // « site trop lent, images lentes », 15/11/2026).
+  const srcSet =
+    src2x && sizes && src2xWidth
+      ? `${src} ${width}w, ${src2x} ${src2xWidth}w`
+      : src2x
+        ? `${src} 1x, ${src2x} 2x`
+        : undefined;
   return (
     <span className={`mono-media block ${className}`}>
       <img
         src={src}
-        srcSet={src2x ? `${src} 1x, ${src2x} 2x` : undefined}
+        srcSet={srcSet}
+        sizes={sizes}
         alt={decorative ? "" : alt}
         aria-hidden={decorative ? "true" : undefined}
         width={width}
@@ -71,6 +94,7 @@ export function BrowserMockup({
   height = 900,
   priority = false,
   forceMono = false,
+  sizes,
 }: {
   src: string;
   /** Variante haute densité @2x (voir MonoImage). */
@@ -81,12 +105,18 @@ export function BrowserMockup({
   width?: number;
   height?: number;
   priority?: boolean;
+  /** Tailles d'affichage CSS — sans elle, repli DPR 1x/2x. */
+  sizes?: string;
   /** Noir et blanc PERMANENT sur tous les écrans (mobile comprise) —
    *  aucune couleur au survol : mockups du hero (demande de
    *  l'éditeur, 13/11/2026). */
   forceMono?: boolean;
 }) {
   const shortUrl = url.replace(/^https?:\/\//, "");
+  // Fichiers réels : desktop 1440 px (1x) et 1920 px (@2x vraie densité)
+  const srcSet = src2x
+    ? `${src} 1440w, ${src2x} 1920w`
+    : undefined;
   return (
     <figure className={`group/mockup overflow-hidden rounded-md border border-[#e4e4e4]/25 bg-[#232323] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] ${className}`}>
       <figcaption className="flex items-center gap-2 border-b border-[#e4e4e4]/12 px-2.5 py-1.5 sm:px-3.5 sm:py-2.5">
@@ -103,12 +133,14 @@ export function BrowserMockup({
       <span className={`mono-media block ${forceMono ? "mono-locked" : ""}`}>
         <img
           src={src}
-          srcSet={src2x ? `${src} 1x, ${src2x} 2x` : undefined}
+          srcSet={srcSet}
+          sizes={sizes}
           alt={alt}
           width={width}
           height={height}
           loading={priority ? "eager" : "lazy"}
-          decoding="async"
+          decoding={priority ? "sync" : "async"}
+          fetchPriority={priority ? "high" : "auto"}
           className="block w-full object-cover"
           style={{ aspectRatio: `${width} / ${height}` }}
         />
@@ -131,7 +163,9 @@ export function PhoneMockup({
   className = "",
   width = 390,
   height = 844,
+  priority = false,
   forceMono = false,
+  sizes,
 }: {
   src: string;
   /** Variante haute densité @2x (voir MonoImage). */
@@ -140,10 +174,19 @@ export function PhoneMockup({
   className?: string;
   width?: number;
   height?: number;
+  /** Chargement immédiat (mockups du hero, visibles à l'écran au
+   *  chargement — demande « images trop lentes », 15/11/2026). */
+  priority?: boolean;
+  /** Tailles d'affichage CSS — sans elle, repli DPR 1x/2x. */
+  sizes?: string;
   /** Noir et blanc PERMANENT sur tous les écrans — aucune couleur
    *  au survol (mockups du hero). */
   forceMono?: boolean;
 }) {
+  // Fichiers réels : mobile 390 px (1x) et 780 px (@2x vraie densité)
+  const srcSet = src2x
+    ? `${src} 390w, ${src2x} 780w`
+    : undefined;
   return (
     <figure
       className={`group/mockup relative overflow-hidden rounded-[14px] border border-[#e4e4e4]/25 bg-[#232323] p-[2.5px] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] ${className}`}
@@ -155,12 +198,14 @@ export function PhoneMockup({
       <span className={`mono-media block overflow-hidden rounded-[11px] ${forceMono ? "mono-locked" : ""}`}>
         <img
           src={src}
-          srcSet={src2x ? `${src} 1x, ${src2x} 2x` : undefined}
+          srcSet={srcSet}
+          sizes={sizes}
           alt={alt}
           width={width}
           height={height}
-          loading="lazy"
-          decoding="async"
+          loading={priority ? "eager" : "lazy"}
+          decoding={priority ? "sync" : "async"}
+          fetchPriority={priority ? "high" : "auto"}
           className="block w-full object-cover object-top"
           style={{ aspectRatio: `${width} / ${height}` }}
         />

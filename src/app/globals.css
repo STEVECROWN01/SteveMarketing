@@ -241,7 +241,10 @@
 .mono-media {
   overflow: hidden;
   -webkit-overflow: hidden;
-  will-change: transform;
+  /* will-change retiré (perf, 15/11/2026) : posé sur des dizaines
+     d'images, il réservait autant de couches GPU et ralentissait les
+     mobiles — les transitions du filtre/déplacement restent fluides
+     sans cette invitation permanente au compositeur. */
 }
 .mono-media > img,
 .mono-media > .media-fill {
@@ -463,7 +466,10 @@ html.hoverable .media-group:where(:hover, :focus-within) .mono-locked > .media-f
    fondent : fade-in à gauche, fade-out à droite (demande de
    l'éditeur, 14/11/2026 — entre « POUR QUI JE CONÇOIS CES SITES » /
    « VOTRE ACTIVITÉ MÉRITE… » et entre « COMMENT ÇA FONCTIONNE ? » /
-   « DAVANTAGE DE VALEUR… »). */
+   « DAVANTAGE DE VALEUR… »).
+   Variante demi-largeur (15/11/2026) : le trait entre « POUR QUI
+   JE CONÇOIS CES SITES » et « VOTRE ACTIVITÉ MÉRITE… » était trop
+   long aux yeux de l'éditeur — réduit de moitié, centré. */
 .separator-fade {
   height: 1px;
   width: 100%;
@@ -476,67 +482,100 @@ html.hoverable .media-group:where(:hover, :focus-within) .mono-locked > .media-f
     rgba(228, 228, 228, 0) 100%
   );
 }
+.separator-fade-half {
+  width: 50%;
+  margin-inline: auto;
+}
 
-/* ---------- Lueur blanche circulante (limite section / footer) ----------
-   Sur la limite entre « IL EST TEMPS DE DONNER UNE NOUVELLE
-   DIMENSION À VOTRE ACTIVITÉ » et le pied de page : une lueur
-   blanche #ffffff (trait fin + halo doux) qui parcourt la ligne de
-   gauche à droite en continu, à vitesse normale (7 s le traverse),
-   avec fade-in à l'apparition et fade-out à la disparition
-   (demande de l'éditeur, 14/11/2026). Le halo est rogné par la
-   section (overflow-hidden) : la lueur surgit et s'éteint aux bords
-   de l'écran sans à-coup. */
-.glow-boundary-track {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  height: 2.5rem;
-  overflow: hidden;
-  pointer-events: none;
+/* ---------- Formulaires façon sheragency : choix stylisés ----------
+   Radios et case de consentement du formulaire de devis, calqués sur
+   le widget GoHighLevel de sheragency.com (demande « formulaires
+   exactement comme ceux de sheragency », 15/11/2026) : pastille
+   blanche à bordure grise #ACACAC, remplie de vert #039855 (couleur
+   du bouton « Get A Quote » de la référence) une fois cochée. */
+.sher-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  cursor: pointer;
 }
-.glow-boundary-sweep {
+/* Variante alignée en haut : case de consentement multi-lignes. */
+.sher-choice--top {
+  align-items: flex-start;
+}
+.sher-choice--top .sher-choice-dot {
+  margin-top: 3px;
+}
+.sher-choice-input {
   position: absolute;
-  bottom: 0;
-  left: -15rem;
-  width: 15rem;
-  height: 2px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.sher-choice-dot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  background-color: #ffffff;
+  border: 1.5px solid #acacac;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.sher-choice-dot--radio {
   border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.85) 35%,
-    rgba(255, 255, 255, 0.85) 65%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  box-shadow:
-    0 0 14px 3px rgba(255, 255, 255, 0.45),
-    0 0 30px 8px rgba(255, 255, 255, 0.18);
-  animation: glow-boundary-sweep 7s linear infinite;
 }
-@keyframes glow-boundary-sweep {
-  0% {
-    left: -15rem;
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 1;
-  }
-  100% {
-    left: calc(100% + 0.5rem);
-    opacity: 0;
-  }
+.sher-choice-dot--check {
+  border-radius: 4px;
 }
-/* Mouvement réduit : la lueur reste discrète et statique au centre. */
-@media (prefers-reduced-motion: reduce) {
-  .glow-boundary-sweep {
-    animation: none;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0.4;
-  }
+.sher-choice-dot::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background-color: #039855;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.sher-choice-dot--check::after {
+  content: none;
+}
+.sher-choice-dot--check::before {
+  content: "";
+  position: absolute;
+  width: 5px;
+  height: 9px;
+  border-right: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+  opacity: 0;
+  transform: rotate(45deg) scale(0.5);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.sher-choice:hover .sher-choice-dot {
+  border-color: #7a7a7a;
+}
+input:checked + .sher-choice-dot {
+  border-color: #039855;
+}
+input:checked + .sher-choice-dot--radio::after {
+  opacity: 1;
+  transform: scale(1);
+}
+input:checked + .sher-choice-dot--check {
+  background-color: #039855;
+  border-color: #039855;
+}
+input:checked + .sher-choice-dot--check::before {
+  opacity: 1;
+  transform: rotate(45deg) scale(1);
+}
+.sher-choice-input:focus-visible + .sher-choice-dot {
+  outline: 2px solid #039855;
+  outline-offset: 2px;
 }
 
 /* rev: mono-2 */

@@ -143,6 +143,15 @@ export const leadSchema = z
         });
       }
     }
+    // Devis « New Client Application » (sheragency, 15/11/2026) :
+    // le téléphone est requis, comme sur le formulaire de référence.
+    if (data.type === "quote" && (!data.phone || data.phone.replace(/\D/g, "").length < 6)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["phone"],
+        message: "Indiquez votre numéro de téléphone.",
+      });
+    }
   });
 
 export type LeadInput = z.infer<typeof leadSchema>;
