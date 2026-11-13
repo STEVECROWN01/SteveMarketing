@@ -59,6 +59,7 @@ export function BrowserMockup({
   width = 1440,
   height = 900,
   priority = false,
+  forceMono = false,
 }: {
   src: string;
   alt: string;
@@ -67,6 +68,9 @@ export function BrowserMockup({
   width?: number;
   height?: number;
   priority?: boolean;
+  /** Noir et blanc par défaut sur tous les écrans (mobile compris),
+   *  couleur d'origine au survol / au toucher. */
+  forceMono?: boolean;
 }) {
   const shortUrl = url.replace(/^https?:\/\//, "");
   return (
@@ -82,7 +86,7 @@ export function BrowserMockup({
           {shortUrl}
         </span>
       </figcaption>
-      <span className="mono-media block">
+      <span className={`mono-media block ${forceMono ? "mono-always" : ""}`}>
         <img
           src={src}
           alt={alt}
@@ -105,12 +109,16 @@ export function PhoneMockup({
   className = "",
   width = 390,
   height = 844,
+  forceMono = false,
 }: {
   src: string;
   alt: string;
   className?: string;
   width?: number;
   height?: number;
+  /** Noir et blanc par défaut sur tous les écrans (mobile compris),
+   *  couleur d'origine au survol / au toucher. */
+  forceMono?: boolean;
 }) {
   return (
     <figure
@@ -120,7 +128,7 @@ export function PhoneMockup({
         className="absolute left-1/2 top-[10px] z-10 h-4 w-16 -translate-x-1/2 rounded-full bg-[#1c1c1c]"
         aria-hidden="true"
       />
-      <span className="mono-media block overflow-hidden rounded-[1.6rem]">
+      <span className={`mono-media block overflow-hidden rounded-[1.6rem] ${forceMono ? "mono-always" : ""}`}>
         <img
           src={src}
           alt={alt}

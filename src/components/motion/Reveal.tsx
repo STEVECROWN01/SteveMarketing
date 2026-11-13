@@ -51,11 +51,10 @@ function useInView<T extends HTMLElement>(threshold: number) {
 
   useEffect(() => {
     const element = ref.current;
-    if (!element) return;
-    if (typeof IntersectionObserver === "undefined") {
-      setInView(true);
-      return;
-    }
+    // Navigateurs sans IntersectionObserver (obsolètes) : contenu
+    // laissé masqué — tous les navigateurs cibles (svh, :where…) le
+    // prennent en charge depuis 2019.
+    if (!element || typeof IntersectionObserver === "undefined") return;
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
@@ -89,7 +88,7 @@ export function Reveal({
 }: RevealProps) {
   const reduce = useReducedMotion();
   const { ref, inView } = useInView<HTMLDivElement>(
-    Math.min(Math.max(amount, 0), 0.2)
+    Math.min(Math.max(amount, 0.05), 0.9)
   );
   const Comp = as as React.ElementType;
 

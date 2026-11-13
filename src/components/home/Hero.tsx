@@ -46,8 +46,8 @@ export function Hero() {
 
       <div className="container-site relative flex flex-1 flex-col justify-center pb-4 pt-[64px] sm:pb-8 sm:pt-[68px] lg:pb-8 lg:pt-[112px]">
         <div className="grid items-center gap-3.5 sm:gap-5 lg:grid-cols-[1.15fr_0.85fr] lg:gap-7 xl:gap-9">
-          {/* ---------- Bloc texte haut : eyebrow, titre ---------- */}
-          {/* Mobile : eyebrow → H1, puis image (bloc visuel), puis
+          {/* ---------- Bloc texte haut : note 5 étoiles, titre ---------- */}
+          {/* Mobile : note → H1, puis image (bloc visuel), puis
               suite du texte. Desktop : colonne gauche, ligne 1. */}
           <div className="order-1 lg:col-start-1 lg:row-start-1">
             {/* Cinq étoiles — la cinquième à moitié remplie horizontalement —
@@ -83,10 +83,13 @@ export function Hero() {
 
           {/* ---------- Colonne visuelle : portrait + mockups ---------- */}
           {/* Mobile : placée entre le titre et la description (demande
-              explicite de l'éditeur) ; desktop : colonne droite sur les
-              deux lignes de la grille, hauteur plafonnée en svh pour
-              que le hero tienne dans l'écran. */}
-          <div className="order-2 relative mx-auto w-full max-w-md lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:max-w-none">
+              explicite de l'éditeur), avec un espace accru entre le
+              titre et l'image, et une réserve sous le portrait pour les
+              mockups flottants (désormais présents aussi sur mobile) ;
+              desktop : colonne droite sur les deux lignes de la grille,
+              hauteur plafonnée en svh pour que le hero tienne dans
+              l'écran. */}
+          <div className="order-2 relative mx-auto mt-7 mb-24 w-full max-w-md sm:mb-36 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:mb-0 lg:max-w-none">
             {/* Bloc beige en décalage derrière le portrait */}
             <div
               aria-hidden="true"
@@ -115,9 +118,12 @@ export function Hero() {
                 </figcaption>
               </figure>
 
-              {/* Mockup navigateur flottant — MR STEVE ENGLISH */}
+              {/* Mockup navigateur flottant — MR STEVE ENGLISH.
+                  Présent aussi sur mobile (taille et bords adaptés).
+                  Noir et blanc par défaut, couleur d'origine au
+                  survol — sur tous les écrans (forceMono). */}
               <motion.div
-                className="absolute -bottom-8 -left-4 hidden w-[58%] sm:block lg:-left-14 lg:w-[62%]"
+                className="absolute -bottom-5 -left-1 w-[46%] sm:-bottom-8 sm:-left-4 sm:w-[58%] lg:-left-14 lg:w-[62%]"
                 initial={reduce ? undefined : { opacity: 0, y: 26, rotate: -5 }}
                 animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotate: -3 }}
                 transition={{ delay: 0.6, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -129,13 +135,16 @@ export function Hero() {
                     url={PROJECTS[0].url}
                     width={1440}
                     height={900}
+                    forceMono
                   />
                 </motion.div>
               </motion.div>
 
-              {/* Mockup smartphone flottant — AFRIBAYIT */}
+              {/* Mockup smartphone flottant — AFRIBAYIT. Présent aussi
+                  sur mobile, noir et blanc par défaut, couleur au
+                  survol — sur tous les écrans (forceMono). */}
               <motion.div
-                className="absolute -right-2 -top-10 hidden w-[26%] sm:block lg:-right-8 lg:w-[28%]"
+                className="absolute -right-1 -top-5 w-[22%] sm:-right-2 sm:-top-10 sm:w-[26%] lg:-right-8 lg:w-[28%]"
                 initial={reduce ? undefined : { opacity: 0, y: 26, rotate: 5 }}
                 animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotate: 2 }}
                 transition={{ delay: 0.75, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -146,6 +155,7 @@ export function Hero() {
                     alt={`Aperçu mobile du site ${PROJECTS[2].name}`}
                     width={390}
                     height={844}
+                    forceMono
                   />
                 </motion.div>
               </motion.div>

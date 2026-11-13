@@ -104,11 +104,16 @@
   }
   html {
     scroll-behavior: smooth;
+    /* Aucun défilement horizontal : les décors débordants (halos du
+       hero, pastilles, mockups flottants) sont rognés sans créer de
+       ballotement latéral sur mobile. */
+    overflow-x: clip;
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-feature-settings: "ss01" on, "cv11" on;
     text-rendering: optimizeLegibility;
+    overflow-x: clip;
   }
   ::selection {
     background-color: #c9baac;
@@ -274,6 +279,28 @@ html.hoverable .mono-media:where(:hover, :focus-within) > img,
 html.hoverable .mono-media:where(:hover, :focus-within) > .media-fill,
 html.hoverable .media-group:where(:hover, :focus-within) .mono-media > img,
 html.hoverable .media-group:where(:hover, :focus-within) .mono-media > .media-fill {
+  filter: grayscale(0);
+  transform: scale(1.035);
+}
+
+/* ---------- Variante .mono-always : noir et blanc par défaut sur
+   TOUS les périphériques (y compris mobile/tactile) ----------
+   Mockups du hero et captures de la section PROJETS RÉALISÉS :
+   noir et blanc par défaut, retour à la couleur d'origine au survol
+   (desktop) ou au toucher (mobile — le tap applique :hover).
+   Placé après les règles .mono-media : même spécificité, ordre gagnant. */
+.mono-always > img,
+.mono-always > .media-fill {
+  filter: grayscale(1);
+}
+.mono-always:where(:hover, :focus-within) > img,
+.mono-always:where(:hover, :focus-within) > .media-fill,
+.media-group:where(:hover, :focus-within) .mono-always > img,
+.media-group:where(:hover, :focus-within) .mono-always > .media-fill,
+html.hoverable .mono-always:where(:hover, :focus-within) > img,
+html.hoverable .mono-always:where(:hover, :focus-within) > .media-fill,
+html.hoverable .media-group:where(:hover, :focus-within) .mono-always > img,
+html.hoverable .media-group:where(:hover, :focus-within) .mono-always > .media-fill {
   filter: grayscale(0);
   transform: scale(1.035);
 }

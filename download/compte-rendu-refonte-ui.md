@@ -108,3 +108,28 @@ git push origin main             # déploiement Vercel automatique
 `src/components/pages/ProjectPage.tsx` (nouveau),
 `src/components/pages/ServicesPage.tsx`, `src/components/router-context.tsx`,
 `src/content/site-content.ts`, `src/lib/email.ts`, `src/lib/site.ts`.
+
+## Complément (13/11/2026, session suivante) — 5 corrections de l'éditeur
+
+1. **Animations des sections rétablies dans les DEUX sens** : chaque bloc
+   se révèle à l'entrée dans le viewport, se masque à la sortie et se
+   réanime au retour (montée ET descente). Implémentation IntersectionObserver
+   + transitions CSS (remplace les états `whileInView`) : l'opacité suit
+   à tout instant l'état réel d'intersection — un texte ne peut plus
+   rester bloqué invisible après un défilement rapide. Vérifié par sondes :
+   opacité 1 en vue → 0 hors vue → 1 au retour.
+2. **Mockups du hero présents sur mobile** (navigateur + smartphone,
+   tailles et bords adaptés) — noir et blanc par défaut, couleur
+   d'origine au survol/toucher (`forceMono`). Vérifié : grayscale(1) →
+   grayscale(0) au survol, sur les deux mockups.
+3. **Eyebrow du hero remplacé par la note** : cinq étoiles beige
+   (#c9baac), la cinquième à moitié remplie horizontalement, suivie de
+   « 4,9/5 ».
+4. **Espace titre↔image accru sur mobile** (42 px mesurés) ; hero toujours
+   exactement à la hauteur du viewport (844 px mesurés à 390×844, 900 px
+   à 1440×900) — 100 % visible sans scroll.
+5. **Section PROJETS RÉALISÉS** : bouton « Voir Nos Réalisations »
+   (libellé corrigé) ; captures en noir et blanc par défaut sur tous les
+   écrans, couleur au survol de la carte (grayscale(0) mesuré).
+   Garde-fou global `overflow-x: clip` (html/body) : plus aucun
+   débordement horizontal mobile (scrollWidth 390 = viewport).
