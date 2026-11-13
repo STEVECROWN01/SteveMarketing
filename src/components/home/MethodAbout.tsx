@@ -23,10 +23,12 @@ export function AboutSection() {
     >
       <div className="container-site">
         <div className="grid gap-14 lg:grid-cols-[0.92fr_1.08fr] lg:gap-16 xl:gap-24">
-          {/* Portrait (image principale) + aperçu mobile épinglé par-dessus,
+          {/* Portrait (image principale) + image épinglée par-dessus,
               en bas, de façon oblique — demande de l'éditeur : espace
               entre les deux images quasi supprimé, seconde image
-              ENCORE plus grande (72 % de la largeur, 13/11/2026). */}
+              ENCORE plus grande (72 % de la largeur, 13/11/2026) ;
+              14/11/2026 : l'image épinglée est désormais
+              stevens-akpovi-workspace.webp (fournie par l'éditeur). */}
           <div className="relative mx-auto w-full max-w-md lg:max-w-none lg:self-start">
             <div
               aria-hidden="true"
@@ -43,10 +45,10 @@ export function AboutSection() {
             </Reveal>
             <Reveal direction="up" delay={0.2} className="absolute -bottom-12 -left-3 w-[72%] sm:-left-6 lg:-left-8">
               <MonoImage
-                src={ASSETS.workspaceMobile}
-                alt="Travail de conception web en mobilité — collaboration à distance"
-                width={1280}
-                height={853}
+                src={ASSETS.workspace}
+                alt="Espace de travail de Stevens Akpovi — conception web en situation réelle"
+                width={1536}
+                height={1024}
                 className="rotate-[3deg] rounded-2xl border border-[#e4e4e4] bg-white shadow-[0_25px_50px_-20px_rgba(28,28,28,0.5)]"
               />
             </Reveal>

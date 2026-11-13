@@ -91,10 +91,14 @@ export function ProblemSection() {
 }
 
 /** SECTION 03 — REMISE EN QUESTION (fond clair)
- *  Sans le bloc-titre « VOUS AVEZ DÉJÀ UN SITE ? » (demande de
- *  l'éditeur, 13/11/2026) : les six bandes de questions occupent
- *  désormais toute la largeur en DEUX colonnes — trois rangées au
- *  lieu de six — puis le bloc conclusion + CTA. */
+ *  Contenus de gauche RESTAURÉS à leur place (demande de l'éditeur,
+ *  14/11/2026 : la réorganisation des six bandes en deux colonnes ×
+ *  trois rangées avait été faite, mais le bloc-titre « VOUS AVEZ
+ *  DÉJÀ UN SITE ? » + le texte descriptif — qui se trouvaient à
+ *  GAUCHE, les bandes de questions à DROITE — avaient été supprimés
+ *  par erreur). Désormais : titre + texte à gauche, six bandes en
+ *  deux colonnes × trois rangées à droite, puis le bloc conclusion
+ *  + CTA. */
 export function QuestioningSection() {
   return (
     <section
@@ -103,19 +107,33 @@ export function QuestioningSection() {
       className="section-light bg-grid-light scroll-mt-20 py-20 sm:py-24 lg:py-32"
     >
       <div className="container-site">
-        {/* Six bandes de questions — deux colonnes, trois rangées */}
-        <ul className="grid gap-3.5 sm:grid-cols-2 sm:gap-4">
-          {QUESTIONING.questions.map((q, i) => (
-            <Reveal key={q} direction="left" delay={0.08 * (i % 3) + 0.04 * Math.floor(i / 3)} as="li">
-              <div className="flex h-full items-start gap-4 rounded-xl border border-[#e4e4e4] bg-white px-5 py-4.5 transition-shadow duration-300 hover:shadow-[0_18px_40px_-24px_rgba(28,28,28,0.25)]">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e4]/20 text-[#1c1c1c]">
-                  <HelpCircle className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <p className="text-[15px] font-medium leading-relaxed text-[#1c1c1c]">{q}</p>
-              </div>
+        <div className="grid items-start gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16 xl:gap-20">
+          {/* Contenus de gauche — restaurés (eyebrow, titre, texte) */}
+          <div>
+            <SectionHeading
+              eyebrow={QUESTIONING.eyebrow}
+              title={QUESTIONING.title}
+              tone="light"
+            />
+            <Reveal direction="up" delay={0.15}>
+              <RichText text={QUESTIONING.text} className="text-body mt-6 max-w-xl on-paper-muted" />
             </Reveal>
-          ))}
-        </ul>
+          </div>
+
+          {/* Bandes de questions à droite — deux colonnes, trois rangées */}
+          <ul className="grid gap-3.5 sm:grid-cols-2 sm:gap-4">
+            {QUESTIONING.questions.map((q, i) => (
+              <Reveal key={q} direction="left" delay={0.08 * (i % 3) + 0.04 * Math.floor(i / 3)} as="li">
+                <div className="flex h-full items-start gap-4 rounded-xl border border-[#e4e4e4] bg-white px-5 py-4.5 transition-shadow duration-300 hover:shadow-[0_18px_40px_-24px_rgba(28,28,28,0.25)]">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#e4e4e4]/20 text-[#1c1c1c]">
+                    <HelpCircle className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  <p className="text-[15px] font-medium leading-relaxed text-[#1c1c1c]">{q}</p>
+                </div>
+              </Reveal>
+            ))}
+          </ul>
+        </div>
 
         <Reveal direction="up" delay={0.2}>
           <div className="mt-12 max-w-3xl rounded-2xl bg-[#1c1c1c] px-6 py-7 sm:px-8">

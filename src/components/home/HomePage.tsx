@@ -8,6 +8,7 @@ import { ServicesSection, IncludedSection } from "@/components/home/ServicesSect
 import { WorksSection } from "@/components/home/WorksSection";
 import { AboutSection } from "@/components/home/MethodAbout";
 import { FaqSection, FinalCtaSection } from "@/components/home/FaqFinal";
+import { FadeSeparator } from "@/components/marketing/Marketing";
 import { Reveal } from "@/components/motion/Reveal";
 import { TARGETS } from "@/content/site-content";
 
@@ -48,17 +49,22 @@ function AudienceStrip() {
  *  « DES SOLUTIONS ADAPTÉES » entre « ET SI VOTRE SITE DEVENAIT… » et
  *  « COMMENT ÇA FONCTIONNE ? » ; sections « DÉVELOPPER VOTRE
  *  VISIBILITÉ » et « COMMENT NOUS ALLONS TRAVAILLER ENSEMBLE »
- *  supprimées à la demande de l'éditeur). */
+ *  supprimées à la demande de l'éditeur).
+ *  14/11/2026 : traits de séparation à extrémités fondues entre
+ *  « POUR QUI JE CONÇOIS CES SITES » ↔ « VOTRE ACTIVITÉ MÉRITE… »
+ *  et « COMMENT ÇA FONCTIONNE ? » ↔ « DAVANTAGE DE VALEUR… ». */
 export function HomePage() {
   return (
     <>
       <Hero />
       <AudienceStrip />
+      <FadeSeparator />
       <ProblemSection />
       <QuestioningSection />
       <TransformationSection />
       <ServicesSection />
       <SolutionSection />
+      <FadeSeparator />
       <IncludedSection />
       <WorksSection />
       <AboutSection />

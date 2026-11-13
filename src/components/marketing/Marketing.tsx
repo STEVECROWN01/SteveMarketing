@@ -295,6 +295,18 @@ export function PageHero({
   );
 }
 
+/* ============================ Séparation de sections ============================ */
+
+/** Trait de séparation horizontal — les deux extrémités se fondent
+ *  (fade-in à gauche, fade-out à droite) entre deux sections de fond
+ *  sombre consécutives (demande de l'éditeur, 14/11/2026 : entre
+ *  « POUR QUI JE CONÇOIS CES SITES » / « VOTRE ACTIVITÉ MÉRITE… »
+ *  et entre « COMMENT ÇA FONCTIONNE ? » / « DAVANTAGE DE VALEUR… »).
+ *  Pur décor : aria-hidden, aucune interaction. */
+export function FadeSeparator({ className = "" }: { className?: string }) {
+  return <div aria-hidden="true" className={`separator-fade ${className}`} />;
+}
+
 /* ============================ Lien externe avec icône ============================ */
 
 export function ExternalLink({

@@ -118,10 +118,11 @@ export function BrowserMockup({
 }
 
 /** Mockup smartphone (aperçu mobile des réalisations).
- *  Cadre très fin (2,5 px) et coins à peine cassés (10 px) : l'écran du
- *  site occupe quasiment tout le mockup et son contenu reste visible
- *  en entier, même à petite largeur dans le hero (demande de
- *  l'éditeur, 14/11/2026). La fente « encoche » se réduit à un fin
+ *  Cadre très fin (2,5 px) et coins légèrement arrondis (14 px —
+ *  remontés depuis les 10 px trop cassés, demande de l'éditeur,
+ *  14/11/2026) : l'écran du site occupe quasiment tout le mockup
+ *  et son contenu reste visible en entier, même à petite largeur
+ *  dans le hero. La fente « encoche » se réduit à un fin
  *  haut-parleur qui ne masque plus l'en-tête du site capturé. */
 export function PhoneMockup({
   src,
@@ -145,13 +146,13 @@ export function PhoneMockup({
 }) {
   return (
     <figure
-      className={`group/mockup relative overflow-hidden rounded-[10px] border border-[#e4e4e4]/25 bg-[#232323] p-[2.5px] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] ${className}`}
+      className={`group/mockup relative overflow-hidden rounded-[14px] border border-[#e4e4e4]/25 bg-[#232323] p-[2.5px] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] ${className}`}
     >
       <span
         className="absolute left-1/2 top-[4px] z-10 h-[5px] w-[34px] -translate-x-1/2 rounded-full bg-[#1c1c1c]"
         aria-hidden="true"
       />
-      <span className={`mono-media block overflow-hidden rounded-[7px] ${forceMono ? "mono-locked" : ""}`}>
+      <span className={`mono-media block overflow-hidden rounded-[11px] ${forceMono ? "mono-locked" : ""}`}>
         <img
           src={src}
           srcSet={src2x ? `${src} 1x, ${src2x} 2x` : undefined}

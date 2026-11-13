@@ -280,11 +280,12 @@ export function Hero() {
 
       {/* Fondu progressif vers la section suivante : plus de trait de
           séparation — le fond du hero (#070707) se fond dans celui de la
-          section suivante (#1c1c1c) sur ~112 px, sans limite nette
-          (demande de l'éditeur, 13/11/2026). */}
+          section suivante (#1c1c1c), sur ~48-56 px seulement (réduit à la
+          demande de l'éditeur, 14/11/2026 : l'effet entrait trop profond
+          dans le hero), sans limite nette. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent to-[#1c1c1c] sm:h-28"
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-[#1c1c1c] sm:h-14"
       />
     </section>
   );

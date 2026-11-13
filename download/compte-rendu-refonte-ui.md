@@ -403,3 +403,62 @@ sont pas aussi nettes que les originales ? Corriger, mobile/desktop. »
   progressif conservé, CDN Vercel).
 - Commit `ea894c3` poussé sur `main`, déployé et vérifié sur
   https://stevensakpovi.vercel.app.
+
+## Complément 10 — 14/11/2026 (4e session) : restauration + six ajustements
+
+Demandes de l'éditeur (message du 14/11/2026) : contenus supprimés à
+gauche de la section « VOUS AVEZ DÉJÀ UN SITE ? », fondu bas du hero
+trop profond, arrondi du mockup téléphone trop réduit, traits de
+séparation à extrémités fondues, image épinglée « QUI SUIS-JE ? » et
+lueur blanche circulante avant le footer.
+
+### Corrections
+1. **Contenus de gauche RESTAURÉS** (`ProblemQuestioning.tsx`) : lors
+   de la réorganisation en deux colonnes × trois rangées, le
+   bloc-titre « VOUS AVEZ DÉJÀ UN SITE ? », le titre « Votre site web
+   vous rapporte-t-il réellement quelque chose ? » et le texte
+   descriptif avaient été supprimés par erreur. Ils sont de retour à
+   leur place (colonne de gauche) ; les six bandes de questions
+   restent à droite en 2 colonnes × 3 rangées ; conclusion + CTA
+   inchangés dessous. Mobile : titre puis bandes empilées.
+2. **Fondu bas du hero réduit de moitié** (`Hero.tsx`) : bande
+   96/112 px → **48/56 px** — l'effet n'entre plus profondément dans
+   le hero, la transition vers « POUR QUI JE CONÇOIS CES SITES »
+   reste douce.
+3. **Arrondi du mockup smartphone relevé** (`Media.tsx`) : 10 px →
+   **14 px** (écran intérieur 7 → 11 px) — « un peu légèrement »
+   comme demandé ; cadre fin (2,5 px) conservé. Concerne le hero
+   (AFRIBAYIT) et la page projet.
+4. **Traits de séparation à extrémités fondues** (nouveau composant
+   `FadeSeparator` + `.separator-fade` dans globals.css) : entre
+   « POUR QUI JE CONÇOIS CES SITES » et « VOTRE ACTIVITÉ MÉRITE
+   D'ÊTRE DAVANTAGE VISIBLE », puis entre « COMMENT ÇA FONCTIONNE ? »
+   et « DAVANTAGE DE VALEUR, SANS FRAIS SUPPLÉMENTAIRES » — fin
+   trait 1 px, fade-in à gauche / fade-out à droite (profil mesuré
+   32 → 96 → 32 de luminance sur fond #1c1c1c).
+5. **Image épinglée « QUI SUIS-JE ? » remplacée**
+   (`MethodAbout.tsx`) : `stevens-akpovi-workspace-mobile.webp` →
+   **`stevens-akpovi-workspace.webp`** (1536×1024, même ratio 3:2 —
+   cadrage inchangé, style oblique conservé).
+6. **Lueur blanche #ffffff circulante** (`FaqFinal.tsx` +
+   `.glow-boundary-*` dans globals.css) : sur la limite entre « IL
+   EST TEMPS DE DONNER UNE NOUVELLE DIMENSION À VOTRE ACTIVITÉ » et
+   le footer — un trait lumineux (240 px, halo doux) parcourt la
+   ligne **de gauche à droite en continu**, vitesse normale (7 s le
+   traverse), avec **fade-in à l'apparition et fade-out à la
+   disparition** ; rogné par la section, aucun à-coup aux bords ;
+   respecte `prefers-reduced-motion` (lueur statique discrète).
+
+### Vérifications (desktop 1440×900 + mobile 390×844)
+- Build production : OK (10/10 pages).
+- Section questions : titre à gauche (x=136) et 6 bandes à droite
+  (x=734–1332) en 2×3 ; mobile : titre puis bandes empilées
+  pleine largeur.
+- Hero : fondu 56 px (48 px mobile) ; hero mobile = 844 px = viewport
+  (entièrement visible sans défilement, préservé) ; mockup
+  téléphone `rounded-[14px]`.
+- Lueur : cycle de 7 s confirmé (positions x mesurées 849 → retour
+  bord gauche → 463 → …), trait blanc visible sur la ligne de
+  limite (pixel-vérifié).
+- Commit poussé sur `main`, déployé et vérifié sur
+  https://stevensakpovi.vercel.app.
