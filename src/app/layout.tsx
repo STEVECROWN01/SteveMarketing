@@ -76,10 +76,10 @@ export const metadata: Metadata = {
   },
   icons: {
     // Paramètre de version : force les navigateurs (cache favicon très
-    // rétentif) à recharger l'icône régénérée depuis le « Logo
-    // Favicon.png » mis à jour par l'éditeur (14/11/2026).
-    icon: "/assets/favicon.png?v=2026-11-14",
-    apple: "/assets/favicon.png?v=2026-11-14",
+    // rétentif) à recharger l'icône. Version 2026-11-14-2 : fond noir
+    // retiré (PNG RGBA transparent, glyphe recadré sur son enveloppe).
+    icon: "/assets/favicon.png?v=2026-11-14-2",
+    apple: "/assets/favicon.png?v=2026-11-14-2",
   },
 };
 

@@ -332,3 +332,21 @@ E2E formulaire de contact (redirection + enregistrement base constatés),
   360×640 → 640px ; 320×568 → 568px ; CTA 2 lignes (115px) → 1 ligne
   (48px) ; mention 44px/2 lignes → 25px/1 ligne ; desktop hero 900px,
   portrait 570px → 640px.
+
+## Complément 8 — 14/11/2026 (2e session) : fond noir retiré du favicon
+
+1. **Favicon transparent** : le « Logo Favicon.png » est un glyphe blanc
+   sur fond noir ; le fond est retiré proprement (script
+   `scripts/prepare-favicon-transparent.py`) :
+   - alpha de couverture extrait par dé-prémultiplication (alpha =
+     canal le plus clair — bords anti-aliasés conservés, aucun halo
+     sombre) ; QA : recompositing sur noir → diff moyenne 0,27/255 ;
+   - glyphe recadré sur son enveloppe + marge 6 %, recentré sur canevas
+     carré transparent → il occupe ~88 % du canevas (48 % avant) ;
+   - `favicon.png` 512×512 RGBA, 90 Ko, coins alpha 0.
+2. **Cache navigateur** : URL déclarée dans `layout.tsx` bumpée en
+   `?v=2026-11-14-2`.
+3. Note : le glyphe étant blanc, il sera discret sur un onglet de
+   navigateur à thème clair (invisible sur fond blanc) ; parfait sur
+   thème sombre. Variante inversée (glyphe sombre) disponible sur
+   demande.
