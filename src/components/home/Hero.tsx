@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { Star } from "lucide-react";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
 import { BrowserMockup, PhoneMockup } from "@/components/media/Media";
@@ -49,10 +50,26 @@ export function Hero() {
           {/* Mobile : eyebrow → H1, puis image (bloc visuel), puis
               suite du texte. Desktop : colonne gauche, ligne 1. */}
           <div className="order-1 lg:col-start-1 lg:row-start-1">
+            {/* Cinq étoiles — la cinquième à moitié remplie horizontalement —
+                suivies de « 4,9/5 » (remplace l'ancien eyebrow). */}
             <Reveal direction="up">
-              <p className="text-eyebrow">
-                {HERO.eyebrow}
-                <span className="hidden sm:inline"> · STRATÉGIE DIGITALE</span>
+              <p
+                className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] font-medium tracking-[0.02em] text-[#c8c8c8] sm:text-sm"
+                aria-label="Note moyenne de 4,9 sur 5"
+              >
+                <span className="flex items-center gap-1" aria-hidden="true">
+                  {[0, 1, 2, 3].map((i) => (
+                    <Star key={i} fill="#c9baac" strokeWidth={0} className="h-4 w-4" />
+                  ))}
+                  {/* Cinquième étoile : moitié gauche remplie, moitié droite vide */}
+                  <span className="relative inline-flex h-4 w-4 items-center justify-center">
+                    <Star className="absolute h-4 w-4 text-[#525252]" strokeWidth={1.5} />
+                    <span className="absolute inset-y-0 left-0 w-1/2 overflow-hidden">
+                      <Star fill="#c9baac" strokeWidth={0} className="h-4 w-4" />
+                    </span>
+                  </span>
+                </span>
+                <span>4,9/5</span>
               </p>
             </Reveal>
 
