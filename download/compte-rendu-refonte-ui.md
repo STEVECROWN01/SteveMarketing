@@ -350,3 +350,56 @@ E2E formulaire de contact (redirection + enregistrement base constatés),
    navigateur à thème clair (invisible sur fond blanc) ; parfait sur
    thème sombre. Variante inversée (glyphe sombre) disponible sur
    demande.
+
+## Complément 9 — 14/11/2026 (3e session) : netteté des images (mobile/desktop)
+
+Demande de l'éditeur : « Pourquoi les images épinglées et autres ne
+sont pas aussi nettes que les originales ? Corriger, mobile/desktop. »
+
+### Diagnostic (causes réelles, mesurées)
+1. **Compression WebP trop agressive** : les dérivés servis étaient
+   générés en qualité 82-84 par les anciens scripts
+   (`optimize-images.py`, `prepare-assets-batch2.py`) — ex. portrait
+   1024×1536 réduit à 79 Ko, « À propos » 59 Ko, captures de sites
+   (texte !) à q82. Les PNG sources (2 Mo), eux, restaient nets : la
+   différence visible venait de là (les images sont servies telles
+   quelles par `<img>`, sans optimiseur intermédiaire).
+2. **Upscaling navigateur** : captures mobiles 390px affichées
+   jusqu'à ~716px réels sur téléphones Retina (mockup smartphone de la
+   page projet), captures desktop 1440px affichées jusqu'à ~1656px
+   réels sur écran 2x → agrandissement logiciel = flou.
+3. **Logos dérivés en 220px** — juste-limite sur écrans 3x.
+
+### Corrections
+1. **Régénération de tous les dérivés WebP en haute qualité**
+   (`scripts/regen-images-hd.py`) : photos/illustrations **q90**
+   (portrait 79→136 Ko, à-propos 59→99 Ko, épinglées workspace/
+   problem/benefit q90), captures de sites **q95** (texte crisp).
+   Sources PNG intactes.
+2. **Re-capture des 6 aperçus projets en densité 2x RÉELLE**
+   (`scripts/recapture-projects-2x.js`, Playwright DPR2 sur les sites
+   en ligne) : mobiles 780×1688 (au lieu de 390 agrandis), desktops
+   2880×1800 → dérivés 1920×1200. Équivalence de contenu vérifiée
+   (diff moyen 4,5-11,6/255 = bruit de phase d'animation uniquement).
+3. **srcset 1x/2x** : `src2x` ajouté à `MonoImage`, `BrowserMockup`,
+   `PhoneMockup` ; champs `desktop2x`/`mobile2x` dans `PROJECTS`
+   (site.ts) ; passés aux 6 points d'appel (Hero ×2, ProjectPage ×2,
+   ProjectCard, PortfolioPage). DPR1 → fichiers 1x (légers) ;
+   DPR2/3 → fichiers @2x (vrais pixels) choisis automatiquement.
+4. **Logos dérivés 220px → 440px** (header, footer, e-mails) — nets
+   jusqu'aux écrans 3x.
+5. **Anti-régression** : `optimize-images.py` relevé en q90/q95 avec
+   avertissement ; sources 2x archivées (`raw2x-*.png` dans
+   `projects/sources/`).
+
+### Vérifications
+- Build production : OK (10/10 pages).
+- Local + **production** (agent-browser) : desktop DPR1 → 1x ;
+  iPhone 14 DPR3 → `mrsteveenglish-desktop@2x.webp` (1920px),
+  `afribayit-mobile@2x.webp` (780px) sélectionnés automatiquement,
+  y compris sur la page projet ; tous les assets HTTP 200
+  (portrait 139 330 octets = nouvelle version q90).
+- Poids total des dérivés ~1,1 Mo → ~2,4 Mo (raisonnable, chargement
+  progressif conservé, CDN Vercel).
+- Commit `ea894c3` poussé sur `main`, déployé et vérifié sur
+  https://stevensakpovi.vercel.app.
