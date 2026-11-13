@@ -37,11 +37,11 @@ export function Hero() {
       <div className="bg-grid-dark absolute inset-0" aria-hidden="true" />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-32 right-[-10%] h-[560px] w-[560px] rounded-full bg-[#c9baac] opacity-[0.09] blur-[130px]"
+        className="pointer-events-none absolute -top-32 right-[-10%] h-[560px] w-[560px] rounded-full bg-[#e4e4e4] opacity-[0.09] blur-[130px]"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-[-20%] left-[-12%] h-[420px] w-[420px] rounded-full bg-[#c9baac] opacity-[0.05] blur-[110px]"
+        className="pointer-events-none absolute bottom-[-20%] left-[-12%] h-[420px] w-[420px] rounded-full bg-[#e4e4e4] opacity-[0.05] blur-[110px]"
       />
 
       <div className="container-site relative flex flex-1 flex-col justify-center pb-4 pt-[64px] sm:pb-8 sm:pt-[68px] lg:pb-8 lg:pt-[112px]">
@@ -59,13 +59,13 @@ export function Hero() {
               >
                 <span className="flex items-center gap-1" aria-hidden="true">
                   {[0, 1, 2, 3].map((i) => (
-                    <Star key={i} fill="#c9baac" strokeWidth={0} className="h-4 w-4" />
+                    <Star key={i} fill="#e4e4e4" strokeWidth={0} className="h-4 w-4" />
                   ))}
                   {/* Cinquième étoile : moitié gauche remplie, moitié droite vide */}
                   <span className="relative inline-flex h-4 w-4 items-center justify-center">
                     <Star className="absolute h-4 w-4 text-[#525252]" strokeWidth={1.5} />
                     <span className="absolute inset-y-0 left-0 w-1/2 overflow-hidden">
-                      <Star fill="#c9baac" strokeWidth={0} className="h-4 w-4" />
+                      <Star fill="#e4e4e4" strokeWidth={0} className="h-4 w-4" />
                     </span>
                   </span>
                 </span>
@@ -76,6 +76,7 @@ export function Hero() {
             <RevealText
               as="h1"
               text={HERO.h1}
+              boldText={HERO.h1Bold}
               delay={0.08}
               className="text-hero-title-viewport mt-3 text-white sm:mt-4"
             />
@@ -85,15 +86,14 @@ export function Hero() {
           {/* Mobile : placée entre le titre et la description (demande
               explicite de l'éditeur), avec un espace accru entre le
               titre et l'image, et une réserve sous le portrait pour les
-              mockups flottants (désormais présents aussi sur mobile) ;
-              desktop : colonne droite sur les deux lignes de la grille,
-              hauteur plafonnée en svh pour que le hero tienne dans
-              l'écran. */}
-          <div className="order-2 relative mx-auto mt-7 mb-24 w-full max-w-md sm:mb-36 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:mb-0 lg:max-w-none">
-            {/* Bloc beige en décalage derrière le portrait */}
+              mockups flottants (présents aussi sur mobile) ; desktop :
+              colonne droite sur les deux lignes de la grille, hauteur
+              plafonnée en svh pour que le hero tienne dans l'écran. */}
+          <div className="order-2 relative mx-auto mt-9 mb-14 w-full max-w-md sm:mb-36 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:mb-0 lg:max-w-none">
+            {/* Bloc neutre en décalage derrière le portrait */}
             <div
               aria-hidden="true"
-              className="absolute -inset-3 rotate-[2.5deg] rounded-[2rem] bg-[#c9baac]/90 opacity-[0.16] sm:rotate-[3deg]"
+              className="absolute -inset-3 rotate-[2.5deg] rounded-[2rem] bg-[#e4e4e4]/90 opacity-[0.16] sm:rotate-[3deg]"
             />
             <div className="relative flex justify-center">
               {/* Portrait professionnel — NON cliquable */}
@@ -112,7 +112,7 @@ export function Hero() {
                 </span>
                 <figcaption className="absolute left-4 top-4">
                   <span className="inline-flex items-center gap-2 rounded-full bg-[#070707]/75 px-3.5 py-1.5 text-xs font-medium text-white backdrop-blur-sm">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#c9baac]" aria-hidden="true" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#e4e4e4]" aria-hidden="true" />
                     Stevens Akpovi
                   </span>
                 </figcaption>
@@ -120,8 +120,8 @@ export function Hero() {
 
               {/* Mockup navigateur flottant — MR STEVE ENGLISH.
                   Présent aussi sur mobile (taille et bords adaptés).
-                  Noir et blanc par défaut, couleur d'origine au
-                  survol — sur tous les écrans (forceMono). */}
+                  Exclusivement noir et blanc (forceMono) — aucune
+                  couleur au survol. */}
               <motion.div
                 className="absolute -bottom-5 -left-1 w-[46%] sm:-bottom-8 sm:-left-4 sm:w-[58%] lg:-left-14 lg:w-[62%]"
                 initial={reduce ? undefined : { opacity: 0, y: 26, rotate: -5 }}
@@ -141,8 +141,8 @@ export function Hero() {
               </motion.div>
 
               {/* Mockup smartphone flottant — AFRIBAYIT. Présent aussi
-                  sur mobile, noir et blanc par défaut, couleur au
-                  survol — sur tous les écrans (forceMono). */}
+                  sur mobile. Exclusivement noir et blanc (forceMono) —
+                  aucune couleur au survol. */}
               <motion.div
                 className="absolute -right-1 -top-5 w-[22%] sm:-right-2 sm:-top-10 sm:w-[26%] lg:-right-8 lg:w-[28%]"
                 initial={reduce ? undefined : { opacity: 0, y: 26, rotate: 5 }}

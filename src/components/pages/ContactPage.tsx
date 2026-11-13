@@ -24,7 +24,7 @@ export function ContactPage() {
       >
         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
-            Réserver Un Appel (30 Min)
+            Réserver Un Appel
           </CTAButton>
           <CTAButton action={{ kind: "anchor", sectionId: "devis" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
             Demander Un Devis
@@ -47,16 +47,16 @@ export function ContactPage() {
             <Reveal direction="up" delay={0.05} as="article">
               <a
                 href={`mailto:${SITE.email}`}
-                className="group flex h-full flex-col rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[#c9baac]/40"
+                className="group flex h-full flex-col rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[#e4e4e4]/40"
               >
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#c9baac]/12 text-[#c9baac]">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e4e4e4]/12 text-[#e4e4e4]">
                   <Mail className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <h3 className="mt-5 font-display text-lg font-semibold text-white">Email</h3>
                 <p className="mt-2.5 text-sm leading-relaxed text-[#c8c8c8]">
                   Pour toute demande, question ou précision sur vos projets.
                 </p>
-                <p className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium break-all text-[#c9baac]">
+                <p className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium break-all text-[#e4e4e4]">
                   {SITE.email}
                   <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
                 </p>
@@ -68,16 +68,16 @@ export function ContactPage() {
                 href={SITE.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex h-full flex-col rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[#c9baac]/40"
+                className="group flex h-full flex-col rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[#e4e4e4]/40"
               >
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#c9baac]/12 text-[#c9baac]">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e4e4e4]/12 text-[#e4e4e4]">
                   <Linkedin className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <h3 className="mt-5 font-display text-lg font-semibold text-white">LinkedIn</h3>
                 <p className="mt-2.5 text-sm leading-relaxed text-[#c8c8c8]">
                   Pour découvrir mon univers professionnel et échanger en message privé.
                 </p>
-                <p className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[#c9baac]">
+                <p className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[#e4e4e4]">
                   Stevens Akpovi
                   <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
                 </p>
@@ -89,16 +89,16 @@ export function ContactPage() {
                 href={SITE.whatsapp}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex h-full flex-col rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[#c9baac]/40"
+                className="group flex h-full flex-col rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[#e4e4e4]/40"
               >
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#c9baac]/12 text-[#c9baac]">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e4e4e4]/12 text-[#e4e4e4]">
                   <MessageCircle className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <h3 className="mt-5 font-display text-lg font-semibold text-white">WhatsApp</h3>
                 <p className="mt-2.5 text-sm leading-relaxed text-[#c8c8c8]">
                   Une conversation rapide, directement depuis votre téléphone.
                 </p>
-                <p className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[#c9baac]">
+                <p className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[#e4e4e4]">
                   Écrire sur WhatsApp
                   <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
                 </p>
@@ -126,8 +126,8 @@ export function ContactPage() {
                 </p>
               </Reveal>
               <Reveal direction="up" delay={0.2}>
-                <div className="mt-7 flex items-start gap-3.5 rounded-2xl border border-[#c9baac]/25 bg-[#1c1c1c] px-6 py-5">
-                  <Phone className="mt-1 h-5 w-5 shrink-0 text-[#c9baac]" aria-hidden="true" />
+                <div className="mt-7 flex items-start gap-3.5 rounded-2xl border border-[#e4e4e4]/25 bg-[#1c1c1c] px-6 py-5">
+                  <Phone className="mt-1 h-5 w-5 shrink-0 text-[#e4e4e4]" aria-hidden="true" />
                   <p className="text-sm leading-relaxed text-[#d9d9d9]">
                     <strong className="font-medium text-white">{SITE.calendlyMention}</strong>{" "}
                     Vous recevez automatiquement le lien de visioconférence après réservation,
@@ -138,15 +138,15 @@ export function ContactPage() {
               <Reveal direction="up" delay={0.25}>
                 <ul className="mt-6 space-y-2.5 text-sm text-[#c8c8c8]">
                   <li className="flex items-center gap-2.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#c9baac]" aria-hidden="true" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#e4e4e4]" aria-hidden="true" />
                     Parler de votre activité et de vos objectifs
                   </li>
                   <li className="flex items-center gap-2.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#c9baac]" aria-hidden="true" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#e4e4e4]" aria-hidden="true" />
                     Identifier la solution adaptée à votre besoin
                   </li>
                   <li className="flex items-center gap-2.5">
-                    <span className="h-1.5 w-1.5 rounded-full bg-[#c9baac]" aria-hidden="true" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#e4e4e4]" aria-hidden="true" />
                     Repartir avec des prochaines étapes claires
                   </li>
                 </ul>
@@ -185,7 +185,7 @@ export function ContactPage() {
                     <button
                       type="button"
                       onClick={() => document.getElementById("appel")?.scrollIntoView({ behavior: "smooth" })}
-                      className="font-medium text-[#c9baac] underline underline-offset-4"
+                      className="font-medium text-[#e4e4e4] underline underline-offset-4"
                     >
                       Réservez l'appel de 30 minutes
                     </button>{" "}
@@ -220,7 +220,7 @@ export function ContactPage() {
                 </p>
               </Reveal>
               <Reveal direction="up" delay={0.2}>
-                <div className="mt-7 rounded-2xl bg-[#c9baac] px-6 py-5">
+                <div className="mt-7 rounded-2xl bg-[#e4e4e4] px-6 py-5">
                   <p className="text-sm font-medium leading-relaxed text-[#1c1c1c]">
                     L'audit est gratuit et sans engagement — comme l'appel.
                   </p>

@@ -41,15 +41,14 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
         aria-label={`Voir Le Projet — ${project.name}`}
         className="group media-group flex h-full flex-col rounded-2xl border border-[#e4e4e4] bg-white p-4 transition-all duration-300 hover:border-[#1c1c1c]/25 hover:shadow-[0_30px_60px_-35px_rgba(28,28,28,0.35)] sm:p-5"
       >
-        {/* Capture du site — noir et blanc par défaut sur tous les
-            écrans, couleur d'origine au survol (desktop) ou au
-            toucher (mobile). */}
+        {/* Capture du site — exclusivement en noir et blanc (aucune
+            couleur au survol, sur aucun écran) — demande de l'éditeur. */}
         <MonoImage
           src={project.desktop}
           alt={`Aperçu du site ${project.name}`}
           width={1440}
           height={900}
-          className="mono-always rounded-xl border border-[#e4e4e4]"
+          className="mono-locked rounded-xl border border-[#e4e4e4]"
         />
 
         {/* Nom du projet */}

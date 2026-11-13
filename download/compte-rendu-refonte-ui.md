@@ -133,3 +133,58 @@ git push origin main             # déploiement Vercel automatique
    écrans, couleur au survol de la carte (grayscale(0) mesuré).
    Garde-fou global `overflow-x: clip` (html/body) : plus aucun
    débordement horizontal mobile (scrollWidth 390 = viewport).
+
+## Complément (13/11/2026, 3e session) — purge beige + refonte Réalisations
+
+1. **Purge de l'accent beige #c9baac** (demande explicite) : boutons beige →
+   blanc #ffffff exact (style « Démarrer Un Projet » : connexion admin,
+   soumission formulaires, export CSV, filtres admin, déclencheur Calendly,
+   variante « primary » des CTA) ; tous les autres éléments (textes, pastilles,
+   bordures, fonds de blocs, icônes, points de séparation, halos, sélection,
+   focus, thème Calendly) → #e4e4e4 (couleur de survol du bouton blanc de
+   référence). Le fond du bloc « Votre projet peut être notre prochaine
+   réalisation. » → #e4e4e4. Seuls les SURVOLS de bordure des boutons blancs
+   de référence conservent le beige (« à part ces boutons »). Audit navigateur :
+   0 élément beige restant. Focus clavier lisible maintenu sur sections claires
+   (contour encre sombre).
+2. **Animations exclusivement au scroll-down** : entrée par descente animée
+   (700 ms), entrée par remontée INSTANTANÉE (sans rejouer), sortie masquée.
+   Vérifié par sondes sur les deux directions.
+3. **Titre hero corrigé** : « Je crée des Sites Web Professionnels qui génèrent
+   des Ventes. » — seule « qui génèrent des Ventes. » en gras (700), le reste
+   en 400 (mesuré mot à mot). Éspace titre↔image mobile accru (50 px), hero
+   toujours exactement à la hauteur du viewport (844 px à 390×844).
+4. **Header** : logo agrandi (64 px bureau / 40 px mobile, pastilles 100×104),
+   favicon régénéré en 512×512, espace à gauche de « Services » = espace entre
+   liens (20 px = 20 px mesurés), soulignement actif PLEINE LARGEUR (65,7 px
+   ≈ largeur du lien, left 0 — l'ancien bug demi-largeur décalée venait d'un
+   conflit de classes left-1/2/w-0 vs left-0/w-full).
+5. **Menu plein écran** : croix plus espacée (right-4/top-4), ouverture et
+   fermeture douces et animées (fondu + translation verticale légère, 350 ms).
+6. **Réalisations — page** : seconde section présentée comme la page « Our
+   Work » de sheragency.com (design uniquement) : fond sombre, chaque projet
+   en ligne pleine largeur — pastille catégorie (#e4e4e4), grand titre blanc
+   60 px poids 400, bouton blanc « Voir Le Projet », grande capture à droite
+   (monochrome au repos, couleur au survol) ; 3 lignes, alternance de colonne.
+   - **Accueil — section PROJETS RÉALISÉS** : les trois projets sur une seule
+   ligne (3 colonnes) ; bouton « Voir Nos Réalisations » ; captures
+   EXCLUSIVEMENT noir et blanc (grayscale(1) mesuré au survol ET sans survol),
+   comme les deux mockups du hero et la deuxième image « VOTRE ACTIVITÉ ».
+7. **Images épinglées** : la seconde image de « VOTRE ACTIVITÉ MÉRITE… », de
+   « QUI SUIS-JE ? » et de la page À propos est désormais ÉPINGLÉE sur la
+   partie inférieure de l'image principale, de façon oblique (rotate 3°),
+   agrandie (58-60 %) — chevauchement mesuré (~150 px sur l'image principale ;
+   correctif structurel : conteneurs `lg:self-start`, l'étirement des colonnes
+   de grille plaçait l'épingle en bas de colonne).
+8. **QUI SUIS-JE ?** : première image remplacée par le portrait officiel
+   (stevens-akpovi-portrait.webp) ; les trois blocs « Approche », « Inclus
+   dans chaque projet », « Mode de collaboration » sont supprimés.
+9. **Page À propos** : image remplacée par APROPOS-PORTRAIT (WebP optimisé,
+   59 Ko), épingle oblique idem.
+10. **POUR QUI JE CONÇOIS CES SITES** : 3 mentions fusionnées (contenus des 3
+    supprimées intégrés), 6 → 3 pastilles.
+11. **Données projets** : AFRIBAYIT « Plateforme immobilière. » ; projet 2
+    renommé « PRÉ-LAUNCH MR STEVE ENGLISH » (+ meta description) ; bouton
+    « Réserver Un Appel » (sans « 30 Min ») partout.
+12. **Assets mis à jour depuis GitHub** : APROPOS-PORTRAIT.png (converti
+    WebP), problem-no-website.png (WebP régénéré depuis la nouvelle version).

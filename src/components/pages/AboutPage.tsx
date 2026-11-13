@@ -37,24 +37,27 @@ export function AboutPage() {
       <section aria-labelledby="a-propos-texte" className="section-light py-20 sm:py-24 lg:py-28">
         <div className="container-site">
           <div className="grid gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16 xl:gap-20">
-            <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-              <div aria-hidden="true" className="absolute -inset-3 rotate-[2deg] rounded-[2rem] bg-[#c9baac] opacity-25" />
+      {/* Portrait éditeur (APROPOS-PORTRAIT) + aperçu de travail épinglé
+              par-dessus, en bas, de façon oblique — seconde image
+              agrandie et espace quasi supprimé (demande de l'éditeur). */}
+          <div className="relative mx-auto w-full max-w-md lg:max-w-none lg:self-start">
+              <div aria-hidden="true" className="absolute -inset-3 rotate-[2deg] rounded-[2rem] bg-[#e4e4e4] opacity-25" />
               <Reveal direction="right">
                 <MonoImage
-                  src={ASSETS.portrait}
+                  src={ASSETS.aboutPortrait}
                   alt="Portrait professionnel de Stevens Akpovi, concepteur de sites web professionnels"
                   width={1024}
                   height={1536}
                   className="relative rounded-2xl border border-[#e4e4e4] shadow-[0_30px_60px_-30px_rgba(28,28,28,0.4)]"
                 />
               </Reveal>
-              <Reveal direction="up" delay={0.2} className="absolute -bottom-8 -right-2 hidden w-[52%] sm:block lg:-right-6">
+              <Reveal direction="up" delay={0.2} className="absolute -bottom-10 -right-3 w-[58%] sm:-right-6 lg:-right-8">
                 <MonoImage
                   src={ASSETS.strategyWork}
                   alt="Illustration du travail de stratégie web de Stevens Akpovi"
                   width={1280}
                   height={853}
-                  className="rounded-2xl border border-[#e4e4e4] shadow-[0_25px_50px_-25px_rgba(28,28,28,0.45)]"
+                  className="rotate-[3deg] rounded-2xl border border-[#e4e4e4] bg-white shadow-[0_25px_50px_-20px_rgba(28,28,28,0.5)]"
                 />
               </Reveal>
             </div>
@@ -142,9 +145,9 @@ export function AboutPage() {
                 <AccordionItem
                   key={item.q}
                   value={`about-faq-${i}`}
-                  className="rounded-xl border border-[#e4e4e4]/12 bg-[#232323] px-5 data-[state=open]:border-[#c9baac]/35"
+                  className="rounded-xl border border-[#e4e4e4]/12 bg-[#232323] px-5 data-[state=open]:border-[#e4e4e4]/35"
                 >
-                  <AccordionTrigger className="py-5 text-left font-display text-[15px] font-medium text-white hover:text-[#c9baac] hover:no-underline">
+                  <AccordionTrigger className="py-5 text-left font-display text-[15px] font-medium text-white hover:text-[#e4e4e4] hover:no-underline">
                     {item.q}
                   </AccordionTrigger>
                   <AccordionContent className="pb-5 text-sm leading-relaxed text-[#c8c8c8]">

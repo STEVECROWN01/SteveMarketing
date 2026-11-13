@@ -160,7 +160,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
   }
 
   const inputBase =
-    "min-h-[48px] w-full rounded-lg border border-[#e4e4e4]/18 bg-[#1c1c1c] px-4 py-3 text-[15px] text-white placeholder:text-[#c8c8c8]/50 transition-colors focus:border-[#c9baac] focus:outline-none";
+    "min-h-[48px] w-full rounded-lg border border-[#e4e4e4]/18 bg-[#1c1c1c] px-4 py-3 text-[15px] text-white placeholder:text-[#c8c8c8]/50 transition-colors focus:border-[#e4e4e4] focus:outline-none";
   const labelBase = "mb-1.5 block text-sm font-medium text-white";
   const errorBase = "mt-1.5 text-xs text-[#ea384c]";
 
@@ -168,9 +168,9 @@ export function LeadForm({ kind }: { kind: FormKind }) {
     return (
       <div
         id={`${kind}-confirmation`}
-        className="rounded-2xl border border-[#c9baac]/40 bg-[#232323] p-8 text-center sm:p-10"
+        className="rounded-2xl border border-[#e4e4e4]/40 bg-[#232323] p-8 text-center sm:p-10"
       >
-        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#c9baac] text-[#1c1c1c]">
+        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#e4e4e4] text-[#1c1c1c]">
           <CheckCircle2 className="h-7 w-7" aria-hidden="true" />
         </span>
         <h3 className="mt-6 font-display text-2xl font-semibold text-white">
@@ -202,7 +202,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
             href={SITE.calendly}
             target="_blank"
             rel="noopener noreferrer"
-            className="font-medium text-[#c9baac] underline underline-offset-4"
+            className="font-medium text-[#e4e4e4] underline underline-offset-4"
           >
             Réservez un appel de 30 minutes
           </a>{" "}
@@ -235,7 +235,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor={`${kind}-field-name`} className={labelBase}>
-            Nom complet <span className="text-[#c9baac]">*</span>
+            Nom complet <span className="text-[#e4e4e4]">*</span>
           </label>
           <input
             id={`${kind}-field-name`}
@@ -258,7 +258,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
 
         <div>
           <label htmlFor={`${kind}-field-email`} className={labelBase}>
-            Email <span className="text-[#c9baac]">*</span>
+            Email <span className="text-[#e4e4e4]">*</span>
           </label>
           <input
             id={`${kind}-field-email`}
@@ -323,7 +323,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
         ) : (
           <div>
             <label htmlFor={`${kind}-field-website`} className={labelBase}>
-              URL de votre site actuel <span className="text-[#c9baac]">*</span>
+              URL de votre site actuel <span className="text-[#e4e4e4]">*</span>
             </label>
             <input
               id={`${kind}-field-website`}
@@ -350,7 +350,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
           <>
             <div>
               <label htmlFor={`${kind}-field-service`} className={labelBase}>
-                Service souhaité <span className="text-[#c9baac]">*</span>
+                Service souhaité <span className="text-[#e4e4e4]">*</span>
               </label>
               <select
                 id={`${kind}-field-service`}
@@ -432,7 +432,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
         <div className="sm:col-span-2">
           <label htmlFor={`${kind}-field-message`} className={labelBase}>
             {isQuote ? "Votre projet" : "Votre site et vos objectifs"}{" "}
-            <span className="text-[#c9baac]">*</span>
+            <span className="text-[#e4e4e4]">*</span>
           </label>
           <textarea
             id={`${kind}-field-message`}
@@ -476,7 +476,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
         <button
           type="submit"
           disabled={submitting}
-          className="btn-fill inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full bg-[#c9baac] px-7 py-4 font-medium text-[#1c1c1c] transition-transform duration-300 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 [&::before]:bg-[#e4e4e4]"
+          className="btn-fill inline-flex min-h-[52px] items-center justify-center gap-2.5 rounded-full border border-[#e4e4e4] bg-white px-7 py-4 font-medium text-[#1c1c1c] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-[#c9baac] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 [&::before]:bg-[#e4e4e4]"
         >
           {submitting ? (
             <span className="inline-flex items-center gap-2.5">

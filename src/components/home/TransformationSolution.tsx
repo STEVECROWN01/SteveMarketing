@@ -27,7 +27,7 @@ export function TransformationSection() {
           <div className="relative mx-auto w-full max-w-md lg:max-w-none lg:order-2">
             <div
               aria-hidden="true"
-              className="absolute -inset-3 -rotate-[2.5deg] rounded-[2rem] bg-[#c9baac] opacity-[0.12]"
+              className="absolute -inset-3 -rotate-[2.5deg] rounded-[2rem] bg-[#e4e4e4] opacity-[0.12]"
             />
             <Reveal direction="right">
               <MonoImage
@@ -56,8 +56,8 @@ export function TransformationSection() {
               const Icon = BENEFIT_ICONS[i] ?? TrendingUp;
               return (
                 <Reveal key={benefit.title} direction="up" delay={i * 0.06} as="article">
-                  <div className="group h-full rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#c9baac]/35">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#c9baac]/12 text-[#c9baac]">
+                  <div className="group h-full rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#e4e4e4]/35">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#e4e4e4]/12 text-[#e4e4e4]">
                       <Icon className="h-5 w-5" aria-hidden="true" />
                     </span>
                     <h3 className="mt-5 font-display text-base font-semibold text-white">
@@ -119,10 +119,10 @@ export function SolutionSection() {
           <div className="flex flex-col gap-5 lg:pt-4">
             {SOLUTION.pillars.map((pillar, i) => (
               <Reveal key={pillar.name} direction="left" delay={0.1 + i * 0.08} as="article">
-                <div className="group relative overflow-hidden rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-7 transition-colors duration-300 hover:border-[#c9baac]/35 sm:p-8">
+                <div className="group relative overflow-hidden rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-7 transition-colors duration-300 hover:border-[#e4e4e4]/35 sm:p-8">
                   <span
                     aria-hidden="true"
-                    className="font-display absolute -right-2 -top-5 select-none text-[7rem] font-bold leading-none text-[#c9baac]/10 transition-colors duration-300 group-hover:text-[#c9baac]/16"
+                    className="font-display absolute -right-2 -top-5 select-none text-[7rem] font-bold leading-none text-[#e4e4e4]/10 transition-colors duration-300 group-hover:text-[#e4e4e4]/16"
                   >
                     {String(i + 1).padStart(2, "0")}
                   </span>
@@ -138,7 +138,7 @@ export function SolutionSection() {
             ))}
 
             <Reveal direction="up" delay={0.35}>
-              <div className="rounded-2xl bg-[#c9baac] p-7 sm:p-8">
+              <div className="rounded-2xl bg-[#e4e4e4] p-7 sm:p-8">
                 <p className="font-display text-lg font-semibold leading-snug text-[#1c1c1c] sm:text-xl">
                   Comprendre votre activité avant de concevoir votre site.
                 </p>

@@ -8,9 +8,11 @@
 
 export const HERO = {
   eyebrow: "CONCEPTION DE SITES WEB PROFESSIONNELS",
-  h1: "Je crée des sites web qui génèrent des ventes.",
+  h1: "Je crée des Sites Web Professionnels qui génèrent des Ventes.",
+  /** Partie du titre en gras (700) — le reste reste en graisse normale. */
+  h1Bold: "qui génèrent des Ventes.",
   text: "Vous n'avez pas encore de site web ? Ou votre site actuel ne vous apporte pas les résultats espérés ? Je conçois des sites web professionnels, élégants et stratégiquement pensés pour valoriser votre activité, attirer des visiteurs qualifiés et transformer leur intérêt en clients.",
-  ctaPrimary: "Réserver Un Appel (30 Min)",
+  ctaPrimary: "Réserver Un Appel",
   ctaTertiary: "Voir Nos Travaux",
   reassurance: "30 minutes · Gratuit · Sans engagement",
   portraitAlt:
@@ -278,11 +280,8 @@ export const TARGETS = {
   eyebrow: "POUR QUI JE CONÇOIS CES SITES",
   title: "Des professionnels qui veulent transformer leur présence en ligne.",
   items: [
-    "Professionnels sans site web.",
-    "PME sans véritable présence professionnelle en ligne.",
-    "Agences et indépendants souhaitant mieux présenter leurs services.",
-    "Coachs et entrepreneurs souhaitant développer leur activité.",
-    "Entreprises ayant un site vieillissant ou inefficace.",
-    "Professionnels dont le site ne génère pas suffisamment de demandes commerciales.",
+    "Professionnels sans site web ou dont le site web ne génère pas suffisamment de demandes commerciales.",
+    "PME sans véritable présence professionnelle en ligne ou ayant un site vieillissant ou inefficace.",
+    "Agences et indépendants souhaitant mieux présenter leurs services pour développer leur activité.",
   ],
 } as const;

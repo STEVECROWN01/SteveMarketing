@@ -59,7 +59,7 @@ export function ServicesSection() {
             return (
               <Reveal key={service.title} direction="up" delay={i * 0.05} as="article">
                 <div className="group flex h-full flex-col rounded-2xl border border-[#e4e4e4] bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_50px_-28px_rgba(28,28,28,0.3)] sm:p-7">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1c1c1c] text-[#c9baac] transition-colors duration-300 group-hover:bg-[#c9baac] group-hover:text-[#1c1c1c]">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1c1c1c] text-[#e4e4e4] transition-colors duration-300 group-hover:bg-[#e4e4e4] group-hover:text-[#1c1c1c]">
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <h3 className="mt-5 font-display text-lg font-semibold text-[#1c1c1c]">
@@ -104,9 +104,9 @@ export function IncludedSection() {
             const Icon = INCLUDED_ICONS[i] ?? BadgeCheck;
             return (
               <Reveal key={item.title} direction={i === 0 ? "right" : "left"} delay={0.1 * i} as="article">
-                <div className="flex h-full flex-col rounded-2xl border border-[#c9baac]/25 bg-[#232323] p-7 sm:p-8">
+                <div className="flex h-full flex-col rounded-2xl border border-[#e4e4e4]/25 bg-[#232323] p-7 sm:p-8">
                   <div className="flex items-center gap-4">
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#c9baac] text-[#1c1c1c]">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e4e4e4] text-[#1c1c1c]">
                       <Icon className="h-5 w-5" aria-hidden="true" />
                     </span>
                     <h3 className="font-display text-xl font-semibold text-white">{item.title}</h3>
@@ -115,7 +115,7 @@ export function IncludedSection() {
                     text={item.text}
                     className="mt-5 text-[15px] leading-relaxed text-[#c8c8c8]"
                   />
-                  <p className="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-medium tracking-widest text-[#c9baac]">
+                  <p className="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-medium tracking-widest text-[#e4e4e4]">
                     <BadgeCheck className="h-4 w-4" aria-hidden="true" />
                     INCLUS SANS FRAIS SUPPLÉMENTAIRES
                   </p>
@@ -175,9 +175,9 @@ export function ComplementarySection() {
               const Icon = COMPLEMENTARY_ICONS[i] ?? Megaphone;
               return (
                 <Reveal key={item.title} direction="left" delay={0.1 * i} as="li">
-                  <div className="group rounded-2xl border border-[#e4e4e4]/12 bg-[#1c1c1c] p-7 transition-colors duration-300 hover:border-[#c9baac]/35 sm:p-9">
+                  <div className="group rounded-2xl border border-[#e4e4e4]/12 bg-[#1c1c1c] p-7 transition-colors duration-300 hover:border-[#e4e4e4]/35 sm:p-9">
                     <div className="flex items-center justify-between gap-4">
-                      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#c9baac]/12 text-[#c9baac]">
+                      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#e4e4e4]/12 text-[#e4e4e4]">
                         <Icon className="h-5.5 w-5.5" aria-hidden="true" />
                       </span>
                       <span className="text-eyebrow">Prestation complémentaire</span>

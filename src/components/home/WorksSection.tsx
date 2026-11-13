@@ -12,10 +12,11 @@ import { PROJECTS } from "@/lib/site";
  * Présentation calquée sur la section « Websites We Created » de
  * sheragency.com : titre + double CTA (bouton noir « Demander Un
  * Devis », bouton contour « Voir Nos Réalisations »), puis
- * grille de cartes projet — grande capture, nom, catégorie et
- * bouton « Voir Le Projet » ouvrant la page de présentation du
+ * grille de cartes projet — les TROIS projets sur une seule
+ * ligne (demande de l'éditeur) — grande capture, nom, catégorie
+ * et bouton « Voir Le Projet » ouvrant la page de présentation du
  * projet (#/projet/<id>), exactement comme la référence ouvre ses
- * pages de case study.
+ * pages de case study. Captures exclusivement en noir et blanc.
  */
 export function WorksSection() {
   return (
@@ -56,8 +57,10 @@ export function WorksSection() {
           </Reveal>
         </div>
 
-        {/* Grille des projets — grande capture + nom + « Voir Le Projet » */}
-        <div className="mt-12 grid gap-6 sm:mt-14 md:grid-cols-2">
+        {/* Grille des projets — les trois projets présentés sur une seule
+            ligne (desktop) ; captures en noir et blanc permanent +
+            « Voir Le Projet ». */}
+        <div className="mt-12 grid gap-5 sm:mt-14 md:grid-cols-3">
           {PROJECTS.map((project, i) => (
             <ProjectCard key={project.id} project={project} index={i} />
           ))}

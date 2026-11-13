@@ -27,7 +27,7 @@ export function FaqSection() {
           <div className="lg:sticky lg:top-28 lg:self-start">
             <SectionHeading eyebrow={FAQ.eyebrow} title={FAQ.title} tone="dark" />
             <Reveal direction="up" delay={0.18}>
-              <div className="mt-9 rounded-2xl bg-[#c9baac] p-6 sm:p-7">
+              <div className="mt-9 rounded-2xl bg-[#e4e4e4] p-6 sm:p-7">
                 <p className="font-display text-base font-semibold leading-snug text-[#1c1c1c]">
                   Une question spécifique&nbsp;? Prenons 30 minutes pour en discuter.
                 </p>
@@ -52,9 +52,9 @@ export function FaqSection() {
                 <AccordionItem
                   key={item.q}
                   value={`faq-${i}`}
-                  className="rounded-xl border border-[#e4e4e4]/12 bg-[#232323] px-5 data-[state=open]:border-[#c9baac]/35"
+                  className="rounded-xl border border-[#e4e4e4]/12 bg-[#232323] px-5 data-[state=open]:border-[#e4e4e4]/35"
                 >
-                  <AccordionTrigger className="py-5 text-left font-display text-[15px] font-medium text-white hover:text-[#c9baac] hover:no-underline sm:text-base">
+                  <AccordionTrigger className="py-5 text-left font-display text-[15px] font-medium text-white hover:text-[#e4e4e4] hover:no-underline sm:text-base">
                     {item.q}
                   </AccordionTrigger>
                   <AccordionContent className="pb-5 text-sm leading-relaxed text-[#c8c8c8]">
@@ -80,7 +80,7 @@ export function FinalCtaSection() {
       <div className="bg-grid-dark absolute inset-0" aria-hidden="true" />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[560px] w-[880px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#c9baac] opacity-[0.08] blur-[140px]"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[560px] w-[880px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#e4e4e4] opacity-[0.08] blur-[140px]"
       />
 
       <div className="container-site relative text-center">

@@ -27,10 +27,10 @@ export function Footer() {
               <img
                 src={ASSETS.logoLight}
                 alt="Stevens Akpovi"
-                width={220}
-                height={176}
+                width={240}
+                height={192}
                 loading="lazy"
-                className="h-10 w-auto"
+                className="h-12 w-auto"
               />
               <p className="mt-4 text-sm leading-relaxed text-[#c8c8c8]">
                 Je crée des sites web qui génèrent des ventes. Conception de sites web
@@ -54,7 +54,7 @@ export function Footer() {
                         e.preventDefault();
                         router.navigate(item.key as never);
                       }}
-                      className="inline-flex min-h-[24px] items-center text-sm text-[#c8c8c8] transition-colors hover:text-[#c9baac]"
+                      className="inline-flex min-h-[24px] items-center text-sm text-[#c8c8c8] transition-colors hover:text-[#e4e4e4]"
                     >
                       {item.label}
                     </a>
@@ -67,7 +67,7 @@ export function Footer() {
                       e.preventDefault();
                       router.navigate("legal");
                     }}
-                    className="inline-flex min-h-[24px] items-center text-sm text-[#c8c8c8] transition-colors hover:text-[#c9baac]"
+                    className="inline-flex min-h-[24px] items-center text-sm text-[#c8c8c8] transition-colors hover:text-[#e4e4e4]"
                   >
                     Mentions légales
                   </a>
@@ -82,9 +82,9 @@ export function Footer() {
                 <li>
                   <a
                     href={`mailto:${SITE.email}`}
-                    className="inline-flex min-h-[24px] items-center gap-2.5 text-sm text-[#c8c8c8] transition-colors hover:text-[#c9baac]"
+                    className="inline-flex min-h-[24px] items-center gap-2.5 text-sm text-[#c8c8c8] transition-colors hover:text-[#e4e4e4]"
                   >
-                    <Mail className="h-4 w-4 text-[#c9baac]" aria-hidden="true" />
+                    <Mail className="h-4 w-4 text-[#e4e4e4]" aria-hidden="true" />
                     {SITE.email}
                   </a>
                 </li>
@@ -93,9 +93,9 @@ export function Footer() {
                     href={SITE.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-[24px] items-center gap-2.5 text-sm text-[#c8c8c8] transition-colors hover:text-[#c9baac]"
+                    className="inline-flex min-h-[24px] items-center gap-2.5 text-sm text-[#c8c8c8] transition-colors hover:text-[#e4e4e4]"
                   >
-                    <Linkedin className="h-4 w-4 text-[#c9baac]" aria-hidden="true" />
+                    <Linkedin className="h-4 w-4 text-[#e4e4e4]" aria-hidden="true" />
                     LinkedIn
                     <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
                   </a>
@@ -105,15 +105,15 @@ export function Footer() {
                     href={SITE.whatsapp}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex min-h-[24px] items-center gap-2.5 text-sm text-[#c8c8c8] transition-colors hover:text-[#c9baac]"
+                    className="inline-flex min-h-[24px] items-center gap-2.5 text-sm text-[#c8c8c8] transition-colors hover:text-[#e4e4e4]"
                   >
-                    <MessageCircle className="h-4 w-4 text-[#c9baac]" aria-hidden="true" />
+                    <MessageCircle className="h-4 w-4 text-[#e4e4e4]" aria-hidden="true" />
                     WhatsApp
                     <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
                   </a>
                 </li>
               </ul>
-              <p className="mt-6 inline-flex rounded-full border border-[#c9baac]/30 bg-[#c9baac]/10 px-4 py-1.5 text-xs text-[#c9baac]">
+              <p className="mt-6 inline-flex rounded-full border border-[#e4e4e4]/30 bg-[#e4e4e4]/10 px-4 py-1.5 text-xs text-[#e4e4e4]">
                 {SITE.calendlyMention}
               </p>
             </div>

@@ -84,9 +84,10 @@ export function SectionHeading({
 /*
  * Deux styles canoniques, conformes à la demande de l'éditeur :
  * - BLANC : fond #ffffff exact — même design que le bouton hero
- *   « Réserver Un Appel (30 Min) » : texte #1c1c1c, bordure #e4e4e4
+ *   « Réserver Un Appel » : texte #1c1c1c, bordure #e4e4e4
  *   qui devient beige au survol, remplissage progressif #e4e4e4,
- *   légère élévation, flèche qui glisse.
+ *   légère élévation, flèche qui glisse. L'ancienne variante beige
+ *   #c9baac a été convertie au blanc exact (demande du 13/11/2026).
  * - NOIR : fond #000000 exact — même design que le bouton hero
  *   « Audit gratuit de votre site actuel » : texte blanc, bordure
  *   claire discrète, remplissage progressif #3c3c3c au survol,
@@ -158,7 +159,7 @@ export function CTAButton({
 
   const variants: Record<Variant, string> = {
     primary:
-      "bg-[#c9baac] text-[#1c1c1c] shadow-[0_14px_34px_-14px_rgba(201,186,172,0.5)] [&::before]:bg-[#e4e4e4]",
+      "bg-white text-[#1c1c1c] border border-[#e4e4e4] hover:border-[#c9baac] [&::before]:bg-[#e4e4e4]",
     secondary:
       "bg-white text-[#1c1c1c] border border-[#e4e4e4] hover:border-[#c9baac] [&::before]:bg-[#e4e4e4]",
     dark: "bg-[#000000] text-white border border-[#e4e4e4]/30 [&::before]:bg-[#3c3c3c]",
@@ -219,7 +220,7 @@ export function ReassuranceBar({
     >
       {items.map((item, i) => (
         <li key={item} className="flex items-center gap-3">
-          {i > 0 && <span className="h-1 w-1 rounded-full bg-[#c9baac]" aria-hidden="true" />}
+          {i > 0 && <span className="h-1 w-1 rounded-full bg-[#e4e4e4]" aria-hidden="true" />}
           {item}
         </li>
       ))}
@@ -248,7 +249,7 @@ export function PageHero({
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-40 left-1/2 h-[480px] w-[720px] -translate-x-1/2 rounded-full bg-[#c9baac] opacity-[0.07] blur-[110px]"
+        className="pointer-events-none absolute -top-40 left-1/2 h-[480px] w-[720px] -translate-x-1/2 rounded-full bg-[#e4e4e4] opacity-[0.07] blur-[110px]"
       />
       <div className="container-site relative">
         <Reveal direction="up">
@@ -295,7 +296,7 @@ export function ExternalLink({
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group/link inline-flex items-center gap-1.5 underline decoration-[#c9baac]/50 decoration-2 underline-offset-[6px] transition-colors hover:decoration-[#c9baac] ${className}`}
+      className={`group/link inline-flex items-center gap-1.5 underline decoration-[#e4e4e4]/50 decoration-2 underline-offset-[6px] transition-colors hover:decoration-[#e4e4e4] ${className}`}
     >
       {children}
       <ArrowUpRight

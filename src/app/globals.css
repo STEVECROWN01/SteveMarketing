@@ -16,7 +16,9 @@
    - Bordure claire ............ #e4e4e4
    - Texte sur clair ........... #1c1c1c / #555555 / #525252
    - Texte sur sombre .......... #ffffff / #d9d9d9 / #c8c8c8
-   - ACCENT SIGNATURE .......... #c9baac (beige)
+   - ACCENT NEUTRE ........... #e4e4e4 (le beige #c9baac a été retiré
+     à la demande de l'éditeur : seuls les survols de bordure des
+     boutons blancs de référence le conservent)
    - Bouton sombre ............. #3c3c3c (hover #525252)
    - Bouton clair ............... #ffffff (hover #e4e4e4)
    - Erreur .................... #ea384c
@@ -36,7 +38,7 @@
   --color-card-foreground: #ffffff;
   --color-popover: #232323;
   --color-popover-foreground: #ffffff;
-  --color-primary: #c9baac;
+  --color-primary: #e4e4e4;
   --color-primary-foreground: #1c1c1c;
   --color-secondary: #2f2f2f;
   --color-secondary-foreground: #ffffff;
@@ -48,10 +50,10 @@
   --color-destructive-foreground: #ffffff;
   --color-border: rgba(228, 228, 228, 0.14);
   --color-input: rgba(228, 228, 228, 0.18);
-  --color-ring: #c9baac;
+  --color-ring: #e4e4e4;
 
   /* Tokens de marque */
-  --color-brand: #c9baac;
+  --color-brand: #e4e4e4;
   --color-brand-foreground: #1c1c1c;
   --color-ink: #1c1c1c;
   --color-ink-deep: #070707;
@@ -84,7 +86,7 @@
   --card-foreground: #ffffff;
   --popover: #232323;
   --popover-foreground: #ffffff;
-  --primary: #c9baac;
+  --primary: #e4e4e4;
   --primary-foreground: #1c1c1c;
   --secondary: #2f2f2f;
   --secondary-foreground: #ffffff;
@@ -95,7 +97,7 @@
   --destructive: #ea384c;
   --border: rgba(228, 228, 228, 0.14);
   --input: rgba(228, 228, 228, 0.18);
-  --ring: #c9baac;
+  --ring: #e4e4e4;
 }
 
 @layer base {
@@ -116,12 +118,12 @@
     overflow-x: clip;
   }
   ::selection {
-    background-color: #c9baac;
+    background-color: #e4e4e4;
     color: #1c1c1c;
   }
   /* Accessibilité : focus visible net sur fond sombre et clair */
   :focus-visible {
-    outline: 2px solid #c9baac;
+    outline: 2px solid #e4e4e4;
     outline-offset: 3px;
     border-radius: 2px;
   }
@@ -168,7 +170,7 @@
   font-size: 0.72rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: #c9baac;
+  color: #e4e4e4;
 }
 .on-paper .text-eyebrow,
 .section-light .text-eyebrow,
@@ -283,26 +285,25 @@ html.hoverable .media-group:where(:hover, :focus-within) .mono-media > .media-fi
   transform: scale(1.035);
 }
 
-/* ---------- Variante .mono-always : noir et blanc par défaut sur
-   TOUS les périphériques (y compris mobile/tactile) ----------
-   Mockups du hero et captures de la section PROJETS RÉALISÉS :
-   noir et blanc par défaut, retour à la couleur d'origine au survol
-   (desktop) ou au toucher (mobile — le tap applique :hover).
-   Placé après les règles .mono-media : même spécificité, ordre gagnant. */
-.mono-always > img,
-.mono-always > .media-fill {
+/* ---------- Variante .mono-locked : noir et blanc PERMANENT ----------
+   Mockups du hero, captures de la section PROJETS RÉALISÉS et
+   deuxième image de « VOTRE ACTIVITÉ MÉRITE… » : exclusivement en
+   noir et blanc — aucune couleur au survol, sur aucun écran.
+   Règles placées après les règles de survol .mono-media : même
+   spécificité, ordre ultérieur gagnant. */
+.mono-locked > img,
+.mono-locked > .media-fill {
   filter: grayscale(1);
 }
-.mono-always:where(:hover, :focus-within) > img,
-.mono-always:where(:hover, :focus-within) > .media-fill,
-.media-group:where(:hover, :focus-within) .mono-always > img,
-.media-group:where(:hover, :focus-within) .mono-always > .media-fill,
-html.hoverable .mono-always:where(:hover, :focus-within) > img,
-html.hoverable .mono-always:where(:hover, :focus-within) > .media-fill,
-html.hoverable .media-group:where(:hover, :focus-within) .mono-always > img,
-html.hoverable .media-group:where(:hover, :focus-within) .mono-always > .media-fill {
-  filter: grayscale(0);
-  transform: scale(1.035);
+.mono-locked:where(:hover, :focus-within) > img,
+.mono-locked:where(:hover, :focus-within) > .media-fill,
+.media-group:where(:hover, :focus-within) .mono-locked > img,
+.media-group:where(:hover, :focus-within) .mono-locked > .media-fill,
+html.hoverable .mono-locked:where(:hover, :focus-within) > img,
+html.hoverable .mono-locked:where(:hover, :focus-within) > .media-fill,
+html.hoverable .media-group:where(:hover, :focus-within) .mono-locked > img,
+html.hoverable .media-group:where(:hover, :focus-within) .mono-locked > .media-fill {
+  filter: grayscale(1);
 }
 
 /* ---------- Icône directionnelle sur visuels cliquables ---------- */
@@ -384,11 +385,25 @@ html.hoverable .media-group:where(:hover, :focus-within) .mono-always > .media-f
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .mono-media > img,
-  .mono-media > .media-fill {
+  .mono-media:not(.mono-locked) > img,
+  .mono-media:not(.mono-locked) > .media-fill {
     filter: none !important;
     transform: none !important;
   }
+  .mono-locked > img,
+  .mono-locked > .media-fill {
+    filter: grayscale(1) !important;
+  }
+}
+
+/* ---------- Focus visible lisible sur les sections claires ----------
+   L'anneau neutre #e4e4e4 (ex-beige) est invisible sur fond blanc :
+   sur les sections claires, le contour de focus repasse en encre
+   sombre — l'accessibilité clavier reste garantie. */
+.section-light :is(a, button, input, textarea, select, [tabindex]):focus-visible,
+.section-bright :is(a, button, input, textarea, select, [tabindex]):focus-visible,
+.on-paper :is(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline-color: rgba(28, 28, 28, 0.6);
 }
 
 /* rev: mono-2 */

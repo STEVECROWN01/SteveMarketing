@@ -41,7 +41,7 @@ export function ServicesPage() {
                 <Reveal key={service.title} direction="up" delay={i * 0.05} as="article">
                   <div className="group flex h-full flex-col rounded-2xl border border-[#e4e4e4] bg-white p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_50px_-28px_rgba(28,28,28,0.3)]">
                     <div className="flex items-center justify-between">
-                      <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1c1c1c] text-[#c9baac] transition-colors duration-300 group-hover:bg-[#c9baac] group-hover:text-[#1c1c1c]">
+                      <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1c1c1c] text-[#e4e4e4] transition-colors duration-300 group-hover:bg-[#e4e4e4] group-hover:text-[#1c1c1c]">
                         <Icon className="h-5 w-5" aria-hidden="true" />
                       </span>
                       <span className="font-display text-sm font-semibold text-[#525252]">
@@ -77,9 +77,9 @@ export function ServicesPage() {
               const Icon = INCLUDED_ICONS[i] ?? Check;
               return (
                 <Reveal key={item.title} direction={i === 0 ? "right" : "left"} delay={0.1 * i} as="article">
-                  <div className="h-full rounded-2xl border border-[#c9baac]/25 bg-[#232323] p-7 sm:p-8">
+                  <div className="h-full rounded-2xl border border-[#e4e4e4]/25 bg-[#232323] p-7 sm:p-8">
                     <div className="flex items-center gap-4">
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#c9baac] text-[#1c1c1c]">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#e4e4e4] text-[#1c1c1c]">
                         <Icon className="h-5 w-5" aria-hidden="true" />
                       </span>
                       <h3 className="font-display text-xl font-semibold text-white">{item.title}</h3>
@@ -113,7 +113,7 @@ export function ServicesPage() {
               return (
                 <Reveal key={item.title} direction="up" delay={i * 0.08} as="article">
                   <div className="h-full rounded-2xl border border-[#e4e4e4]/12 bg-[#1c1c1c] p-7 sm:p-8">
-                    <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#c9baac]/12 text-[#c9baac]">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#e4e4e4]/12 text-[#e4e4e4]">
                       <Icon className="h-5.5 w-5.5" aria-hidden="true" />
                     </span>
                     <h3 className="mt-6 font-display text-xl font-semibold text-white">{item.title}</h3>
@@ -124,7 +124,7 @@ export function ServicesPage() {
             })}
           </div>
           <Reveal direction="up" delay={0.15}>
-            <div className="mt-10 rounded-2xl bg-[#c9baac] p-7 sm:p-8">
+            <div className="mt-10 rounded-2xl bg-[#e4e4e4] p-7 sm:p-8">
               <p className="font-display text-lg font-semibold leading-snug text-[#1c1c1c] sm:text-xl">
                 Discuter de ma stratégie digitale
               </p>

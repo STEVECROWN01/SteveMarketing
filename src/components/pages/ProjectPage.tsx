@@ -134,7 +134,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
         <div className="bg-grid-dark absolute inset-0" aria-hidden="true" />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[760px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#c9baac] opacity-[0.08] blur-[130px]"
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[760px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#e4e4e4] opacity-[0.08] blur-[130px]"
         />
         <div className="container-site relative text-center">
           <Reveal direction="up">
@@ -154,7 +154,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
                 icon={CTAIcons.calendar}
                 ariaLabel={`Réserver un appel de 30 minutes sur Calendly — ${SITE.calendlyMention}`}
               >
-                Réserver Un Appel (30 Min)
+                Réserver Un Appel
               </CTAButton>
               <CTAButton
                 action={{ kind: "page", page: "contact", section: "devis" }}

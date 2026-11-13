@@ -77,7 +77,7 @@ export const PAGES = {
     label: "Réalisations",
     title: "Réalisations — Projets web | Stevens Akpovi",
     description:
-      "Découvrez les projets conçus par Stevens Akpovi : MR Steve English, pré-lancement MR Steve English et AfriBayit.",
+      "Découvrez les projets conçus par Stevens Akpovi : MR STEVE ENGLISH, PRÉ-LAUNCH MR STEVE ENGLISH et AFRIBAYIT.",
   },
   aPropos: {
     hash: "#/a-propos",
@@ -127,7 +127,7 @@ export const PROJECTS = [
   },
   {
     id: "prelaunch",
-    name: "PRÉ-LANCEMENT MR STEVE ENGLISH",
+    name: "PRÉ-LAUNCH MR STEVE ENGLISH",
     category: "Page de vente",
     description:
       "Une page commerciale conçue pour présenter une offre de coaching, valoriser ses bénéfices et guider le visiteur vers l'inscription.",
@@ -139,7 +139,7 @@ export const PROJECTS = [
   {
     id: "afribayit",
     name: "AFRIBAYIT",
-    category: "Site web de plateforme immobilière",
+    category: "Plateforme immobilière",
     description:
       "Une expérience digitale dédiée au secteur immobilier, pensée pour présenter une plateforme et faciliter la découverte de ses offres.",
     cta: "Découvrir Le Projet",
@@ -158,6 +158,8 @@ export const ASSETS = {
   benefitGrowth: "/assets/benefit-business-growth.webp",
   problemNoWebsite: "/assets/problem-no-website.webp",
   problemIneffective: "/assets/problem-ineffective-website.webp",
+  /** Portrait dédié de la page « À propos » (fourni par l'éditeur). */
+  aboutPortrait: "/assets/apropos-portrait.webp",
   /** Logo officiel — version blanche (pour fonds noirs/sombres). */
   logoLight: "/assets/logo-blanc.png",
   /** Logo officiel — version noire (pour fonds blancs/clairs). */

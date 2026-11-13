@@ -12,7 +12,7 @@ import { SITE } from "@/lib/site";
 
 const WIDGET_SRC = "https://assets.calendly.com/assets/external/widget.js";
 const CALENDLY_PARAMS =
-  "hide_gdpr_banner=1&background_color=1c1c1c&text_color=ffffff&primary_color=c9baac";
+  "hide_gdpr_banner=1&background_color=1c1c1c&text_color=ffffff&primary_color=e4e4e4";
 
 const CalendlyContext = createContext<{ openCalendly: () => void } | null>(null);
 
@@ -139,7 +139,7 @@ export function CalendlyProvider({ children }: { children: React.ReactNode }) {
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Fermer la fenêtre de réservation"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#c9baac] text-[#1c1c1c] transition-transform duration-300 hover:scale-105 focus-visible:scale-105"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#e4e4e4] bg-white text-[#1c1c1c] transition-[transform,border-color] duration-300 hover:scale-105 hover:border-[#c9baac] focus-visible:scale-105"
               >
                 <X className="h-4.5 w-4.5" aria-hidden="true" />
               </button>

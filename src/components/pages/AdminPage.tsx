@@ -45,10 +45,10 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_STYLES: Record<string, string> = {
-  new: "bg-[#c9baac] text-[#1c1c1c]",
+  new: "bg-[#e4e4e4] text-[#1c1c1c]",
   contacted: "bg-[#2f2f2f] text-white border border-[#e4e4e4]/20",
-  qualified: "bg-[#c9baac]/20 text-[#c9baac] border border-[#c9baac]/40",
-  won: "bg-[#c9baac] text-[#1c1c1c]",
+  qualified: "bg-[#e4e4e4]/20 text-[#e4e4e4] border border-[#e4e4e4]/40",
+  won: "bg-[#e4e4e4] text-[#1c1c1c]",
   lost: "bg-[#2f2f2f] text-[#c8c8c8] border border-[#e4e4e4]/12",
 };
 
@@ -90,7 +90,7 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
   return (
     <div className="container-site flex min-h-screen items-center justify-center py-32">
       <div className="w-full max-w-md rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-8 sm:p-10">
-        <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#c9baac] text-[#1c1c1c]">
+        <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#e4e4e4] text-[#1c1c1c]">
           <Lock className="h-5.5 w-5.5" aria-hidden="true" />
         </span>
         <h1 className="mt-6 font-display text-2xl font-semibold text-white">
@@ -112,7 +112,7 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="min-h-[48px] w-full rounded-lg border border-[#e4e4e4]/18 bg-[#1c1c1c] px-4 py-3 text-[15px] text-white placeholder:text-[#c8c8c8]/50 focus:border-[#c9baac] focus:outline-none"
+              className="min-h-[48px] w-full rounded-lg border border-[#e4e4e4]/18 bg-[#1c1c1c] px-4 py-3 text-[15px] text-white placeholder:text-[#c8c8c8]/50 focus:border-[#e4e4e4] focus:outline-none"
               placeholder="••••••••••••"
             />
           </div>
@@ -124,7 +124,7 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
           <button
             type="submit"
             disabled={loading}
-            className="btn-fill flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-full bg-[#c9baac] px-6 py-4 font-medium text-[#1c1c1c] disabled:opacity-60 [&::before]:bg-[#e4e4e4]"
+            className="btn-fill flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-full border border-[#e4e4e4] bg-white px-6 py-4 font-medium text-[#1c1c1c] hover:border-[#c9baac] disabled:opacity-60 [&::before]:bg-[#e4e4e4]"
           >
             {loading ? (
               <>
@@ -249,7 +249,7 @@ export function AdminPage() {
   if (authed === null) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-[#c9baac]" aria-hidden="true" />
+        <Loader2 className="h-6 w-6 animate-spin text-[#e4e4e4]" aria-hidden="true" />
       </div>
     );
   }
@@ -270,7 +270,7 @@ export function AdminPage() {
             type="button"
             onClick={loadLeads}
             disabled={loading}
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[#e4e4e4]/25 px-5 py-2.5 text-sm text-white transition-colors hover:border-[#c9baac] disabled:opacity-50"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[#e4e4e4]/25 px-5 py-2.5 text-sm text-white transition-colors hover:border-[#e4e4e4] disabled:opacity-50"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} aria-hidden="true" />
             Actualiser
@@ -279,7 +279,7 @@ export function AdminPage() {
             type="button"
             onClick={exportCsv}
             disabled={filtered.length === 0}
-            className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-[#c9baac] px-5 py-2.5 text-sm font-medium text-[#1c1c1c] transition-transform hover:-translate-y-0.5 disabled:opacity-50"
+            className="inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[#e4e4e4] bg-white px-5 py-2.5 text-sm font-medium text-[#1c1c1c] hover:border-[#c9baac] transition-transform hover:-translate-y-0.5 disabled:opacity-50"
           >
             <Download className="h-4 w-4" aria-hidden="true" />
             Exporter CSV ({filtered.length})
@@ -309,7 +309,7 @@ export function AdminPage() {
             type="button"
             onClick={() => setFilter(f.key)}
             className={`min-h-[40px] rounded-full px-4 py-2 text-xs font-medium transition-colors ${
-              filter === f.key ? "bg-[#c9baac] text-[#1c1c1c]" : "border border-[#e4e4e4]/20 text-[#c8c8c8] hover:border-[#c9baac]/40"
+              filter === f.key ? "border border-[#e4e4e4] bg-white text-[#1c1c1c]" : "border border-[#e4e4e4]/20 text-[#c8c8c8] hover:border-[#e4e4e4]/40"
             }`}
           >
             {f.label}
@@ -326,7 +326,7 @@ export function AdminPage() {
             type="button"
             onClick={() => setTypeFilter(f.key)}
             className={`min-h-[40px] rounded-full px-4 py-2 text-xs font-medium transition-colors ${
-              typeFilter === f.key ? "bg-[#c9baac] text-[#1c1c1c]" : "border border-[#e4e4e4]/20 text-[#c8c8c8] hover:border-[#c9baac]/40"
+              typeFilter === f.key ? "border border-[#e4e4e4] bg-white text-[#1c1c1c]" : "border border-[#e4e4e4]/20 text-[#c8c8c8] hover:border-[#e4e4e4]/40"
             }`}
           >
             {f.label}
@@ -337,7 +337,7 @@ export function AdminPage() {
       {/* Liste */}
       {filtered.length === 0 ? (
         <div className="mt-10 flex flex-col items-center gap-4 rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] py-16 text-center">
-          <Inbox className="h-8 w-8 text-[#c9baac]" aria-hidden="true" />
+          <Inbox className="h-8 w-8 text-[#e4e4e4]" aria-hidden="true" />
           <p className="text-sm text-[#c8c8c8]">Aucune demande ne correspond à ces filtres.</p>
         </div>
       ) : (
@@ -364,7 +364,7 @@ export function AdminPage() {
                       </p>
                     </td>
                     <td className="px-5 py-4">
-                      <span className="rounded-full bg-[#c9baac]/12 px-3 py-1 text-xs font-medium text-[#c9baac]">
+                      <span className="rounded-full bg-[#e4e4e4]/12 px-3 py-1 text-xs font-medium text-[#e4e4e4]">
                         {lead.type === "audit" ? "Audit" : "Devis"}
                       </span>
                     </td>
@@ -398,7 +398,7 @@ export function AdminPage() {
                         onClick={() => setExpanded(expanded === lead.id ? null : lead.id)}
                         aria-expanded={expanded === lead.id}
                         aria-label={`Détails de la demande de ${lead.name}`}
-                        className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#c9baac] hover:text-[#c9baac]"
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-[#e4e4e4]"
                       >
                         <ChevronRight
                           className={`h-4 w-4 transition-transform ${expanded === lead.id ? "rotate-90" : ""}`}
@@ -445,7 +445,7 @@ export function AdminPage() {
 
       {/* Note d'architecture honnête */}
       <div className="mt-8 flex items-start gap-3 rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] px-6 py-5">
-        <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#c9baac]" aria-hidden="true" />
+        <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#e4e4e4]" aria-hidden="true" />
         <p className="text-sm leading-relaxed text-[#c8c8c8]">
           Espace indépendant, non listé dans la navigation publique. Fonctionnalités
           opérationnelles : consultation des demandes, gestion des statuts et export CSV. La

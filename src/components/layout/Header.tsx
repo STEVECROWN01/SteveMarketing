@@ -132,7 +132,7 @@ export function Header() {
     <header className="fixed inset-x-0 top-0 z-50">
       <a
         href="#contenu-principal"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-[#c9baac] focus:px-5 focus:py-2.5 focus:text-sm focus:font-medium focus:text-[#1c1c1c]"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-[#e4e4e4] focus:px-5 focus:py-2.5 focus:text-sm focus:font-medium focus:text-[#1c1c1c]"
       >
         Aller au contenu principal
       </a>
@@ -143,27 +143,35 @@ export function Header() {
           href="#/accueil"
           onClick={(e) => goPage(e, "accueil")}
           aria-label="Stevens Akpovi — retour à l'accueil"
-          className="flex h-14 w-12 items-center justify-center rounded-b-lg bg-[#1c1c1c] transition-colors duration-300 hover:bg-[#232323] lg:h-[98px] lg:w-[94px] lg:rounded-b-[9px]"
+          className="flex h-14 w-14 items-center justify-center rounded-b-lg bg-[#1c1c1c] transition-colors duration-300 hover:bg-[#232323] lg:h-[104px] lg:w-[100px] lg:rounded-b-[9px]"
         >
-          {/* Logo officiel (version blanche, pour fond sombre) */}
+          {/* Logo officiel (version blanche, pour fond sombre) — légèrement
+              agrandi à la demande de l'éditeur */}
           <img
             src={ASSETS.logoLight}
             alt="Stevens Akpovi"
-            width={220}
-            height={176}
+            width={240}
+            height={192}
             fetchPriority="high"
-            className="h-9 w-auto lg:h-[58px]"
+            className="h-10 w-auto lg:h-[64px]"
           />
         </a>
 
         {/* ---------- 2. Pilule de navigation (bureau) ---------- */}
+        {/* Espacement à gauche de « Services » aligné sur l'espace entre
+            les liens (mx-[10px] de chaque lien = 20px) — demande de
+            l'éditeur. */}
         <nav
           aria-label="Navigation principale"
-          className="mt-[13px] hidden h-[85px] items-center justify-between rounded-[9px] bg-[#1c1c1c] pl-[57px] pr-[7px] lg:flex"
+          className="mt-[13px] hidden h-[85px] items-center justify-between rounded-[9px] bg-[#1c1c1c] pl-[10px] pr-[7px] lg:flex"
         >
           <ul className="flex items-center">
             {HEADER_NAV_ITEMS.map((item) => (
               <li key={item.key}>
+                {/* Soulignement actif : pleine largeur, aligné à gauche
+                    (avant : demi-largeur décalée — conflit left-1/2/w-0
+                    contre left-0/w-full). Chaque état porte ses propres
+                    utilitaires left/w pour éviter tout conflit d'ordre CSS. */}
                 <a
                   href={`#/${NAV_PAGES[item.key]}`}
                   onClick={(e) => {
@@ -171,8 +179,10 @@ export function Header() {
                     router.navigate(item.key as never);
                   }}
                   aria-current={isActive(item.key) ? "page" : undefined}
-                  className={`relative mx-[10px] py-2 text-[16px] font-normal leading-5 text-white transition-colors duration-300 hover:text-[#efefef] after:absolute after:bottom-0 after:left-1/2 after:h-px after:w-0 after:bg-white after:transition-all after:duration-300 hover:after:left-0 hover:after:w-full ${
-                    isActive(item.key) ? "after:left-0 after:w-full" : ""
+                  className={`relative mx-[10px] py-2 text-[16px] font-normal leading-5 text-white transition-colors duration-300 hover:text-[#efefef] after:absolute after:bottom-0 after:h-px after:bg-white after:transition-all after:duration-300 ${
+                    isActive(item.key)
+                      ? "after:left-0 after:w-full"
+                      : "after:left-1/2 after:w-0 hover:after:left-0 hover:after:w-full"
                   }`}
                 >
                   {item.label}
@@ -190,7 +200,7 @@ export function Header() {
           aria-expanded={menuOpen}
           aria-controls="menu-plein-ecran"
           aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-          className="flex h-14 w-12 items-center justify-center rounded-b-lg bg-[#1c1c1c] transition-colors duration-300 hover:bg-[#232323] lg:h-[98px] lg:w-[94px] lg:rounded-b-[9px]"
+          className="flex h-14 w-14 items-center justify-center rounded-b-lg bg-[#1c1c1c] transition-colors duration-300 hover:bg-[#232323] lg:h-[104px] lg:w-[100px] lg:rounded-b-[9px]"
         >
           {BurgerIcon}
         </button>
@@ -200,15 +210,16 @@ export function Header() {
       {/* Hauteur 100svh, contenu compact : tout est visible sans
           défilement, sur tous les écrans. Croix de fermeture dédiée
           sous la pastille hamburger (qui devient elle aussi une
-          croix). */}
+          croix). Ouverture/fermeture douces et légèrement animées
+          (fondu + translation courte). */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
             id="menu-plein-ecran"
-            initial={reduce ? { opacity: 0 } : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: -18, scale: 0.995 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -14, scale: 0.997 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-[#1c1c1c]"
           >
             <div className="container-site relative flex min-h-0 flex-1 flex-col pb-5 pt-[76px] sm:pb-6 sm:pt-[88px] lg:pb-8 lg:pt-[132px]">
@@ -217,7 +228,7 @@ export function Header() {
                 type="button"
                 onClick={() => setMenuOpen(false)}
                 aria-label="Fermer le menu"
-                className="absolute right-0 top-0 flex h-12 w-12 items-center justify-center rounded-full border border-[#e4e4e4]/25 bg-[#232323] text-white transition-colors duration-300 hover:border-[#c9baac] hover:text-[#c9baac] focus-visible:outline-2 focus-visible:outline-offset-4 sm:h-14 sm:w-14"
+                className="absolute right-4 top-4 flex h-12 w-12 items-center justify-center rounded-full border border-[#e4e4e4]/25 bg-[#232323] text-white transition-colors duration-300 hover:border-[#e4e4e4] hover:text-[#e4e4e4] focus-visible:outline-2 focus-visible:outline-offset-4 sm:h-14 sm:w-14"
               >
                 <X className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
               </button>
@@ -235,8 +246,10 @@ export function Header() {
                         href={`#/${NAV_PAGES[item.key]}`}
                         onClick={(e) => goPage(e, item.key)}
                         aria-current={isActive(item.key) ? "page" : undefined}
-                        className={`group relative inline-block py-1.5 font-display text-[clamp(1.3rem,6vw,2.5rem)] font-medium leading-tight text-white transition-colors duration-300 hover:text-[#efefef] after:absolute after:bottom-1.5 after:left-1/2 after:h-px after:w-0 after:bg-white after:transition-all after:duration-300 hover:after:left-0 hover:after:w-full sm:py-2.5 lg:py-3 ${
-                          isActive(item.key) ? "after:left-0 after:w-full" : ""
+                        className={`group relative inline-block py-1.5 font-display text-[clamp(1.3rem,6vw,2.5rem)] font-medium leading-tight text-white transition-colors duration-300 hover:text-[#efefef] after:absolute after:bottom-1.5 after:h-px after:bg-white after:transition-all after:duration-300 sm:py-2.5 lg:py-3 ${
+                          isActive(item.key)
+                            ? "after:left-0 after:w-full"
+                            : "after:left-1/2 after:w-0 hover:after:left-0 hover:after:w-full"
                         }`}
                       >
                         {item.label}
@@ -263,7 +276,7 @@ export function Header() {
                   className="group/btn btn-fill inline-flex min-h-[46px] items-center justify-center gap-2.5 rounded-full border border-[#e4e4e4]/30 bg-[#000000] px-5 py-2.5 text-[13px] font-medium text-white transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-3 sm:min-h-[52px] sm:px-6 sm:py-3 sm:text-[15px] [&::before]:bg-[#3c3c3c]"
                 >
                   <CalendarCheck className="h-4 w-4" aria-hidden="true" />
-                  Réserver Un Appel (30 Min)
+                  Réserver Un Appel
                 </button>
               </motion.div>
 
@@ -274,9 +287,9 @@ export function Header() {
                 className="mt-3 flex flex-wrap items-center gap-x-3 text-[13px] text-[#c8c8c8] sm:text-sm"
               >
                 <span>30 minutes</span>
-                <span className="h-1 w-1 rounded-full bg-[#c9baac]" aria-hidden="true" />
+                <span className="h-1 w-1 rounded-full bg-[#e4e4e4]" aria-hidden="true" />
                 <span>Gratuit</span>
-                <span className="h-1 w-1 rounded-full bg-[#c9baac]" aria-hidden="true" />
+                <span className="h-1 w-1 rounded-full bg-[#e4e4e4]" aria-hidden="true" />
                 <span>Sans engagement</span>
               </motion.p>
 

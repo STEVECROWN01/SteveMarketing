@@ -68,8 +68,9 @@ export function BrowserMockup({
   width?: number;
   height?: number;
   priority?: boolean;
-  /** Noir et blanc par défaut sur tous les écrans (mobile compris),
-   *  couleur d'origine au survol / au toucher. */
+  /** Noir et blanc PERMANENT sur tous les écrans (mobile comprise) —
+   *  aucune couleur au survol : mockups du hero (demande de
+   *  l'éditeur, 13/11/2026). */
   forceMono?: boolean;
 }) {
   const shortUrl = url.replace(/^https?:\/\//, "");
@@ -82,11 +83,11 @@ export function BrowserMockup({
           <span className="h-2.5 w-2.5 rounded-full bg-[#3c3c3c]" />
         </span>
         <span className="mx-auto flex max-w-[70%] items-center gap-1.5 truncate rounded-md bg-[#1c1c1c] px-3 py-1 text-[10px] text-[#c8c8c8] sm:text-[11px]" aria-hidden="true">
-          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#c9baac]" />
+          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#e4e4e4]" />
           {shortUrl}
         </span>
       </figcaption>
-      <span className={`mono-media block ${forceMono ? "mono-always" : ""}`}>
+      <span className={`mono-media block ${forceMono ? "mono-locked" : ""}`}>
         <img
           src={src}
           alt={alt}
@@ -116,8 +117,8 @@ export function PhoneMockup({
   className?: string;
   width?: number;
   height?: number;
-  /** Noir et blanc par défaut sur tous les écrans (mobile compris),
-   *  couleur d'origine au survol / au toucher. */
+  /** Noir et blanc PERMANENT sur tous les écrans — aucune couleur
+   *  au survol (mockups du hero). */
   forceMono?: boolean;
 }) {
   return (
@@ -128,7 +129,7 @@ export function PhoneMockup({
         className="absolute left-1/2 top-[10px] z-10 h-4 w-16 -translate-x-1/2 rounded-full bg-[#1c1c1c]"
         aria-hidden="true"
       />
-      <span className={`mono-media block overflow-hidden rounded-[1.6rem] ${forceMono ? "mono-always" : ""}`}>
+      <span className={`mono-media block overflow-hidden rounded-[1.6rem] ${forceMono ? "mono-locked" : ""}`}>
         <img
           src={src}
           alt={alt}
@@ -149,7 +150,7 @@ export function DirectionalIcon({ className = "" }: { className?: string }) {
   return (
     <span
       aria-hidden="true"
-      className={`dir-icon flex h-11 w-11 items-center justify-center rounded-full bg-[#c9baac] text-[#1c1c1c] ${className}`}
+      className={`dir-icon flex h-11 w-11 items-center justify-center rounded-full bg-[#e4e4e4] text-[#1c1c1c] ${className}`}
     >
       <ArrowUpRight className="h-5 w-5" strokeWidth={2.2} />
     </span>
