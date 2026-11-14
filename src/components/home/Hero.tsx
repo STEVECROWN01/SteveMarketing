@@ -226,9 +226,11 @@ export function Hero() {
                   AGRANDI et RAPPROCHÉ verticalement du portrait à la
                   demande de l'éditeur (15/11/2026) — sur MOBILE, sa
                   taille est DOUBLÉE (15 % → 30 % de la largeur du
-                  portrait). */}
+                  portrait). Sur bureau, légèrement agrandi ensuite
+                  (16/11/2026 : 21 % → 24 % de la largeur du portrait),
+                  toujours épinglé au coin haut-droit. */}
               <motion.div
-                className="absolute -top-1 -right-[6%] w-[30%] sm:-top-4 sm:-right-[8%] sm:w-[19%] lg:-top-5 lg:-right-[10%] lg:w-[21%]"
+                className="absolute -top-1 -right-[6%] w-[30%] sm:-top-4 sm:-right-[8%] sm:w-[19%] lg:-top-5 lg:-right-[10%] lg:w-[24%]"
                 initial={reduce ? undefined : { opacity: 0, y: 26, rotate: 5 }}
                 animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotate: 2 }}
                 transition={{ delay: 0.75, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -242,7 +244,7 @@ export function Hero() {
                     height={844}
                     forceMono
                     priority
-                    sizes="(max-width: 640px) 62px, (max-width: 1023px) 62px, 96px"
+                    sizes="(max-width: 640px) 62px, (max-width: 1023px) 62px, 110px"
                   />
                 </motion.div>
               </motion.div>
