@@ -144,10 +144,14 @@ export function Hero() {
               colonne droite sur les deux lignes de la grille, hauteur
               plafonnée en svh pour que le hero tienne dans l'écran. */}
           <div className="order-2 hero-visual relative mx-auto mt-5 mb-6 w-full max-w-md sm:mt-9 sm:mb-36 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:mb-0 lg:max-w-none">
-            {/* Bloc neutre en décalage derrière le portrait */}
+            {/* Bloc neutre en décalage derrière le portrait — RÉDUIT
+                à la demande de l'éditeur (15/11/2026 : « réduis un peu
+                la taille du fond gris carré qui est derrière mon
+                image, sur tous les appareils ») : débordement de
+                12 px → 4 px (mobile) / 6 px (bureau). */}
             <div
               aria-hidden="true"
-              className="absolute -inset-3 rotate-[2.5deg] rounded-[2rem] bg-[#e4e4e4]/90 opacity-[0.16] sm:rotate-[3deg]"
+              className="absolute -inset-1 rotate-[2.5deg] rounded-[2rem] bg-[#e4e4e4]/90 opacity-[0.16] sm:-inset-1.5 sm:rotate-[3deg]"
             />
             {/* Enveloppe « w-fit » : exactement la largeur du portrait —
                 les pourcentages des mockups épinglés (largeur, décalages)
@@ -173,7 +177,7 @@ export function Hero() {
                     loading="eager"
                     fetchPriority="high"
                     decoding="sync"
-                    className="block h-[min(35svh,320px)] w-full object-cover object-top sm:h-[min(38svh,320px)] lg:h-[min(72svh,640px)] lg:w-auto"
+                    className="block h-[min(39svh,336px)] w-full object-cover object-top sm:h-[min(38svh,320px)] lg:h-[min(72svh,640px)] lg:w-auto"
                   />
                 </span>
                 {/* Mention épinglée « Stevens Akpovi » : bas-droit du
@@ -192,14 +196,11 @@ export function Hero() {
                   Présent aussi sur mobile (taille et bords adaptés).
                   Exclusivement noir et blanc (forceMono) — aucune
                   couleur au survol.
-                  DIMENSIONNÉ pour ne jamais masquer la moitié du
-                  portrait (demande de l'éditeur, 15/11/2026) : largeur
-                  réduite et ancrage très décalé vers l'extérieur — il
-                  ne recouvre qu'un coin du portrait (≈ 30 % de la
-                  largeur, sur la seule bande basse), quel que soit
-                  l'écran. */}
+                  AGRANDI et RAPPROCHÉ verticalement du portrait à la
+                  demande de l'éditeur (15/11/2026) ; l'entête du
+                  navigateur est plus fine (voir Media.tsx). */}
               <motion.div
-                className="absolute -bottom-2 -left-[7%] w-[36%] sm:-bottom-6 sm:-left-[13%] sm:w-[42%] lg:-bottom-8 lg:-left-[14%] lg:w-[44%]"
+                className="absolute -bottom-1 -left-[7%] w-[40%] sm:-bottom-4 sm:-left-[12%] sm:w-[47%] lg:-bottom-5 lg:-left-[13%] lg:w-[52%]"
                 initial={reduce ? undefined : { opacity: 0, y: 26, rotate: -5 }}
                 animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotate: -3 }}
                 transition={{ delay: 0.6, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -214,7 +215,7 @@ export function Hero() {
                     height={900}
                     forceMono
                     priority
-                    sizes="(max-width: 640px) 76px, (max-width: 1023px) 92px, 190px"
+                    sizes="(max-width: 640px) 88px, (max-width: 1023px) 145px, 230px"
                   />
                 </motion.div>
               </motion.div>
@@ -222,13 +223,12 @@ export function Hero() {
               {/* Mockup smartphone flottant — AFRIBAYIT. Présent aussi
                   sur mobile. Exclusivement noir et blanc (forceMono) —
                   aucune couleur au survol.
-                  DIMENSIONNÉ pour ne jamais masquer la moitié du
-                  portrait (demande de l'éditeur, 15/11/2026) : largeur
-                  réduite et ancrage très décalé vers l'extérieur — il
-                  ne recouvre que la fine bande droite du portrait,
-                  sans jamais toucher le visage (centré, object-top). */}
+                  AGRANDI et RAPPROCHÉ verticalement du portrait à la
+                  demande de l'éditeur (15/11/2026) — sur MOBILE, sa
+                  taille est DOUBLÉE (15 % → 30 % de la largeur du
+                  portrait). */}
               <motion.div
-                className="absolute -top-2 -right-[6%] w-[15%] sm:-top-6 sm:-right-[8%] sm:w-[17%] lg:-top-8 lg:-right-[10%] lg:w-[19%]"
+                className="absolute -top-1 -right-[6%] w-[30%] sm:-top-4 sm:-right-[8%] sm:w-[19%] lg:-top-5 lg:-right-[10%] lg:w-[21%]"
                 initial={reduce ? undefined : { opacity: 0, y: 26, rotate: 5 }}
                 animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotate: 2 }}
                 transition={{ delay: 0.75, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -242,7 +242,7 @@ export function Hero() {
                     height={844}
                     forceMono
                     priority
-                    sizes="(max-width: 640px) 32px, (max-width: 1023px) 40px, 90px"
+                    sizes="(max-width: 640px) 62px, (max-width: 1023px) 62px, 96px"
                   />
                 </motion.div>
               </motion.div>

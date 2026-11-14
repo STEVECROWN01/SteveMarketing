@@ -129,6 +129,26 @@
   }
 }
 
+/* ---------- Défilement fluide (Lenis) — sheragency ----------
+   Le site défile avec une inertie douce, comme sheragency.com
+   (demande de l'éditeur, 15/11/2026) : même un défilement lancé
+   d'un coup continue souplement après le relâchement de la souris.
+   CSS recommandé par Lenis — « html { scroll-behavior: smooth } »
+   est neutralisé pendant que Lenis pilote le défilement. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
 /* ---------- Typographie éditoriale ---------- */
 .font-display {
   font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
@@ -405,21 +425,16 @@ html.hoverable .media-group:where(:hover, :focus-within) .mono-locked > .media-f
    320×568), l'image épinglée, la description et les marges du bloc
    visuel se resserrent encore. Les sélecteurs par identifiant
    l'emportent sur les utilitaires Tailwind, sans !important.
-   (Demande de l'éditeur, 14/11/2026.) */
+   (Demande de l'éditeur, 14/11/2026 — hauteurs relevées le
+   15/11/2026 avec l'agrandissement du portrait sur mobile.) */
 @media (max-width: 480px) and (max-height: 660px) {
   #hero .hero-visual {
     margin-top: 1rem;
     margin-bottom: 1.25rem;
   }
-  /* Portrait seul — pas les images des mockups épinglés : ceux-ci
-     embarquent leurs propres <figure>, d'où la classe dédiée
-     « hero-portrait » sur le portrait. L'ancien sélecteur « img »
-     générique forçait aussi les mockups à 33svh de haut, qui
-     recouvraient alors presque tout le portrait sur téléphones
-     courts (corrigé 15/11/2026, demande de l'éditeur : les mockups
-     ne doivent jamais cacher la moitié de l'image). */
+  /* Portrait seul — pas les images des mockups épinglés. */
   #hero figure.hero-portrait img {
-    height: 33svh;
+    height: 36svh;
   }
   #hero .hero-desc {
     font-size: 11px;
@@ -441,7 +456,7 @@ html.hoverable .media-group:where(:hover, :focus-within) .mono-locked > .media-f
   }
   /* Portrait seul — voir la remarque ci-dessus. */
   #hero figure.hero-portrait img {
-    height: 29svh;
+    height: 31svh;
   }
   #hero .hero-desc {
     font-size: 10px;

@@ -8,6 +8,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HomePage } from "@/components/home/HomePage";
 import { Toaster } from "@/components/ui/toaster";
+import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { PROJECTS } from "@/lib/site";
 
 /**
@@ -17,19 +18,25 @@ import { PROJECTS } from "@/lib/site";
  *
  * PERFORMANCE (15/11/2026 — « le site est trop lent ») : seule la
  * page d'accueil est dans le paquet JavaScript initial. Toutes les
- * autres pages (services, réalisations, projet, à propos, contact,
- * devis, appel, mentions, admin) sont découpées en morceaux chargés
- * à la demande (React.lazy) — puis PRÉCHARGÉES dès que le navigateur
- * est inactif : la première visite n'emporte plus le code des pages
- * non consultées, et les navigations restent instantanées.
+ * autres pages (méthode, référencement SEO, publicité Meta Ads,
+ * réalisations, projet, à propos, contact, devis, appel, mentions,
+ * admin) sont découpées en morceaux chargés à la demande
+ * (React.lazy) — puis PRÉCHARGÉES dès que le navigateur est
+ * inactif : la première visite n'emporte plus le code des pages non
+ * consultées, et les navigations restent instantanées. La page
+ * « Services » a été supprimée (demande de l'éditeur, 15/11/2026)
+ * au profit des pages Méthode / Référencement / Publicité.
  */
 
 /* Pages secondaires — morceaux séparés, préchargés à l'inactivité. */
-const ServicesPage = React.lazy(() =>
-  import("@/components/pages/ServicesPage").then((m) => ({ default: m.ServicesPage })),
-);
 const ProcessPage = React.lazy(() =>
   import("@/components/pages/ProcessPage").then((m) => ({ default: m.ProcessPage })),
+);
+const SeoPage = React.lazy(() =>
+  import("@/components/pages/SeoPage").then((m) => ({ default: m.SeoPage })),
+);
+const MetaAdsPage = React.lazy(() =>
+  import("@/components/pages/MetaAdsPage").then((m) => ({ default: m.MetaAdsPage })),
 );
 const PortfolioPage = React.lazy(() =>
   import("@/components/pages/PortfolioPage").then((m) => ({ default: m.PortfolioPage })),
@@ -61,7 +68,8 @@ const AdminPage = React.lazy(() =>
  *  navigations instantanées sans rien ajouter au chargement initial. */
 const PREFETCH_PAGES = [
   () => import("@/components/pages/ProcessPage"),
-  () => import("@/components/pages/ServicesPage"),
+  () => import("@/components/pages/SeoPage"),
+  () => import("@/components/pages/MetaAdsPage"),
   () => import("@/components/pages/PortfolioPage"),
   () => import("@/components/pages/ProjectPage"),
   () => import("@/components/pages/AboutPage"),
@@ -81,8 +89,10 @@ function PageSwitch() {
     switch (page) {
       case "processus":
         return <ProcessPage />;
-      case "services":
-        return <ServicesPage />;
+      case "referencement":
+        return <SeoPage />;
+      case "publicite":
+        return <MetaAdsPage />;
       case "realisations":
         return <PortfolioPage />;
       case "projet": {
@@ -181,6 +191,9 @@ export default function App() {
   return (
     <RouterProvider>
       <CalendlyProvider>
+        {/* Défilement fluide à la sheragency (inertie douce de la
+            molette) — composant « sans rendu » monté une seule fois. */}
+        <SmoothScroll />
         <Shell />
         <Toaster />
       </CalendlyProvider>

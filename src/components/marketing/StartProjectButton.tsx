@@ -26,7 +26,7 @@ export function StartProjectButton({
       type="button"
       onClick={onClick}
       aria-label={ariaLabel ?? `${label} — page de demande de devis`}
-      className={`group/cta btn-fill inline-flex min-h-[52px] items-center gap-3 rounded-full border border-[#e4e4e4] bg-white py-2 pl-6 pr-1.5 font-medium tracking-[0.01em] text-[#1c1c1c] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-[#c9baac] focus-visible:outline-2 focus-visible:outline-offset-4 [&::before]:bg-[#e4e4e4] ${className}`}
+      className={`group/cta btn-fill inline-flex min-h-[52px] items-center gap-3 rounded-full border border-[#e4e4e4] bg-white py-2 pl-6 pr-2.5 font-medium tracking-[0.01em] text-[#1c1c1c] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-[#c9baac] focus-visible:outline-2 focus-visible:outline-offset-4 [&::before]:bg-[#e4e4e4] ${className}`}
     >
       <span className="text-[15px]">{label}</span>
       <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#e4e4e4] transition-colors duration-300 group-hover/cta:bg-[#1c1c1c]">

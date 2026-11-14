@@ -66,18 +66,25 @@ export const PAGES = {
       "Sites vitrines, multipages, landing pages et pages de vente pensés pour convertir. Copywriting et SEO de base inclus. Appelez Stevens Akpovi ou demandez votre devis.",
   },
   processus: {
-    hash: "#/processus",
-    label: "Mon Process",
-    title: "Mon Process — Comment je travaille | Stevens Akpovi",
+    hash: "#/methode",
+    label: "Méthode",
+    title: "Méthode — Comment je travaille | Stevens Akpovi",
     description:
-      "Découvrez le processus de collaboration de Stevens Akpovi : échange et compréhension, parcours utilisateur, conception visuelle, rédaction, développement, mise en ligne et génération de trafic.",
+      "Découvrez la méthode de collaboration de Stevens Akpovi : échange et compréhension, parcours utilisateur, conception visuelle, rédaction, développement, mise en ligne et génération de trafic.",
   },
-  services: {
-    hash: "#/services",
-    label: "Services",
-    title: "Services — Sites web orientés conversion | Stevens Akpovi",
+  referencement: {
+    hash: "#/referencement-seo",
+    label: "Référencement SEO",
+    title: "Référencement SEO — Positionnement Google | Stevens Akpovi",
     description:
-      "Sites vitrines professionnels, sites multipages, landing pages, pages de vente, refontes et systèmes d'acquisition client. Meta Ads et référencement approfondi en options.",
+      "Améliorez votre positionnement sur Google, renforcez votre visibilité et développez une présence organique durable grâce à une stratégie de référencement adaptée à votre marché.",
+  },
+  publicite: {
+    hash: "#/publicite-meta-ads",
+    label: "Publicité Meta Ads",
+    title: "Publicité Meta Ads — Facebook & Instagram | Stevens Akpovi",
+    description:
+      "Développez votre présence sur Facebook et Instagram grâce à des campagnes publicitaires ciblées et structurées autour de vos objectifs.",
   },
   realisations: {
     hash: "#/realisations",
@@ -124,12 +131,17 @@ export const PAGES = {
 
 export type PageKey = keyof typeof PAGES | "admin";
 
-/** Navigation publique (ordre éditorial). */
+/** Navigation publique (ordre éditorial) — pages « Services » supprimée
+ *  (demande de l'éditeur, 15/11/2026) : le header présente Méthode,
+ *  Référencement, Publicité, Portfolio et À propos (le menu Contact
+ *  a été retiré du header à la demande de l'éditeur ; il reste dans
+ *  le menu plein écran, colonne « Autre », et dans le pied de page). */
 export const NAV_ITEMS: { key: PageKey; label: string }[] = [
   { key: "accueil", label: "Accueil" },
-  { key: "processus", label: "Mon Process" },
-  { key: "services", label: "Services" },
-  { key: "realisations", label: "Réalisations" },
+  { key: "processus", label: "Méthode" },
+  { key: "referencement", label: "Référencement" },
+  { key: "publicite", label: "Publicité" },
+  { key: "realisations", label: "Portfolio" },
   { key: "aPropos", label: "À propos" },
   { key: "contact", label: "Contact" },
 ];

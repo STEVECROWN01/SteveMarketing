@@ -11,13 +11,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: `${SITE.url}/#/processus`,
+      url: `${SITE.url}/#/methode`,
       lastModified: now,
       changeFrequency: "monthly",
-      priority: 0.8,
+      priority: 0.9,
     },
     {
-      url: `${SITE.url}/#/services`,
+      url: `${SITE.url}/#/referencement-seo`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${SITE.url}/#/publicite-meta-ads`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.9,

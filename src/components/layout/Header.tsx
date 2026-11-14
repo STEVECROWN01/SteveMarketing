@@ -1,33 +1,55 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { X, Linkedin, Mail, MessageCircle } from "lucide-react";
+import { X } from "lucide-react";
 import { useRouter } from "@/components/router-context";
 import { ASSETS, NAV_ITEMS, SITE } from "@/lib/site";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { StartProjectButton } from "@/components/marketing/StartProjectButton";
+import {
+  EmailBrandIcon,
+  LinkedInBrandIcon,
+  WhatsAppBrandIcon,
+} from "@/components/media/BrandIcons";
 
 const NAV_PAGES: Record<string, string> = {
   accueil: "accueil",
-  processus: "processus",
-  services: "services",
+  processus: "methode",
+  referencement: "referencement-seo",
+  publicite: "publicite-meta-ads",
   realisations: "realisations",
   aPropos: "a-propos",
   contact: "contact",
+  legal: "mentions-legales",
 };
 
-/** Navigation du header — « Accueil » retiré à la demande de l'éditeur
- *  (le logo ramène déjà à l'accueil ; le pied de page le conserve). */
-const HEADER_NAV_ITEMS = NAV_ITEMS.filter((item) => item.key !== "accueil");
+/** Navigation du header (bureau) — à la demande de l'éditeur
+ *  (15/11/2026) : « Accueil » retiré (le logo ramène déjà à
+ *  l'accueil) et « Contact » retiré du header. Ordre éditorial :
+ *  Méthode, Référencement, Publicité, Portfolio, À propos. */
+const HEADER_NAV_ITEMS = NAV_ITEMS.filter(
+  (item) => item.key !== "accueil" && item.key !== "contact",
+);
 
-/** Menus listés dans le menu plein écran (mobile/tablette) — à la
- *  demande de l'éditeur (15/11/2026) : la liste est resserrée sur
- *  « Mon Process » puis « Nos Réalisations », suivis d'une barre de
- *  séparation à extrémités fondues, des trois icônes de contact
- *  (email, LinkedIn, WhatsApp) et du menu « Me Contacter ». */
-const MENU_FULLSCREEN_ITEMS: { key: string; label: string }[] = [
-  { key: "processus", label: "Mon Process" },
+/** PREMIÈRE colonne du menu plein écran (demande de l'éditeur,
+ *  15/11/2026) : les pages majeures — Méthode, Référencement SEO,
+ *  Référencement International SEO (ancre de section sur la page
+ *  Référencement), Publicité Meta Ads, puis Nos Réalisations. */
+const MENU_MAIN_ITEMS: { key: string; label: string; section?: string }[] = [
+  { key: "processus", label: "Méthode" },
+  { key: "referencement", label: "Référencement SEO" },
+  { key: "referencement", label: "Référencement International SEO", section: "seo-international" },
+  { key: "publicite", label: "Publicité Meta Ads" },
   { key: "realisations", label: "Nos Réalisations" },
+];
+
+/** DEUXIÈME colonne du menu plein écran, nommée « Autre » (demande
+ *  de l'éditeur, 15/11/2026) : À propos, Contact et Mentions
+ *  légales. */
+const MENU_OTHER_ITEMS: { key: string; label: string }[] = [
+  { key: "aPropos", label: "À propos" },
+  { key: "contact", label: "Contact" },
+  { key: "legal", label: "Mentions légales" },
 ];
 
 /**
@@ -38,27 +60,32 @@ const MENU_FULLSCREEN_ITEMS: { key: string; label: string }[] = [
  * 2. pilule de navigation centrale (85px, arrondie 9px) : liens
  *    blancs 16px + soulignement qui s'étend depuis le centre au
  *    survol, bouton blanc « Démarrer un projet » à droite (pastille
- *    flèche ↗ de 28px) — mène à la page de demande de devis ;
+ *    flèche ↗) — mène à la page de demande de devis ;
  * 3. pastille hamburger à droite, collée au bord haut — ouvre le
- *    menu plein écran (liens XL + CTA), comme la référence.
+ *    menu plein écran, comme la référence.
  * Le bandeau reste fixe : les pastilles étant opaques, la présentation
  * est identique sur tous les fonds.
  *
- * MENU PLEIN ÉCRAN — entièrement visible sans défilement sur tout
- * écran (hauteur 100svh, contenu compact et adaptatif) + croix de
- * fermeture dédiée dans le menu, en plus de la pastille hamburger
- * qui se transforme en croix.
+ * MENU PLEIN ÉCRAN — deux colonnes (demande de l'éditeur,
+ * 15/11/2026) : pages majeures à gauche, colonne « Autre » à droite,
+ * puis barre de séparation à extrémités fondues et les trois VRAIES
+ * icônes de réseaux (email, LinkedIn, WhatsApp) en monochrome.
  */
 export function Header() {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const reduce = useReducedMotion();
 
-  // Bloque le défilement quand le menu plein écran est ouvert
+  // Bloque le défilement quand le menu plein écran est ouvert —
+  // y compris le défilement fluide Lenis (événement de contrôle).
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
+    window.dispatchEvent(
+      new CustomEvent("app:lenis-control", { detail: menuOpen ? "stop" : "start" }),
+    );
     return () => {
       document.body.style.overflow = "";
+      window.dispatchEvent(new CustomEvent("app:lenis-control", { detail: "start" }));
     };
   }, [menuOpen]);
 
@@ -87,10 +114,10 @@ export function Header() {
     router.navigate("devis");
   };
 
-  const goPage = (e: React.MouseEvent, key: string) => {
+  const goPage = (e: React.MouseEvent, key: string, section?: string) => {
     e.preventDefault();
     setMenuOpen(false);
-    router.navigate(key as never);
+    router.navigate(key as never, section ?? null);
   };
 
   /** Icône hamburger à deux lignes inégales (style sher) / croix si ouvert. */
@@ -120,23 +147,23 @@ export function Header() {
           aria-label="Stevens Akpovi — retour à l'accueil"
           className="flex h-14 w-14 items-center justify-center rounded-b-lg bg-[#1c1c1c] transition-colors duration-300 hover:bg-[#232323] lg:h-[104px] lg:w-[100px] lg:rounded-b-[9px]"
         >
-          {/* Logo officiel (version blanche, pour fond sombre) — légèrement
-              agrandi à la demande de l'éditeur */}
+          {/* Logo officiel (version blanche, pour fond sombre) —
+              agrandi à nouveau à la demande de l'éditeur (15/11/2026). */}
           <img
             src={ASSETS.logoLight}
             alt="Stevens Akpovi"
             width={240}
             height={192}
             fetchPriority="high"
-            className="h-10 w-auto lg:h-[64px]"
+            className="h-11 w-auto lg:h-[72px]"
           />
         </a>
 
         {/* ---------- 2. Pilule de navigation (bureau) ---------- */}
         {/* Espaces à la demande de l'éditeur (15/11/2026) : air à
-            gauche du premier lien (« Mon Process ») ; l'espace à
-            droite du bouton « Démarrer un projet », élargi puis
-            jugé trop grand, est légèrement réduit (40 → 30px). */}
+            gauche du premier lien ; l'espace à droite du bouton
+            « Démarrer un projet », élargi puis jugé trop grand, est
+            légèrement réduit (40 → 30px). */}
         <nav
           aria-label="Navigation principale"
           className="mt-[13px] hidden h-[85px] items-center justify-between rounded-[9px] bg-[#1c1c1c] pl-[30px] pr-[30px] lg:flex"
@@ -144,10 +171,8 @@ export function Header() {
           <ul className="flex items-center">
             {HEADER_NAV_ITEMS.map((item) => (
               <li key={item.key}>
-                {/* Soulignement actif : pleine largeur, aligné à gauche
-                    (avant : demi-largeur décalée — conflit left-1/2/w-0
-                    contre left-0/w-full). Chaque état porte ses propres
-                    utilitaires left/w pour éviter tout conflit d'ordre CSS. */}
+                {/* Soulignement actif : pleine largeur, aligné à gauche.
+                    Chaque état porte ses propres utilitaires left/w. */}
                 <a
                   href={`#/${NAV_PAGES[item.key]}`}
                   onClick={(e) => {
@@ -183,11 +208,9 @@ export function Header() {
       </div>
 
       {/* ---------- Menu plein écran (comme sheragency) ---------- */}
-      {/* Hauteur 100svh, contenu compact : tout est visible sans
-          défilement, sur tous les écrans. Croix de fermeture dédiée
-          sous la pastille hamburger (qui devient elle aussi une
-          croix). Ouverture/fermeture douces et légèrement animées
-          (fondu + translation courte). */}
+      {/* Hauteur 100svh, contenu compact : deux colonnes de menus,
+          barre de séparation à extrémités fondues, trois vraies
+          icônes de réseaux — tout est visible sans défilement. */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -198,15 +221,10 @@ export function Header() {
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-[#1c1c1c]"
           >
-            {/* Espacements à la demande de l'éditeur (15/11/2026) :
-                l'espace au-dessus des menus est légèrement réduit
-                (−8px mobile/tablette, −12px bureau) et la même quantité
-                est ajoutée sous le dernier élément (« Me Contacter »). */}
             <div className="container-site relative flex min-h-0 flex-1 flex-col pb-[28px] pt-[68px] sm:pb-[32px] sm:pt-[80px] lg:pb-[44px] lg:pt-[120px]">
               {/* Croix de fermeture dédiée — sous la pastille hamburger.
                   Au survol, TOUT le bouton prend la couleur de survol du
-                  bouton du header (remplissage #e4e4e4, bordure #c9baac,
-                  croix sombre) — pas seulement la bordure circulaire. */}
+                  bouton du header (remplissage #e4e4e4, croix sombre). */}
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
@@ -216,33 +234,65 @@ export function Header() {
                 <X className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
               </button>
 
-              {/* Menus — « Mon Process » puis « Nos Réalisations »
-                  (demande de l'éditeur, 15/11/2026). */}
-              <nav aria-label="Navigation plein écran">
-                <ul className="flex flex-col">
-                  {MENU_FULLSCREEN_ITEMS.map((item, i) => (
-                    <motion.li
-                      key={item.key}
-                      initial={reduce ? undefined : { opacity: 0, x: -18 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.08 + 0.05 * i, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                    >
-                      <a
-                        href={`#/${NAV_PAGES[item.key]}`}
-                        onClick={(e) => goPage(e, item.key)}
-                        aria-current={isActive(item.key) ? "page" : undefined}
-                        className={`group relative inline-block py-1.5 font-display text-[clamp(1.3rem,6vw,2.5rem)] font-medium leading-tight text-white transition-colors duration-300 hover:text-[#efefef] after:absolute after:bottom-1.5 after:h-px after:bg-white after:transition-all after:duration-300 sm:py-2.5 lg:py-3 ${
-                          isActive(item.key)
-                            ? "after:left-0 after:w-full"
-                            : "after:left-1/2 after:w-0 hover:after:left-0 hover:after:w-full"
-                        }`}
+              {/* Menus — deux colonnes (demande de l'éditeur,
+                  15/11/2026) : pages majeures à gauche, « Autre » à
+                  droite ; empilées sur très petits écrans. */}
+              <div className="flex min-h-0 flex-1 flex-col justify-center gap-9 py-4 min-[560px]:flex-row min-[560px]:items-start min-[560px]:gap-14 lg:gap-24">
+                <nav aria-label="Navigation plein écran — pages" className="min-w-0 flex-1">
+                  <ul className="flex flex-col">
+                    {MENU_MAIN_ITEMS.map((item, i) => (
+                      <motion.li
+                        key={item.label}
+                        initial={reduce ? undefined : { opacity: 0, x: -18 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.08 + 0.05 * i, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                       >
-                        {item.label}
-                      </a>
-                    </motion.li>
-                  ))}
-                </ul>
-              </nav>
+                        <a
+                          href={`#/${NAV_PAGES[item.key]}${item.section ? `/${item.section}` : ""}`}
+                          onClick={(e) => goPage(e, item.key, item.section)}
+                          aria-current={isActive(item.key) ? "page" : undefined}
+                          className={`group relative inline-block py-1.5 font-display text-[clamp(1.25rem,5vw,2.5rem)] font-medium leading-tight text-white transition-colors duration-300 hover:text-[#efefef] after:absolute after:bottom-1.5 after:h-px after:bg-white after:transition-all after:duration-300 sm:py-2.5 lg:py-3 ${
+                            isActive(item.key)
+                              ? "after:left-0 after:w-full"
+                              : "after:left-1/2 after:w-0 hover:after:left-0 hover:after:w-full"
+                          }`}
+                        >
+                          {item.label}
+                        </a>
+                      </motion.li>
+                    ))}
+                  </ul>
+                </nav>
+
+                {/* Colonne « Autre » — à propos, contact, mentions
+                    légales (nom de colonne demandé par l'éditeur). */}
+                <nav aria-label="Navigation plein écran — autre" className="min-w-0 shrink-0">
+                  <p className="text-eyebrow mb-4 sm:mb-5">Autre</p>
+                  <ul className="flex flex-col">
+                    {MENU_OTHER_ITEMS.map((item, i) => (
+                      <motion.li
+                        key={item.label}
+                        initial={reduce ? undefined : { opacity: 0, x: -14 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.16 + 0.05 * i, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                      >
+                        <a
+                          href={`#/${NAV_PAGES[item.key]}`}
+                          onClick={(e) => goPage(e, item.key)}
+                          aria-current={isActive(item.key) ? "page" : undefined}
+                          className={`group relative inline-block py-1.5 font-display text-[clamp(1.05rem,4vw,1.75rem)] font-medium leading-tight text-white transition-colors duration-300 hover:text-[#efefef] after:absolute after:bottom-1.5 after:h-px after:bg-white after:transition-all after:duration-300 sm:py-2 ${
+                            isActive(item.key)
+                              ? "after:left-0 after:w-full"
+                              : "after:left-1/2 after:w-0 hover:after:left-0 hover:after:w-full"
+                          }`}
+                        >
+                          {item.label}
+                        </a>
+                      </motion.li>
+                    ))}
+                  </ul>
+                </nav>
+              </div>
 
               {/* Barre de séparation à extrémités fondues — comme
                   toutes les barres de séparation du site (fade-in à
@@ -251,56 +301,40 @@ export function Header() {
                 initial={reduce ? undefined : { opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.4 }}
-                className="mt-5 sm:mt-7 lg:mt-9"
               >
                 <div aria-hidden="true" className="separator-fade" />
 
-                {/* Trois icônes de contact (email, LinkedIn, WhatsApp) —
-                    mêmes pastilles blanches que le pied de page, style
-                    sheragency. Elles remplacent les deux boutons
-                    précédents (demande de l'éditeur, 15/11/2026). */}
+                {/* Trois VRAIES icônes de contact (email, LinkedIn,
+                    WhatsApp) — glyphes officiels monochromes, mêmes
+                    pastilles blanches que le pied de page (demande de
+                    l'éditeur, 15/11/2026). */}
                 <div className="mt-5 flex items-center gap-2.5 sm:mt-6">
                   <a
                     href={`mailto:${SITE.email}`}
                     aria-label={`Écrire un email à Stevens Akpovi — ${SITE.email}`}
-                    className="flex h-[45px] w-[45px] items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#e4e4e4] focus-visible:outline-2 focus-visible:outline-offset-4"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#e4e4e4] focus-visible:outline-2 focus-visible:outline-offset-4"
                   >
-                    <Mail className="h-[18px] w-[18px]" aria-hidden="true" />
+                    <EmailBrandIcon className="h-4 w-4" />
                   </a>
                   <a
                     href={SITE.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="LinkedIn — Stevens Akpovi"
-                    className="flex h-[45px] w-[45px] items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#e4e4e4] focus-visible:outline-2 focus-visible:outline-offset-4"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#e4e4e4] focus-visible:outline-2 focus-visible:outline-offset-4"
                   >
-                    <Linkedin className="h-[18px] w-[18px]" aria-hidden="true" />
+                    <LinkedInBrandIcon className="h-4 w-4" />
                   </a>
                   <a
                     href={SITE.whatsapp}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="WhatsApp — Stevens Akpovi"
-                    className="flex h-[45px] w-[45px] items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#e4e4e4] focus-visible:outline-2 focus-visible:outline-offset-4"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#e4e4e4] focus-visible:outline-2 focus-visible:outline-offset-4"
                   >
-                    <MessageCircle className="h-[18px] w-[18px]" aria-hidden="true" />
+                    <WhatsAppBrandIcon className="h-4 w-4" />
                   </a>
                 </div>
-
-                {/* Menu « Me Contacter » — remplace la mention
-                    « 30 minutes · Gratuit · Sans engagement ». */}
-                <a
-                  href="#/contact"
-                  onClick={(e) => goPage(e, "contact")}
-                  aria-current={isActive("contact") ? "page" : undefined}
-                  className={`group relative mt-3 inline-block font-display text-[clamp(1.3rem,6vw,2.5rem)] font-medium leading-tight text-white transition-colors duration-300 hover:text-[#efefef] after:absolute after:bottom-1.5 after:h-px after:bg-white after:transition-all after:duration-300 sm:mt-4 ${
-                    isActive("contact")
-                      ? "after:left-0 after:w-full"
-                      : "after:left-1/2 after:w-0 hover:after:left-0 hover:after:w-full"
-                  }`}
-                >
-                  Me Contacter
-                </a>
               </motion.div>
             </div>
           </motion.div>

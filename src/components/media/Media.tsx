@@ -81,9 +81,11 @@ export function MonoImage({
 }
 
 /** Mockup navigateur (aperçu desktop des réalisations).
- *  Arrondi volontairement discret (rounded-md) et barre chrome fine :
- *  le contenu du site capturé doit rester pleinement lisible, y compris
- *  à petite échelle dans le hero (demande de l'éditeur, 14/11/2026). */
+ *  Arrondi volontairement discret (rounded-md) et barre chrome
+ *  fine — ENCORE amincie à la demande de l'éditeur (15/11/2026 :
+ *  « réduis l'épaisseur de l'entête appareil du mockup desktop ») :
+ *  pastilles et retraits réduits, le contenu capturé occupe
+ *  davantage du mockup. */
 export function BrowserMockup({
   src,
   src2x,
@@ -119,13 +121,13 @@ export function BrowserMockup({
     : undefined;
   return (
     <figure className={`group/mockup overflow-hidden rounded-md border border-[#e4e4e4]/25 bg-[#232323] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] ${className}`}>
-      <figcaption className="flex items-center gap-2 border-b border-[#e4e4e4]/12 px-2.5 py-1.5 sm:px-3.5 sm:py-2.5">
+      <figcaption className="flex items-center gap-1.5 border-b border-[#e4e4e4]/12 px-2 py-1 sm:gap-2 sm:px-3 sm:py-1.5">
         <span className="flex gap-1" aria-hidden="true">
-          <span className="h-2 w-2 rounded-full bg-[#3c3c3c]" />
-          <span className="h-2 w-2 rounded-full bg-[#3c3c3c]" />
-          <span className="h-2 w-2 rounded-full bg-[#3c3c3c]" />
+          <span className="h-1.5 w-1.5 rounded-full bg-[#3c3c3c]" />
+          <span className="h-1.5 w-1.5 rounded-full bg-[#3c3c3c]" />
+          <span className="h-1.5 w-1.5 rounded-full bg-[#3c3c3c]" />
         </span>
-        <span className="mx-auto flex max-w-[70%] items-center gap-1.5 truncate rounded-md bg-[#1c1c1c] px-2 py-0.5 text-[9px] text-[#c8c8c8] sm:text-[10px]" aria-hidden="true">
+        <span className="mx-auto flex max-w-[70%] items-center gap-1.5 truncate rounded-md bg-[#1c1c1c] px-2 py-[2px] text-[8px] text-[#c8c8c8] sm:text-[9px]" aria-hidden="true">
           <span className="h-1 w-1 shrink-0 rounded-full bg-[#e4e4e4]" />
           {shortUrl}
         </span>

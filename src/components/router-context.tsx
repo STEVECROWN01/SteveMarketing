@@ -13,17 +13,18 @@ import { PAGES, PROJECTS, type PageKey } from "@/lib/site";
 
 /**
  * Routeur applicatif du site (pages virtuelles dans la route `/`).
- * URLs propres par fragment : #/services, #/realisations, #/a-propos,
- * #/contact, #/demander-un-devis, #/reserver-un-appel,
- * #/mentions-legales, #/projet/<id> (page de présentation
- * d'une réalisation) — ancrage de section possible :
- * #/accueil/portfolio…
+ * URLs propres par fragment : #/methode, #/referencement-seo,
+ * #/publicite-meta-ads, #/realisations, #/a-propos, #/contact,
+ * #/demander-un-devis, #/reserver-un-appel, #/mentions-legales,
+ * #/projet/<id> (page de présentation d'une réalisation) — ancrage
+ * de section possible : #/accueil/portfolio…
  */
 
 export type AppPage =
   | "accueil"
   | "processus"
-  | "services"
+  | "referencement"
+  | "publicite"
   | "realisations"
   | "projet"
   | "aPropos"
@@ -48,7 +49,8 @@ const RouterContext = createContext<RouterContextValue | null>(null);
 const PAGE_KEYS: Record<AppPage, keyof typeof PAGES | "admin"> = {
   accueil: "accueil",
   processus: "processus",
-  services: "services",
+  referencement: "referencement",
+  publicite: "publicite",
   realisations: "realisations",
   projet: "realisations",
   aPropos: "aPropos",
@@ -61,11 +63,18 @@ const PAGE_KEYS: Record<AppPage, keyof typeof PAGES | "admin"> = {
 
 const SERVER_HASH = "";
 
-/** Correspondance URL (fragment) → clé de page applicative. */
+/** Correspondance URL (fragment) → clé de page applicative.
+ *  Anciens fragments conservés en alias : « processus » (page
+ *  renommée « méthode », 15/11/2026) et « services » (page
+ *  supprimée — ses contenus vivent désormais sur la page Méthode :
+ *  l'ancienne URL y ramène). */
 const HASH_TO_PAGE: Record<string, AppPage> = {
   accueil: "accueil",
+  methode: "processus",
   processus: "processus",
-  services: "services",
+  services: "processus",
+  "referencement-seo": "referencement",
+  "publicite-meta-ads": "publicite",
   realisations: "realisations",
   projet: "projet",
   "a-propos": "aPropos",
@@ -101,8 +110,9 @@ function parseHash(hash: string): RouterState {
 /** Clé de page → fragment d'URL propre. */
 const PAGE_TO_HASH: Record<AppPage, string> = {
   accueil: "accueil",
-  processus: "processus",
-  services: "services",
+  processus: "methode",
+  referencement: "referencement-seo",
+  publicite: "publicite-meta-ads",
   realisations: "realisations",
   projet: "projet",
   aPropos: "a-propos",

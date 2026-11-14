@@ -44,15 +44,18 @@ export function ServicesSection() {
         <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
           <SectionHeading eyebrow={SERVICES_SUMMARY.eyebrow} title={SERVICES_SUMMARY.title} tone="light" className="max-w-2xl" />
           <Reveal direction="up" delay={0.15}>
+            {/* La page Services a été supprimée (demande de l'éditeur,
+                15/11/2026) — le détail de l'offre et le processus vivent
+                désormais sur la page Méthode. */}
             <a
-              href="#/services"
+              href="#/methode"
               onClick={(e) => {
                 e.preventDefault();
-                router.navigate("services");
+                router.navigate("processus");
               }}
               className="group inline-flex items-center gap-2 rounded-full border border-[#1c1c1c]/20 px-5 py-2.5 text-sm font-medium text-[#1c1c1c] transition-colors duration-300 hover:border-[#1c1c1c] hover:bg-[#1c1c1c] hover:text-white"
             >
-              Explorer Le Détail Des Services
+              Découvrir Ma Méthode
               <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </a>
           </Reveal>
