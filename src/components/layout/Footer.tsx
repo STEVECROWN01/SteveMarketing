@@ -12,11 +12,11 @@ import {
 
 /** Liens de la colonne « Services » — à la demande de l'éditeur
  *  (15/11/2026) : trois services, chacun vers SA page dédiée —
- *  « Obtention ou Refonte de Site Web » vers la page Méthode,
+ *  « Conception de Sites Web » vers la page Méthode,
  *  « Référencement SEO » vers la page dédiée au référencement,
  *  « Publicité Meta Ads » vers la page dédiée à la publicité. */
 const FOOTER_SERVICES = [
-  { label: "Obtention ou Refonte de Site Web", page: "processus" },
+  { label: "Conception de Sites Web", page: "processus" },
   { label: "Référencement SEO", page: "referencement" },
   { label: "Publicité Meta Ads", page: "publicite" },
 ] as const;
@@ -62,7 +62,7 @@ const FOOTER_LINK_CLASS =
  * 2. à la place de leurs deux logos de reconnaissance sous le
  *    logo, notre mention : « Conception de Sites Web
  *    Professionnel qui Vendent. » ;
- * 3. colonne « Services » : Obtention ou Refonte de Site Web,
+ * 3. colonne « Services » : Conception de Sites Web,
  *    Référencement SEO, Publicité Meta Ads — chacun vers sa page ;
  * 4. colonne « Professionnel » : « Portfolio », « Contact » et
  *    « À propos » ;
