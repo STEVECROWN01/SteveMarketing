@@ -25,10 +25,14 @@ const NAV_PAGES: Record<string, string> = {
 
 /** Navigation du header (bureau) — à la demande de l'éditeur
  *  (15/11/2026) : « Accueil » retiré (le logo ramène déjà à
- *  l'accueil) et « Contact » retiré du header. Ordre éditorial :
- *  Méthode, Référencement, Publicité, Portfolio, À propos. */
+ *  l'accueil), « Contact » retiré, puis « À propos » retiré
+ *  (16/11/2026). Ordre éditorial restant :
+ *  Méthode, Référencement, Publicité, Portfolio. */
 const HEADER_NAV_ITEMS = NAV_ITEMS.filter(
-  (item) => item.key !== "accueil" && item.key !== "contact",
+  (item) =>
+    item.key !== "accueil" &&
+    item.key !== "contact" &&
+    item.key !== "aPropos",
 );
 
 /** PREMIÈRE colonne du menu plein écran (demande de l'éditeur,
