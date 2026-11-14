@@ -48,9 +48,9 @@ const MENU_MAIN_ITEMS: { key: string; label: string; section?: string }[] = [
   { key: "realisations", label: "Nos Réalisations" },
 ];
 
-/** DEUXIÈME colonne du menu plein écran, nommée « Autre » (demande
- *  de l'éditeur, 15/11/2026) : À propos, Contact et Mentions
- *  légales. */
+/** DEUXIÈME colonne du menu plein écran, nommée « Autre Liens »
+ *  (demande de l'éditeur, 15/11/2026, renommée de « Autre » le
+ *  16/11/2026) : À propos, Contact et Mentions légales. */
 const MENU_OTHER_ITEMS: { key: string; label: string }[] = [
   { key: "aPropos", label: "À propos" },
   { key: "contact", label: "Contact" },
@@ -269,10 +269,10 @@ export function Header() {
                   </ul>
                 </nav>
 
-                {/* Colonne « Autre » — à propos, contact, mentions
-                    légales (nom de colonne demandé par l'éditeur). */}
-                <nav aria-label="Navigation plein écran — autre" className="min-w-0 shrink-0">
-                  <p className="text-eyebrow mb-4 sm:mb-5">Autre</p>
+                {/* Colonne « Autre Liens » — à propos, contact,
+                    mentions légales (nom demandé par l'éditeur). */}
+                <nav aria-label="Navigation plein écran — autres liens" className="min-w-0 shrink-0">
+                  <p className="text-eyebrow mb-4 sm:mb-5">Autre Liens</p>
                   <ul className="flex flex-col">
                     {MENU_OTHER_ITEMS.map((item, i) => (
                       <motion.li
@@ -310,14 +310,18 @@ export function Header() {
                 <div aria-hidden="true" className="separator-fade" />
 
                 {/* Trois VRAIES icônes de contact (email, LinkedIn,
-                    WhatsApp) — glyphes officiels monochromes, mêmes
-                    pastilles blanches que le pied de page (demande de
-                    l'éditeur, 15/11/2026). */}
+                    WhatsApp) — glyphes officiels, mêmes pastilles
+                    blanches que le pied de page. Au survol, chaque
+                    pastille prend la couleur officielle de son réseau
+                    et le glyphe passe en blanc (demande de
+                    l'éditeur, 16/11/2026) : LinkedIn #0A66C2,
+                    WhatsApp #25D366 ; l'email n'ayant pas de couleur
+                    officielle, il prend le noir #1c1c1c du site. */}
                 <div className="mt-5 flex items-center gap-2.5 sm:mt-6">
                   <a
                     href={`mailto:${SITE.email}`}
                     aria-label={`Écrire un email à Stevens Akpovi — ${SITE.email}`}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#e4e4e4] focus-visible:outline-2 focus-visible:outline-offset-4"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#1c1c1c] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
                   >
                     <EmailBrandIcon className="h-4 w-4" />
                   </a>
@@ -326,7 +330,7 @@ export function Header() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="LinkedIn — Stevens Akpovi"
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#e4e4e4] focus-visible:outline-2 focus-visible:outline-offset-4"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#0A66C2] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
                   >
                     <LinkedInBrandIcon className="h-4 w-4" />
                   </a>
@@ -335,7 +339,7 @@ export function Header() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="WhatsApp — Stevens Akpovi"
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#e4e4e4] focus-visible:outline-2 focus-visible:outline-offset-4"
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#25D366] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
                   >
                     <WhatsAppBrandIcon className="h-4 w-4" />
                   </a>

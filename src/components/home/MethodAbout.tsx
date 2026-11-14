@@ -32,7 +32,7 @@ export function AboutSection() {
           <div className="relative mx-auto w-full max-w-md lg:max-w-none lg:self-start">
             <div
               aria-hidden="true"
-              className="absolute -inset-3 rotate-[2deg] rounded-[2rem] bg-[#e4e4e4] opacity-[0.25]"
+              className="absolute -inset-2 rotate-[2deg] rounded-[2rem] bg-[#e4e4e4] opacity-[0.25] sm:-inset-3"
             />
             <Reveal direction="right">
               <MonoImage

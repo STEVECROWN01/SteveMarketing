@@ -123,12 +123,17 @@ export function Footer() {
                 {/* Trois pastilles de contact — VRAIES icônes des
                     réseaux (glyphes officiels en monochrome),
                     réduites à la demande de l'éditeur (15/11/2026) :
-                    cercles blancs de 36px, icônes sombres de 15px. */}
+                    cercles blancs de 36px, icônes sombres de 15px.
+                    Au survol, la pastille prend la couleur OFFICIELLE
+                    du réseau et le glyphe passe en blanc (demande de
+                    l'éditeur, 16/11/2026) : LinkedIn #0A66C2,
+                    WhatsApp #25D366 ; l'email n'ayant pas de couleur
+                    officielle, il prend le noir #1c1c1c du site. */}
                 <div className="flex items-center gap-2.5 pb-2.5">
                   <a
                     href={`mailto:${SITE.email}`}
                     aria-label={`Écrire un email à Stevens Akpovi — ${SITE.email}`}
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#e4e4e4] focus-visible:outline-2 focus-visible:outline-offset-4"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#1c1c1c] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
                   >
                     <EmailBrandIcon className="h-[15px] w-[15px]" />
                   </a>
@@ -137,7 +142,7 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="LinkedIn — Stevens Akpovi"
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#e4e4e4] focus-visible:outline-2 focus-visible:outline-offset-4"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#0A66C2] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
                   >
                     <LinkedInBrandIcon className="h-[15px] w-[15px]" />
                   </a>
@@ -146,7 +151,7 @@ export function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="WhatsApp — Stevens Akpovi"
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#e4e4e4] focus-visible:outline-2 focus-visible:outline-offset-4"
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#25D366] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
                   >
                     <WhatsAppBrandIcon className="h-[15px] w-[15px]" />
                   </a>

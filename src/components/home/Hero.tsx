@@ -198,9 +198,13 @@ export function Hero() {
                   couleur au survol.
                   AGRANDI et RAPPROCHÉ verticalement du portrait à la
                   demande de l'éditeur (15/11/2026) ; l'entête du
-                  navigateur est plus fine (voir Media.tsx). */}
+                  navigateur est plus fine (voir Media.tsx).
+                  Tailles recentrées sur mobile et tablette
+                  (16/11/2026 : « taille raisonnable ») : 40 % → 36 %
+                  de la largeur du portrait sur mobile, 47 % → 42 %
+                  sur tablette ; bureau inchangé (52 %). */}
               <motion.div
-                className="absolute -bottom-1 -left-[7%] w-[40%] sm:-bottom-4 sm:-left-[12%] sm:w-[47%] lg:-bottom-5 lg:-left-[13%] lg:w-[52%]"
+                className="absolute -bottom-1 -left-[7%] w-[36%] sm:-bottom-4 sm:-left-[10%] sm:w-[42%] lg:-bottom-5 lg:-left-[13%] lg:w-[52%]"
                 initial={reduce ? undefined : { opacity: 0, y: 26, rotate: -5 }}
                 animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotate: -3 }}
                 transition={{ delay: 0.6, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -215,7 +219,7 @@ export function Hero() {
                     height={900}
                     forceMono
                     priority
-                    sizes="(max-width: 640px) 88px, (max-width: 1023px) 145px, 230px"
+                    sizes="(max-width: 640px) 64px, (max-width: 1023px) 92px, 230px"
                   />
                 </motion.div>
               </motion.div>
@@ -223,14 +227,15 @@ export function Hero() {
               {/* Mockup smartphone flottant — AFRIBAYIT. Présent aussi
                   sur mobile. Exclusivement noir et blanc (forceMono) —
                   aucune couleur au survol.
-                  AGRANDI et RAPPROCHÉ verticalement du portrait à la
-                  demande de l'éditeur (15/11/2026) — sur MOBILE, sa
-                  taille est DOUBLÉE (15 % → 30 % de la largeur du
-                  portrait). Sur bureau, légèrement agrandi ensuite
-                  (16/11/2026 : 21 % → 24 % de la largeur du portrait),
-                  toujours épinglé au coin haut-droit. */}
+                  Tailles recentrées sur mobile et tablette
+                  (16/11/2026 : « taille raisonnable ») : 30 % → 26 %
+                  de la largeur du portrait sur mobile (après le
+                  doublement de 15 % demandé le 15/11), 19 % → 24 %
+                  sur tablette ; bureau inchangé (24 %, légèrement
+                  agrandi le 16/11). Toujours épinglé au coin
+                  haut-droit. */}
               <motion.div
-                className="absolute -top-1 -right-[6%] w-[30%] sm:-top-4 sm:-right-[8%] sm:w-[19%] lg:-top-5 lg:-right-[10%] lg:w-[24%]"
+                className="absolute -top-1 -right-[6%] w-[26%] sm:-top-4 sm:-right-[8%] sm:w-[24%] lg:-top-5 lg:-right-[10%] lg:w-[24%]"
                 initial={reduce ? undefined : { opacity: 0, y: 26, rotate: 5 }}
                 animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotate: 2 }}
                 transition={{ delay: 0.75, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -244,7 +249,7 @@ export function Hero() {
                     height={844}
                     forceMono
                     priority
-                    sizes="(max-width: 640px) 62px, (max-width: 1023px) 62px, 110px"
+                    sizes="(max-width: 640px) 46px, (max-width: 1023px) 52px, 104px"
                   />
                 </motion.div>
               </motion.div>

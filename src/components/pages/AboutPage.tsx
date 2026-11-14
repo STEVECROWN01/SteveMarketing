@@ -43,7 +43,7 @@ export function AboutPage() {
               ENCORE agrandie (72 % de la largeur) à la demande de
               l'éditeur, 13/11/2026. */}
           <div className="relative mx-auto w-full max-w-md lg:max-w-none lg:self-start">
-              <div aria-hidden="true" className="absolute -inset-3 rotate-[2deg] rounded-[2rem] bg-[#e4e4e4] opacity-25" />
+              <div aria-hidden="true" className="absolute -inset-2 rotate-[2deg] rounded-[2rem] bg-[#e4e4e4] opacity-25 sm:-inset-3" />
               <Reveal direction="right">
                 <MonoImage
                   src={ASSETS.aboutPortrait}

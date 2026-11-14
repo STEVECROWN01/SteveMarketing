@@ -474,6 +474,33 @@ html.hoverable .media-group:where(:hover, :focus-within) .mono-locked > .media-f
   }
 }
 
+/* ---------- MENU PLEIN ÉCRAN : écrans peu hauts ----------
+   Téléphones en paysage et écrans très bas (≤ 440 px de haut,
+   ex. 740×360) : liens et marges resserrés pour que TOUTES les
+   entrées des deux colonnes, la séparation et les trois pastilles
+   restent visibles sans défilement ni coupe (audit responsive,
+   16/11/2026). Les sélecteurs par identifiant l'emportent sur les
+   utilitaires Tailwind, sans !important. */
+@media (max-height: 440px) {
+  #menu-plein-ecran .container-site {
+    padding-top: 52px;
+    padding-bottom: 14px;
+  }
+  #menu-plein-ecran nav a {
+    font-size: clamp(1.05rem, 3.6vh, 1.5rem);
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem;
+  }
+  #menu-plein-ecran p.text-eyebrow {
+    margin-bottom: 0.5rem;
+    font-size: 0.62rem;
+  }
+  #menu-plein-ecran .mt-5,
+  #menu-plein-ecran .mt-6 {
+    margin-top: 0.65rem;
+  }
+}
+
 /* ---------- Focus visible lisible sur les sections claires ----------
    L'anneau neutre #e4e4e4 (ex-beige) est invisible sur fond blanc :
    sur les sections claires, le contour de focus repasse en encre
