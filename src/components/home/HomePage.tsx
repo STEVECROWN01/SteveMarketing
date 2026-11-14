@@ -66,7 +66,9 @@ export function HomePage() {
       <TransformationSection />
       <ServicesSection />
       <SolutionSection />
-      <FadeSeparator />
+      {/* Demi-largeur à la demande de l'éditeur (15/11/2026) : ce
+          trait-là aussi était trop long — réduit de moitié, centré. */}
+      <FadeSeparator className="separator-fade-half" />
       <IncludedSection />
       <WorksSection />
       <AboutSection />
