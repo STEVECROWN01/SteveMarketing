@@ -112,8 +112,13 @@ export function SolutionSection() {
     <section
       id="solution"
       aria-label="Comment ça fonctionne — processus de collaboration"
-      className="section-dark border-t border-[#e4e4e4]/10 scroll-mt-20 py-20 sm:py-24 lg:py-32"
+      className="section-dark relative scroll-mt-20 py-20 sm:py-24 lg:py-32"
     >
+      {/* Barre de séparation à extrémités fondues — fade-in à gauche,
+          fade-out à droite, comme toutes les barres de séparation du
+          site (demande de l'éditeur, 15/11/2026) ; remplace l'ancienne
+          bordure pleine. */}
+      <div aria-hidden="true" className="separator-fade absolute inset-x-0 top-0" />
       <div className="container-site">
         <div className="grid gap-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-20">
           {/* Colonne gauche : titre, texte, boutons */}

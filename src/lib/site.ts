@@ -67,8 +67,8 @@ export const PAGES = {
   },
   processus: {
     hash: "#/processus",
-    label: "Process",
-    title: "Process — Comment je travaille | Stevens Akpovi",
+    label: "Mon Process",
+    title: "Mon Process — Comment je travaille | Stevens Akpovi",
     description:
       "Découvrez le processus de collaboration de Stevens Akpovi : échange et compréhension, parcours utilisateur, conception visuelle, rédaction, développement, mise en ligne et génération de trafic.",
   },
@@ -127,7 +127,7 @@ export type PageKey = keyof typeof PAGES | "admin";
 /** Navigation publique (ordre éditorial). */
 export const NAV_ITEMS: { key: PageKey; label: string }[] = [
   { key: "accueil", label: "Accueil" },
-  { key: "processus", label: "Process" },
+  { key: "processus", label: "Mon Process" },
   { key: "services", label: "Services" },
   { key: "realisations", label: "Réalisations" },
   { key: "aPropos", label: "À propos" },

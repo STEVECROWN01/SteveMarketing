@@ -51,8 +51,13 @@ export function ProcessPage() {
           « + »/« − » à droite, panneau à hauteur animée. */}
       <section
         aria-labelledby="process-etapes-titre"
-        className="section-dark border-t border-[#e4e4e4]/10 py-20 sm:py-24 lg:py-32"
+        className="section-dark relative py-20 sm:py-24 lg:py-32"
       >
+        {/* Barre de séparation à extrémités fondues — fade-in à
+            gauche, fade-out à droite, comme toutes les barres de
+            séparation du site (demande de l'éditeur, 15/11/2026) ;
+            remplace l'ancienne bordure pleine. */}
+        <div aria-hidden="true" className="separator-fade absolute inset-x-0 top-0" />
         <div className="container-site">
           <SectionHeading
             eyebrow="LES ÉTAPES"
