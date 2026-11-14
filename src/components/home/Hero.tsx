@@ -149,9 +149,21 @@ export function Hero() {
               aria-hidden="true"
               className="absolute -inset-3 rotate-[2.5deg] rounded-[2rem] bg-[#e4e4e4]/90 opacity-[0.16] sm:rotate-[3deg]"
             />
-            <div className="relative flex justify-center">
-              {/* Portrait professionnel — NON cliquable */}
-              <figure className="relative overflow-hidden rounded-[1.75rem] border border-[#e4e4e4]/15 bg-[#232323] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.7)]">
+            {/* Enveloppe « w-fit » : exactement la largeur du portrait —
+                les pourcentages des mockups épinglés (largeur, décalages)
+                se réfèrent donc au portrait lui-même, et non au bloc
+                visuel plus large : le navigateur comme le smartphone
+                restent accrochés aux coins de l'image, sans jamais
+                déborder de l'écran ni recouvrir sa moitié, quelle que
+                soit la taille (demande de l'éditeur, 15/11/2026). */}
+            <div className="relative mx-auto flex w-fit justify-center">
+              {/* Portrait professionnel — NON cliquable. Classe
+                  « hero-portrait » : cible des adaptations CSS aux
+                  téléphones courts (uniquement cette image — les
+                  mockups épinglés embarquent leurs propres <figure> et
+                  ne doivent jamais être redimensionnés par ces
+                  règles). */}
+              <figure className="hero-portrait relative overflow-hidden rounded-[1.75rem] border border-[#e4e4e4]/15 bg-[#232323] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.7)]">
                 <span className="mono-media block">
                   <img
                     src={ASSETS.portrait}
@@ -179,9 +191,15 @@ export function Hero() {
               {/* Mockup navigateur flottant — MR STEVE ENGLISH.
                   Présent aussi sur mobile (taille et bords adaptés).
                   Exclusivement noir et blanc (forceMono) — aucune
-                  couleur au survol. */}
+                  couleur au survol.
+                  DIMENSIONNÉ pour ne jamais masquer la moitié du
+                  portrait (demande de l'éditeur, 15/11/2026) : largeur
+                  réduite et ancrage très décalé vers l'extérieur — il
+                  ne recouvre qu'un coin du portrait (≈ 30 % de la
+                  largeur, sur la seule bande basse), quel que soit
+                  l'écran. */}
               <motion.div
-                className="absolute -bottom-4 -left-1 w-[46%] sm:-bottom-8 sm:-left-4 sm:w-[58%] lg:-left-14 lg:w-[62%]"
+                className="absolute -bottom-2 -left-[7%] w-[36%] sm:-bottom-6 sm:-left-[13%] sm:w-[42%] lg:-bottom-8 lg:-left-[14%] lg:w-[44%]"
                 initial={reduce ? undefined : { opacity: 0, y: 26, rotate: -5 }}
                 animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotate: -3 }}
                 transition={{ delay: 0.6, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -196,16 +214,21 @@ export function Hero() {
                     height={900}
                     forceMono
                     priority
-                    sizes="(max-width: 640px) 46vw, (max-width: 1023px) 58vw, 340px"
+                    sizes="(max-width: 640px) 76px, (max-width: 1023px) 92px, 190px"
                   />
                 </motion.div>
               </motion.div>
 
               {/* Mockup smartphone flottant — AFRIBAYIT. Présent aussi
                   sur mobile. Exclusivement noir et blanc (forceMono) —
-                  aucune couleur au survol. */}
+                  aucune couleur au survol.
+                  DIMENSIONNÉ pour ne jamais masquer la moitié du
+                  portrait (demande de l'éditeur, 15/11/2026) : largeur
+                  réduite et ancrage très décalé vers l'extérieur — il
+                  ne recouvre que la fine bande droite du portrait,
+                  sans jamais toucher le visage (centré, object-top). */}
               <motion.div
-                className="absolute -right-1 -top-3 w-[22%] sm:-right-2 sm:-top-10 sm:w-[26%] lg:-right-8 lg:w-[28%]"
+                className="absolute -top-2 -right-[6%] w-[15%] sm:-top-6 sm:-right-[8%] sm:w-[17%] lg:-top-8 lg:-right-[10%] lg:w-[19%]"
                 initial={reduce ? undefined : { opacity: 0, y: 26, rotate: 5 }}
                 animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotate: 2 }}
                 transition={{ delay: 0.75, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -219,7 +242,7 @@ export function Hero() {
                     height={844}
                     forceMono
                     priority
-                    sizes="(max-width: 640px) 24vw, 150px"
+                    sizes="(max-width: 640px) 32px, (max-width: 1023px) 40px, 90px"
                   />
                 </motion.div>
               </motion.div>

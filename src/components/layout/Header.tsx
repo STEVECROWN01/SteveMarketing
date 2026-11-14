@@ -10,6 +10,7 @@ import { StartProjectButton } from "@/components/marketing/StartProjectButton";
 
 const NAV_PAGES: Record<string, string> = {
   accueil: "accueil",
+  processus: "processus",
   services: "services",
   realisations: "realisations",
   aPropos: "a-propos",
@@ -129,12 +130,12 @@ export function Header() {
         </a>
 
         {/* ---------- 2. Pilule de navigation (bureau) ---------- */}
-        {/* Espacement à gauche de « Services » aligné sur l'espace entre
-            les liens (mx-[10px] de chaque lien = 20px) — demande de
-            l'éditeur. */}
+        {/* Espaces élargis à la demande de l'éditeur (15/11/2026) :
+            davantage d'air à gauche du premier lien (« Process ») et à
+            droite du bouton « Démarrer un projet » — la pilule respire. */}
         <nav
           aria-label="Navigation principale"
-          className="mt-[13px] hidden h-[85px] items-center justify-between rounded-[9px] bg-[#1c1c1c] pl-[10px] pr-[7px] lg:flex"
+          className="mt-[13px] hidden h-[85px] items-center justify-between rounded-[9px] bg-[#1c1c1c] pl-[30px] pr-[40px] lg:flex"
         >
           <ul className="flex items-center">
             {HEADER_NAV_ITEMS.map((item) => (

@@ -8,6 +8,7 @@ import { Reveal } from "@/components/motion/Reveal";
 
 const NAV_PAGES: Record<string, string> = {
   accueil: "accueil",
+  processus: "processus",
   services: "services",
   realisations: "realisations",
   aPropos: "a-propos",

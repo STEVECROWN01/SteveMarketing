@@ -65,6 +65,13 @@ export const PAGES = {
     description:
       "Sites vitrines, multipages, landing pages et pages de vente pensés pour convertir. Copywriting et SEO de base inclus. Appelez Stevens Akpovi ou demandez votre devis.",
   },
+  processus: {
+    hash: "#/processus",
+    label: "Process",
+    title: "Process — Comment je travaille | Stevens Akpovi",
+    description:
+      "Découvrez le processus de collaboration de Stevens Akpovi : échange et compréhension, parcours utilisateur, conception visuelle, rédaction, développement, mise en ligne et génération de trafic.",
+  },
   services: {
     hash: "#/services",
     label: "Services",
@@ -120,6 +127,7 @@ export type PageKey = keyof typeof PAGES | "admin";
 /** Navigation publique (ordre éditorial). */
 export const NAV_ITEMS: { key: PageKey; label: string }[] = [
   { key: "accueil", label: "Accueil" },
+  { key: "processus", label: "Process" },
   { key: "services", label: "Services" },
   { key: "realisations", label: "Réalisations" },
   { key: "aPropos", label: "À propos" },

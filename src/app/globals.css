@@ -411,7 +411,14 @@ html.hoverable .media-group:where(:hover, :focus-within) .mono-locked > .media-f
     margin-top: 1rem;
     margin-bottom: 1.25rem;
   }
-  #hero .hero-visual img {
+  /* Portrait seul — pas les images des mockups épinglés : ceux-ci
+     embarquent leurs propres <figure>, d'où la classe dédiée
+     « hero-portrait » sur le portrait. L'ancien sélecteur « img »
+     générique forçait aussi les mockups à 33svh de haut, qui
+     recouvraient alors presque tout le portrait sur téléphones
+     courts (corrigé 15/11/2026, demande de l'éditeur : les mockups
+     ne doivent jamais cacher la moitié de l'image). */
+  #hero figure.hero-portrait img {
     height: 33svh;
   }
   #hero .hero-desc {
@@ -432,7 +439,8 @@ html.hoverable .media-group:where(:hover, :focus-within) .mono-locked > .media-f
     margin-top: 10px;
     margin-bottom: 14px;
   }
-  #hero .hero-visual img {
+  /* Portrait seul — voir la remarque ci-dessus. */
+  #hero figure.hero-portrait img {
     height: 29svh;
   }
   #hero .hero-desc {

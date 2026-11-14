@@ -28,6 +28,9 @@ import { PROJECTS } from "@/lib/site";
 const ServicesPage = React.lazy(() =>
   import("@/components/pages/ServicesPage").then((m) => ({ default: m.ServicesPage })),
 );
+const ProcessPage = React.lazy(() =>
+  import("@/components/pages/ProcessPage").then((m) => ({ default: m.ProcessPage })),
+);
 const PortfolioPage = React.lazy(() =>
   import("@/components/pages/PortfolioPage").then((m) => ({ default: m.PortfolioPage })),
 );
@@ -57,6 +60,7 @@ const AdminPage = React.lazy(() =>
  *  d'accueil récupère en arrière-plan les morceaux des autres pages —
  *  navigations instantanées sans rien ajouter au chargement initial. */
 const PREFETCH_PAGES = [
+  () => import("@/components/pages/ProcessPage"),
   () => import("@/components/pages/ServicesPage"),
   () => import("@/components/pages/PortfolioPage"),
   () => import("@/components/pages/ProjectPage"),
@@ -75,6 +79,8 @@ function PageSwitch() {
   // Identifiant inconnu → repli sur la liste des réalisations.
   const content = (() => {
     switch (page) {
+      case "processus":
+        return <ProcessPage />;
       case "services":
         return <ServicesPage />;
       case "realisations":

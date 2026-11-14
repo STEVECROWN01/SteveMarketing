@@ -22,6 +22,7 @@ import { PAGES, PROJECTS, type PageKey } from "@/lib/site";
 
 export type AppPage =
   | "accueil"
+  | "processus"
   | "services"
   | "realisations"
   | "projet"
@@ -46,6 +47,7 @@ const RouterContext = createContext<RouterContextValue | null>(null);
 
 const PAGE_KEYS: Record<AppPage, keyof typeof PAGES | "admin"> = {
   accueil: "accueil",
+  processus: "processus",
   services: "services",
   realisations: "realisations",
   projet: "realisations",
@@ -62,6 +64,7 @@ const SERVER_HASH = "";
 /** Correspondance URL (fragment) → clé de page applicative. */
 const HASH_TO_PAGE: Record<string, AppPage> = {
   accueil: "accueil",
+  processus: "processus",
   services: "services",
   realisations: "realisations",
   projet: "projet",
@@ -98,6 +101,7 @@ function parseHash(hash: string): RouterState {
 /** Clé de page → fragment d'URL propre. */
 const PAGE_TO_HASH: Record<AppPage, string> = {
   accueil: "accueil",
+  processus: "processus",
   services: "services",
   realisations: "realisations",
   projet: "projet",
