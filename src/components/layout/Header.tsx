@@ -146,21 +146,25 @@ export function Header() {
 
       <div className="mx-auto flex w-full max-w-[1400px] items-start justify-between px-5 sm:px-8 lg:px-10">
         {/* ---------- 1. Pastille logo — collée en haut, coins bas arrondis ---------- */}
+        {/* Pastille légèrement AGRANDIE sur tablette et mobile (64 px,
+            demande de l'éditeur, 16/11/2026) pour loger un logo plus
+            grand — la pastille hamburger suit, par symétrie. */}
         <a
           href="#/accueil"
           onClick={(e) => goPage(e, "accueil")}
           aria-label="Stevens Akpovi — retour à l'accueil"
-          className="flex h-14 w-14 items-center justify-center rounded-b-lg bg-[#1c1c1c] transition-colors duration-300 hover:bg-[#232323] lg:h-[104px] lg:w-[100px] lg:rounded-b-[9px]"
+          className="flex h-16 w-16 items-center justify-center rounded-b-lg bg-[#1c1c1c] transition-colors duration-300 hover:bg-[#232323] lg:h-[104px] lg:w-[100px] lg:rounded-b-[9px]"
         >
           {/* Logo officiel (version blanche, pour fond sombre) —
-              agrandi à nouveau à la demande de l'éditeur (15/11/2026). */}
+              légèrement AGRANDI sur tablette et mobile à la demande
+              de l'éditeur (16/11/2026). */}
           <img
             src={ASSETS.logoLight}
             alt="Stevens Akpovi"
             width={240}
             height={192}
             fetchPriority="high"
-            className="h-11 w-auto lg:h-[72px]"
+            className="h-[50px] w-auto lg:h-[72px]"
           />
         </a>
 
@@ -200,13 +204,16 @@ export function Header() {
         </nav>
 
         {/* ---------- 3. Pastille hamburger — collée en haut ---------- */}
+        {/* Même hauteur que la pastille logo (64 px sur tablette et
+            mobile, 16/11/2026) — les deux pastilles restent
+            symétriques. */}
         <button
           type="button"
           onClick={() => setMenuOpen((v) => !v)}
           aria-expanded={menuOpen}
           aria-controls="menu-plein-ecran"
           aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-          className="flex h-14 w-14 items-center justify-center rounded-b-lg bg-[#1c1c1c] transition-colors duration-300 hover:bg-[#232323] lg:h-[104px] lg:w-[100px] lg:rounded-b-[9px]"
+          className="flex h-16 w-16 items-center justify-center rounded-b-lg bg-[#1c1c1c] transition-colors duration-300 hover:bg-[#232323] lg:h-[104px] lg:w-[100px] lg:rounded-b-[9px]"
         >
           {BurgerIcon}
         </button>

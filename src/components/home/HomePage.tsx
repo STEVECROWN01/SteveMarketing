@@ -7,6 +7,7 @@ import { TransformationSection, SolutionSection } from "@/components/home/Transf
 import { ServicesSection, IncludedSection } from "@/components/home/ServicesSections";
 import { WorksSection } from "@/components/home/WorksSection";
 import { AboutSection } from "@/components/home/MethodAbout";
+import { MarqueeBand } from "@/components/home/MarqueeBand";
 import { FaqSection, FinalCtaSection } from "@/components/home/FaqFinal";
 import { FadeSeparator } from "@/components/marketing/Marketing";
 import { Reveal } from "@/components/motion/Reveal";
@@ -73,6 +74,11 @@ export function HomePage() {
       <FadeSeparator className="separator-fade-half" />
       <IncludedSection />
       <WorksSection />
+      {/* Bande noire défilante (droite → gauche) : mots-clés SEO du
+          copywriting en blanc, séparés par de gros points — entre
+          « Projets Réalisés » et la section qui suit (demande de
+          l'éditeur, 16/11/2026). */}
+      <MarqueeBand />
       <AboutSection />
       <FaqSection />
       <FinalCtaSection />

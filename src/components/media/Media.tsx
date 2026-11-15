@@ -104,6 +104,7 @@ export function BrowserMockup({
   width = 1440,
   height = 900,
   priority = false,
+  pinMono = false,
   forceMono = false,
   color = false,
   sizes,
@@ -119,6 +120,10 @@ export function BrowserMockup({
   priority?: boolean;
   /** Tailles d'affichage CSS — sans elle, repli DPR 1x/2x. */
   sizes?: string;
+  /** Noir et blanc PERMANENT sur tous les écrans (mobile comprise),
+   *  mais la couleur originale se révèle au survol (demande de
+   *  l'éditeur, 16/11/2026) : mockups épinglés du hero. */
+  pinMono?: boolean;
   /** Noir et blanc PERMANENT sur tous les écrans (mobile comprise) —
    *  aucune couleur au survol : mockups du hero (demande de
    *  l'éditeur, 13/11/2026). */
@@ -146,7 +151,15 @@ export function BrowserMockup({
           {shortUrl}
         </span>
       </figcaption>
-      <span className={color ? "block" : `mono-media block ${forceMono ? "mono-locked" : ""}`}>
+      <span
+        className={
+          color
+            ? "block"
+            : pinMono
+              ? "mono-pin block"
+              : `mono-media block ${forceMono ? "mono-locked" : ""}`
+        }
+      >
         <img
           src={src}
           srcSet={srcSet}
@@ -180,6 +193,7 @@ export function PhoneMockup({
   width = 390,
   height = 844,
   priority = false,
+  pinMono = false,
   forceMono = false,
   color = false,
   sizes,
@@ -196,6 +210,9 @@ export function PhoneMockup({
   priority?: boolean;
   /** Tailles d'affichage CSS — sans elle, repli DPR 1x/2x. */
   sizes?: string;
+  /** Noir et blanc PERMANENT, couleur révélée au survol — mockups
+   *  épinglés du hero (demande de l'éditeur, 16/11/2026). */
+  pinMono?: boolean;
   /** Noir et blanc PERMANENT sur tous les écrans — aucune couleur
    *  au survol (mockups du hero). */
   forceMono?: boolean;
@@ -214,7 +231,15 @@ export function PhoneMockup({
         className="absolute left-1/2 top-[4px] z-10 h-[5px] w-[34px] -translate-x-1/2 rounded-full bg-[#1c1c1c]"
         aria-hidden="true"
       />
-      <span className={color ? "block overflow-hidden rounded-[11px]" : `mono-media block overflow-hidden rounded-[11px] ${forceMono ? "mono-locked" : ""}`}>
+      <span
+        className={
+          color
+            ? "block overflow-hidden rounded-[11px]"
+            : pinMono
+              ? "mono-pin block overflow-hidden rounded-[11px]"
+              : `mono-media block overflow-hidden rounded-[11px] ${forceMono ? "mono-locked" : ""}`
+        }
+      >
         <img
           src={src}
           srcSet={srcSet}

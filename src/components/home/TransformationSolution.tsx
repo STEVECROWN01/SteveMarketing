@@ -92,14 +92,11 @@ export function TransformationSection() {
 
 /** SECTION 05 — « COMMENT JE TRAVAILLE » (fond sombre)
  *  Grand titre « Comment Je Travaille » (grande typographie
- *  display, graisse normale), trait vertical de séparation à
- *  EXACTEMENT la hauteur de la liste des étapes (fondu haut/bas,
- *  comme tous les traits du site) et espaces symétriques de part et
- *  d'autre du trait (demande de l'éditeur, 16/11/2026) : à gauche,
- *  le grand titre, le texte « Je ne crée pas simplement des sites
- *  web… » et les deux boutons ; à droite du trait, les SIX cartes à
+ *  display, graisse normale) et, à droite, les SIX cartes à
  *  accordéon « + »/« − » — numéros stylisés en angle supérieur
- *  GAUCHE. */
+ *  GAUCHE. Le trait vertical de séparation a été SUPPRIMÉ à la
+ *  demande de l'éditeur (16/11/2026) : les deux colonnes sont
+ *  simplement séparées par la gouttière standard de la grille. */
 export function SolutionSection() {
   const router = useRouter();
   // Une seule étape ouverte à la fois — la première par défaut,
@@ -120,11 +117,9 @@ export function SolutionSection() {
           bordure pleine. */}
       <div aria-hidden="true" className="separator-fade absolute inset-x-0 top-0" />
       <div className="container-site">
-        <div className="grid gap-14 lg:grid-cols-[0.92fr_1.08fr] lg:gap-0">
-          {/* Colonne gauche : GRAND TITRE, texte, boutons — espace
-              symétrique à droite du titre (miroir du padding gauche de
-              la liste) de part et d'autre du trait. */}
-          <div className="lg:sticky lg:top-28 lg:self-start lg:py-1.5 lg:pr-14 xl:pr-20">
+        <div className="grid gap-14 lg:grid-cols-[0.92fr_1.08fr] lg:gap-16 xl:gap-20">
+          {/* Colonne gauche : GRAND TITRE, texte, boutons. */}
+          <div className="lg:sticky lg:top-28 lg:self-start lg:py-1.5">
             {/* GRAND TITRE « Comment Je Travaille » — grande
                 typographie display, graisse normale, comme les grands
                 titres de la page Réalisations. */}
@@ -161,18 +156,11 @@ export function SolutionSection() {
             </Reveal>
           </div>
 
-          {/* Colonne droite : LE TRAIT + les six cartes à accordéon.
-              Le trait vertical (fondu en haut et en bas, comme tous
-              les traits du site) est posé sur le bord gauche de la
-              COLONNE DE LISTE : il épouse donc exactement la hauteur
-              de la liste — du haut de la première carte au bas de la
-              dernière. Espaces symétriques : autant d'air à gauche de
-              la liste (lg:pl-14) qu'à droite du titre (lg:pr-14). */}
-          <div className="relative lg:py-1.5 lg:pl-14 xl:pl-20">
-            <div
-              aria-hidden="true"
-              className="absolute left-0 top-0 hidden h-full w-px bg-gradient-to-b from-transparent via-[#e4e4e4]/40 to-transparent lg:block"
-            />
+          {/* Colonne droite : les six cartes à accordéon. Le trait
+              vertical de séparation a été supprimé (demande de
+              l'éditeur, 16/11/2026) — la gouttière de la grille
+              sépare naturellement les deux colonnes. */}
+          <div className="lg:py-1.5">
             <ol className="flex flex-col gap-4">
             {SOLUTION.steps.map((step, i) => {
               const isOpen = open === i;

@@ -69,19 +69,12 @@ export function AboutPage() {
               <Reveal direction="up" delay={0.12}>
                 <RichText text={ABOUT.text} className="text-body mt-6 max-w-xl on-paper-muted" />
               </Reveal>
+              {/* Les trois petites cartes « Approche / Inclus dans
+                  chaque projet / Mode de collaboration » ont été
+                  SUPPRIMÉES définitivement à la demande de l'éditeur
+                  (16/11/2026), tout comme la dernière phrase de la
+                  description. */}
               <Reveal direction="up" delay={0.18}>
-                <dl className="mt-9 grid gap-3 sm:grid-cols-3">
-                  {ABOUT.facts.map((fact) => (
-                    <div key={fact.label} className="rounded-xl border border-[#e4e4e4] bg-white px-4 py-4">
-                      <dt className="text-[11px] font-semibold tracking-widest text-[#525252] uppercase">
-                        {fact.label}
-                      </dt>
-                      <dd className="mt-1.5 text-sm font-medium text-[#1c1c1c]">{fact.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </Reveal>
-              <Reveal direction="up" delay={0.24}>
                 <div className="mt-9 rounded-2xl bg-[#1c1c1c] px-6 py-6 sm:px-8 sm:py-7">
                   <p className="font-display text-lg font-medium leading-relaxed text-white sm:text-xl">
                     Faisons connaissance — 30 minutes suffisent pour commencer.

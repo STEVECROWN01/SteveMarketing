@@ -329,6 +329,33 @@ html.hoverable .media-group:where(:hover, :focus-within) .mono-locked > .media-f
   filter: grayscale(1);
 }
 
+/* ---------- Variante .mono-pin : noir et blanc PERMANENT,
+   couleur révélée au survol ----------
+   Mockups épinglés du hero (navigateur et smartphone) : toujours
+   en noir et blanc, quel que soit l'écran ou l'appareil — mobile
+   et tablette comprises (demande de l'éditeur, 16/11/2026) —
+   mais leur véritable couleur se révèle progressivement au
+   survol sur les périphériques capables de survoler. */
+.mono-pin {
+  overflow: hidden;
+  -webkit-overflow: hidden;
+}
+.mono-pin > img,
+.mono-pin > .media-fill {
+  filter: grayscale(1);
+  transition: filter 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .mono-pin:where(:hover, :focus-within) > img,
+  .mono-pin:where(:hover, :focus-within) > .media-fill {
+    filter: grayscale(0);
+  }
+}
+html.hoverable .mono-pin:where(:hover, :focus-within) > img,
+html.hoverable .mono-pin:where(:hover, :focus-within) > .media-fill {
+  filter: grayscale(0);
+}
+
 /* ---------- Icône directionnelle sur visuels cliquables ---------- */
 .dir-icon {
   transition:
@@ -534,6 +561,29 @@ html.hoverable .media-group:where(:hover, :focus-within) .mono-locked > .media-f
 .mockup-sway--phone {
   animation-duration: 1.8s;
   animation-delay: -0.9s;
+}
+
+/* ---------- BANDE DÉFILANTE NOIRE (accueil, entre « Projets
+   Réalisés » et la section suivante — demande de l'éditeur,
+   16/11/2026) ----------
+   Bande #070707 pleine largeur, mots-clés SEO en blanc séparés
+   par de gros points, défilement CONTINU de la droite vers la
+   gauche. La piste contient deux copies identiques de la liste :
+   l'animation translateX(0 → -50 %) fait défiler exactement une
+   copie, puis boucle sans aucune couture visible. En
+   `prefers-reduced-motion`, la règle globale du site fige la
+   bande (durée 0,01 ms) : les mots-clés restent lisibles. */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 45s linear infinite;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
 }
 
 /* ---------- MENU PLEIN ÉCRAN : écrans peu hauts ----------

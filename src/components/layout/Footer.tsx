@@ -47,9 +47,11 @@ const FOOTER_LINK_PAGES: Record<string, string> = {
 /** Classe commune des liens des colonnes : AUCUN changement de
  *  couleur au survol — un soulignement qui s'étend depuis le centre,
  *  exactement comme les menus du header (demande de l'éditeur,
- *  15/11/2026). */
+ *  15/11/2026). Taille responsive (16/11/2026) : les deux colonnes
+ *  étant désormais côte à côte sur TOUTES les tailles d'écran, les
+ *  liens sont légèrement plus compacts sur téléphone. */
 const FOOTER_LINK_CLASS =
-  "relative inline-block text-[18px] leading-[26px] text-white after:absolute after:bottom-0 after:left-1/2 after:h-px after:w-0 after:bg-white after:transition-all after:duration-300 hover:after:left-0 hover:after:w-full focus-visible:outline-2 focus-visible:outline-offset-4";
+  "relative inline-block text-[15px] leading-[24px] text-white after:absolute after:bottom-0 after:left-1/2 after:h-px after:w-0 after:bg-white after:transition-all after:duration-300 hover:after:left-0 hover:after:w-full focus-visible:outline-2 focus-visible:outline-offset-4 sm:text-[18px] sm:leading-[26px]";
 
 /**
  * PIED DE PAGE — présentation calquée sur le footer de
@@ -102,8 +104,10 @@ export function Footer() {
             <div>
               <div className="flex items-center gap-4">
                 {/* Logo officiel (version blanche, fond sombre) —
-                    même taille que celui du header, agrandi à la
-                    demande de l'éditeur (15/11/2026). */}
+                    légèrement AGRANDI sur tablette et mobile à la
+                    demande de l'éditeur (16/11/2026) : il reste
+                    nettement plus grand que les pastilles réseaux à
+                    sa droite. */}
                 <a
                   href={FOOTER_LINK_PAGES.accueil}
                   onClick={(e) => go(e, "accueil")}
@@ -116,60 +120,66 @@ export function Footer() {
                     width={240}
                     height={192}
                     loading="lazy"
-                    className="h-11 w-auto lg:h-[72px]"
+                    className="h-12 w-auto sm:h-14 lg:h-[72px]"
                   />
                 </a>
 
                 {/* Trois pastilles de contact — VRAIES icônes des
-                    réseaux (glyphes officiels en monochrome),
-                    réduites à la demande de l'éditeur (15/11/2026) :
-                    cercles blancs de 36px, icônes sombres de 15px.
-                    Au survol, la pastille prend la couleur OFFICIELLE
-                    du réseau et le glyphe passe en blanc (demande de
-                    l'éditeur, 16/11/2026) : LinkedIn #0A66C2,
+                    réseaux (glyphes officiels en monochrome), à la
+                    taille RESPONSIVE (demande de l'éditeur, 16/11/2026) :
+                    32 px sur téléphone, 36 px à partir de sm — toujours
+                    plus PETITES que le logo à leur gauche (c'est
+                    l'inverse qui était reproché). Au survol, la pastille
+                    prend la couleur OFFICIELLE du réseau et le glyphe
+                    passe en blanc (16/11/2026) : LinkedIn #0A66C2,
                     WhatsApp #25D366 ; l'email n'ayant pas de couleur
                     officielle, il prend le noir #1c1c1c du site. */}
                 <div className="flex items-center gap-2.5 pb-2.5">
                   <a
                     href={`mailto:${SITE.email}`}
                     aria-label={`Écrire un email à Stevens Akpovi — ${SITE.email}`}
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#1c1c1c] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#1c1c1c] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 sm:h-9 sm:w-9"
                   >
-                    <EmailBrandIcon className="h-[15px] w-[15px]" />
+                    <EmailBrandIcon className="h-[13px] w-[13px] sm:h-[15px] sm:w-[15px]" />
                   </a>
                   <a
                     href={SITE.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="LinkedIn — Stevens Akpovi"
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#0A66C2] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#0A66C2] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 sm:h-9 sm:w-9"
                   >
-                    <LinkedInBrandIcon className="h-[15px] w-[15px]" />
+                    <LinkedInBrandIcon className="h-[13px] w-[13px] sm:h-[15px] sm:w-[15px]" />
                   </a>
                   <a
                     href={SITE.whatsapp}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="WhatsApp — Stevens Akpovi"
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#25D366] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#25D366] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 sm:h-9 sm:w-9"
                   >
-                    <WhatsAppBrandIcon className="h-[15px] w-[15px]" />
+                    <WhatsAppBrandIcon className="h-[13px] w-[13px] sm:h-[15px] sm:w-[15px]" />
                   </a>
                 </div>
               </div>
 
-              {/* Mention sous le logo — à la place des deux logos de
-                  reconnaissance de la référence (texte corrigé par
-                  l'éditeur, 15/11/2026). */}
-              <p className="mt-5 max-w-[294px] text-sm leading-relaxed text-[#c8c8c8]">
+              {/* Mention sous le logo — EN GRAS (demande de
+                  l'éditeur, 16/11/2026), à la place des deux logos
+                  de reconnaissance de la référence. */}
+              <p className="mt-5 max-w-[294px] text-sm font-bold leading-relaxed text-[#c8c8c8]">
                 Votre activité mérite un site web qui travaille pour vous.
               </p>
             </div>
 
             {/* ---------- Colonnes de menus ---------- */}
-            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:gap-20">
+            {/* Les deux colonnes « Services » et « Professionnel » sont
+                alignées horizontalement — côte à côte, titres sur la
+                même ligne — sur TOUTES les tailles d'écran (demande de
+                l'éditeur, 16/11/2026) ; sur téléphone, titres et liens
+                sont légèrement plus compacts pour tenir. */}
+            <div className="grid grid-cols-2 gap-6 sm:gap-10 lg:gap-20">
               <nav aria-label="Services — pied de page">
-                <p className="font-display text-[26px] font-semibold text-white sm:text-[32px]">
+                <p className="font-display text-[20px] font-semibold text-white sm:text-[32px]">
                   Services
                 </p>
                 <ul className="mt-[25px]">
@@ -188,7 +198,7 @@ export function Footer() {
               </nav>
 
               <nav aria-label="Professionnel — pied de page">
-                <p className="font-display text-[26px] font-semibold text-white sm:text-[32px]">
+                <p className="font-display text-[20px] font-semibold text-white sm:text-[32px]">
                   Professionnel
                 </p>
                 <ul className="mt-[25px]">

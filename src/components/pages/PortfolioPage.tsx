@@ -94,9 +94,11 @@ export function PortfolioPage() {
                   </Reveal>
                 </div>
 
-                {/* Grande capture du site — en COULEUR permanente
-                    (mockups projets en couleur, demande de l'éditeur,
-                    16/11/2026) */}
+                {/* Grande capture du site — sur bureau : noir et
+                    blanc au repos, la véritable couleur se révèle +
+                    zoom léger au survol ; sur tablette et mobile :
+                    couleur d'origine directe (demande de l'éditeur,
+                    16/11/2026). */}
                 <Reveal direction={i % 2 === 1 ? "right" : "left"} delay={0.1} className={i % 2 === 1 ? "lg:order-1" : ""}>
                   <a
                     href={`#/projet/${project.id}`}
@@ -110,7 +112,6 @@ export function PortfolioPage() {
                       alt={`Aperçu du site ${project.name}`}
                       width={1440}
                       height={900}
-                      color
                       eager={i === 0}
                       sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 560px"
                       src2xWidth={1920}

@@ -132,13 +132,16 @@ export function ProcessPage() {
 
       {/* ---------- 3. « COMMENT JE TRAVAILLE » : grand titre vertical +
           déroulés (demande de l'éditeur, 15/11/2026) ----------
-          À gauche, le titre en GRANDE taille, écrit verticalement (du
-          bas vers le haut) ; puis un trait vertical de séparation à
-          extrémités fondues qui s'étend EXACTEMENT à la hauteur de la
-          liste des étapes ; puis la liste, décalée un peu plus vers
-          la droite. Le MÊME espace (40 px) sépare le trait du titre
-          et le trait de la liste. Sur mobile : titre horizontal,
-          trait de séparation horizontal fondu, déroulés. */}
+          À gauche, le titre en GRANDE taille, EN GRAS, écrit
+          verticalement (du bas vers le haut) ; puis un trait vertical
+          de séparation à extrémités fondues qui s'étend EXACTEMENT à
+          la hauteur de la liste des étapes ; puis la liste. Le MÊME
+          espace (48 px, légèrement agrandi le 16/11/2026) sépare le
+          trait du titre et le trait de la liste. L'ENSEMBLE
+          (titre + trait + liste) est CENTRÉ horizontalement dans la
+          page (demande de l'éditeur, 16/11/2026) — plus rien n'est
+          rangé à gauche. Sur mobile : titre horizontal, trait de
+          séparation horizontal fondu, déroulés. */}
       <section
         aria-labelledby="methode-processus-titre"
         className="section-dark relative py-20 sm:py-24 lg:py-32"
@@ -147,14 +150,13 @@ export function ProcessPage() {
             barres de séparation du site. */}
         <div aria-hidden="true" className="separator-fade absolute inset-x-0 top-0" />
         <div className="container-site">
-          <div className="lg:flex lg:items-start lg:gap-10">
+          <div className="lg:flex lg:items-start lg:justify-center lg:gap-12">
             {/* Titre vertical (bureau) — du bas vers le haut, GRANDE
-                taille (remplace l'ancien « Mon processus » en petit
-                capitales, demande de l'éditeur, 15/11/2026). */}
+                taille, EN GRAS (demande de l'éditeur, 16/11/2026). */}
             <div className="hidden shrink-0 items-center py-1 lg:flex">
               <h2
                 id="methode-processus-titre"
-                className="font-display text-[clamp(2.25rem,3vw,3.25rem)] font-medium leading-tight tracking-[0.01em] text-white [writing-mode:vertical-rl] rotate-180"
+                className="font-display text-[clamp(2.25rem,3vw,3.25rem)] font-bold leading-tight tracking-[0.01em] text-white [writing-mode:vertical-rl] rotate-180"
               >
                 Comment Je Travaille
               </h2>
@@ -177,10 +179,12 @@ export function ProcessPage() {
 
             {/* Les six étapes à accordéon « + »/« − » — mêmes cartes que
                 la section « Comment Je Travaille » de l'accueil. Le
-                même espace (gap-10) que côté titre sépare le trait de
-                la liste : la liste commence exactement à 40 px du
-                trait (plus de centrage automatique qui l'en éloignait). */}
-            <ol className="mt-10 flex w-full max-w-3xl flex-col gap-4 lg:mt-0">
+                même espace (gap-12, 48 px — un peu plus que les 40 px
+                d'avant, demande de l'éditeur 16/11/2026) sépare le
+                trait du titre et le trait de la liste. Largeur fixe
+                sur bureau : avec justify-center, l'ensemble
+                titre + trait + liste est centré dans la page. */}
+            <ol className="mt-10 flex w-full flex-col gap-4 lg:mt-0 lg:w-[min(768px,62vw)]">
               {SOLUTION.steps.map((step, i) => {
                 const isOpen = open === i;
                 return (

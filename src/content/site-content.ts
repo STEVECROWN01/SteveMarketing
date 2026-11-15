@@ -282,19 +282,16 @@ export const METHOD = {
 export const ABOUT = {
   eyebrow: "QUI SUIS-JE ?",
   title: "Je suis Stevens Akpovi. Et je crois qu'un bon site web doit servir le business qu'il représente.",
-  text: "Je suis concepteur de sites web professionnels et passionné par la manière dont le numérique peut accompagner le développement des entreprises.\n\nMon travail consiste à transformer les besoins d'un professionnel en une expérience digitale claire, élégante et orientée vers ses objectifs.\n\nJe m'intéresse autant à la présentation visuelle qu'au message transmis et au chemin que suit un visiteur avant de prendre une décision.\n\nParce qu'un site réussi ne se résume pas à son apparence.\n\nIl doit donner une bonne première impression, présenter la valeur de votre activité et faciliter la relation avec vos futurs clients.\n\nJe travaille à distance et accompagne des professionnels et des entreprises au-delà des frontières.",
+  text: "Je suis concepteur de sites web professionnels et passionné par la manière dont le numérique peut accompagner le développement des entreprises.\n\nMon travail consiste à transformer les besoins d'un professionnel en une expérience digitale claire, élégante et orientée vers ses objectifs.\n\nJe m'intéresse autant à la présentation visuelle qu'au message transmis et au chemin que suit un visiteur avant de prendre une décision.\n\nParce qu'un site réussi ne se résume pas à son apparence.\n\nIl doit donner une bonne première impression, présenter la valeur de votre activité et faciliter la relation avec vos futurs clients.",
   cta: "Faisons Connaissance",
-  /** Texte de la section « QUI SUIS-JE ? » de l'accueil — le dernier
-   *  paragraphe (« Je travaille à distance… ») en a été retiré à la
-   *  demande de l'éditeur (15/11/2026) ; la page « À propos » garde
-   *  la biographie complète (`text`). */
+  /** Dernière phrase (« Je travaille à distance et accompagne des
+   *  professionnels et des entreprises au-delà des frontières. »)
+   *  et les trois petites cartes (« facts ») SUPPRIMÉES
+   *  définitivement à la demande de l'éditeur (16/11/2026) — la
+   *  biographie de la page « À propos » et celle de l'accueil
+   *  (textHome) sont désormais identiques. */
   textHome:
     "Je suis concepteur de sites web professionnels et passionné par la manière dont le numérique peut accompagner le développement des entreprises.\n\nMon travail consiste à transformer les besoins d'un professionnel en une expérience digitale claire, élégante et orientée vers ses objectifs.\n\nJe m'intéresse autant à la présentation visuelle qu'au message transmis et au chemin que suit un visiteur avant de prendre une décision.\n\nParce qu'un site réussi ne se résume pas à son apparence.\n\nIl doit donner une bonne première impression, présenter la valeur de votre activité et faciliter la relation avec vos futurs clients.",
-  facts: [
-    { label: "Approche", value: "Stratégie · Design · Conversion" },
-    { label: "Inclus dans chaque projet", value: "Copywriting professionnel · SEO de base" },
-    { label: "Mode de collaboration", value: "À distance, échanges organisés, suivi structuré" },
-  ],
 } as const;
 
 /* ============================ 12 — FAQ ============================ */
