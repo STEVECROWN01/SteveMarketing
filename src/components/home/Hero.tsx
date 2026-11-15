@@ -13,16 +13,22 @@ import { ASSETS, PROJECTS } from "@/lib/site";
  * Totalement visible à l'écran, sans défilement, sur TOUTES les
  * tailles (la section occupe exactement la hauteur du viewport).
  *
- * Deux mises en page selon l'écran (demande de l'éditeur,
- * 15/11/2026) :
- * - BUREAU (≥ 1024 px) : grille deux colonnes — texte à gauche
- *   (note, titre, description, CTA, réassurance), à droite le
- *   PORTRAIT VERTICAL (apropos-portrait.webp) sur sa plaque grise
- *   inclinée, épinglé des deux mockups.
- * - MOBILE / TABLETTE : note, titre, puis la PHOTO HORIZONTALE
- *   (stevens-akpovi-portrait-long.webp) sur la même plaque grise
- *   (d'où la plaque horizontale sur ces écrans) avec les deux
- *   mockups épinglés, puis description, CTA et réassurance.
+ * Une seule et même image sur tous les écrans (retour arrière
+ * demandé par l'éditeur, 16/11/2026) : SON PORTRAIT ORIGINAL
+ * stevens-akpovi-portrait.webp — l'essai « portrait vertical sur
+ * bureau / photo horizontale sur mobile » n'a pas été retenu.
+ * Bureau : grille deux colonnes — texte à gauche (note, titre,
+ * description, CTA, réassurance), à droite le portrait sur sa
+ * plaque grise inclinée, épinglé des deux mockups. Mobile /
+ * tablette : le portrait se place entre le titre et la
+ * description.
+ *
+ * EFFET SURVOL DE L'IMAGE (restauré, 16/11/2026) : le portrait
+ * est enveloppé dans .mono-media — noir et blanc par défaut sur
+ * les périphériques capables de survoler, retour progressif à la
+ * couleur + zoom léger (scale 1.035) au survol (règles
+ * .mono-media de globals.css) ; couleur naturelle directe sur
+ * mobile / tactile.
  *
  * ANIMATION D'APPARITION (à chaque chargement, 4 s au total, chaque
  * élément en exactement 1 s — demande de l'éditeur, 15/11/2026) :
@@ -104,12 +110,9 @@ export function Hero() {
       aria-label="Introduction — Stevens Akpovi, conception de sites web orientés conversion"
       className="section-deep relative flex min-h-svh flex-col overflow-hidden"
     >
-      {/* Préchargement des images du hero (performance, 15/11/2026) :
-          chaque variante n'est préchargée que sur les écrans qui
-          l'affichent (attribut media), la capture du mockup
-          navigateur est commune aux deux mises en page. */}
-      <link rel="preload" as="image" href={ASSETS.portraitLong} media="(max-width: 1023px)" fetchPriority="high" />
-      <link rel="preload" as="image" href={ASSETS.aboutPortrait} media="(min-width: 1024px)" fetchPriority="high" />
+      {/* Préchargement des images du hero (performance) : le
+          portrait est le même sur tous les écrans. */}
+      <link rel="preload" as="image" href={ASSETS.portrait} fetchPriority="high" />
       <link rel="preload" as="image" href={PROJECTS[0].desktop} fetchPriority="high" />
 
       {/* Décor : grille discrète + halo neutre */}
@@ -175,52 +178,39 @@ export function Hero() {
               {/* PLAQUE GRISE derrière l'image — animation 0-1 s :
                   elle surgit sur place depuis un petit point, en
                   grossissant subitement (rebond croissant). Débord
-                  uniforme de 4 px autour de l'image, inclinée. */}
-              <div aria-hidden="true" className="hero-anim-plate absolute -inset-1">
+                  RESTAURÉ (16/11/2026) : 4 px (mobile) / 6 px
+                  (bureau) autour de l'image, comme avant l'essai
+                  « hero par écran ». */}
+              <div aria-hidden="true" className="hero-anim-plate absolute -inset-1 sm:-inset-1.5">
                 <div className="h-full w-full rotate-[2.5deg] rounded-[2rem] bg-[#e4e4e4]/90 opacity-[0.16] sm:rotate-[3deg]" />
               </div>
 
               {/* IMAGE — animation 1-2 s : elle arrive depuis la
-                  droite et se pose sur la plaque. Deux figures, une
-                  seule visible : le portrait VERTICAL sur bureau
-                  (apropos-portrait.webp), la photo HORIZONTALE sur
-                  mobile/tablette (stevens-akpovi-portrait-long.webp).
-                  Les deux étant en `loading="lazy"`, celle qui est
-                  masquée en `display:none` n'est jamais téléchargée. */}
+                  droite et se pose sur la plaque. Le PORTRAIT
+                  ORIGINAL de l'éditeur (stevens-akpovi-portrait.webp),
+                  le même sur tous les écrans (retour arrière,
+                  16/11/2026). Enveloppe .mono-media : effet de
+                  survol restauré — noir et blanc sur bureau, retour
+                  à la couleur + zoom léger au survol. Classe
+                  « hero-portrait » : cible des adaptations CSS aux
+                  téléphones courts (uniquement cette image — les
+                  mockups épinglés embarquent leurs propres <figure>
+                  et ne doivent jamais être redimensionnés par ces
+                  règles). */}
               <div className="hero-anim-img">
-                {/* Portrait vertical — BUREAU EXCLUSIVEMENT (demande de
-                    l'éditeur, 15/11/2026). Classe « hero-portrait » :
-                    cible des adaptations CSS aux téléphones courts
-                    (règles devenues sans objet sur ces écrans, la
-                    figure y est masquée). */}
-                <figure className="hero-portrait relative hidden overflow-hidden rounded-[1.75rem] border border-[#e4e4e4]/15 bg-[#232323] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.7)] lg:block">
-                  <img
-                    src={ASSETS.aboutPortrait}
-                    alt={HERO.portraitAlt}
-                    width={1024}
-                    height={1536}
-                    loading="lazy"
-                    fetchPriority="high"
-                    decoding="async"
-                    className="block h-[min(72svh,640px)] w-auto object-cover object-top"
-                  />
-                </figure>
-
-                {/* Photo horizontale — MOBILE ET TABLETTE (plaque
-                    horizontale sur ces écrans). Pleine largeur,
-                    hauteur naturelle (1672×941) : le hero reste
-                    entièrement visible sans défilement. */}
-                <figure className="relative overflow-hidden rounded-[1.25rem] border border-[#e4e4e4]/15 bg-[#232323] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.7)] lg:hidden">
-                  <img
-                    src={ASSETS.portraitLong}
-                    alt={HERO.portraitLongAlt}
-                    width={1672}
-                    height={941}
-                    loading="lazy"
-                    fetchPriority="high"
-                    decoding="async"
-                    className="block h-auto w-full object-cover"
-                  />
+                <figure className="hero-portrait relative overflow-hidden rounded-[1.75rem] border border-[#e4e4e4]/15 bg-[#232323] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.7)]">
+                  <span className="mono-media block">
+                    <img
+                      src={ASSETS.portrait}
+                      alt={HERO.portraitAlt}
+                      width={1024}
+                      height={1536}
+                      loading="eager"
+                      fetchPriority="high"
+                      decoding="sync"
+                      className="block h-[min(39svh,336px)] w-full object-cover object-top sm:h-[min(38svh,320px)] lg:h-[min(72svh,640px)] lg:w-auto"
+                    />
+                  </span>
                 </figure>
               </div>
 
@@ -241,11 +231,11 @@ export function Hero() {
                   (arrive en gros, de face, et atterrit en rebond
                   pour l'épingler), puis balancement continu
                   gauche-droite autour de son point d'appui haut.
-                  Exclusivement noir et blanc (forceMono). Mobile :
-                  50 % de la largeur de l'image — assez grand pour un
-                  rendu RECTANGULAIRE net (demande de l'éditeur,
-                  15/11/2026) ; bureau : 52 %. */}
-              <div className="hero-anim-browser absolute -bottom-2 -left-[4%] z-10 w-[50%] sm:w-[44%] lg:-bottom-5 lg:-left-[13%] lg:w-[52%]">
+                  Exclusivement noir et blanc (forceMono). Tailles
+                  restaurées pour le portrait vertical (16/11/2026) :
+                  36 % de la largeur du portrait sur mobile, 42 % sur
+                  tablette, 52 % sur bureau. */}
+              <div className="hero-anim-browser absolute -bottom-1 -left-[7%] z-10 w-[36%] sm:-bottom-4 sm:-left-[10%] sm:w-[42%] lg:-bottom-5 lg:-left-[13%] lg:w-[52%]">
                 <div className="mockup-sway">
                   <BrowserMockup
                     src={PROJECTS[0].desktop}
@@ -256,7 +246,7 @@ export function Hero() {
                     height={900}
                     forceMono
                     priority
-                    sizes="(max-width: 640px) 180px, (max-width: 1023px) 200px, 230px"
+                    sizes="(max-width: 640px) 64px, (max-width: 1023px) 92px, 230px"
                   />
                 </div>
               </div>
@@ -264,12 +254,10 @@ export function Hero() {
               {/* Mockup smartphone épinglé — AFRIBAYIT (coin
                   haut-droit). Animation 3-4 s : jeté sur l'image à
                   son tour, puis balancement continu décalé.
-                  Mobile/tablette : proportion RÉDUITE (19-20 %) —
-                  l'image horizontale étant courte, un mockup plus
-                  grand descendrait jusqu'à l'étiquette du nom
-                  (bas-droit) et la recouvrirait ; bureau : 24 % du
-                  portrait vertical, inchangé. */}
-              <div className="hero-anim-phone absolute -right-[4%] -top-2 z-10 w-[19%] sm:w-[20%] lg:-right-[10%] lg:-top-5 lg:w-[24%]">
+                  Tailles restaurées pour le portrait vertical
+                  (16/11/2026) : 26 % de la largeur du portrait sur
+                  mobile, 24 % sur tablette et bureau. */}
+              <div className="hero-anim-phone absolute -top-1 -right-[6%] z-10 w-[26%] sm:-top-4 sm:-right-[8%] sm:w-[24%] lg:-top-5 lg:-right-[10%] lg:w-[24%]">
                 <div className="mockup-sway mockup-sway--phone">
                   <PhoneMockup
                     src={PROJECTS[2].mobile}
@@ -279,7 +267,7 @@ export function Hero() {
                     height={844}
                     forceMono
                     priority
-                    sizes="(max-width: 640px) 70px, (max-width: 1023px) 92px, 104px"
+                    sizes="(max-width: 640px) 46px, (max-width: 1023px) 52px, 104px"
                   />
                 </div>
               </div>
