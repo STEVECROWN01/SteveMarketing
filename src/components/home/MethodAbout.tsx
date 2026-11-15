@@ -16,10 +16,15 @@ import { ASSETS } from "@/lib/site";
  */
 export function AboutSection() {
   return (
+    /* Padding supérieur réduit d'un cran (demande de l'éditeur,
+       16/11/2026) : l'espace clair entre la bande noire défilante
+       qui précède et le titre « QUI SUIS-JE » était trop généreux —
+       80/96/128 px → 64/80/96 px. Le padding inférieur (vers la
+       section suivante) est inchangé. */
     <section
       id="a-propos"
       aria-labelledby="a-propos-titre"
-      className="section-light scroll-mt-20 py-20 sm:py-24 lg:py-32"
+      className="section-light scroll-mt-20 py-20 pt-16 sm:py-24 sm:pt-20 lg:py-32 lg:pt-24"
     >
       <div className="container-site">
         <div className="grid gap-14 lg:grid-cols-[0.92fr_1.08fr] lg:gap-16 xl:gap-24">

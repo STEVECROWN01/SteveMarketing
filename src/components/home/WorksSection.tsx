@@ -20,10 +20,15 @@ import { PROJECTS } from "@/lib/site";
  */
 export function WorksSection() {
   return (
+    /* Padding inférieur réduit d'un cran (demande de l'éditeur,
+       16/11/2026) : l'espace clair entre les dernières cartes et la
+       bande noire défilante qui suit était trop généreux —
+       80/96/128 px → 64/80/96 px. Le padding supérieur (vers la
+       section précédente) est inchangé. */
     <section
       id="realisations"
       aria-labelledby="realisations-titre"
-      className="section-bright scroll-mt-20 py-20 sm:py-24 lg:py-32"
+      className="section-bright scroll-mt-20 py-20 pb-16 sm:py-24 sm:pb-20 lg:py-32 lg:pb-24"
     >
       <div className="container-site">
         {/* Titre + double CTA — comme la colonne gauche de la référence */}

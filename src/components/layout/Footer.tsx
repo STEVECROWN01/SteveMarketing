@@ -163,10 +163,11 @@ export function Footer() {
                 </div>
               </div>
 
-              {/* Mention sous le logo — EN GRAS (demande de
-                  l'éditeur, 16/11/2026), à la place des deux logos
-                  de reconnaissance de la référence. */}
-              <p className="mt-5 max-w-[294px] text-sm font-bold leading-relaxed text-[#c8c8c8]">
+              {/* Mention sous le logo — graisse NORMALE (l'éditeur
+                  l'avait demandée en gras le 16/11/2026 puis s'est
+                  ravisé dans la foulée : gras retiré), à la place des
+                  deux logos de reconnaissance de la référence. */}
+              <p className="mt-5 max-w-[294px] text-sm leading-relaxed text-[#c8c8c8]">
                 Votre activité mérite un site web qui travaille pour vous.
               </p>
             </div>

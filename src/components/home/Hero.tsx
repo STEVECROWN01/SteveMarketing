@@ -25,10 +25,14 @@ import { ASSETS, PROJECTS } from "@/lib/site";
  *   les deux mockups épinglés, puis description, CTA et
  *   réassurance.
  *
- * PLAQUE GRISE (demande de l'éditeur, 16/11/2026) : toujours
- * légèrement plus large que l'image affichée — débord uniforme de
- * 12 px sur les quatre côtés, comme à l'origine (« fond gris
- * carré » sur bureau, rectangulaire sur tablette/mobile).
+ * PLAQUE GRISE (demande de l'éditeur, 16/11/2026, précisée le
+ * même jour) : sur BUREAU elle est en FORMAT CARRÉ — le portrait
+ * étant vertical, la plaque ne suit plus sa forme : son côté
+ * mesure la HAUTEUR de l'image + 24 px et elle est centrée
+ * derrière le portrait, qu'elle déborde largement à gauche et à
+ * droite (les deux mockups épinglés reposent alors sur elle).
+ * Sur TABLETTE/MOBILE elle reste rectangulaire : photo
+ * horizontale + débord uniforme de 12 px sur les quatre côtés.
  *
  * EFFET DE SURVOL DE L'IMAGE : les deux variantes sont enveloppées
  * dans .mono-media — noir et blanc par défaut sur les périphériques
@@ -145,7 +149,11 @@ export function Hero() {
       <div className="container-site relative flex flex-1 flex-col justify-center pb-2 pt-[60px] sm:pb-8 sm:pt-[68px] lg:pb-8 lg:pt-[112px]">
         <div className="grid items-center gap-2.5 sm:gap-5 lg:grid-cols-[1.15fr_0.85fr] lg:gap-7 xl:gap-9">
           {/* ---------- Bloc texte haut : note 5 étoiles, titre ---------- */}
-          <div className="order-1 lg:col-start-1 lg:row-start-1">
+          {/* lg:relative + lg:z-10 : sur les bureaux étroits (≈ 1024 px),
+              la plaque carrée du portrait déborde jusqu'à la colonne de
+              texte — le texte reste ainsi TOUJOURS au-dessus d'elle,
+              jamais sous son léger voile gris (16/11/2026). */}
+          <div className="order-1 lg:col-start-1 lg:row-start-1 lg:relative lg:z-10">
             {/* Cinq étoiles — la cinquième à moitié remplie horizontalement —
                 suivies de « 4,9/5 » (remplace l'ancien eyebrow). */}
             <Reveal direction="up">
@@ -193,13 +201,25 @@ export function Hero() {
             <div className="relative mx-auto flex w-fit justify-center">
               {/* PLAQUE GRISE derrière l'image — animation 0-1 s :
                   elle surgit sur place depuis un petit point, en
-                  grossissant subitement (rebond croissant). Débord
-                  RESTAURÉ (16/11/2026) : toujours légèrement plus
-                  large que l'image — 12 px sur les quatre côtés,
-                  comme à l'origine (le dernier commit l'avait réduit
-                  à 4/6 px, d'où la plainte de l'éditeur). */}
-              <div aria-hidden="true" className="hero-anim-plate absolute -inset-3">
-                <div className="h-full w-full rotate-[2.5deg] rounded-[2rem] bg-[#e4e4e4]/90 opacity-[0.16] sm:rotate-[3deg]" />
+                  grossissant subitement (rebond croissant).
+                  BUREAU (16/11/2026) : FORMAT CARRÉ — l'enveloppe
+                  externe occupe exactement la surface de l'image et
+                  centre son contenu (flex) ; la plaque animée a pour
+                  côté la hauteur de l'image + 24 px (aspect-square),
+                  elle déborde donc à gauche et à droite du portrait
+                  vertical sans jamais être découpée. Le centrage se
+                  fait en flex — AUCUN translate sur l'élément animé,
+                  dont l'animation (transform: scale) resterait
+                  sinon en conflit avec lui. TABLETTE/MOBILE :
+                  débord uniforme de 12 px autour de la photo
+                  horizontale, comme à l'origine. */}
+              <div
+                aria-hidden="true"
+                className="absolute -inset-3 lg:inset-0 lg:flex lg:items-center lg:justify-center"
+              >
+                <div className="hero-anim-plate h-full w-full lg:aspect-square lg:h-[calc(100%+1.5rem)] lg:w-auto lg:shrink-0">
+                  <div className="h-full w-full rotate-[2.5deg] rounded-[2rem] bg-[#e4e4e4]/90 opacity-[0.16] sm:rotate-[3deg]" />
+                </div>
               </div>
 
               {/* IMAGE — animation 1-2 s : elle arrive depuis la
@@ -327,7 +347,7 @@ export function Hero() {
               « descriptionEquilibree » place la description pour
               qu'il y ait autant d'espace au-dessus qu'au-dessous —
               sans bouger le titre ni les boutons. */}
-          <div className="order-3 mt-[clamp(0.75rem,2.5svh,1.75rem)] lg:col-start-1 lg:row-start-2 lg:mt-0">
+          <div className="order-3 mt-[clamp(0.75rem,2.5svh,1.75rem)] lg:col-start-1 lg:row-start-2 lg:mt-0 lg:relative lg:z-10">
             <Reveal direction="up" delay={0.18}>
               <p
                 ref={descRef}

@@ -141,7 +141,15 @@ export function ProcessPage() {
           (titre + trait + liste) est CENTRÉ horizontalement dans la
           page (demande de l'éditeur, 16/11/2026) — plus rien n'est
           rangé à gauche. Sur mobile : titre horizontal, trait de
-          séparation horizontal fondu, déroulés. */}
+          séparation horizontal fondu, déroulés.
+          FLÈCHE SINUSOÏDALE CROISSANTE (demande de l'éditeur,
+          16/11/2026) : sur bureau, une flèche ondulée quitte le bas
+          du titre vertical (sa fin), monte en sinuosités
+          d'amplitude croissante le long du trait et pointe sa pointe
+          vers la première carte de la liste des étapes — elle relie
+          visuellement le titre à la méthode. Décorative
+          (aria-hidden, pointer-events-none), révélée en fondu au
+          défilement comme le reste du site. */}
       <section
         aria-labelledby="methode-processus-titre"
         className="section-dark relative py-20 sm:py-24 lg:py-32"
@@ -152,14 +160,57 @@ export function ProcessPage() {
         <div className="container-site">
           <div className="lg:flex lg:items-start lg:justify-center lg:gap-12">
             {/* Titre vertical (bureau) — du bas vers le haut, GRANDE
-                taille, EN GRAS (demande de l'éditeur, 16/11/2026). */}
-            <div className="hidden shrink-0 items-center py-1 lg:flex">
+                taille, EN GRAS (demande de l'éditeur, 16/11/2026).
+                « relative » : ancre de la flèche sinusoïdale. */}
+            <div className="relative hidden shrink-0 items-center py-1 lg:flex">
               <h2
                 id="methode-processus-titre"
                 className="font-display text-[clamp(2.25rem,3vw,3.25rem)] font-bold leading-tight tracking-[0.01em] text-white [writing-mode:vertical-rl] rotate-180"
               >
                 Comment Je Travaille
               </h2>
+
+              {/* FLÈCHE SINUSOÏDALE CROISSANTE (demande de l'éditeur,
+                  16/11/2026) : elle part de la fin du titre vertical
+                  (le bas de la colonne), ondule — ses sinuosités
+                  s'élargissent à mesure qu'elle monte — et vient
+                  pointer, en haut, la première carte de la liste des
+                  étapes. Hauteur = toute la hauteur du titre (inset-y-0)
+                  ; largeur proportionnelle (viewBox 100×520, mise à
+                  l'échelle uniforme) : la pointe atterrit exactement
+                  au bord gauche de la liste, qu'elle survole à peine.
+                  Décor purement visuel : aria-hidden + pointer-events-none,
+                  fondu à l'apparition via Reveal, comme tout le site. */}
+              <Reveal
+                direction="fade"
+                amount={0.3}
+                className="pointer-events-none absolute inset-y-0 left-full z-10 ml-0.5"
+              >
+                <svg
+                  viewBox="0 0 100 520"
+                  fill="none"
+                  aria-hidden="true"
+                  className="h-full w-auto"
+                >
+                  {/* Corps sinusoïdal ascendant, amplitude croissante. */}
+                  <path
+                    d="M 8 512 C 30 504 40 492 32 478 C 24 464 12 458 18 444 C 24 430 46 424 48 406 C 50 388 34 376 36 356 C 38 336 58 330 62 308 C 66 286 46 272 48 248 C 50 224 72 218 76 194 C 80 170 58 154 60 128 C 62 102 84 96 86 70 C 88 44 82 26 98 24"
+                    stroke="#e4e4e4"
+                    strokeOpacity="0.55"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  />
+                  {/* Pointe de la flèche — orientée vers la liste. */}
+                  <path
+                    d="M 74 12 L 99 24 L 78 42"
+                    stroke="#e4e4e4"
+                    strokeOpacity="0.55"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </Reveal>
             </div>
 
             {/* Trait vertical de séparation — fondu en haut et en bas,
