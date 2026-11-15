@@ -466,12 +466,74 @@ html.hoverable .media-group:where(:hover, :focus-within) .mono-locked > .media-f
     font-size: clamp(1.4rem, 0.55rem + 3vw, 1.6rem);
   }
   /* CTA resserrés : les deux boutons tiennent sur une seule ligne
-     même à 320 px de large. */
-  #hero .order-3 a {
+     même à 320 px de large. (Sélecteur « .hero-cta » — la rangée de
+     boutons du hero, ex-.order-3, restructurée le 16/11/2026.) */
+  #hero .hero-cta a {
     font-size: 11px;
     padding-left: 10px;
     padding-right: 10px;
   }
+}
+
+/* ---------- HERO : chorégraphie d'apparition du bloc visuel ----------
+   Demande de l'éditeur (15/11/2026) — 4 s au total, chaque élément
+   en exactement 1 s : la plaque grise surgit sur place depuis un
+   petit point en grossissant subitement (0-1 s), l'image arrive
+   depuis la droite et se pose dessus (1-2 s), le nom apparaît en
+   fondu pendant que le mockup navigateur est jeté sur l'image pour
+   l'épingler (2-3 s), puis le mockup smartphone à son tour (3-4 s).
+   Chaque élément tient son état initial pendant son délai
+   (animation-fill-mode: both). En `prefers-reduced-motion`, la règle
+   globale (durée 0,01 ms) fait tout apparaître immédiatement. */
+@keyframes hero-plate-in {
+  from { opacity: 0; transform: scale(0.12); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes hero-img-in {
+  from { opacity: 0; transform: translateX(110px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes hero-name-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes hero-throw-browser {
+  from { opacity: 0; transform: translateY(-46px) scale(1.6) rotate(-10deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(-3deg); }
+}
+@keyframes hero-throw-phone {
+  from { opacity: 0; transform: translateY(-46px) scale(1.6) rotate(10deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(2deg); }
+}
+/* Balancement continu des deux mockups épinglés : léger va-et-vient
+   gauche-droite autour du point d'appui haut, comme une image
+   épinglée au mur (demande de l'éditeur, 15/11/2026). */
+@keyframes mockup-sway {
+  from { transform: rotate(-2.2deg); }
+  to { transform: rotate(2.2deg); }
+}
+.hero-anim-plate {
+  animation: hero-plate-in 1s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.hero-anim-img {
+  animation: hero-img-in 1s cubic-bezier(0.22, 1, 0.36, 1) 1s both;
+}
+.hero-anim-name {
+  animation: hero-name-in 0.6s ease-out 2s both;
+}
+.hero-anim-browser {
+  animation: hero-throw-browser 1s cubic-bezier(0.34, 1.56, 0.64, 1) 2s both;
+}
+.hero-anim-phone {
+  animation: hero-throw-phone 1s cubic-bezier(0.34, 1.56, 0.64, 1) 3s both;
+}
+.mockup-sway {
+  transform-origin: top center;
+  animation: mockup-sway 2.1s ease-in-out infinite alternate;
+}
+.mockup-sway--phone {
+  animation-duration: 1.8s;
+  animation-delay: -0.9s;
 }
 
 /* ---------- MENU PLEIN ÉCRAN : écrans peu hauts ----------

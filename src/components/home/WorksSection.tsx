@@ -16,7 +16,7 @@ import { PROJECTS } from "@/lib/site";
  * ligne (demande de l'éditeur) — grande capture, nom, catégorie
  * et bouton « Voir Le Projet » ouvrant la page de présentation du
  * projet (#/projet/<id>), exactement comme la référence ouvre ses
- * pages de case study. Captures exclusivement en noir et blanc.
+ * pages de case study. Captures en COULEUR (16/11/2026).
  */
 export function WorksSection() {
   return (
@@ -58,8 +58,7 @@ export function WorksSection() {
         </div>
 
         {/* Grille des projets — les trois projets présentés sur une seule
-            ligne (desktop) ; captures en noir et blanc permanent +
-            « Voir Le Projet ». */}
+            ligne (desktop) ; captures en COULEUR + « Voir Le Projet ». */}
         <div className="mt-12 grid gap-5 sm:mt-14 md:grid-cols-3">
           {PROJECTS.map((project, i) => (
             <ProjectCard key={project.id} project={project} index={i} />

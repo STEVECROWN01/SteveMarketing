@@ -162,7 +162,7 @@ export function Footer() {
                   reconnaissance de la référence (texte corrigé par
                   l'éditeur, 15/11/2026). */}
               <p className="mt-5 max-w-[294px] text-sm leading-relaxed text-[#c8c8c8]">
-                Conception de Sites Web Professionnel qui Vendent.
+                Votre activité mérite un site web qui travaille pour vous.
               </p>
             </div>
 
@@ -216,14 +216,18 @@ export function Footer() {
 
         {/* ---------- Barre copyright (comme la référence) ----------
             « © Stevens Akpovi - {année} » à gauche, « Mentions
-            légales » à droite (à la place de « Privacy Policy ») —
-            survol en soulignement, sans changement de couleur. */}
-        <div className="flex flex-col gap-3 py-[15px] text-[18px] sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[#f5f5f5]">© Stevens Akpovi - {new Date().getFullYear()}</p>
+            légales » à droite — TOUJOURS sur la même ligne
+            horizontale, quelle que soit la taille d'écran (demande
+            de l'éditeur, 15/11/2026) : le premier totalement à
+            gauche, le second totalement à droite ; sur mobile, la
+            taille de police est réduite (13 px) pour que les deux
+            restent alignés sans retour à la ligne. */}
+        <div className="flex items-center justify-between gap-3 py-[15px] text-[13px] sm:text-[18px]">
+          <p className="whitespace-nowrap text-[#f5f5f5]">© Stevens Akpovi - {new Date().getFullYear()}</p>
           <a
             href={FOOTER_LINK_PAGES.legal}
             onClick={(e) => go(e, "legal")}
-            className="relative inline-block w-fit text-white after:absolute after:bottom-0 after:left-1/2 after:h-px after:w-0 after:bg-white after:transition-all after:duration-300 hover:after:left-0 hover:after:w-full focus-visible:outline-2 focus-visible:outline-offset-4"
+            className="relative inline-block w-fit whitespace-nowrap text-white after:absolute after:bottom-0 after:left-1/2 after:h-px after:w-0 after:bg-white after:transition-all after:duration-300 hover:after:left-0 hover:after:w-full focus-visible:outline-2 focus-visible:outline-offset-4"
           >
             Mentions légales
           </a>

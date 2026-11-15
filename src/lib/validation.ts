@@ -20,6 +20,7 @@ export const SERVICE_TYPES = [
 export const DISCOVERY_SOURCES = [
   "TikTok",
   "Instagram",
+  "Facebook",
   "LinkedIn",
   "YouTube",
   "Google",

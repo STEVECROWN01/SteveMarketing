@@ -192,6 +192,10 @@ export const PROJECTS = [
 /** Assets fournis dans le dépôt officiel du projet. */
 export const ASSETS = {
   portrait: "/assets/stevens-akpovi-portrait.webp",
+  /** Portrait paysage (espace de travail, 1672×941) — grand visuel du
+   *  hero horizontal bureau (demande de l'éditeur, 16/11/2026) ;
+   *  dérivé WebP q90 du PNG source conservé dans le dépôt. */
+  portraitLong: "/assets/stevens-akpovi-portrait-long.webp",
   workspaceDesktop: "/assets/stevens-akpovi-workspace-desktop.webp",
   workspaceMobile: "/assets/stevens-akpovi-workspace-mobile.webp",
   /** Espace de travail (version webp optimisée du PNG fourni par

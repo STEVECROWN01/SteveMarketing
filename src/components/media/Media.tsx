@@ -25,6 +25,11 @@ interface MonoImageProps {
   imgClassName?: string;
   eager?: boolean;
   decorative?: boolean;
+  /** COULEUR PERMANENTE (demande de l'éditeur, 16/11/2026 :
+   *  « mockups projets en couleur ») — aucun noir et blanc, ni au
+   *  repos ni de transition au survol : l'image s'affiche dans ses
+   *  couleurs d'origine sur tous les écrans. */
+  color?: boolean;
   /** Tailles d'affichage CSS (attribut sizes) — combinée au srcset
    *  en descripteurs de largeur, elle évite aux mobiles de
    *  télécharger la variante @2x surdimensionnée (performance,
@@ -46,6 +51,7 @@ export function MonoImage({
   imgClassName = "",
   eager = false,
   decorative = false,
+  color = false,
   sizes,
   src2xWidth,
 }: MonoImageProps) {
@@ -60,8 +66,11 @@ export function MonoImage({
       : src2x
         ? `${src} 1x, ${src2x} 2x`
         : undefined;
+  // `color` : pas de classe mono-media — donc ni filtre noir et
+  // blanc ni zoom au survol, la couleur d'origine s'affiche
+  // directement (mockups projets en couleur, 16/11/2026).
   return (
-    <span className={`mono-media block ${className}`}>
+    <span className={`${color ? "block" : "mono-media block"} ${className}`}>
       <img
         src={src}
         srcSet={srcSet}
@@ -96,6 +105,7 @@ export function BrowserMockup({
   height = 900,
   priority = false,
   forceMono = false,
+  color = false,
   sizes,
 }: {
   src: string;
@@ -113,6 +123,10 @@ export function BrowserMockup({
    *  aucune couleur au survol : mockups du hero (demande de
    *  l'éditeur, 13/11/2026). */
   forceMono?: boolean;
+  /** COULEUR PERMANENTE (mockups projets en couleur, demande de
+   *  l'éditeur, 16/11/2026) — aucun noir et blanc : l'aperçu du
+   *  site s'affiche dans ses couleurs réelles. */
+  color?: boolean;
 }) {
   const shortUrl = url.replace(/^https?:\/\//, "");
   // Fichiers réels : desktop 1440 px (1x) et 1920 px (@2x vraie densité)
@@ -121,18 +135,18 @@ export function BrowserMockup({
     : undefined;
   return (
     <figure className={`group/mockup overflow-hidden rounded-md border border-[#e4e4e4]/25 bg-[#232323] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] ${className}`}>
-      <figcaption className="flex items-center gap-1.5 border-b border-[#e4e4e4]/12 px-2 py-1 sm:gap-2 sm:px-3 sm:py-1.5">
+      <figcaption className="flex items-center gap-1 border-b border-[#e4e4e4]/12 px-1.5 py-[3px] sm:gap-2 sm:px-3 sm:py-1.5">
         <span className="flex gap-1" aria-hidden="true">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#3c3c3c]" />
-          <span className="h-1.5 w-1.5 rounded-full bg-[#3c3c3c]" />
-          <span className="h-1.5 w-1.5 rounded-full bg-[#3c3c3c]" />
+          <span className="h-1 w-1 rounded-full bg-[#3c3c3c] sm:h-1.5 sm:w-1.5" />
+          <span className="h-1 w-1 rounded-full bg-[#3c3c3c] sm:h-1.5 sm:w-1.5" />
+          <span className="h-1 w-1 rounded-full bg-[#3c3c3c] sm:h-1.5 sm:w-1.5" />
         </span>
-        <span className="mx-auto flex max-w-[70%] items-center gap-1.5 truncate rounded-md bg-[#1c1c1c] px-2 py-[2px] text-[8px] text-[#c8c8c8] sm:text-[9px]" aria-hidden="true">
+        <span className="mx-auto flex max-w-[70%] items-center gap-1.5 truncate rounded-md bg-[#1c1c1c] px-2 py-[2px] text-[7px] leading-none text-[#c8c8c8] sm:text-[9px]" aria-hidden="true">
           <span className="h-1 w-1 shrink-0 rounded-full bg-[#e4e4e4]" />
           {shortUrl}
         </span>
       </figcaption>
-      <span className={`mono-media block ${forceMono ? "mono-locked" : ""}`}>
+      <span className={color ? "block" : `mono-media block ${forceMono ? "mono-locked" : ""}`}>
         <img
           src={src}
           srcSet={srcSet}
@@ -167,6 +181,7 @@ export function PhoneMockup({
   height = 844,
   priority = false,
   forceMono = false,
+  color = false,
   sizes,
 }: {
   src: string;
@@ -184,6 +199,8 @@ export function PhoneMockup({
   /** Noir et blanc PERMANENT sur tous les écrans — aucune couleur
    *  au survol (mockups du hero). */
   forceMono?: boolean;
+  /** COULEUR PERMANENTE (mockups projets en couleur, 16/11/2026). */
+  color?: boolean;
 }) {
   // Fichiers réels : mobile 390 px (1x) et 780 px (@2x vraie densité)
   const srcSet = src2x
@@ -197,7 +214,7 @@ export function PhoneMockup({
         className="absolute left-1/2 top-[4px] z-10 h-[5px] w-[34px] -translate-x-1/2 rounded-full bg-[#1c1c1c]"
         aria-hidden="true"
       />
-      <span className={`mono-media block overflow-hidden rounded-[11px] ${forceMono ? "mono-locked" : ""}`}>
+      <span className={color ? "block overflow-hidden rounded-[11px]" : `mono-media block overflow-hidden rounded-[11px] ${forceMono ? "mono-locked" : ""}`}>
         <img
           src={src}
           srcSet={srcSet}

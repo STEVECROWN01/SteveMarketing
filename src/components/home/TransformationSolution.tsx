@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Clock, TrendingUp, Users, Home, RefreshCw, Plus, Minus } from "lucide-react";
-import { Reveal } from "@/components/motion/Reveal";
+import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { SectionHeading, CTAButton, CTAIcons, RichText } from "@/components/marketing/Marketing";
 import { StartProjectButton } from "@/components/marketing/StartProjectButton";
 import { useRouter } from "@/components/router-context";
@@ -90,16 +90,16 @@ export function TransformationSection() {
   );
 }
 
-/** SECTION 05 — « COMMENT ÇA FONCTIONNE ? » (fond sombre)
- *  Ex-« UNE APPROCHE QUI VA AU-DELÀ DU DESIGN », renommée et
- *  refondée à la demande de l'éditeur (13/11/2026) :
- *  à gauche, titre « Un processus clair. Une collaboration
- *  structurée », texte « Je ne crée pas simplement des sites web… »
- *  et deux boutons (« Démarrons Votre Projet » blanc style header,
- *  « Voir Nos Travaux » noir) ; à droite, SIX cartes à accordéon
- *  « + »/« − » — numéros stylisés en angle supérieur GAUCHE, plus
- *  de mention « Pilier 01 », et la carte « Comprendre votre
- *  activité avant de concevoir votre site. » a été supprimée. */
+/** SECTION 05 — « COMMENT JE TRAVAILLE » (fond sombre)
+ *  Grand titre « Comment Je Travaille » (grande typographie
+ *  display, graisse normale), trait vertical de séparation à
+ *  EXACTEMENT la hauteur de la liste des étapes (fondu haut/bas,
+ *  comme tous les traits du site) et espaces symétriques de part et
+ *  d'autre du trait (demande de l'éditeur, 16/11/2026) : à gauche,
+ *  le grand titre, le texte « Je ne crée pas simplement des sites
+ *  web… » et les deux boutons ; à droite du trait, les SIX cartes à
+ *  accordéon « + »/« − » — numéros stylisés en angle supérieur
+ *  GAUCHE. */
 export function SolutionSection() {
   const router = useRouter();
   // Une seule étape ouverte à la fois — la première par défaut,
@@ -111,7 +111,7 @@ export function SolutionSection() {
   return (
     <section
       id="solution"
-      aria-label="Comment ça fonctionne — processus de collaboration"
+      aria-label="Comment je travaille — processus de collaboration"
       className="section-dark relative scroll-mt-20 py-20 sm:py-24 lg:py-32"
     >
       {/* Barre de séparation à extrémités fondues — fade-in à gauche,
@@ -120,10 +120,20 @@ export function SolutionSection() {
           bordure pleine. */}
       <div aria-hidden="true" className="separator-fade absolute inset-x-0 top-0" />
       <div className="container-site">
-        <div className="grid gap-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-20">
-          {/* Colonne gauche : titre, texte, boutons */}
-          <div className="lg:sticky lg:top-28 lg:self-start">
-            <SectionHeading eyebrow={SOLUTION.eyebrow} title={SOLUTION.title} tone="dark" />
+        <div className="grid gap-14 lg:grid-cols-[0.92fr_1.08fr] lg:gap-0">
+          {/* Colonne gauche : GRAND TITRE, texte, boutons — espace
+              symétrique à droite du titre (miroir du padding gauche de
+              la liste) de part et d'autre du trait. */}
+          <div className="lg:sticky lg:top-28 lg:self-start lg:py-1.5 lg:pr-14 xl:pr-20">
+            {/* GRAND TITRE « Comment Je Travaille » — grande
+                typographie display, graisse normale, comme les grands
+                titres de la page Réalisations. */}
+            <RevealText
+              as="h2"
+              text={SOLUTION.title}
+              delay={0.05}
+              className="font-display text-[clamp(2.5rem,4.5vw,3.75rem)] font-normal leading-[1.05] tracking-[-0.02em] text-white"
+            />
             <Reveal direction="up" delay={0.15}>
               <RichText text={SOLUTION.text} className="text-body mt-6 max-w-xl on-dark-muted" />
             </Reveal>
@@ -151,8 +161,19 @@ export function SolutionSection() {
             </Reveal>
           </div>
 
-          {/* Colonne droite : six cartes à accordéon « + »/« − » */}
-          <ol className="flex flex-col gap-4">
+          {/* Colonne droite : LE TRAIT + les six cartes à accordéon.
+              Le trait vertical (fondu en haut et en bas, comme tous
+              les traits du site) est posé sur le bord gauche de la
+              COLONNE DE LISTE : il épouse donc exactement la hauteur
+              de la liste — du haut de la première carte au bas de la
+              dernière. Espaces symétriques : autant d'air à gauche de
+              la liste (lg:pl-14) qu'à droite du titre (lg:pr-14). */}
+          <div className="relative lg:py-1.5 lg:pl-14 xl:pl-20">
+            <div
+              aria-hidden="true"
+              className="absolute left-0 top-0 hidden h-full w-px bg-gradient-to-b from-transparent via-[#e4e4e4]/40 to-transparent lg:block"
+            />
+            <ol className="flex flex-col gap-4">
             {SOLUTION.steps.map((step, i) => {
               const isOpen = open === i;
               return (
@@ -217,7 +238,8 @@ export function SolutionSection() {
                 </Reveal>
               );
             })}
-          </ol>
+            </ol>
+          </div>
         </div>
       </div>
     </section>

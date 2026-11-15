@@ -63,7 +63,7 @@ function escapeHtml(value: string): string {
 
 function fieldRow(label: string, value?: string | null): string {
   if (!value) return "";
-  return `<tr><td style="padding:8px 14px;color:#525252;font-family:Arial,sans-serif;font-size:13px;white-space:nowrap;text-align:right">${label}</td><td style="padding:8px 14px;color:#1c1c1c;font-family:Arial,sans-serif;font-size:14px"><strong>${escapeHtml(value)}</strong></td></tr>`;
+  return `<tr><td style="padding:8px 14px;color:#525252;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;white-space:nowrap;text-align:right">${label}&nbsp;:</td><td style="padding:8px 14px;color:#1c1c1c;font-family:Arial,sans-serif;font-size:14px">${escapeHtml(value)}</td></tr>`;
 }
 
 /** Notification interne : la demande est transmise à stevensakpovi@gmail.com */
@@ -91,7 +91,7 @@ export async function notifyOwner(lead: LeadPayload): Promise<boolean> {
         ${fieldRow("Échéance", lead.timeline)}
       </table>
       <div style="padding:0 28px 12px">
-        <p style="color:#525252;font-family:Arial,sans-serif;font-size:13px;margin:0 0 6px">Message :</p>
+        <p style="color:#525252;font-family:Arial,sans-serif;font-size:13px;font-weight:bold;margin:0 0 6px">Message&nbsp;:</p>
         <p style="color:#1c1c1c;font-family:Arial,sans-serif;font-size:14px;line-height:1.6;white-space:pre-line">${escapeHtml(lead.message)}</p>
       </div>
       <div style="padding:16px 28px;background:#f5f5f5;border-top:1px solid #e4e4e4;color:#525252;font-family:Arial,sans-serif;font-size:12px">

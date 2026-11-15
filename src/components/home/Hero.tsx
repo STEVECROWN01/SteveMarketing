@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { motion, useReducedMotion } from "framer-motion";
 import { Star } from "lucide-react";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
@@ -12,24 +11,39 @@ import { ASSETS, PROJECTS } from "@/lib/site";
 /**
  * SECTION 01 — HERO
  * Totalement visible à l'écran, sans défilement, sur TOUTES les
- * tailles : la section occupe exactement la hauteur du viewport
- * (100svh, y compris barres dynamiques mobiles) et son contenu
- * s'adapte en taille à tous les écrans (typographie fluide, portrait
- * dimensionné en svh, CTA compacts sur téléphone, media query
- * « téléphones courts » dans globals.css). Sans scroller, le
- * visiteur comprend : qui est Stevens, ce qu'il propose, le bénéfice
- * principal, comment réserver et comment découvrir les
- * réalisations. Mobile : l'image se place entre le titre et la
- * description. Les mentions « Copywriting inclus » / « SEO de
- * base » sont volontairement absentes : elles appartiennent à la
- * section « Avantages inclus » qui présente l'offre.
+ * tailles (la section occupe exactement la hauteur du viewport).
+ *
+ * Deux mises en page selon l'écran (demande de l'éditeur,
+ * 15/11/2026) :
+ * - BUREAU (≥ 1024 px) : grille deux colonnes — texte à gauche
+ *   (note, titre, description, CTA, réassurance), à droite le
+ *   PORTRAIT VERTICAL (apropos-portrait.webp) sur sa plaque grise
+ *   inclinée, épinglé des deux mockups.
+ * - MOBILE / TABLETTE : note, titre, puis la PHOTO HORIZONTALE
+ *   (stevens-akpovi-portrait-long.webp) sur la même plaque grise
+ *   (d'où la plaque horizontale sur ces écrans) avec les deux
+ *   mockups épinglés, puis description, CTA et réassurance.
+ *
+ * ANIMATION D'APPARITION (à chaque chargement, 4 s au total, chaque
+ * élément en exactement 1 s — demande de l'éditeur, 15/11/2026) :
+ * 0-1 s : la plaque grise surgit sur place depuis un point,
+ *         en grossissant subitement (rebond) ;
+ * 1-2 s : l'image arrive depuis la droite et se pose dessus ;
+ * 2-3 s : le nom « Stevens Akpovi » apparaît en fondu (pendant que
+ *         le premier mockup arrive) et le mockup NAVIGATEUR est
+ *         jeté sur l'image pour l'épingler (coin bas-gauche) ;
+ * 3-4 s : le mockup SMARTPHONE est jeté à son tour (coin
+ *         haut-droit).
+ * Après leur apparition, les deux mockups gardent une animation
+ * continue : un léger balancement gauche-droite, comme une image
+ * épinglée au mur (rotation autour du point d'appui haut).
+ * Toute la chorégraphie est en ANIMATIONS CSS (globals.css,
+ * classes .hero-anim-* / .mockup-sway) : elle démarre dès le premier
+ * rendu, sans attendre l'hydratation, et `prefers-reduced-motion`
+ * fait tout apparaître immédiatement (règle globale du site).
  */
 export function Hero() {
-  const reduce = useReducedMotion();
-
-  const floatTransition = { duration: 5.5, repeat: Infinity, repeatType: "mirror" as const, ease: "easeInOut" as const };
-
-  /* Équilibre vertical de la description (bureau uniquement) :
+  /* Équilibrage vertical de la description (bureau uniquement) :
      même espace au-dessus et au-dessous de la description — la
      description seule est déplacée verticalement, le titre et les
      boutons restent strictement immobiles (demande de l'éditeur,
@@ -80,13 +94,25 @@ export function Hero() {
     };
   }, []);
 
+  /* Description : première phrase en gras, suite normale. */
+  const rest =
+    HERO.text.startsWith(HERO.textBold) ? HERO.text.slice(HERO.textBold.length).trim() : HERO.text;
+
   return (
     <section
       id="hero"
       aria-label="Introduction — Stevens Akpovi, conception de sites web orientés conversion"
       className="section-deep relative flex min-h-svh flex-col overflow-hidden"
     >
-      {/* Décor : grille discrète + halo beige */}
+      {/* Préchargement des images du hero (performance, 15/11/2026) :
+          chaque variante n'est préchargée que sur les écrans qui
+          l'affichent (attribut media), la capture du mockup
+          navigateur est commune aux deux mises en page. */}
+      <link rel="preload" as="image" href={ASSETS.portraitLong} media="(max-width: 1023px)" fetchPriority="high" />
+      <link rel="preload" as="image" href={ASSETS.aboutPortrait} media="(min-width: 1024px)" fetchPriority="high" />
+      <link rel="preload" as="image" href={PROJECTS[0].desktop} fetchPriority="high" />
+
+      {/* Décor : grille discrète + halo neutre */}
       <div className="bg-grid-dark absolute inset-0" aria-hidden="true" />
       <div
         aria-hidden="true"
@@ -100,8 +126,6 @@ export function Hero() {
       <div className="container-site relative flex flex-1 flex-col justify-center pb-2 pt-[60px] sm:pb-8 sm:pt-[68px] lg:pb-8 lg:pt-[112px]">
         <div className="grid items-center gap-2.5 sm:gap-5 lg:grid-cols-[1.15fr_0.85fr] lg:gap-7 xl:gap-9">
           {/* ---------- Bloc texte haut : note 5 étoiles, titre ---------- */}
-          {/* Mobile : note → H1, puis image (bloc visuel), puis
-              suite du texte. Desktop : colonne gauche, ligne 1. */}
           <div className="order-1 lg:col-start-1 lg:row-start-1">
             {/* Cinq étoiles — la cinquième à moitié remplie horizontalement —
                 suivies de « 4,9/5 » (remplace l'ancien eyebrow). */}
@@ -135,81 +159,94 @@ export function Hero() {
             />
           </div>
 
-          {/* ---------- Colonne visuelle : portrait + mockups ---------- */}
-          {/* Mobile : placée entre le titre et la description (demande
-              explicite de l'éditeur), portrait agrandi (34svh, 38svh en
-              tablette) et marges resserrées pour tenir tout le hero à
-              l'écran ; une réserve sous le portrait laisse place aux
-              mockups flottants (présents aussi sur mobile) ; desktop :
-              colonne droite sur les deux lignes de la grille, hauteur
-              plafonnée en svh pour que le hero tienne dans l'écran. */}
-          <div className="order-2 hero-visual relative mx-auto mt-5 mb-6 w-full max-w-md sm:mt-9 sm:mb-36 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:mb-0 lg:max-w-none">
-            {/* Bloc neutre en décalage derrière le portrait — RÉDUIT
-                à la demande de l'éditeur (15/11/2026 : « réduis un peu
-                la taille du fond gris carré qui est derrière mon
-                image, sur tous les appareils ») : débordement de
-                12 px → 4 px (mobile) / 6 px (bureau). */}
-            <div
-              aria-hidden="true"
-              className="absolute -inset-1 rotate-[2.5deg] rounded-[2rem] bg-[#e4e4e4]/90 opacity-[0.16] sm:-inset-1.5 sm:rotate-[3deg]"
-            />
-            {/* Enveloppe « w-fit » : exactement la largeur du portrait —
-                les pourcentages des mockups épinglés (largeur, décalages)
-                se réfèrent donc au portrait lui-même, et non au bloc
-                visuel plus large : le navigateur comme le smartphone
-                restent accrochés aux coins de l'image, sans jamais
-                déborder de l'écran ni recouvrir sa moitié, quelle que
-                soit la taille (demande de l'éditeur, 15/11/2026). */}
+          {/* ---------- Bloc visuel : plaque + image + mockups épinglés ---------- */}
+          {/* Bureau : colonne droite sur les deux rangées de la grille,
+              hauteur du portrait plafonnée en svh pour que le hero
+              tienne dans l'écran. L'espace sous l'image (vers la
+              description, sur mobile/tablette) est RESPONSIVE : marge
+              fluide en svh, la même proportion sur tous les écrans
+              (demande de l'éditeur, 15/11/2026 — l'ancienne marge
+              fixe de 144 px sur tablette était trop spacieuse). */}
+          <div className="hero-visual order-2 relative mx-auto mt-5 w-full max-w-md sm:mt-7 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:max-w-none">
+            {/* Enveloppe « w-fit » : exactement la largeur de l'image —
+                les pourcentages des mockups épinglés (largeur,
+                décalages) se réfèrent donc à l'image elle-même. */}
             <div className="relative mx-auto flex w-fit justify-center">
-              {/* Portrait professionnel — NON cliquable. Classe
-                  « hero-portrait » : cible des adaptations CSS aux
-                  téléphones courts (uniquement cette image — les
-                  mockups épinglés embarquent leurs propres <figure> et
-                  ne doivent jamais être redimensionnés par ces
-                  règles). */}
-              <figure className="hero-portrait relative overflow-hidden rounded-[1.75rem] border border-[#e4e4e4]/15 bg-[#232323] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.7)]">
-                <span className="mono-media block">
+              {/* PLAQUE GRISE derrière l'image — animation 0-1 s :
+                  elle surgit sur place depuis un petit point, en
+                  grossissant subitement (rebond croissant). Débord
+                  uniforme de 4 px autour de l'image, inclinée. */}
+              <div aria-hidden="true" className="hero-anim-plate absolute -inset-1">
+                <div className="h-full w-full rotate-[2.5deg] rounded-[2rem] bg-[#e4e4e4]/90 opacity-[0.16] sm:rotate-[3deg]" />
+              </div>
+
+              {/* IMAGE — animation 1-2 s : elle arrive depuis la
+                  droite et se pose sur la plaque. Deux figures, une
+                  seule visible : le portrait VERTICAL sur bureau
+                  (apropos-portrait.webp), la photo HORIZONTALE sur
+                  mobile/tablette (stevens-akpovi-portrait-long.webp).
+                  Les deux étant en `loading="lazy"`, celle qui est
+                  masquée en `display:none` n'est jamais téléchargée. */}
+              <div className="hero-anim-img">
+                {/* Portrait vertical — BUREAU EXCLUSIVEMENT (demande de
+                    l'éditeur, 15/11/2026). Classe « hero-portrait » :
+                    cible des adaptations CSS aux téléphones courts
+                    (règles devenues sans objet sur ces écrans, la
+                    figure y est masquée). */}
+                <figure className="hero-portrait relative hidden overflow-hidden rounded-[1.75rem] border border-[#e4e4e4]/15 bg-[#232323] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.7)] lg:block">
                   <img
-                    src={ASSETS.portrait}
+                    src={ASSETS.aboutPortrait}
                     alt={HERO.portraitAlt}
                     width={1024}
                     height={1536}
-                    loading="eager"
+                    loading="lazy"
                     fetchPriority="high"
-                    decoding="sync"
-                    className="block h-[min(39svh,336px)] w-full object-cover object-top sm:h-[min(38svh,320px)] lg:h-[min(72svh,640px)] lg:w-auto"
+                    decoding="async"
+                    className="block h-[min(72svh,640px)] w-auto object-cover object-top"
                   />
-                </span>
-                {/* Mention épinglée « Stevens Akpovi » : bas-droit du
-                    portrait — le visage est en haut (object-top) et ne
-                    doit pas être masqué ; une seule ligne, taille
-                    réduite (demande de l'éditeur, 14/11/2026). */}
-                <figcaption className="absolute bottom-3 right-3">
-                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#070707]/75 px-2.5 py-1 text-[10px] font-medium leading-none text-white backdrop-blur-sm">
-                    <span className="h-1 w-1 shrink-0 rounded-full bg-[#e4e4e4]" aria-hidden="true" />
-                    <span>Stevens Akpovi</span>
-                  </span>
-                </figcaption>
-              </figure>
+                </figure>
 
-              {/* Mockup navigateur flottant — MR STEVE ENGLISH.
-                  Présent aussi sur mobile (taille et bords adaptés).
-                  Exclusivement noir et blanc (forceMono) — aucune
-                  couleur au survol.
-                  AGRANDI et RAPPROCHÉ verticalement du portrait à la
-                  demande de l'éditeur (15/11/2026) ; l'entête du
-                  navigateur est plus fine (voir Media.tsx).
-                  Tailles recentrées sur mobile et tablette
-                  (16/11/2026 : « taille raisonnable ») : 40 % → 36 %
-                  de la largeur du portrait sur mobile, 47 % → 42 %
-                  sur tablette ; bureau inchangé (52 %). */}
-              <motion.div
-                className="absolute -bottom-1 -left-[7%] w-[36%] sm:-bottom-4 sm:-left-[10%] sm:w-[42%] lg:-bottom-5 lg:-left-[13%] lg:w-[52%]"
-                initial={reduce ? undefined : { opacity: 0, y: 26, rotate: -5 }}
-                animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotate: -3 }}
-                transition={{ delay: 0.6, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <motion.div animate={reduce ? undefined : { y: [0, -7, 0] }} transition={floatTransition}>
+                {/* Photo horizontale — MOBILE ET TABLETTE (plaque
+                    horizontale sur ces écrans). Pleine largeur,
+                    hauteur naturelle (1672×941) : le hero reste
+                    entièrement visible sans défilement. */}
+                <figure className="relative overflow-hidden rounded-[1.25rem] border border-[#e4e4e4]/15 bg-[#232323] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.7)] lg:hidden">
+                  <img
+                    src={ASSETS.portraitLong}
+                    alt={HERO.portraitLongAlt}
+                    width={1672}
+                    height={941}
+                    loading="lazy"
+                    fetchPriority="high"
+                    decoding="async"
+                    className="block h-auto w-full object-cover"
+                  />
+                </figure>
+              </div>
+
+              {/* Mention épinglée « Stevens Akpovi » : bas-droit de
+                  l'image, une seule ligne, taille réduite — le nom
+                  reste protégé. Apparition en fondu à 2 s (dès que
+                  l'image est posée, en même temps que le premier
+                  mockup). */}
+              <span className="hero-anim-name absolute bottom-3 right-3 z-10">
+                <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#070707]/75 px-2.5 py-1 text-[10px] font-medium leading-none text-white backdrop-blur-sm">
+                  <span className="h-1 w-1 shrink-0 rounded-full bg-[#e4e4e4]" aria-hidden="true" />
+                  <span>Stevens Akpovi</span>
+                </span>
+              </span>
+
+              {/* Mockup navigateur épinglé — MR STEVE ENGLISH (coin
+                  bas-gauche). Animation 2-3 s : jeté sur l'image
+                  (arrive en gros, de face, et atterrit en rebond
+                  pour l'épingler), puis balancement continu
+                  gauche-droite autour de son point d'appui haut.
+                  Exclusivement noir et blanc (forceMono). Mobile :
+                  50 % de la largeur de l'image — assez grand pour un
+                  rendu RECTANGULAIRE net (demande de l'éditeur,
+                  15/11/2026) ; bureau : 52 %. */}
+              <div className="hero-anim-browser absolute -bottom-2 -left-[4%] z-10 w-[50%] sm:w-[44%] lg:-bottom-5 lg:-left-[13%] lg:w-[52%]">
+                <div className="mockup-sway">
                   <BrowserMockup
                     src={PROJECTS[0].desktop}
                     src2x={PROJECTS[0].desktop2x}
@@ -219,28 +256,21 @@ export function Hero() {
                     height={900}
                     forceMono
                     priority
-                    sizes="(max-width: 640px) 64px, (max-width: 1023px) 92px, 230px"
+                    sizes="(max-width: 640px) 180px, (max-width: 1023px) 200px, 230px"
                   />
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
 
-              {/* Mockup smartphone flottant — AFRIBAYIT. Présent aussi
-                  sur mobile. Exclusivement noir et blanc (forceMono) —
-                  aucune couleur au survol.
-                  Tailles recentrées sur mobile et tablette
-                  (16/11/2026 : « taille raisonnable ») : 30 % → 26 %
-                  de la largeur du portrait sur mobile (après le
-                  doublement de 15 % demandé le 15/11), 19 % → 24 %
-                  sur tablette ; bureau inchangé (24 %, légèrement
-                  agrandi le 16/11). Toujours épinglé au coin
-                  haut-droit. */}
-              <motion.div
-                className="absolute -top-1 -right-[6%] w-[26%] sm:-top-4 sm:-right-[8%] sm:w-[24%] lg:-top-5 lg:-right-[10%] lg:w-[24%]"
-                initial={reduce ? undefined : { opacity: 0, y: 26, rotate: 5 }}
-                animate={reduce ? { opacity: 1 } : { opacity: 1, y: 0, rotate: 2 }}
-                transition={{ delay: 0.75, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <motion.div animate={reduce ? undefined : { y: [0, 8, 0] }} transition={{ ...floatTransition, delay: 1.2 }}>
+              {/* Mockup smartphone épinglé — AFRIBAYIT (coin
+                  haut-droit). Animation 3-4 s : jeté sur l'image à
+                  son tour, puis balancement continu décalé.
+                  Mobile/tablette : proportion RÉDUITE (19-20 %) —
+                  l'image horizontale étant courte, un mockup plus
+                  grand descendrait jusqu'à l'étiquette du nom
+                  (bas-droit) et la recouvrirait ; bureau : 24 % du
+                  portrait vertical, inchangé. */}
+              <div className="hero-anim-phone absolute -right-[4%] -top-2 z-10 w-[19%] sm:w-[20%] lg:-right-[10%] lg:-top-5 lg:w-[24%]">
+                <div className="mockup-sway mockup-sway--phone">
                   <PhoneMockup
                     src={PROJECTS[2].mobile}
                     src2x={PROJECTS[2].mobile2x}
@@ -249,36 +279,39 @@ export function Hero() {
                     height={844}
                     forceMono
                     priority
-                    sizes="(max-width: 640px) 46px, (max-width: 1023px) 52px, 104px"
+                    sizes="(max-width: 640px) 70px, (max-width: 1023px) 92px, 104px"
                   />
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* ---------- Bloc texte bas : description, CTA, réassurance ---------- */}
-          {/* Mobile : succède à l'image ; desktop : colonne gauche, ligne 2.
-              Bureau : l'effet « descriptionEquilibree » place la description
-              pour qu'il y ait autant d'espace au-dessus qu'au-dessous — sans
-              bouger le titre ni les boutons. */}
-          <div className="order-3 lg:col-start-1 lg:row-start-2">
+          {/* Mobile : succède à l'image avec la marge fluide du bloc
+              visuel (clamp en svh : la même proportion d'espace sur
+              tous les écrans — demande de l'éditeur, 15/11/2026) ;
+              bureau : colonne gauche, rangée 2. Bureau : l'effet
+              « descriptionEquilibree » place la description pour
+              qu'il y ait autant d'espace au-dessus qu'au-dessous —
+              sans bouger le titre ni les boutons. */}
+          <div className="order-3 mt-[clamp(0.75rem,2.5svh,1.75rem)] lg:col-start-1 lg:row-start-2 lg:mt-0">
             <Reveal direction="up" delay={0.18}>
               <p
                 ref={descRef}
-                className="hero-desc relative max-w-xl text-[12px] leading-[1.5] text-[#c8c8c8] transition-[top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] sm:mt-3 sm:text-[15px] lg:text-[15px] xl:text-base"
+                className="hero-desc relative max-w-xl text-[12px] leading-[1.5] text-[#c8c8c8] transition-[top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] sm:text-[15px] lg:text-[15px] xl:text-base"
               >
-                {HERO.text}
+                <strong className="font-semibold text-white">{HERO.textBold}</strong>{" "}
+                {rest}
               </p>
             </Reveal>
 
-            {/* CTA — les deux boutons partagent la même ligne sur desktop :
-                réservation d'appel (blanc, sans icône à gauche — mène à la
-                page de demande de devis) + découverte des réalisations
-                (noir, sans flèche à droite). */}
+            {/* CTA — les deux boutons partagent la même ligne :
+                réservation d'appel (blanc, mène à la page de demande
+                de devis) + découverte des réalisations (noir). */}
             <Reveal direction="up" delay={0.24}>
               <div
                 ref={ctaRowRef}
-                className="mt-2.5 flex flex-wrap items-center gap-2 sm:mt-5 sm:gap-3 lg:mt-5"
+                className="hero-cta mt-2.5 flex flex-wrap items-center gap-2 sm:mt-5 sm:gap-3 lg:mt-5"
               >
                 <CTAButton
                   action={{ kind: "page", page: "devis" }}
@@ -312,11 +345,9 @@ export function Hero() {
         </div>
       </div>
 
-      {/* Fondu progressif vers la section suivante : plus de trait de
-          séparation — le fond du hero (#070707) se fond dans celui de la
-          section suivante (#1c1c1c), sur ~36-44 px seulement (réduit à
-          nouveau à la demande de l'éditeur, 15/11/2026 : l'effet entrait
-          encore trop profond dans le hero), sans limite nette. */}
+      {/* Fondu progressif vers la section suivante : le fond du hero
+          (#070707) se fond dans celui de la section suivante (#1c1c1c),
+          sur ~36-44 px seulement, sans limite nette. */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 h-9 bg-gradient-to-b from-transparent to-[#1c1c1c] sm:h-11"

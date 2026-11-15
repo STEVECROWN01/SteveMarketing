@@ -58,7 +58,10 @@ export function AboutSection() {
           <div className="lg:pt-2">
             <SectionHeading eyebrow={ABOUT.eyebrow} title={ABOUT.title} tone="light" />
             <Reveal direction="up" delay={0.15}>
-              <RichText text={ABOUT.text} className="text-body mt-6 max-w-xl on-paper-muted" />
+              {/* Biographie de la section « QUI SUIS-JE ? » de l'accueil —
+                  sans le dernier paragraphe (« Je travaille à distance… »),
+                  retiré à la demande de l'éditeur (15/11/2026). */}
+              <RichText text={ABOUT.textHome} className="text-body mt-6 max-w-xl on-paper-muted" />
             </Reveal>
 
             {/* Les trois blocs « Approche », « Inclus dans chaque projet » et

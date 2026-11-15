@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, Minus, ArrowUpRight, Building2, ShoppingCart, RefreshCcw } from "lucide-react";
+import { Plus, Minus, Building2, ShoppingCart, RefreshCcw } from "lucide-react";
 import { useRouter } from "@/components/router-context";
 import { useCalendly } from "@/components/calendly/CalendlyContext";
 import { PageHero, CTAButton, RichText } from "@/components/marketing/Marketing";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { StartProjectButton } from "@/components/marketing/StartProjectButton";
+import { ProjectCard } from "@/components/marketing/ProjectCard";
 import { SERVICES_SUMMARY, SOLUTION } from "@/content/site-content";
 import { PROJECTS } from "@/lib/site";
 
@@ -40,11 +41,6 @@ export function ProcessPage() {
   // Une seule étape ouverte à la fois — la première par défaut,
   // comme le déroulé de lecture de la section d'accueil.
   const [open, setOpen] = useState<number | null>(0);
-
-  const goProject = (e: React.MouseEvent, id: string) => {
-    e.preventDefault();
-    router.navigate("projet", id);
-  };
 
   return (
     <>
@@ -134,12 +130,15 @@ export function ProcessPage() {
         </div>
       </section>
 
-      {/* ---------- 3. « MON PROCESSUS » : titre vertical + déroulés ----------
-          À gauche, le titre écrit verticalement, du bas vers le haut,
-          suivi d'un trait vertical de séparation à extrémités fondues
-          (fondu haut et bas, comme tous les traits du site) ; à droite
-          du trait, les six déroulés du processus. Sur mobile : titre
-          horizontal, trait de séparation horizontal fondu, déroulés. */}
+      {/* ---------- 3. « COMMENT JE TRAVAILLE » : grand titre vertical +
+          déroulés (demande de l'éditeur, 15/11/2026) ----------
+          À gauche, le titre en GRANDE taille, écrit verticalement (du
+          bas vers le haut) ; puis un trait vertical de séparation à
+          extrémités fondues qui s'étend EXACTEMENT à la hauteur de la
+          liste des étapes ; puis la liste, décalée un peu plus vers
+          la droite. Le MÊME espace (40 px) sépare le trait du titre
+          et le trait de la liste. Sur mobile : titre horizontal,
+          trait de séparation horizontal fondu, déroulés. */}
       <section
         aria-labelledby="methode-processus-titre"
         className="section-dark relative py-20 sm:py-24 lg:py-32"
@@ -148,33 +147,40 @@ export function ProcessPage() {
             barres de séparation du site. */}
         <div aria-hidden="true" className="separator-fade absolute inset-x-0 top-0" />
         <div className="container-site">
-          <div className="grid gap-10 lg:grid-cols-[auto_minmax(0,1fr)] lg:items-start lg:gap-14 xl:gap-20">
-            {/* Titre vertical (bureau) — du bas vers le haut */}
-            <div className="hidden items-stretch gap-7 py-1 lg:flex">
+          <div className="lg:flex lg:items-start lg:gap-10">
+            {/* Titre vertical (bureau) — du bas vers le haut, GRANDE
+                taille (remplace l'ancien « Mon processus » en petit
+                capitales, demande de l'éditeur, 15/11/2026). */}
+            <div className="hidden shrink-0 items-center py-1 lg:flex">
               <h2
                 id="methode-processus-titre"
-                className="font-display text-[15px] font-semibold uppercase tracking-[0.35em] text-white [writing-mode:vertical-rl] rotate-180"
+                className="font-display text-[clamp(2.25rem,3vw,3.25rem)] font-medium leading-tight tracking-[0.01em] text-white [writing-mode:vertical-rl] rotate-180"
               >
-                Mon processus
+                Comment Je Travaille
               </h2>
-              {/* Trait vertical de séparation — fondu en haut et en bas */}
-              <div
-                aria-hidden="true"
-                className="w-px bg-gradient-to-b from-transparent via-[#e4e4e4]/40 to-transparent"
-              />
             </div>
+
+            {/* Trait vertical de séparation — fondu en haut et en bas,
+                exactement à la hauteur de la liste (self-stretch). */}
+            <div
+              aria-hidden="true"
+              className="hidden w-px shrink-0 self-stretch bg-gradient-to-b from-transparent via-[#e4e4e4]/40 to-transparent lg:block"
+            />
 
             {/* Titre horizontal (mobile/tablette) + trait fondu */}
             <div className="lg:hidden">
               <h2 id="methode-processus-titre" className="text-section-title text-white">
-                Mon processus
+                Comment Je Travaille
               </h2>
               <div aria-hidden="true" className="separator-fade mt-6" />
             </div>
 
             {/* Les six étapes à accordéon « + »/« − » — mêmes cartes que
-                la section « Comment ça fonctionne ? » de l'accueil. */}
-            <ol className="mx-auto flex w-full max-w-3xl flex-col gap-4">
+                la section « Comment Je Travaille » de l'accueil. Le
+                même espace (gap-10) que côté titre sépare le trait de
+                la liste : la liste commence exactement à 40 px du
+                trait (plus de centrage automatique qui l'en éloignait). */}
+            <ol className="mt-10 flex w-full max-w-3xl flex-col gap-4 lg:mt-0">
               {SOLUTION.steps.map((step, i) => {
                 const isOpen = open === i;
                 return (
@@ -243,41 +249,20 @@ export function ProcessPage() {
         </div>
       </section>
 
-      {/* ---------- 4. Appel à l'action « Franchissons ensemble… » (conservé) ---------- */}
-      <section aria-labelledby="process-cta-titre" className="section-deep relative overflow-hidden py-20 sm:py-24 lg:py-28">
-        <div className="bg-grid-dark absolute inset-0" aria-hidden="true" />
-        <div className="container-site relative text-center">
-          <Reveal direction="up">
-            <p className="text-eyebrow">PARLONS DE VOTRE PROJET</p>
-            <h2 id="process-cta-titre" className="text-section-title mx-auto mt-4 max-w-2xl text-white">
-              Franchissons ensemble la première étape.
-            </h2>
-          </Reveal>
-          <Reveal direction="up" delay={0.12}>
-            <div className="mt-9 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
-              <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg">
-                Réserver Un Appel
-              </CTAButton>
-              <CTAButton action={{ kind: "page", page: "devis" }} variant="secondary" size="lg">
-                Demander Un Devis Personnalisé
-              </CTAButton>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ---------- 5. Réalisations : titre + « Voir Plus De Projets » à
-          gauche, liste des trois réalisations à droite (demande de
-          l'éditeur, 15/11/2026 — le bouton mène au portfolio, « Nos
-          Réalisations »). ---------- */}
+      {/* ---------- 4. NOS RÉALISATIONS (avant l'appel à l'action,
+          demande de l'éditeur, 15/11/2026) : les projets présentés
+          avec leurs mockups — les mêmes cartes que la section
+          « PROJETS RÉALISÉS » de l'accueil (grande capture en
+          couleur, nom, catégorie, bouton « Voir Le Projet ») —
+          alignés VERTICALEMENT, un projet par ligne. ---------- */}
       <section
         aria-label="Sites web que nous avons créés — nos réalisations"
         className="section-bright py-20 sm:py-24 lg:py-32"
       >
         <div className="container-site">
-          <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-16 xl:gap-20">
+          <div className="grid gap-12 lg:grid-cols-[0.62fr_1.38fr] lg:items-start lg:gap-16 xl:gap-20">
             {/* Colonne gauche : titre + bouton */}
-            <div>
+            <div className="lg:sticky lg:top-28">
               <Reveal direction="up">
                 <p className="text-eyebrow">NOS RÉALISATIONS</p>
               </Reveal>
@@ -300,37 +285,39 @@ export function ProcessPage() {
               </Reveal>
             </div>
 
-            {/* Colonne droite : la liste des trois réalisations */}
-            <div>
+            {/* Colonne droite : les trois réalisations avec leurs
+                mockups, empilées verticalement. */}
+            <div className="flex flex-col gap-6">
               {PROJECTS.map((project, i) => (
-                <div key={project.id}>
-                  {i > 0 && <div aria-hidden="true" className="separator-fade" />}
-                  <Reveal direction="left" delay={0.08 * i}>
-                    <a
-                      href={`#/projet/${project.id}`}
-                      onClick={(e) => goProject(e, project.id)}
-                      aria-label={`Voir Le Projet — ${project.name}`}
-                      className="group flex items-center justify-between gap-6 py-6 focus-visible:outline-2 focus-visible:outline-offset-4"
-                    >
-                      <div className="min-w-0">
-                        <p className="text-eyebrow">Projet {String(i + 1).padStart(2, "0")}</p>
-                        <h3 className="relative mt-2 inline-block text-card-title text-[#1c1c1c] after:absolute after:bottom-0 after:left-1/2 after:h-px after:w-0 after:bg-[#1c1c1c] after:transition-all after:duration-300 group-hover:after:left-0 group-hover:after:w-full">
-                          {project.name}
-                        </h3>
-                        <p className="mt-1 text-sm text-[#525252]">{project.category}</p>
-                      </div>
-                      <span
-                        aria-hidden="true"
-                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#e4e4e4] text-[#1c1c1c] transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1"
-                      >
-                        <ArrowUpRight className="h-5 w-5" strokeWidth={2.2} />
-                      </span>
-                    </a>
-                  </Reveal>
-                </div>
+                <ProjectCard key={project.id} project={project} index={i} />
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ---------- 5. Appel à l'action « Franchissons ensemble… »
+          (APRÈS la section réalisations, demande de l'éditeur,
+          15/11/2026) ---------- */}
+      <section aria-labelledby="process-cta-titre" className="section-deep relative overflow-hidden py-20 sm:py-24 lg:py-28">
+        <div className="bg-grid-dark absolute inset-0" aria-hidden="true" />
+        <div className="container-site relative text-center">
+          <Reveal direction="up">
+            <p className="text-eyebrow">PARLONS DE VOTRE PROJET</p>
+            <h2 id="process-cta-titre" className="text-section-title mx-auto mt-4 max-w-2xl text-white">
+              Franchissons ensemble la première étape.
+            </h2>
+          </Reveal>
+          <Reveal direction="up" delay={0.12}>
+            <div className="mt-9 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
+              <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg">
+                Réserver Un Appel
+              </CTAButton>
+              <CTAButton action={{ kind: "page", page: "devis" }} variant="secondary" size="lg">
+                Demander Un Devis Personnalisé
+              </CTAButton>
+            </div>
+          </Reveal>
         </div>
       </section>
     </>

@@ -40,18 +40,24 @@ export function PortfolioPage() {
         </CTAButton>
       </PageHero>
 
-      {/* ---------- Réalisations — présentation façon « Our Work » ---------- */}
+      {/* ---------- Réalisations — présentation façon « Our Work » ----------
+          Fond SANS grille (demande de l'éditeur, 15/11/2026) : seule
+          la première section « PROJETS RÉALISÉS · EXPÉRIENCES
+          DIGITALES » garde le fond quadrillé ; les projets sont
+          séparés par des traits de séparation horizontaux à
+          extrémités fondues (le style du site). */}
       <section
         aria-label="Réalisations de Stevens Akpovi"
-        className="section-deep bg-grid-dark scroll-mt-20 py-20 sm:py-24 lg:py-28"
+        className="section-deep scroll-mt-20 py-20 sm:py-24 lg:py-28"
       >
         <div className="container-site">
-          <div className="flex flex-col gap-20 lg:gap-28">
+          <div className="flex flex-col gap-14 lg:gap-20">
             {PROJECTS.map((project, i) => (
-              <article
-                key={project.id}
-                className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16"
-              >
+              <React.Fragment key={project.id}>
+                {i > 0 && <div aria-hidden="true" className="separator-fade" />}
+                <article
+                  className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16"
+                >
                 {/* Texte : pastille catégorie + grand titre + bouton */}
                 <div className={i % 2 === 1 ? "lg:order-2" : ""}>
                   <Reveal direction="up">
@@ -88,8 +94,9 @@ export function PortfolioPage() {
                   </Reveal>
                 </div>
 
-                {/* Grande capture du site — monochrome au repos,
-                    couleur au survol (comme la référence) */}
+                {/* Grande capture du site — en COULEUR permanente
+                    (mockups projets en couleur, demande de l'éditeur,
+                    16/11/2026) */}
                 <Reveal direction={i % 2 === 1 ? "right" : "left"} delay={0.1} className={i % 2 === 1 ? "lg:order-1" : ""}>
                   <a
                     href={`#/projet/${project.id}`}
@@ -103,6 +110,7 @@ export function PortfolioPage() {
                       alt={`Aperçu du site ${project.name}`}
                       width={1440}
                       height={900}
+                      color
                       eager={i === 0}
                       sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 560px"
                       src2xWidth={1920}
@@ -110,6 +118,7 @@ export function PortfolioPage() {
                   </a>
                 </Reveal>
               </article>
+              </React.Fragment>
             ))}
           </div>
 

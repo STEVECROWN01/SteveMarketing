@@ -269,10 +269,13 @@ export function Header() {
                   </ul>
                 </nav>
 
-                {/* Colonne « Autre Liens » — à propos, contact,
-                    mentions légales (nom demandé par l'éditeur). */}
+                {/* Colonne « Autres Liens » — à propos, contact,
+                    mentions légales (nom demandé par l'éditeur).
+                    Taille de police des liens : 16 px, EXACTEMENT
+                    comme les liens des menus du header (demande de
+                    l'éditeur, 15/11/2026). */}
                 <nav aria-label="Navigation plein écran — autres liens" className="min-w-0 shrink-0">
-                  <p className="text-eyebrow mb-4 sm:mb-5">Autre Liens</p>
+                  <p className="text-eyebrow mb-4 sm:mb-5">Autres Liens</p>
                   <ul className="flex flex-col">
                     {MENU_OTHER_ITEMS.map((item, i) => (
                       <motion.li
@@ -285,7 +288,7 @@ export function Header() {
                           href={`#/${NAV_PAGES[item.key]}`}
                           onClick={(e) => goPage(e, item.key)}
                           aria-current={isActive(item.key) ? "page" : undefined}
-                          className={`group relative inline-block py-1.5 font-display text-[clamp(1.05rem,4vw,1.75rem)] font-medium leading-tight text-white transition-colors duration-300 hover:text-[#efefef] after:absolute after:bottom-1.5 after:h-px after:bg-white after:transition-all after:duration-300 sm:py-2 ${
+                          className={`group relative inline-block py-1.5 font-display text-[16px] font-medium leading-tight text-white transition-colors duration-300 hover:text-[#efefef] after:absolute after:bottom-1.5 after:h-px after:bg-white after:transition-all after:duration-300 sm:py-2 ${
                             isActive(item.key)
                               ? "after:left-0 after:w-full"
                               : "after:left-1/2 after:w-0 hover:after:left-0 hover:after:w-full"

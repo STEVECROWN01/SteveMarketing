@@ -207,9 +207,7 @@ export function ContactPage() {
 
             <Reveal direction="up" delay={0.12}>
               <p className="text-body mt-6 max-w-xl on-dark-muted">
-                Décrivez votre besoin en quelques lignes. Votre message est transmis
-                automatiquement à {SITE.email} — et après l'envoi, réservez directement
-                votre créneau d'appel.
+                Décrivez votre besoin en quelques lignes.
               </p>
             </Reveal>
 

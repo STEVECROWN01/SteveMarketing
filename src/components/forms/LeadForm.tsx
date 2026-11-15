@@ -309,7 +309,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
         <span
           className={
             isLight
-              ? "mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#1c1c1c] text-white"
+              ? "mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#039855] text-white"
               : "mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#e4e4e4] text-[#1c1c1c]"
           }
         >
@@ -344,18 +344,6 @@ export function LeadForm({ kind }: { kind: FormKind }) {
             <span className="inline-flex items-center">Envoyer Une Autre Demande</span>
           </button>
         </div>
-        <p className={`mt-6 text-xs ${isLight ? "text-[#525252]/80" : "text-[#c8c8c8]/70"}`}>
-          Vous préférez avancer plus vite&nbsp;?{" "}
-          <a
-            href={SITE.calendly}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`font-medium underline underline-offset-4 ${isLight ? "text-[#1c1c1c]" : "text-[#e4e4e4]"}`}
-          >
-            Réservez un appel de 30 minutes
-          </a>{" "}
-          — {SITE.calendlyMention.toLowerCase()}
-        </p>
       </div>
     );
   }
@@ -668,20 +656,30 @@ export function LeadForm({ kind }: { kind: FormKind }) {
               <label htmlFor={`${kind}-field-email`} className={labelBase}>
                 Email professionnel <span className="text-white">*</span>
               </label>
-              <input
-                id={`${kind}-field-email`}
-                name="email"
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                required
-                value={form.email}
-                onChange={set("email")}
-                aria-invalid={Boolean(errors.email)}
-                aria-describedby={errors.email ? `${kind}-error-email` : undefined}
-                className={inputBase}
-                placeholder="vous@exemple.com"
-              />
+              {/* Icône enveloppe au début du champ — comme le champ
+                  email du formulaire de devis (demande de
+                  l'éditeur, 15/11/2026). */}
+              <div className="relative">
+                <Mail
+                  className="pointer-events-none absolute left-[15px] top-1/2 h-4 w-4 -translate-y-1/2 text-[#8c8c8c]"
+                  aria-hidden="true"
+                />
+                <input
+                  id={`${kind}-field-email`}
+                  name="email"
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  required
+                  value={form.email}
+                  onChange={set("email")}
+                  aria-invalid={Boolean(errors.email)}
+                  aria-describedby={errors.email ? `${kind}-error-email` : undefined}
+                  className={inputBase}
+                  style={{ paddingLeft: 42 }}
+                  placeholder="vous@exemple.com"
+                />
+              </div>
               {errors.email && (
                 <p id={`${kind}-error-email`} className={errorBase}>
                   {errors.email}
@@ -976,13 +974,15 @@ export function LeadForm({ kind }: { kind: FormKind }) {
 
       {/* ------- Bouton d'envoi ------- */}
       {isContact ? (
-        /* Pilule blanche demi-largeur, rayon 44 px, 17 px — exactement
-           comme « Get In Touch » de sheragency.com/contact-us. */
+        /* Pilule blanche demi-largeur, rayon 44 px, 17 px — comme
+           « Get In Touch » de sheragency.com/contact-us, avec le
+           survol à balayage du bouton du header (remplissage
+           progressif #e4e4e4, demande de l'éditeur, 15/11/2026). */
         <div className="mt-9">
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-[44px] bg-white px-7 font-display text-[17px] font-medium tracking-[0.01em] text-[#000000] shadow-[0_1px_2px_rgba(0,0,0,0.12)] transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_18px_rgba(0,0,0,0.25)] focus-visible:outline-2 focus-visible:outline-offset-3 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 sm:w-1/2"
+            className="btn-fill inline-flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-[44px] bg-white px-7 font-display text-[17px] font-medium tracking-[0.01em] text-[#000000] shadow-[0_1px_2px_rgba(0,0,0,0.12)] transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-[0_6px_18px_rgba(0,0,0,0.25)] focus-visible:outline-2 focus-visible:outline-offset-3 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 [&::before]:bg-[#e4e4e4] sm:w-1/2"
           >
             {submitting ? (
               <span className="inline-flex items-center gap-2.5">
@@ -995,13 +995,15 @@ export function LeadForm({ kind }: { kind: FormKind }) {
           </button>
         </div>
       ) : isQuote ? (
-        /* Bouton vert pleine largeur, coins 8 px — exactement comme
-           « Get A Quote » (#039855) de sheragency.com/request-a-quote. */
+        /* Bouton vert pleine largeur, coins 8 px — comme « Get A
+           Quote » (#039855) de sheragency.com/request-a-quote, avec
+           le survol à balayage du bouton du header (remplissage
+           progressif vert foncé, demande de l'éditeur, 15/11/2026). */
         <div className="mt-9">
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-[8px] bg-[#039855] px-7 font-display text-[17px] font-medium tracking-[0.01em] text-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] transition-[background-color,transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:bg-[#028a49] focus-visible:outline-2 focus-visible:outline-offset-3 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+            className="btn-fill inline-flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-[8px] bg-[#039855] px-7 font-display text-[17px] font-medium tracking-[0.01em] text-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-3 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 [&::before]:bg-[#026d43]"
           >
             {submitting ? (
               <span className="inline-flex items-center gap-2.5">

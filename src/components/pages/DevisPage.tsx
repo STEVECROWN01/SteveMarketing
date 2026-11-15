@@ -5,17 +5,37 @@ import { Star } from "lucide-react";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { LeadForm } from "@/components/forms/LeadForm";
 
+/** Icône « coche pleine » (icon-park-solid:check-one) — celle de la
+ *  liste de bénéfices de sheragency.com, reproduite en inline SVG
+ *  (aucune requête réseau) ; cercle dans l'accent du site #e4e4e4
+ *  (purge du beige, 13/11/2026 — la coche de la référence est
+ *  beige) et coche sombre, comme la référence. */
+function CheckOne({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 31 30" fill="none" className={className} aria-hidden="true">
+      <circle cx="15.72" cy="15" r="13.75" fill="#e4e4e4" />
+      <path
+        d="M10.72 15l3.75 3.75 7.5-7.5"
+        stroke="#070707"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 /**
  * PAGE DEMANDER UN DEVIS (#/demander-un-devis) — présentation
  * calquée sur « /request-a-quote » de sheragency.com : page claire,
- * grand titre centré, sous-texte, trois pastilles de bénéfices,
- * badge de note 4,9/5, puis le formulaire de devis — reproduit
- * EXACTEMENT le widget « New Client Application » de la référence
- * (15/11/2026) : carte blanche à ombre douce, Prénom/Nom sur deux
- * colonnes, consentement SMS, questions à choix unique et bouton
- * vert « Obtenir Un Devis » pleine largeur. La section « Demande de
- * devis » qui vivait sur la page contact a été supprimée au profit
- * de cette page dédiée.
+ * grand titre centré, sous-texte, trois bénéfices à cocher (icône
+ * coche pleine, empilés verticalement — exactement comme la
+ * référence, demande de l'éditeur, 15/11/2026), badge de note
+ * 4,9/5, puis le formulaire de devis — reproduit EXACTEMENT le
+ * widget « New Client Application » de la référence (15/11/2026) :
+ * carte blanche à ombre douce, Prénom/Nom sur deux colonnes,
+ * consentement SMS, questions à choix unique et bouton vert
+ * « Obtenir Un Devis » pleine largeur.
  */
 const BENEFITS = [
   "Attirer des visiteurs qualifiés",
@@ -38,27 +58,31 @@ export function DevisPage() {
 
             <RevealText
               as="h1"
-              text="Parlons de votre futur site."
+              text="Optimisez Votre Site Web Pour Augmenter Les Ventes"
+              boldText="Augmenter Les Ventes"
               delay={0.06}
               className="text-hero-title on-paper mt-5"
             />
 
             <Reveal direction="up" delay={0.14}>
               <p className="text-body mx-auto mt-6 max-w-2xl on-paper-muted">
-                Décrivez votre activité et votre projet. Je reviens vers vous avec un
-                devis personnalisé, établi à partir de votre besoin — le montant dépend
-                du type de site, de son périmètre et de sa complexité.
+                Nous prenons des sites web obsolètes et les transformons en sites web
+                qui attirent davantage de visiteurs, convertissent ces visiteurs en
+                clients et valorisent votre image de marque.
               </p>
             </Reveal>
 
-            {/* Trois pastilles de bénéfices (façon sheragency) */}
+            {/* Trois bénéfices à cocher — exactement comme sheragency.com
+                (demande de l'éditeur, 15/11/2026) : icône coche pleine dans
+                un cercle, un par ligne, alignés à gauche, le groupe centré. */}
             <Reveal direction="up" delay={0.18}>
-              <ul className="mt-8 flex flex-wrap justify-center gap-2.5">
+              <ul className="mx-auto mt-8 flex w-fit flex-col items-start gap-3.5">
                 {BENEFITS.map((benefit) => (
                   <li
                     key={benefit}
-                    className="inline-flex items-center rounded-full border border-[#e4e4e4] bg-[#f5f5f5] px-4 py-2 text-[13px] font-medium text-[#1c1c1c]"
+                    className="flex items-center gap-3 text-left text-[16px] font-medium text-[#1c1c1c]"
                   >
+                    <CheckOne className="h-[26px] w-[27px] shrink-0" />
                     {benefit}
                   </li>
                 ))}

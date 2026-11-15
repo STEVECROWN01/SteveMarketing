@@ -8,15 +8,24 @@
 
 export const HERO = {
   eyebrow: "CONCEPTION DE SITES WEB PROFESSIONNELS",
-  h1: "Je crée des Sites Web Professionnels qui génèrent des Ventes.",
+  h1: "Je crée des Sites Web Professionnels qui Génèrent des Ventes.",
   /** Partie du titre en gras (700) — le reste reste en graisse normale. */
-  h1Bold: "qui génèrent des Ventes.",
-  text: "Vous n'avez pas encore de site web ? Ou votre site actuel ne vous apporte pas les résultats espérés ? Je conçois des sites web professionnels, élégants et stratégiquement pensés pour valoriser votre activité, attirer des visiteurs qualifiés et transformer leur intérêt en clients.",
+  h1Bold: "qui Génèrent des Ventes.",
+  text:
+    "Votre activité mérite un site web qui travaille pour vous. Attirez des clients qualifiés, valorisez bien vos services et transformez vos visiteurs en opportunités commerciales grâce à un site web professionnel élégant conçu pour convertir.",
+  /** Première phrase de la description — affichée en gras (demande de
+   *  l'éditeur, 15/11/2026). */
+  textBold: "Votre activité mérite un site web qui travaille pour vous.",
   ctaPrimary: "Réserver Un Appel",
   ctaTertiary: "Voir Nos Travaux",
   reassurance: "30 minutes · Gratuit · Sans engagement",
   portraitAlt:
     "Portrait professionnel de Stevens Akpovi, concepteur de sites web orientés conversion",
+  /** Photo paysage (espace de travail) — image du hero sur mobile et
+   *  tablette (demande de l'éditeur, 15/11/2026) ; le bureau affiche
+   *  exclusivement le portrait vertical (apropos-portrait.webp). */
+  portraitLongAlt:
+    "Stevens Akpovi, concepteur de sites web professionnels, dans son espace de travail",
 } as const;
 
 /* ============================ 02 — LE PROBLÈME ============================ */
@@ -88,14 +97,15 @@ export const TRANSFORMATION = {
   cta: "Je Veux Développer Ma Présence En Ligne",
 } as const;
 
-/* ============================ 05 — COMMENT ÇA FONCTIONNE ? ============================ */
+/* ============================ 05 — COMMENT JE TRAVAILLE ============================ */
 
-/** Section processus (ex-« UNE APPROCHE QUI VA AU-DELÀ DU DESIGN »),
- *  renommée et refondée en six étapes à accordéons « + »/« − » à la
- *  demande de l'éditeur (13/11/2026). */
+/** Section processus (ex-« UNE APPROCHE QUI VA AU-DELÀ DU DESIGN »,
+ *  puis « COMMENT ÇA FONCTIONNE ? ») — grand titre « Comment Je
+ *  Travaille », trait vertical à hauteur de la liste des étapes et
+ *  espaces symétriques de part et d'autre du trait (demande de
+ *  l'éditeur, 16/11/2026). La page Méthode réutilise `steps`. */
 export const SOLUTION = {
-  eyebrow: "Comment ça fonctionne ?",
-  title: "Un processus clair. Une collaboration structurée",
+  title: "Comment Je Travaille",
   text: "Je ne crée pas simplement des sites web. Je conçois des sites pensés pour convaincre et convertir.",
   steps: [
     {
@@ -274,6 +284,12 @@ export const ABOUT = {
   title: "Je suis Stevens Akpovi. Et je crois qu'un bon site web doit servir le business qu'il représente.",
   text: "Je suis concepteur de sites web professionnels et passionné par la manière dont le numérique peut accompagner le développement des entreprises.\n\nMon travail consiste à transformer les besoins d'un professionnel en une expérience digitale claire, élégante et orientée vers ses objectifs.\n\nJe m'intéresse autant à la présentation visuelle qu'au message transmis et au chemin que suit un visiteur avant de prendre une décision.\n\nParce qu'un site réussi ne se résume pas à son apparence.\n\nIl doit donner une bonne première impression, présenter la valeur de votre activité et faciliter la relation avec vos futurs clients.\n\nJe travaille à distance et accompagne des professionnels et des entreprises au-delà des frontières.",
   cta: "Faisons Connaissance",
+  /** Texte de la section « QUI SUIS-JE ? » de l'accueil — le dernier
+   *  paragraphe (« Je travaille à distance… ») en a été retiré à la
+   *  demande de l'éditeur (15/11/2026) ; la page « À propos » garde
+   *  la biographie complète (`text`). */
+  textHome:
+    "Je suis concepteur de sites web professionnels et passionné par la manière dont le numérique peut accompagner le développement des entreprises.\n\nMon travail consiste à transformer les besoins d'un professionnel en une expérience digitale claire, élégante et orientée vers ses objectifs.\n\nJe m'intéresse autant à la présentation visuelle qu'au message transmis et au chemin que suit un visiteur avant de prendre une décision.\n\nParce qu'un site réussi ne se résume pas à son apparence.\n\nIl doit donner une bonne première impression, présenter la valeur de votre activité et faciliter la relation avec vos futurs clients.",
   facts: [
     { label: "Approche", value: "Stratégie · Design · Conversion" },
     { label: "Inclus dans chaque projet", value: "Copywriting professionnel · SEO de base" },
@@ -326,8 +342,8 @@ export const FAQ = {
 
 export const FINAL_CTA = {
   eyebrow: "IL EST TEMPS DE DONNER UNE NOUVELLE DIMENSION À VOTRE ACTIVITÉ",
-  title: "Je crée des sites web qui génèrent des ventes. Et votre prochain projet peut commencer aujourd'hui.",
-  text: "Vous avez une activité à développer, une expertise à valoriser ou des services à présenter ?\n\nConstruisons une présence en ligne professionnelle qui donne à votre entreprise les moyens de mieux se présenter, de toucher de nouvelles personnes et de transformer davantage d'intérêt en clients.\n\nPrenons simplement 30 minutes pour en discuter.",
+  title: "Votre activité mérite un site web qui travaille pour vous. Et cela peut commencer aujourd'hui.",
+  text: "Construisons une présence en ligne professionnelle qui donne à votre entreprise les moyens de mieux se présenter, de toucher de nouvelles personnes et de transformer davantage d'intérêt en clients.",
   cta1: "Réserver Mon Appel",
   cta2: "Demander Un Devis",
   cta3: "Demander Un Audit Gratuit",

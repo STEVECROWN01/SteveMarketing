@@ -52,7 +52,7 @@ function AudienceStrip() {
  *  supprimées à la demande de l'éditeur).
  *  14/11/2026 : traits de séparation à extrémités fondues entre
  *  « POUR QUI JE CONÇOIS CES SITES » ↔ « VOTRE ACTIVITÉ MÉRITE… »
- *  et « COMMENT ÇA FONCTIONNE ? » ↔ « DAVANTAGE DE VALEUR… ». */
+ *  et « COMMENT JE TRAVAILLE » ↔ « DAVANTAGE DE VALEUR… ». */
 export function HomePage() {
   return (
     <>
@@ -65,6 +65,8 @@ export function HomePage() {
       <QuestioningSection />
       <TransformationSection />
       <ServicesSection />
+      {/* « COMMENT JE TRAVAILLE » (16/11/2026) : grand titre, trait
+          vertical à hauteur de la liste, espaces symétriques. */}
       <SolutionSection />
       {/* Demi-largeur à la demande de l'éditeur (15/11/2026) : ce
           trait-là aussi était trop long — réduit de moitié, centré. */}

@@ -72,6 +72,8 @@ export function ProjectPage({ projectId }: { projectId: string }) {
 
           <div className="mt-12 flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
             <Reveal direction="up" delay={0.1} className="min-w-0 flex-1">
+              {/* Aperçu bureau — en COULEUR (mockups projets en couleur,
+                  demande de l'éditeur, 16/11/2026). */}
               <BrowserMockup
                 src={project.desktop}
                 src2x={project.desktop2x}
@@ -79,6 +81,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
                 url={project.url}
                 width={1440}
                 height={900}
+                color
                 priority
                 sizes="(max-width: 640px) 92vw, (max-width: 1024px) 80vw, 820px"
               />
@@ -90,6 +93,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
                 alt={`Aperçu mobile du site ${project.name}`}
                 width={390}
                 height={844}
+                color
                 sizes="(max-width: 640px) 92vw, 240px"
               />
             </Reveal>
