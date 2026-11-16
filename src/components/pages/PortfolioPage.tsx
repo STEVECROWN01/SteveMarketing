@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ArrowRight, Pin } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 import { PageHero, CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { MonoImage } from "@/components/media/Media";
@@ -14,12 +14,14 @@ import { PROJECTS } from "@/lib/site";
  * La seconde section est présentée exactement comme la page
  * « Our Work » de sheragency.com (design uniquement) : sur fond
  * sombre, chaque projet occupe une ligne pleine largeur — à gauche
- * le grand nom du projet (blanc, graisse normale) accompagné de la
- * mention de catégorie (simple texte + icône d'épingle à droite du
- * titre — plus AUCUNE pastille, demande de l'éditeur 17/11/2026 :
- * « on va croire que c'est un bouton. Or, ce n'est pas un bouton »),
- * la phrase descriptive du projet, puis le bouton blanc « Voir Le
- * Projet » ; à droite la grande capture du site. Le clic (bouton ou
+ * la mention de catégorie (simple texte avec ÉTOILE au début, posée
+ * AU-DESSUS du titre — plus AUCUNE pastille : demandes de l'éditeur
+ * 17/11/2026 : « on va croire que c'est un bouton. Or, ce n'est pas
+ * un bouton », puis « ça devrait être au-dessus du titre… pas une
+ * épingle mais une étoile au début de la mention »), le grand nom
+ * du projet (blanc, graisse normale), la phrase descriptive du
+ * projet, puis le bouton blanc « Voir Le Projet » ; à droite la
+ * grande capture du site. Le clic (bouton ou
  * capture) mène à la page de présentation du projet (#/projet/<id>),
  * comme les case studies de la référence.
  */
@@ -61,36 +63,34 @@ export function PortfolioPage() {
                 <article
                   className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16"
                 >
-                {/* Texte : grand titre (mention à sa droite) +
+                {/* Texte : mention au-dessus du titre + grand titre +
                     phrase descriptive + bouton */}
                 <div className={i % 2 === 1 ? "lg:order-2" : ""}>
-                  {/* Mention de catégorie — PLUS DE PASTILLE BLANCHE
-                      (demande de l'éditeur, 17/11/2026 : elle donnait
-                      l'impression d'être un bouton alors qu'elle n'en
-                      est pas un). C'est désormais un SIMPLE TEXTE posé
-                      à DROITE du titre, suivi d'une icône d'épingle :
-                      aucun fond, aucune bordure, aucune forme de
-                      bouton. Quand le titre est trop long pour la
-                      colonne, la mention passe naturellement sur la
-                      ligne suivante (flex-wrap, alignée sur la ligne
-                      de base du titre quand ils partagent la ligne). */}
-                  <div className="flex flex-wrap items-baseline gap-x-4 gap-y-2.5">
-                    <RevealText
-                      as="h2"
-                      text={project.name}
-                      delay={0.08}
-                      className="font-display text-[clamp(2rem,5vw,3.75rem)] font-normal leading-[1.05] tracking-[-0.02em] text-white"
-                    />
-                    <Reveal direction="up" delay={0.24}>
-                      <p className="text-sm font-medium on-dark-muted">
-                        {project.category}
-                        <Pin
-                          className="ml-1.5 inline-block h-3.5 w-3.5 -translate-y-[1px] text-[#e4e4e4]/80"
-                          aria-hidden="true"
-                        />
-                      </p>
-                    </Reveal>
-                  </div>
+                  {/* Mention de catégorie — SIMPLE TEXTE posé
+                      AU-DESSUS du titre (correction de l'éditeur,
+                      17/11/2026 : « ça devrait pas être à droite du
+                      titre.. ça devrait être au-dessus du titre »),
+                      avec une ÉTOILE AU DÉBUT de la mention (« pas une
+                      épingle mais plutôt une étoile au début de la
+                      mention »). Pas de pastille, pas de fond, pas de
+                      bordure : aucune forme de bouton. Étoile remplie
+                      (fill-current) pour rester lisible à 14 px. */}
+                  <Reveal direction="up">
+                    <p className="inline-flex items-center gap-2 text-sm font-medium on-dark-muted">
+                      <Star
+                        className="h-3.5 w-3.5 shrink-0 fill-current text-[#e4e4e4]/80"
+                        aria-hidden="true"
+                      />
+                      {project.category}
+                    </p>
+                  </Reveal>
+
+                  <RevealText
+                    as="h2"
+                    text={project.name}
+                    delay={0.08}
+                    className="font-display mt-6 text-[clamp(2rem,5vw,3.75rem)] font-normal leading-[1.05] tracking-[-0.02em] text-white"
+                  />
 
                   {/* Phrase descriptive du projet, sous le titre
                       (demande de l'éditeur, 17/11/2026). */}
