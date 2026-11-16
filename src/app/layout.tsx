@@ -59,6 +59,7 @@ export const metadata: Metadata = {
         width: 1254,
         height: 1254,
         alt: "Stevens Akpovi — Je crée des sites web qui génèrent des ventes",
+        type: "image/jpeg",
       },
     ],
   },

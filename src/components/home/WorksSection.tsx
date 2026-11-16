@@ -11,7 +11,7 @@ import { PROJECTS } from "@/lib/site";
  * SECTION 09 — RÉALISATIONS (fond blanc)
  * Présentation calquée sur la section « Websites We Created » de
  * sheragency.com : titre + double CTA (bouton noir « Demander Un
- * Devis », bouton contour « Voir Nos Réalisations »), puis
+ * Devis », bouton contour « Voir Mes Réalisations »), puis
  * grille de cartes projet — les TROIS projets sur une seule
  * ligne (demande de l'éditeur) — grande capture, nom, catégorie
  * et bouton « Voir Le Projet » ouvrant la page de présentation du
@@ -56,7 +56,7 @@ export function WorksSection() {
                 size="lg"
                 icon={CTAIcons.works}
               >
-                Voir Nos Réalisations
+                Voir Mes Réalisations
               </CTAButton>
             </div>
           </Reveal>

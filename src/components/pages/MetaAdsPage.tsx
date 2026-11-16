@@ -58,11 +58,11 @@ const ADS_ACTIONS = [
 const ADS_STEPS = [
   {
     name: "Compréhension de l'objectif",
-    text: "Nous définissons ce que la publicité doit apporter à votre activité : visibilité, demandes, promotion d'une offre.",
+    text: "Je définis ce que la publicité doit apporter à votre activité : visibilité, demandes, promotion d'une offre.",
   },
   {
     name: "Définition des audiences",
-    text: "Nous identifions les audiences à toucher, en cohérence avec vos clients réels et votre marché.",
+    text: "J'identifie les audiences à toucher, en cohérence avec vos clients réels et votre marché.",
   },
   {
     name: "Mise en place des campagnes",

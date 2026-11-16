@@ -216,6 +216,12 @@ export const ASSETS = {
   /** Logo officiel — version noire sur fond TRANSPARENT (RGBA, fond
    *  blanc supprimé du fichier, 15/11/2026) pour fonds clairs. */
   logoDark: "/assets/logo-noir.png?v=2026-11-15",
-  /** Vignette de partage de lien (Open Graph), fournie par l'éditeur. */
-  ogImage: "/assets/OG.png",
+  /** Vignette de partage de lien (Open Graph) — dérivé JPEG optimisé
+   *  (216 Ko) de la vignette fournie par l'éditeur : WhatsApp
+   *  n'affiche pas les aperçus au-delà d'environ 600 Ko et le PNG
+   *  original (1,9 Mo) échouait silencieusement au partage. Nouveau
+   *  nom de fichier = contournement des caches des plateformes. La
+   *  source PNG (OG.png) est conservée dans le dépôt
+   *  (scripts/optimize-og-image-2026-11-16.py). */
+  ogImage: "/assets/OG.jpg",
 } as const;

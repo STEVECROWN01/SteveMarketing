@@ -280,7 +280,13 @@ export function Hero() {
                   mockup). */}
               <span className="hero-anim-name absolute bottom-3 right-3 z-10">
                 <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#070707]/75 px-2.5 py-1 text-[10px] font-medium leading-none text-white backdrop-blur-sm">
-                  <span className="h-1 w-1 shrink-0 rounded-full bg-[#e4e4e4]" aria-hidden="true" />
+                  {/* Point indicateur vert brillant (demande de l'éditeur,
+                      16/11/2026 : passer du gris neutre à un vert vif
+                      attirant l'œil) + léger halo lumineux. */}
+                  <span
+                    className="h-1 w-1 shrink-0 rounded-full bg-[#22c55e] shadow-[0_0_8px_rgba(34,197,94,0.95)]"
+                    aria-hidden="true"
+                  />
                   <span>Stevens Akpovi</span>
                 </span>
               </span>

@@ -44,7 +44,7 @@ const SEO_ACTIONS = [
   {
     icon: KeyRound,
     title: "Recherche de mots-clés",
-    text: "Nous identifions les recherches réellement utilisées par vos futurs clients lorsqu'ils cherchent vos prestations.",
+    text: "J'identifie les recherches réellement utilisées par vos futurs clients lorsqu'ils cherchent vos prestations.",
   },
   {
     icon: LayoutTemplate,

@@ -37,7 +37,7 @@ const HEADER_NAV_ITEMS = NAV_ITEMS.filter(
 
 /** PREMIÈRE colonne du menu plein écran (demande de l'éditeur,
  *  15/11/2026) : les pages majeures — Méthode, Référencement SEO,
- *  Publicité Meta Ads, puis Nos Réalisations. L'entrée
+ *  Publicité Meta Ads, puis Mes Réalisations. L'entrée
  *  « Référencement International SEO » (ancre de section sur la page
  *  Référencement) a été retirée à la demande de l'éditeur
  *  (16/11/2026). */
@@ -45,7 +45,7 @@ const MENU_MAIN_ITEMS: { key: string; label: string; section?: string }[] = [
   { key: "processus", label: "Méthode" },
   { key: "referencement", label: "Référencement SEO" },
   { key: "publicite", label: "Publicité Meta Ads" },
-  { key: "realisations", label: "Nos Réalisations" },
+  { key: "realisations", label: "Mes Réalisations" },
 ];
 
 /** DEUXIÈME colonne du menu plein écran, nommée « Autre Liens »

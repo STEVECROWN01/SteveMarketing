@@ -142,7 +142,7 @@ export function SolutionSection() {
                   onClick={goToDevis}
                   className="min-h-[52px]"
                 />
-                {/* Bouton noir « Voir Nos Travaux » — exactement comme le
+                {/* Bouton noir « Voir Mes Travaux » — exactement comme le
                     bouton « Parlons De Votre Projet » (pastille noire,
                     remplissage #3c3c3c au survol) ; mène aux réalisations. */}
                 <CTAButton

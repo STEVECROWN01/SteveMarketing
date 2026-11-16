@@ -66,7 +66,7 @@ export function DevisPage() {
 
             <Reveal direction="up" delay={0.14}>
               <p className="text-body mx-auto mt-6 max-w-2xl on-paper-muted">
-                Nous prenons des sites web obsolètes et les transformons en sites web
+                Je prends des sites web obsolètes et les transforme en sites web
                 qui attirent davantage de visiteurs, convertissent ces visiteurs en
                 clients et valorisent votre image de marque.
               </p>

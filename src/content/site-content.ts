@@ -17,7 +17,7 @@ export const HERO = {
    *  l'éditeur, 15/11/2026). */
   textBold: "Votre activité mérite un site web qui travaille pour vous.",
   ctaPrimary: "Réserver Un Appel",
-  ctaTertiary: "Voir Nos Travaux",
+  ctaTertiary: "Voir Mes Travaux",
   reassurance: "30 minutes · Gratuit · Sans engagement",
   portraitAlt:
     "Portrait professionnel de Stevens Akpovi, concepteur de sites web orientés conversion",
@@ -114,27 +114,27 @@ export const SOLUTION = {
     },
     {
       name: "Planification du Parcours Utilisateur",
-      text: "Le premier élément, et le plus important à prendre en compte, est le parcours que suit un visiteur sur votre site web.\n\nQuelles questions se pose-t-il lorsqu'il arrive sur votre site ? Quelles hésitations ou objections devons-nous lever ? Comment instaurer un climat de confiance avec lui ?\n\nNous abordons toutes ces questions dès le premier jour de nos projets, lors d'un atelier d'environ 1h, au cours duquel nous présentons la structure du site web et échangeons nos idées.",
+      text: "Le premier élément, et le plus important à prendre en compte, est le parcours que suit un visiteur sur votre site web.\n\nQuelles questions se pose-t-il lorsqu'il arrive sur votre site ? Quelles hésitations ou objections faut-il lever ? Comment instaurer un climat de confiance avec lui ?\n\nJ'aborde toutes ces questions dès le premier jour du projet, lors d'un atelier d'environ 1h, au cours duquel je vous présente la structure du site web et nous échangeons nos idées.",
     },
     {
       name: "Conception Visuelle",
-      text: "En fonction du public que nous ciblons, plusieurs styles esthétiques peuvent être envisagés pour mieux correspondre à ses goûts et renforcer sa confiance.\n\nDans la troisième phase de notre projet, nous explorerons plusieurs pistes créatives et retiendrons la plus adaptée.\n\nNous pouvons réaliser ce travail tout en respectant votre charte graphique et vos contraintes existantes — ou choisir de les repenser entièrement.",
+      text: "En fonction du public que vous visez, plusieurs styles esthétiques peuvent être envisagés pour mieux correspondre à ses goûts et renforcer sa confiance.\n\nDans la troisième phase du projet, j'explorerai plusieurs pistes créatives et retiendrai la plus adaptée.\n\nJe peux réaliser ce travail tout en respectant votre charte graphique et vos contraintes existantes — ou choisir de les repenser entièrement.",
     },
     {
       name: "Rédaction de Contenu",
-      text: "La clé d'une rédaction web efficace réside dans la concision et la pertinence de votre contenu.\n\nNous rédigeons les textes des sites web que nous concevons et, lorsque cela est pertinent, nous les optimisons pour les moteurs de recherche (SEO).",
+      text: "La clé d'une rédaction web efficace réside dans la concision et la pertinence de votre contenu.\n\nJe rédige les textes des sites web que je conçois et, lorsque cela est pertinent, je les optimise pour les moteurs de recherche (SEO).",
     },
     {
       name: "Développement & Mise en Ligne",
-      text: "Durant cette phase, nous transformons les maquettes graphiques que nous avons conçues en un site web fonctionnel, grâce au code.\n\nNous veillons à ce que votre site web offre un rendu impeccable sur tous les formats d'écran : ordinateurs, tablettes et smartphones.\n\nUne fois le développement initial terminé, nous vous présentons le site pour recueillir vos retours et intégrer les éventuels ajustements ou personnalisations souhaités. Après validation et finalisation, nous procédons à sa mise en ligne afin de le rendre accessible à vos visiteurs sur Internet.",
+      text: "Durant cette phase, je transforme les maquettes graphiques que j'ai conçues en un site web fonctionnel, grâce au code.\n\nJe veille à ce que votre site web offre un rendu impeccable sur tous les formats d'écran : ordinateurs, tablettes et smartphones.\n\nUne fois le développement initial terminé, je vous présente le site pour recueillir vos retours et intégrer les éventuels ajustements ou personnalisations souhaités. Après validation et finalisation, je procède à sa mise en ligne afin de le rendre accessible à vos visiteurs sur Internet.",
     },
     {
       name: "Génération de trafic",
-      text: "Maintenant que votre site web est optimisé, il est temps d'attirer des visiteurs.\n\nNous optimisons votre site pour les moteurs de recherche (SEO) et générons du trafic grâce aux campagnes publicitaires Meta Ads.",
+      text: "Maintenant que votre site web est optimisé, il est temps d'attirer des visiteurs.\n\nJ'optimise votre site pour les moteurs de recherche (SEO) et génère du trafic grâce aux campagnes publicitaires Meta Ads.",
     },
   ],
   cta1: "Démarrons Votre Projet",
-  cta2: "Voir Nos Travaux",
+  cta2: "Voir Mes Travaux",
 } as const;
 
 /* Résumé de l'ancienne approche — conservé pour la page « À propos »
@@ -258,7 +258,7 @@ export const WORKS = {
   eyebrow: "PROJETS RÉALISÉS",
   title: "Des réalisations concrètes. Des expériences digitales pensées avec intention.",
   intro: "Découvrez quelques projets auxquels j'ai donné vie.",
-  cta: "Votre projet peut être notre prochaine réalisation.",
+  cta: "Votre projet peut être ma prochaine réalisation.",
 } as const;
 
 /* ============================ 10 — MÉTHODE DE TRAVAIL ============================ */
@@ -267,11 +267,11 @@ export const METHOD = {
   eyebrow: "COMMENT NOUS ALLONS TRAVAILLER ENSEMBLE",
   title: "Un processus clair. Une collaboration structurée. Un résultat pensé pour votre activité.",
   steps: [
-    { name: "Échange et compréhension", text: "Nous discutons de votre activité, de vos besoins et de vos objectifs." },
-    { name: "Stratégie et organisation", text: "Nous définissons le message, les pages, les contenus et la structure de votre futur site." },
-    { name: "Design et conception", text: "Nous construisons une expérience visuelle cohérente avec votre identité et votre audience." },
-    { name: "Développement", text: "Nous transformons la conception en un site fonctionnel, responsive et performant." },
-    { name: "Tests et optimisation", text: "Nous vérifions le comportement du site, ses liens, ses formulaires et son affichage sur tous les appareils." },
+    { name: "Échange et compréhension", text: "Je discute de votre activité, de vos besoins et de vos objectifs." },
+    { name: "Stratégie et organisation", text: "Je définis le message, les pages, les contenus et la structure de votre futur site." },
+    { name: "Design et conception", text: "Je construis une expérience visuelle cohérente avec votre identité et votre audience." },
+    { name: "Développement", text: "Je transforme la conception en un site fonctionnel, responsive et performant." },
+    { name: "Tests et optimisation", text: "Je vérifie le comportement du site, ses liens, ses formulaires et son affichage sur tous les appareils." },
     { name: "Mise en ligne", text: "Votre site est publié et prêt à accueillir ses premiers visiteurs." },
   ],
   cta: "Démarrer Mon Projet",
@@ -306,7 +306,7 @@ export const FAQ = {
     },
     {
       q: "Je possède déjà un site. Puis-je demander une refonte ?",
-      a: "Oui. Nous pouvons étudier votre site actuel et identifier les améliorations nécessaires.",
+      a: "Oui. Je peux étudier votre site actuel et identifier les améliorations nécessaires.",
     },
     {
       q: "La rédaction des textes est-elle facturée séparément ?",

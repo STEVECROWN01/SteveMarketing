@@ -106,7 +106,7 @@ export function ProcessPage() {
               </Reveal>
               <RevealText
                 as="h2"
-                text="Voici comment nous créons des sites web qui génèrent des ventes."
+                text="Voici comment je crée des sites web qui génèrent des ventes."
                 delay={0.08}
                 className="text-section-title mt-4 max-w-xl text-[#1c1c1c]"
               />
@@ -304,14 +304,14 @@ export function ProcessPage() {
         </div>
       </section>
 
-      {/* ---------- 4. NOS RÉALISATIONS (avant l'appel à l'action,
+      {/* ---------- 4. MES RÉALISATIONS (avant l'appel à l'action,
           demande de l'éditeur, 15/11/2026) : les projets présentés
           avec leurs mockups — les mêmes cartes que la section
           « PROJETS RÉALISÉS » de l'accueil (grande capture en
           couleur, nom, catégorie, bouton « Voir Le Projet ») —
           alignés VERTICALEMENT, un projet par ligne. ---------- */}
       <section
-        aria-label="Sites web que nous avons créés — nos réalisations"
+        aria-label="Sites web que j'ai créés — mes réalisations"
         className="section-bright py-20 sm:py-24 lg:py-32"
       >
         <div className="container-site">
@@ -319,11 +319,11 @@ export function ProcessPage() {
             {/* Colonne gauche : titre + bouton */}
             <div className="lg:sticky lg:top-28">
               <Reveal direction="up">
-                <p className="text-eyebrow">NOS RÉALISATIONS</p>
+                <p className="text-eyebrow">MES RÉALISATIONS</p>
               </Reveal>
               <RevealText
                 as="h2"
-                text="Sites web que nous avons créés."
+                text="Sites web que j'ai créés."
                 delay={0.08}
                 className="text-section-title mt-4 max-w-md text-[#1c1c1c]"
               />

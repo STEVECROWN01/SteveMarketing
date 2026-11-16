@@ -128,17 +128,40 @@ export function RouterProvider({ children }: { children: React.ReactNode }) {
   const hash = useSyncExternalStore(subscribe, getHash, getServerHash);
   const state = useMemo(() => parseHash(hash), [hash]);
 
-  // Titre dynamique + défilement après changement de page.
+  // Titre + méta description dynamiques, puis défilement après changement
+  // de page.
   useEffect(() => {
+    /** SEO (16/11/2026) : chaque page virtuelle applique AUSSI sa
+     *  méta description et ses balises Open Graph / Twitter — le titre
+     *  était déjà dynamique, la description et les balises de partage
+     *  suivent désormais la page affichée. Les moteurs et aperçus qui
+     *  exécutent le JavaScript voient ainsi les méta de CHAQUE page,
+     *  pas seulement celles de l'accueil. */
+    const applyMeta = (title: string, description: string) => {
+      document.title = title;
+      const setContent = (selector: string, value: string) => {
+        document
+          .querySelectorAll(selector)
+          .forEach((el) => el.setAttribute("content", value));
+      };
+      setContent('meta[name="description"]', description);
+      setContent('meta[property="og:title"]', title);
+      setContent('meta[property="og:description"]', description);
+      setContent('meta[name="twitter:title"]', title);
+      setContent('meta[name="twitter:description"]', description);
+    };
     // Page projet : le fragment porte l'identifiant du projet (ex.
     // #/projet/mrsteveenglish) — titre dédié, retour en haut sans
     // tentative d'ancrage.
     if (state.page === "projet") {
       const project = PROJECTS.find((p) => p.id === state.section);
       if (typeof document !== "undefined") {
-        document.title = project
-          ? `${project.name} — Projet web | Stevens Akpovi`
-          : "Réalisations — Projets web | Stevens Akpovi";
+        applyMeta(
+          project
+            ? `${project.name} — Projet web | Stevens Akpovi`
+            : "Réalisations — Projets web | Stevens Akpovi",
+          project?.description ?? PAGES.realisations.description
+        );
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -148,7 +171,7 @@ export function RouterProvider({ children }: { children: React.ReactNode }) {
         ? PAGES[PAGE_KEYS[state.page] as keyof typeof PAGES]
         : null;
     if (meta && typeof document !== "undefined") {
-      document.title = meta.title;
+      applyMeta(meta.title, meta.description);
     }
     // Laisse le nouveau contenu monter avant l'ancrage : la transition
     // de page (AnimatePresence mode="wait") retarde le montage du
