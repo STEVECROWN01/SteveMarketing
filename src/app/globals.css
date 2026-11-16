@@ -356,6 +356,26 @@ html.hoverable .mono-pin:where(:hover, :focus-within) > .media-fill {
   filter: grayscale(0);
 }
 
+/* ---------- Variante .mockup-zoom : zoom léger au survol ----------
+   Mockups déjà en couleur (pages projets) : aucun noir et blanc,
+   mais le MÊME zoom doux que .mono-media (scale 1.035) au survol —
+   uniquement sur les périphériques capables de survoler (demande
+   de l'éditeur, 17/11/2026 : « lorsqu'on survole ce mockup, il
+   doit y avoir toujours l'effet de zoom qu'on a sur les mockups
+   du site »). L'image est découpée par le cadre arrondi du
+   mockup (overflow-hidden sur la figure). */
+.mockup-zoom > span > img {
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .mockup-zoom:where(:hover, :focus-within) > span > img {
+    transform: scale(1.035);
+  }
+}
+html.hoverable .mockup-zoom:where(:hover, :focus-within) > span > img {
+  transform: scale(1.035);
+}
+
 /* ---------- Icône directionnelle sur visuels cliquables ---------- */
 .dir-icon {
   transition:

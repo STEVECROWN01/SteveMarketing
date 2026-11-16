@@ -70,10 +70,29 @@ export function ProjectPage({ projectId }: { projectId: string }) {
             </p>
           </Reveal>
 
+          {/* Bureau et smartphone CÔTE À CÔTE, À LA MÊME HAUTEUR
+              (demande de l'éditeur, 17/11/2026 : « la hauteur du
+              mockup téléphone doit être à la même hauteur que le
+              mockup desktop »). Le mockup téléphone garde son ratio
+              390×844 : c'est sa LARGEUR qui est calculée pour que
+              sa hauteur naturelle égale celle du mockup bureau.
+              Mise en équation (bureau = figcaption c = 26 px mesurés
+              + image 1440×900, 2 px de bordure ; téléphone = image
+              390×844, 5 px de padding + 2 px de bordure) :
+                7 + 2,1641·(X−7) = c + 2 + 0,625·(C − g − X − 2)
+              avec C = largeur de la rangée et g = gouttière (48 px,
+              lg:gap-12 à partir de lg et au-delà) — d'où
+                X = (62,5 % + 4,9 px) / 2,7891
+              constante calibrée au pixel par mesure navigateur
+              headless (écart résiduel ≤ 0,3 px sur 1024–1920).
+              En dessous de lg, la colonne empilée d'origine est
+              conservée (téléphone sous le bureau, pleine largeur
+              puis 1/3). */}
           <div className="mt-12 flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
             <Reveal direction="up" delay={0.1} className="min-w-0 flex-1">
               {/* Aperçu bureau — en COULEUR (mockups projets en couleur,
-                  demande de l'éditeur, 16/11/2026). */}
+                  demande de l'éditeur, 16/11/2026) ; coins un peu plus
+                  arrondis + zoom au survol (17/11/2026). */}
               <BrowserMockup
                 src={project.desktop}
                 src2x={project.desktop2x}
@@ -82,11 +101,19 @@ export function ProjectPage({ projectId }: { projectId: string }) {
                 width={1440}
                 height={900}
                 color
+                softRadius
+                zoom
                 priority
                 sizes="(max-width: 640px) 92vw, (max-width: 1024px) 80vw, 820px"
               />
             </Reveal>
-            <Reveal direction="left" delay={0.2} className="w-full shrink-0 sm:w-1/3 lg:w-[24%]">
+            <Reveal
+              direction="left"
+              delay={0.2}
+              className="w-full shrink-0 sm:w-1/3 lg:w-[calc((62.5%_+_4.9px)/2.789)]"
+            >
+              {/* Aperçu mobile — coins adoucis (20 px : « l'angle est
+                  trop pointu », 17/11/2026) + zoom au survol. */}
               <PhoneMockup
                 src={project.mobile}
                 src2x={project.mobile2x}
@@ -94,7 +121,9 @@ export function ProjectPage({ projectId }: { projectId: string }) {
                 width={390}
                 height={844}
                 color
-                sizes="(max-width: 640px) 92vw, 240px"
+                softRadius
+                zoom
+                sizes="(max-width: 640px) 92vw, (max-width: 1023px) 33vw, 290px"
               />
             </Reveal>
           </div>

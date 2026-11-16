@@ -108,6 +108,8 @@ export function BrowserMockup({
   forceMono = false,
   color = false,
   sizes,
+  softRadius = false,
+  zoom = false,
 }: {
   src: string;
   /** Variante haute densité @2x (voir MonoImage). */
@@ -132,6 +134,15 @@ export function BrowserMockup({
    *  l'éditeur, 16/11/2026) — aucun noir et blanc : l'aperçu du
    *  site s'affiche dans ses couleurs réelles. */
   color?: boolean;
+  /** Coins PLUS ARRONDIS (arrondi accentué, demande de l'éditeur,
+   *  17/11/2026 : pages projets — légèrement plus doux que le
+   *  rounded-md historique, pour accompagner le smartphone). */
+  softRadius?: boolean;
+  /** ZOOM LÉGER AU SURVOL (scale 1.035, comme .mono-media) SANS
+   *  noir et blanc — pages projets (demande de l'éditeur,
+   *  17/11/2026 : « lorsqu'on survole ce mockup, il doit y avoir
+   *  toujours l'effet de zoom qu'on a sur les mockups du site »). */
+  zoom?: boolean;
 }) {
   const shortUrl = url.replace(/^https?:\/\//, "");
   // Fichiers réels : desktop 1440 px (1x) et 1920 px (@2x vraie densité)
@@ -139,7 +150,13 @@ export function BrowserMockup({
     ? `${src} 1440w, ${src2x} 1920w`
     : undefined;
   return (
-    <figure className={`group/mockup overflow-hidden rounded-md border border-[#e4e4e4]/25 bg-[#232323] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] ${className}`}>
+    <figure
+      className={`group/mockup overflow-hidden ${
+        softRadius ? "rounded-[16px]" : "rounded-md"
+      } border border-[#e4e4e4]/25 bg-[#232323] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] ${
+        zoom ? "mockup-zoom" : ""
+      } ${className}`}
+    >
       <figcaption className="flex items-center gap-1 border-b border-[#e4e4e4]/12 px-1.5 py-[3px] sm:gap-2 sm:px-3 sm:py-1.5">
         <span className="flex gap-1" aria-hidden="true">
           <span className="h-1 w-1 rounded-full bg-[#3c3c3c] sm:h-1.5 sm:w-1.5" />
@@ -179,12 +196,14 @@ export function BrowserMockup({
 }
 
 /** Mockup smartphone (aperçu mobile des réalisations).
- *  Cadre très fin (2,5 px) et coins légèrement arrondis (14 px —
- *  remontés depuis les 10 px trop cassés, demande de l'éditeur,
- *  14/11/2026) : l'écran du site occupe quasiment tout le mockup
- *  et son contenu reste visible en entier, même à petite largeur
- *  dans le hero. La fente « encoche » se réduit à un fin
- *  haut-parleur qui ne masque plus l'en-tête du site capturé. */
+ *  Cadre très fin (2,5 px) et coins arrondis — 14 px par défaut
+ *  (remontés depuis les 10 px trop cassés, demande de l'éditeur,
+ *  14/11/2026), 20 px avec `softRadius` (pages projets,
+ *  17/11/2026 : « l'angle est trop pointu ») : l'écran du site
+ *  occupe quasiment tout le mockup et son contenu reste visible
+ *  en entier, même à petite largeur dans le hero. La fente
+ *  « encoche » se réduit à un fin haut-parleur qui ne masque plus
+ *  l'en-tête du site capturé. */
 export function PhoneMockup({
   src,
   src2x,
@@ -197,6 +216,8 @@ export function PhoneMockup({
   forceMono = false,
   color = false,
   sizes,
+  softRadius = false,
+  zoom = false,
 }: {
   src: string;
   /** Variante haute densité @2x (voir MonoImage). */
@@ -218,14 +239,26 @@ export function PhoneMockup({
   forceMono?: boolean;
   /** COULEUR PERMANENTE (mockups projets en couleur, 16/11/2026). */
   color?: boolean;
+  /** Coins PLUS ARRONDIS (20 px) — pages projets (demande de
+   *  l'éditeur, 17/11/2026 : « augmente un peu le border-radius du
+   *  mockup téléphone, l'angle est trop pointu »). */
+  softRadius?: boolean;
+  /** ZOOM LÉGER AU SURVOL (scale 1.035, comme .mono-media) SANS
+   *  noir et blanc — pages projets (demande de l'éditeur,
+   *  17/11/2026). */
+  zoom?: boolean;
 }) {
   // Fichiers réels : mobile 390 px (1x) et 780 px (@2x vraie densité)
   const srcSet = src2x
     ? `${src} 390w, ${src2x} 780w`
     : undefined;
+  const radiusOuter = softRadius ? "rounded-[20px]" : "rounded-[14px]";
+  const radiusInner = softRadius ? "rounded-[17px]" : "rounded-[11px]";
   return (
     <figure
-      className={`group/mockup relative overflow-hidden rounded-[14px] border border-[#e4e4e4]/25 bg-[#232323] p-[2.5px] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] ${className}`}
+      className={`group/mockup relative overflow-hidden ${radiusOuter} border border-[#e4e4e4]/25 bg-[#232323] p-[2.5px] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.55)] ${
+        zoom ? "mockup-zoom" : ""
+      } ${className}`}
     >
       <span
         className="absolute left-1/2 top-[4px] z-10 h-[5px] w-[34px] -translate-x-1/2 rounded-full bg-[#1c1c1c]"
@@ -234,10 +267,10 @@ export function PhoneMockup({
       <span
         className={
           color
-            ? "block overflow-hidden rounded-[11px]"
+            ? `block overflow-hidden ${radiusInner}`
             : pinMono
-              ? "mono-pin block overflow-hidden rounded-[11px]"
-              : `mono-media block overflow-hidden rounded-[11px] ${forceMono ? "mono-locked" : ""}`
+              ? `mono-pin block overflow-hidden ${radiusInner}`
+              : `mono-media block overflow-hidden ${radiusInner} ${forceMono ? "mono-locked" : ""}`
         }
       >
         <img
