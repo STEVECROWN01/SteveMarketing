@@ -61,7 +61,7 @@ export const PAGES = {
   accueil: {
     hash: "#/accueil",
     label: "Accueil",
-    title: "Stevens Akpovi — Je crée des sites web qui génèrent des ventes",
+    title: "Stevens Akpovi — Votre activité mérite un site web qui travaille pour vous",
     description:
       "Sites vitrines, multipages, landing pages et pages de vente pensés pour convertir. Copywriting et SEO de base inclus. Appelez Stevens Akpovi ou demandez votre devis.",
   },

@@ -23,7 +23,7 @@ const sora = Sora({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: "Stevens Akpovi — Je crée des sites web qui génèrent des ventes",
+    default: "Stevens Akpovi — Votre activité mérite un site web qui travaille pour vous",
     template: "%s",
   },
   description:
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     url: SITE.url,
     siteName: "Stevens Akpovi",
-    title: "Stevens Akpovi — Je crée des sites web qui génèrent des ventes",
+    title: "Stevens Akpovi — Votre activité mérite un site web qui travaille pour vous",
     description:
       "Sites web professionnels orientés conversion : stratégie, design, copywriting inclus et SEO de base. Appelez Stevens Akpovi — 30 minutes, gratuit, sans engagement.",
     images: [
@@ -58,14 +58,14 @@ export const metadata: Metadata = {
         url: ASSETS.ogImage,
         width: 1254,
         height: 1254,
-        alt: "Stevens Akpovi — Je crée des sites web qui génèrent des ventes",
+        alt: "Stevens Akpovi — Votre activité mérite un site web qui travaille pour vous",
         type: "image/jpeg",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Stevens Akpovi — Je crée des sites web qui génèrent des ventes",
+    title: "Stevens Akpovi — Votre activité mérite un site web qui travaille pour vous",
     description:
       "Sites web professionnels orientés conversion. Copywriting et SEO de base inclus.",
     images: [ASSETS.ogImage],
