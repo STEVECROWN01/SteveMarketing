@@ -206,7 +206,7 @@ export function SeoPage() {
                 </p>
                 <div className="mt-8">
                   <CTAButton action={{ kind: "page", page: "devis" }} variant="ghostDark" size="lg">
-                    Discuter De Mon Marché International
+                    Discuter De Mon Projet International
                   </CTAButton>
                 </div>
               </Reveal>

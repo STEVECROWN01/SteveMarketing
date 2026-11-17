@@ -141,8 +141,13 @@ export function QuestioningSection() {
             <p className="font-display text-lg font-medium leading-relaxed text-white sm:text-xl">
               {QUESTIONING.conclusion}
             </p>
+            {/* CTA « Demander Mon Audit Gratuit » → page dédiée
+                #/audit-gratuit (18/11/2026) : le bouton promettait un
+                audit mais menait au formulaire de contact — il ouvre
+                désormais le VRAI formulaire d'audit, avec l'URL du
+                site actuel en champ obligatoire. */}
             <CTAButton
-              action={{ kind: "page", page: "contact" }}
+              action={{ kind: "page", page: "audit" }}
               variant="primary"
               className="mt-6"
               icon={CTAIcons.audit}

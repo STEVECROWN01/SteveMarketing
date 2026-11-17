@@ -365,18 +365,20 @@ export function Hero() {
             </Reveal>
 
             {/* CTA — les deux boutons partagent la même ligne :
-                réservation d'appel (blanc, mène à la page de demande
-                de devis) + découverte des réalisations (noir). */}
+                réservation d'appel (blanc, ouvre la fenêtre Calendly —
+                exactement comme tous les autres boutons « Réserver Un
+                Appel » du site, harmonisé le 18/11/2026) + découverte
+                des réalisations (noir). */}
             <Reveal direction="up" delay={0.24}>
               <div
                 ref={ctaRowRef}
                 className="hero-cta mt-2.5 flex flex-wrap items-center gap-2 sm:mt-5 sm:gap-3 lg:mt-5"
               >
                 <CTAButton
-                  action={{ kind: "page", page: "devis" }}
+                  action={{ kind: "calendly" }}
                   variant="secondary"
                   size="lg"
-                  ariaLabel="Réserver un appel — page de demande de devis personnalisé"
+                  ariaLabel="Réserver mon appel de 30 minutes — gratuit et sans engagement"
                 >
                   {HERO.ctaPrimary}
                 </CTAButton>
@@ -384,9 +386,12 @@ export function Hero() {
                   action={{ kind: "page", page: "realisations" }}
                   variant="ghostLight"
                   icon={
-                    /* Icône « œil » masquée sous 640 px : le libellé reste
-                       seul et les deux CTA tiennent sur une seule ligne —
-                       condition du hero entièrement visible sans défilement. */
+                    /* Icône « œil » masquée sous 640 px : le libellé
+                       reste seul et plus compact. Depuis l'unification
+                       « Voir Mes Réalisations » (18/11/2026), les deux
+                       CTA s'empilent sur téléphone — le hero reste
+                       entièrement visible sans défilement (vérifié
+                       320–390 px). */
                     <span className="hidden sm:inline-flex">{CTAIcons.works}</span>
                   }
                   hideArrow

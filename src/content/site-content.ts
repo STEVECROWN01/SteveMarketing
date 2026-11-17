@@ -17,7 +17,11 @@ export const HERO = {
    *  l'éditeur, 15/11/2026). */
   textBold: "Votre activité mérite un site web qui travaille pour vous.",
   ctaPrimary: "Réserver Un Appel",
-  ctaTertiary: "Voir Mes Travaux",
+  /** « Voir Mes Réalisations » — libellé unifié (18/11/2026) :
+   *  « Voir Mes Travaux » désignait la même page sous un autre
+   *  nom ; le libellé s'aligne sur le menu (« Mes Réalisations »)
+   *  et sur le bouton de la section Projets Réalisés. */
+  ctaTertiary: "Voir Mes Réalisations",
   reassurance: "30 minutes · Gratuit · Sans engagement",
   portraitAlt:
     "Portrait professionnel de Stevens Akpovi, concepteur de sites web orientés conversion",
@@ -134,7 +138,7 @@ export const SOLUTION = {
     },
   ],
   cta1: "Démarrons Votre Projet",
-  cta2: "Voir Mes Travaux",
+  cta2: "Voir Mes Réalisations",
 } as const;
 
 /* Résumé de l'ancienne approche — conservé pour la page « À propos »
@@ -178,7 +182,7 @@ export const SERVICES_SUMMARY = {
       text: "Modernisez votre site, améliorez son expérience et donnez une nouvelle dimension à votre présence digitale.",
     },
   ],
-  cta: "Trouver La Solution Adaptée À Mon Activité",
+  cta: "Discuter De Mon Projet",
 } as const;
 
 /* ============================ 06 — SERVICES ============================ */
@@ -212,7 +216,7 @@ export const SERVICES = {
       text: "Associez plusieurs pages et parcours commerciaux pour accompagner les visiteurs de leur première découverte jusqu'à la prise de contact.",
     },
   ],
-  cta: "Trouver La Solution Adaptée À Mon Activité",
+  cta: "Discuter De Mon Projet",
 } as const;
 
 /* ============================ 07 — AVANTAGES INCLUS ============================ */
@@ -341,8 +345,13 @@ export const FINAL_CTA = {
   eyebrow: "IL EST TEMPS DE DONNER UNE NOUVELLE DIMENSION À VOTRE ACTIVITÉ",
   title: "Votre activité mérite un site web qui travaille pour vous. Et cela peut commencer aujourd'hui.",
   text: "Construisons une présence en ligne professionnelle qui donne à votre entreprise les moyens de mieux se présenter, de toucher de nouvelles personnes et de transformer davantage d'intérêt en clients.",
-  cta1: "Réserver Mon Appel",
-  cta2: "Demander Un Devis",
+  cta1: "Réserver Un Appel",
+  cta2: "Demander Un Devis Personnalisé",
+  /** cta3 « Demander Un Audit Gratuit » : PLUS RENDU depuis le
+   *  18/11/2026 (bande finale à deux CTA) — l'audit vit désormais
+   *  via son bouton dédié dans « Vous avez déjà un site ? »,
+   *  qui mène à la page #/audit-gratuit. Conservé ici pour
+   *  référence. */
   cta3: "Demander Un Audit Gratuit",
   mention: "30 minutes · Gratuit · Sans engagement",
 } as const;

@@ -53,6 +53,9 @@ const ContactPage = React.lazy(() =>
 const DevisPage = React.lazy(() =>
   import("@/components/pages/DevisPage").then((m) => ({ default: m.DevisPage })),
 );
+const AuditPage = React.lazy(() =>
+  import("@/components/pages/AuditPage").then((m) => ({ default: m.AuditPage })),
+);
 const CallBookingPage = React.lazy(() =>
   import("@/components/pages/CallBookingPage").then((m) => ({ default: m.CallBookingPage })),
 );
@@ -75,6 +78,7 @@ const PREFETCH_PAGES = [
   () => import("@/components/pages/AboutPage"),
   () => import("@/components/pages/ContactPage"),
   () => import("@/components/pages/DevisPage"),
+  () => import("@/components/pages/AuditPage"),
   () => import("@/components/pages/CallBookingPage"),
   () => import("@/components/pages/LegalPage"),
 ];
@@ -105,6 +109,8 @@ function PageSwitch() {
         return <ContactPage />;
       case "devis":
         return <DevisPage />;
+      case "audit":
+        return <AuditPage />;
       case "appel":
         return <CallBookingPage />;
       case "legal":

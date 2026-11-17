@@ -114,6 +114,13 @@ export const PAGES = {
     description:
       "Décrivez votre activité et votre projet : Stevens Akpovi vous répond avec un devis personnalisé, établi à partir de votre besoin.",
   },
+  audit: {
+    hash: "#/audit-gratuit",
+    label: "Audit Gratuit",
+    title: "Audit Gratuit De Votre Site — Stevens Akpovi",
+    description:
+      "Votre site actuel vous rapporte-t-il assez de clients ? Recevez un regard professionnel et concret sur votre site : ce qui fonctionne, ce qui freine vos visiteurs et les améliorations à prioriser — gratuitement.",
+  },
   appel: {
     hash: "#/reserver-un-appel",
     label: "Réserver Un Appel",
@@ -180,7 +187,7 @@ export const PROJECTS = [
     category: "Plateforme immobilière",
     description:
       "Une expérience digitale dédiée au secteur immobilier, pensée pour présenter une plateforme et faciliter la découverte de ses offres.",
-    cta: "Découvrir Le Projet",
+    cta: "Voir Le Site",
     url: "https://afribayit.vercel.app",
     desktop: "/assets/projects/afribayit-desktop.webp",
     desktop2x: "/assets/projects/afribayit-desktop@2x.webp",

@@ -45,7 +45,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
             size="lg"
             icon={CTAIcons.quote}
           >
-            Demander Un Devis
+            Demander Un Devis Personnalisé
           </CTAButton>
         </div>
         <ReassuranceBar className="mt-6" />
@@ -199,7 +199,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
                 size="lg"
                 icon={CTAIcons.quote}
               >
-                Demander Un Devis
+                Demander Un Devis Personnalisé
               </CTAButton>
             </div>
           </Reveal>

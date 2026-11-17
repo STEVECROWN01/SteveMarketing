@@ -15,9 +15,9 @@ import { PAGES, PROJECTS, type PageKey } from "@/lib/site";
  * Routeur applicatif du site (pages virtuelles dans la route `/`).
  * URLs propres par fragment : #/methode, #/referencement-seo,
  * #/publicite-meta-ads, #/realisations, #/a-propos, #/contact,
- * #/demander-un-devis, #/reserver-un-appel, #/mentions-legales,
- * #/projet/<id> (page de présentation d'une réalisation) — ancrage
- * de section possible : #/accueil/portfolio…
+ * #/demander-un-devis, #/audit-gratuit, #/reserver-un-appel,
+ * #/mentions-legales, #/projet/<id> (page de présentation d'une
+ * réalisation) — ancrage de section possible : #/accueil/portfolio…
  */
 
 export type AppPage =
@@ -30,6 +30,7 @@ export type AppPage =
   | "aPropos"
   | "contact"
   | "devis"
+  | "audit"
   | "appel"
   | "legal"
   | "admin";
@@ -56,6 +57,7 @@ const PAGE_KEYS: Record<AppPage, keyof typeof PAGES | "admin"> = {
   aPropos: "aPropos",
   contact: "contact",
   devis: "devis",
+  audit: "audit",
   appel: "appel",
   legal: "legal",
   admin: "admin",
@@ -80,6 +82,7 @@ const HASH_TO_PAGE: Record<string, AppPage> = {
   "a-propos": "aPropos",
   contact: "contact",
   "demander-un-devis": "devis",
+  "audit-gratuit": "audit",
   "reserver-un-appel": "appel",
   "mentions-legales": "legal",
   admin: "admin",
@@ -118,6 +121,7 @@ const PAGE_TO_HASH: Record<AppPage, string> = {
   aPropos: "a-propos",
   contact: "contact",
   devis: "demander-un-devis",
+  audit: "audit-gratuit",
   appel: "reserver-un-appel",
   legal: "mentions-legales",
   admin: "admin",

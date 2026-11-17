@@ -80,7 +80,7 @@ export function ContactPage() {
                   size="lg"
                   icon={CTAIcons.quote}
                 >
-                  Demander Un Devis
+                  Demander Un Devis Personnalisé
                 </CTAButton>
               </div>
             </Reveal>

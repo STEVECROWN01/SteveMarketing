@@ -103,6 +103,13 @@ export function FinalCtaSection() {
         </Reveal>
 
         <Reveal direction="up" delay={0.2}>
+          {/* Deux CTA seulement (18/11/2026) : le troisième bouton
+              « Demander Un Audit Gratuit » a été retiré — trois
+              choix simultanés freinent la décision (paradoxe du
+              choix), et l'audit possède déjà son bouton dédié dans
+              la section « Vous avez déjà un site ? » (il mène
+              désormais à la page #/audit-gratuit). FINAL_CTA.cta3
+              reste dans le fichier de contenu pour référence. */}
           <div className="mt-10 flex flex-col items-center justify-center gap-3.5 sm:flex-row sm:flex-wrap">
             <CTAButton
               action={{ kind: "calendly" }}
@@ -120,14 +127,6 @@ export function FinalCtaSection() {
               icon={CTAIcons.quote}
             >
               {FINAL_CTA.cta2}
-            </CTAButton>
-            <CTAButton
-              action={{ kind: "page", page: "contact" }}
-              variant="ghostLight"
-              size="lg"
-              icon={CTAIcons.audit}
-            >
-              {FINAL_CTA.cta3}
             </CTAButton>
           </div>
         </Reveal>

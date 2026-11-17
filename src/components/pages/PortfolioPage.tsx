@@ -160,7 +160,7 @@ export function PortfolioPage() {
                   Réserver Un Appel
                 </CTAButton>
                 <CTAButton action={{ kind: "page", page: "devis" }} variant="ghostDark" size="lg" icon={CTAIcons.quote}>
-                  Demander Un Devis
+                  Demander Un Devis Personnalisé
                 </CTAButton>
               </div>
               <ReassuranceBar tone="light" className="mt-6 justify-center" />

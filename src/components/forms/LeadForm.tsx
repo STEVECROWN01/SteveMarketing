@@ -32,10 +32,16 @@ import { useRouter } from "@/components/router-context";
  *   invisible, rangées deux colonnes (nom+téléphone, email+
  *   entreprise), liste déroulante et zone de texte pleine largeur,
  *   bouton pilule blanc (rayon 44 px, hauteur 52 px, demi-largeur,
- *   texte noir 17 px) « Entrer En Contact ». Après envoi (email
+ *   texte noir 17 px) « Envoyer Mon Message » (18/11/2026 —
+ *   ex-« Entrer En Contact » : le libellé décrit désormais
+ *   l'action réelle au clic). Après envoi (email
  *   automatique à stevensakpovi@gmail.com), redirection vers la
  *   page dédiée à la réservation d'appel (#/reserver-un-appel).
- * - « audit » (variante historique sombre, conservée pour référence).
+ * - « audit » (page #/audit-gratuit) : montée le 18/11/2026 —
+ *   le bouton « Demander Mon Audit Gratuit » de l'accueil
+ *   promettait un audit mais menait au formulaire de contact ;
+ *   la page dédiée tient la promesse (l'URL du site actuel y
+ *   est un champ obligatoire).
  * Validation frontend (contrôles) + backend (API), protection
  * anti-spam (honeypot + délai), enregistrement fiable et accusé de
  * réception. Aucun secret côté client.
@@ -993,7 +999,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
                 Envoi en cours…
               </span>
             ) : (
-              <span className="inline-flex items-center gap-2.5">Entrer En Contact</span>
+              <span className="inline-flex items-center gap-2.5">Envoyer Mon Message</span>
             )}
           </button>
         </div>

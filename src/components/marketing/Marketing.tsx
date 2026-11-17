@@ -121,7 +121,7 @@ export function CTAButton({
   className?: string;
   size?: "md" | "lg";
   ariaLabel?: string;
-  /** Masque la flèche droite (demande de l'éditeur : « Voir Nos Travaux »
+  /** Masque la flèche droite (demande de l'éditeur : « Voir Mes Réalisations »
    *  du hero sans icône flèche à droite, 13/11/2026). */
   hideArrow?: boolean;
 }) {
@@ -162,9 +162,14 @@ export function CTAButton({
 
   const base =
     "group/btn btn-fill inline-flex items-center justify-center gap-2.5 rounded-full font-medium tracking-[0.01em] transition-[transform,box-shadow,border-color] duration-300 focus-visible:outline-2 focus-visible:outline-offset-3 hover:-translate-y-0.5";
-  // Taille « lg » compacte sur téléphone (44 px, texte 12 px) : les deux
-  // CTA du hero tiennent ainsi sur une seule ligne et la section reste
-  // entièrement visible à l'écran sans défilement ; pleine taille dès 640 px.
+  // Taille « lg » compacte sur téléphone (44 px, texte 12 px) — la
+  // section hero reste entièrement visible à l'écran sans défilement.
+  // Depuis l'unification du libellé en « Voir Mes Réalisations »
+  // (18/11/2026, plus long que l'ancien « Voir Mes Travaux »), les
+  // deux CTA s'empilent sur deux lignes sur téléphone — pattern
+  // mobile standard (une action par ligne, cibles tactiles plus
+  // nettes) ; mesuré 320–390 px : la section tient TOUJOURS dans le
+  // viewport. Pleine taille dès 640 px.
   const sizes =
     size === "lg"
       ? "px-3 py-2.5 text-[12px] min-h-[44px] sm:px-7 sm:py-4 sm:text-[15px] sm:min-h-[52px]"

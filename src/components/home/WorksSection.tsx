@@ -48,7 +48,7 @@ export function WorksSection() {
                 size="lg"
                 icon={CTAIcons.quote}
               >
-                Demander Un Devis
+                Demander Un Devis Personnalisé
               </CTAButton>
               <CTAButton
                 action={{ kind: "page", page: "realisations" }}
