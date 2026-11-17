@@ -6,6 +6,7 @@ import { useRouter } from "@/components/router-context";
 import { useCalendly } from "@/components/calendly/CalendlyContext";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { SITE } from "@/lib/site";
+import { cn } from "@/lib/utils";
 import type { AppPage } from "@/components/router-context";
 
 /* ============================ Texte multi-paragraphes ============================ */
@@ -113,6 +114,7 @@ export function CTAButton({
   size = "md",
   ariaLabel,
   hideArrow = false,
+  hideArrowBelowSm = false,
 }: {
   action: CTAAction;
   variant?: Variant;
@@ -124,6 +126,14 @@ export function CTAButton({
   /** Masque la flèche droite (demande de l'éditeur : « Voir Mes Réalisations »
    *  du hero sans icône flèche à droite, 13/11/2026). */
   hideArrow?: boolean;
+  /** Masque la flèche droite UNIQUEMENT sous 640 px (18/11/2026,
+   *  demande : « les deux CTA du hero restent sur une seule ligne
+   *  peu importe la taille d'écran ») — utilisé par le CTA principal
+   *  du hero : sur téléphone, les deux boutons n'affichent alors que
+   *  leur libellé (l'icône œil du second est déjà masquée sous sm),
+   *  ce qui garantit la rangée sur une seule ligne jusqu'à 280 px
+   *  de large. La flèche revient dès 640 px. */
+  hideArrowBelowSm?: boolean;
 }) {
   const router = useRouter();
   const calendly = useCalendly();
@@ -162,14 +172,13 @@ export function CTAButton({
 
   const base =
     "group/btn btn-fill inline-flex items-center justify-center gap-2.5 rounded-full font-medium tracking-[0.01em] transition-[transform,box-shadow,border-color] duration-300 focus-visible:outline-2 focus-visible:outline-offset-3 hover:-translate-y-0.5";
-  // Taille « lg » compacte sur téléphone (44 px, texte 12 px) — la
-  // section hero reste entièrement visible à l'écran sans défilement.
-  // Depuis l'unification du libellé en « Voir Mes Réalisations »
-  // (18/11/2026, plus long que l'ancien « Voir Mes Travaux »), les
-  // deux CTA s'empilent sur deux lignes sur téléphone — pattern
-  // mobile standard (une action par ligne, cibles tactiles plus
-  // nettes) ; mesuré 320–390 px : la section tient TOUJOURS dans le
-  // viewport. Pleine taille dès 640 px.
+  // Taille « lg » compacte sur téléphone (44 px, texte 12 px) ;
+  // pleine taille dès 640 px. Le HERO du site ne s'en contente plus
+  // depuis l'unification du libellé en « Voir Mes Réalisations »
+  // (18/11/2026, plus long que « Voir Mes Travaux ») : ses deux CTA
+  // passent leurs propres classes compactes (padding 8 px, police
+  // fluide clamp(10px, 3vw, 12px)) pour tenir sur UNE SEULE ligne à
+  // toutes les largeurs — voir Hero.tsx.
   const sizes =
     size === "lg"
       ? "px-3 py-2.5 text-[12px] min-h-[44px] sm:px-7 sm:py-4 sm:text-[15px] sm:min-h-[52px]"
@@ -189,20 +198,27 @@ export function CTAButton({
 
   const external = action.kind === "external";
 
+  // cn (tailwind-merge) : les classes passées via className remplacent
+  // PROPREMENT celles de base en cas de conflit — auparavant la
+  // concaténation naive laissait l'ordre du CSS compilé décider
+  // (px-3 du base vs px-2 du hero).
   return (
     <a
       href={href}
       onClick={handleClick}
       aria-label={ariaLabel}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      className={`${base} ${sizes} ${variants[variant]} ${className}`}
+      className={cn(base, sizes, variants[variant], className)}
     >
       <span className="inline-flex items-center gap-2.5">
         {icon}
         {children}
         {!hideArrow && (
           <ArrowRight
-            className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1"
+            className={cn(
+              "h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1",
+              hideArrowBelowSm && "hidden sm:block",
+            )}
             aria-hidden="true"
           />
         )}

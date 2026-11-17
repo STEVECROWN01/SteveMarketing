@@ -364,21 +364,29 @@ export function Hero() {
               </p>
             </Reveal>
 
-            {/* CTA — les deux boutons partagent la même ligne :
-                réservation d'appel (blanc, ouvre la fenêtre Calendly —
-                exactement comme tous les autres boutons « Réserver Un
-                Appel » du site, harmonisé le 18/11/2026) + découverte
-                des réalisations (noir). */}
+            {/* CTA — les deux boutons partagent TOUJOURS la même
+                ligne, quelle que soit la taille de l'écran (demande
+                de l'éditeur, 18/11/2026 : « Je préfère que les deux
+                CTA du hero restent sur une seule ligne peu importe
+                la taille d'écran ») : rangée en flex-nowrap, classes
+                compactes propres au hero (padding 8 px, police fluide
+                clamp(10px, 3vw, 12px) — 10 px à 280-330 px, 12 px à
+                partir de 400 px) et, sous 640 px, libellés seuls (la
+                flèche du premier et l'icône œil du second sont
+                masquées). Réservation d'appel (blanc, fenêtre
+                Calendly) + découverte des réalisations (noir). */}
             <Reveal direction="up" delay={0.24}>
               <div
                 ref={ctaRowRef}
-                className="hero-cta mt-2.5 flex flex-wrap items-center gap-2 sm:mt-5 sm:gap-3 lg:mt-5"
+                className="hero-cta mt-2.5 flex flex-nowrap items-center gap-2 sm:mt-5 sm:gap-3 lg:mt-5"
               >
                 <CTAButton
                   action={{ kind: "calendly" }}
                   variant="secondary"
                   size="lg"
+                  hideArrowBelowSm
                   ariaLabel="Réserver mon appel de 30 minutes — gratuit et sans engagement"
+                  className="px-2 text-[length:clamp(10px,3vw,12px)] sm:px-7 sm:text-[15px]"
                 >
                   {HERO.ctaPrimary}
                 </CTAButton>
@@ -386,16 +394,15 @@ export function Hero() {
                   action={{ kind: "page", page: "realisations" }}
                   variant="ghostLight"
                   icon={
-                    /* Icône « œil » masquée sous 640 px : le libellé
-                       reste seul et plus compact. Depuis l'unification
-                       « Voir Mes Réalisations » (18/11/2026), les deux
-                       CTA s'empilent sur téléphone — le hero reste
-                       entièrement visible sans défilement (vérifié
-                       320–390 px). */
+                    /* Icône « œil » masquée sous 640 px : sous cette
+                       largeur, les deux CTA du hero n'affichent que
+                       leur libellé pour tenir sur UNE seule ligne à
+                       toutes les tailles (demande de l'éditeur,
+                       18/11/2026) ; icône + pleine taille dès 640 px. */
                     <span className="hidden sm:inline-flex">{CTAIcons.works}</span>
                   }
                   hideArrow
-                  className="px-2.5 py-2.5 text-[12px] sm:px-4 sm:py-3 sm:text-sm"
+                  className="px-2 text-[length:clamp(10px,3vw,12px)] sm:px-4 sm:py-3 sm:text-sm"
                 >
                   {HERO.ctaTertiary}
                 </CTAButton>

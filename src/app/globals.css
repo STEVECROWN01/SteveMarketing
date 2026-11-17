@@ -492,7 +492,13 @@ html.hoverable .mockup-zoom:where(:hover, :focus-within) > span > img {
 /* Deuxième palier — très petits téléphones (≤ 620 px de haut, ex.
    320×568) : portrait, description et marges resserrés au maximum
    pour que le hero tienne intégralement à l'écran. */
-@media (max-width: 480px) and (max-height: 620px) {
+/* Téléphones courts (≤ 480 px ET hauteur ≤ 620 px) et très
+   étroits (≤ 300 px — écran de couverture Galaxy Fold, 280 × 653) :
+   le contenu du hero y est compacté pour rester visible sans
+   défilement. La deuxième condition a été ajoutée le 18/11/2026 :
+   à 280 px de large, le hero dépassait le viewport de ~20 px —
+   mesuré corrigé : le hero tient désormais dans 653 px. */
+@media (max-width: 480px) and (max-height: 620px), (max-width: 300px) {
   #hero > .container-site {
     padding-top: 54px;
     padding-bottom: 4px;
@@ -513,12 +519,20 @@ html.hoverable .mockup-zoom:where(:hover, :focus-within) > span > img {
     font-size: clamp(1.4rem, 0.55rem + 3vw, 1.6rem);
   }
   /* CTA resserrés : les deux boutons tiennent sur une seule ligne
-     même à 320 px de large. (Sélecteur « .hero-cta » — la rangée de
-     boutons du hero, ex-.order-3, restructurée le 16/11/2026.) */
+     même à 280 px de large (demande de l'éditeur, 18/11/2026 :
+     « les deux CTA du hero restent sur une seule ligne peu importe
+     la taille d'écran »). Le libellé unifié « Voir Mes
+     Réalisations » étant plus long que l'ancien « Voir Mes
+     Travaux », cette règle passe à 10 px / 6 px de padding — elle
+     accompagne la police fluide clamp(10px, 3vw, 12px) posée par
+     Hero.tsx, qu'elle remplace ici car les sélecteurs d'ID
+     l'emportent sur les classes utilitaires. (Sélecteur
+     « .hero-cta » — la rangée de boutons du hero, ex-.order-3,
+     restructurée le 16/11/2026.) */
   #hero .hero-cta a {
-    font-size: 11px;
-    padding-left: 10px;
-    padding-right: 10px;
+    font-size: 10px;
+    padding-left: 6px;
+    padding-right: 6px;
   }
 }
 
