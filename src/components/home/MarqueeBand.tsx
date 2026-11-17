@@ -16,31 +16,35 @@ import React from "react";
  * défilement : les mots-clés restent statiques et lisibles.
  */
 
-/** Mots-clés du copywriting du site (optimisés SEO) — reprennent
- *  exactement le vocabulaire de l'offre : le titre du hero (« sites
+/** Mots-clés du site (optimisés SEO) — reprennent exactement
+ *  le vocabulaire de l'offre : le titre du hero (« sites
  *  web qui génèrent des ventes »), les avantages inclus
- *  (« copywriting inclus », « SEO »), les services (site vitrine,
- *  page de vente, refonte) et les pages Méthode / Référencement /
- *  Publicité. */
+ *  (« rédaction professionnelle incluse », « SEO »), les services
+ *  (site vitrine, page de vente, refonte) et les pages Méthode /
+ *  Référencement / Publicité. Vocabulaire volontairement SANS jargon
+ *  marketing (17/11/2026) : « Copywriting Inclus » → « Rédaction
+ *  Professionnelle Incluse », « Trafic Qualifié » → « Attirer Les
+ *  Bons Visiteurs », « Optimisation De Conversion » → « Transformer
+ *  Les Visiteurs En Clients ». */
 const KEYWORDS: readonly string[] = [
   "Création De Sites Web",
   "Sites Web Qui Génèrent Des Ventes",
-  "Copywriting Inclus",
+  "Rédaction Professionnelle Incluse",
   "Référencement SEO",
-  "Trafic Qualifié",
+  "Attirer Les Bons Visiteurs",
   "Publicité Meta Ads",
   "Design Premium",
   "Site Vitrine Professionnel",
   "Page De Vente",
   "Refonte De Site Web",
-  "Optimisation De Conversion",
+  "Transformer Les Visiteurs En Clients",
   "Présence Professionnelle En Ligne",
 ] as const;
 
 export function MarqueeBand() {
   return (
     <section
-      aria-label="Expertises de Stevens Akpovi — création de sites web, copywriting, référencement SEO, publicité"
+      aria-label="Expertises de Stevens Akpovi — création de sites web, rédaction professionnelle, référencement SEO, publicité"
       className="relative overflow-hidden bg-[#070707] py-4 sm:py-5"
     >
       {/* Liserés discrets en haut et en bas de la bande, comme les

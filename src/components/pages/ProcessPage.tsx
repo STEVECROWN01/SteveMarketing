@@ -19,9 +19,10 @@ const SERVICE_ICONS = [Building2, ShoppingCart, RefreshCcw];
  * reproduits. Structure voulue par l'éditeur :
  * 1. en-tête : surtitre « Processus » (ex « MÉTHODE · COMMENT JE
  *    TRAVAILLE », simplifié à la demande de l'éditeur, 17/11/2026)
- *    puis titre « Des sites web pensés pour convertir. » (le mot
- *    « Processus : » en préfixe est retiré — le surtitre l'assume)
- *    et bouton « Réserver Un Appel » (pastille flèche
+ *    puis titre « Des sites web qui transforment vos visiteurs en
+ *    clients. » (ex « …pensés pour convertir. », reformulé le même
+ *    jour : « convertir » au sens marketing échappait à une partie
+ *    des prospects) et bouton « Réserver Un Appel » (pastille flèche
  *    ↗ à l'intérieur droite, comme le header) ;
  * 2. section à deux colonnes : les trois cadres de l'offre (site web
  *    professionnel, page de vente, refonte) empilés à gauche ; à
@@ -52,7 +53,7 @@ export function ProcessPage() {
       {/* ---------- 1. En-tête de page : titre + « Réserver Un Appel » ---------- */}
       <PageHero
         eyebrow="Processus"
-        title="Des sites web pensés pour convertir."
+        title="Des sites web qui transforment vos visiteurs en clients."
       >
         {/* Bouton blanc style header (pastille flèche ↗ à l'intérieur
             droite) — ouvre la réservation d'appel Calendly, comme le

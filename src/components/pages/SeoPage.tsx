@@ -91,7 +91,7 @@ export function SeoPage() {
       <PageHero
         eyebrow="RÉFÉRENCEMENT · SEO"
         title="Référencement SEO : être trouvé par ceux qui vous cherchent."
-        intro="Améliorez votre positionnement sur Google, renforcez votre visibilité et développez une présence organique durable grâce à une stratégie de référencement adaptée à votre marché."
+        intro="Améliorez votre positionnement sur Google, renforcez votre visibilité et attirez des visiteurs sur la durée, sans dépendre de la publicité, grâce à une stratégie de référencement adaptée à votre marché."
       >
         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
@@ -170,8 +170,9 @@ export function SeoPage() {
                 </h3>
                 <p className="mt-4 text-[15px] leading-relaxed text-[#c8c8c8]">
                   Au-delà du socle : une stratégie de référencement complète, adaptée à votre
-                  marché, pour améliorer votre positionnement sur Google et développer une
-                  présence organique durable. C'est le cœur de cette page.
+                  marché, pour améliorer votre positionnement sur Google et attirer des
+                  visiteurs sur la durée, sans dépendre de la publicité. C'est le cœur de
+                  cette page.
                 </p>
               </div>
             </Reveal>
@@ -261,7 +262,7 @@ export function SeoPage() {
           </ol>
 
           {/* Lien croisé vers la publicité Meta Ads — l'autre levier de
-              visibilité (génération de trafic de la méthode). */}
+              visibilité (étape « Attirer des visiteurs » de la méthode). */}
           <Reveal direction="up" delay={0.15}>
             <button
               type="button"

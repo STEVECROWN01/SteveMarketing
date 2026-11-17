@@ -43,12 +43,15 @@ import { useRouter } from "@/components/router-context";
 
 type FormKind = "quote" | "audit" | "contact";
 
-/** Questions du formulaire de devis — options traduites fidèlement
- *  de « New Client Application » (sheragency.com). */
+/** Questions du formulaire de devis — options traduites de
+ *  « New Client Application » (sheragency.com) ; libellés
+ *  marketing reformulés sans jargon (17/11/2026) : « Faible taux
+ *  de conversion » → « Trop peu de visiteurs deviennent clients »,
+ *  « Faible volume de trafic » → « Pas assez de visiteurs ». */
 const WHY_NOW_OPTIONS = [
   "Il n'est pas attrayant visuellement",
-  "Faible taux de conversion",
-  "Faible volume de trafic",
+  "Trop peu de visiteurs deviennent clients",
+  "Pas assez de visiteurs",
   "Je n'ai pas encore de site web",
   "Problèmes techniques (bugs, lenteur, etc.)",
 ] as const;

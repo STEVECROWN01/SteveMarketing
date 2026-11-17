@@ -30,7 +30,7 @@ export const SITE = {
   role: "Concepteur de sites web professionnels orientés conversion",
   positioning: "Je crée des sites web qui génèrent des ventes.",
   description:
-    "J'accompagne entreprises, PME, agences, coachs, infopreneurs et freelances dans la création de sites web stratégiques qui valorisent leur activité, attirent des visiteurs qualifiés et transforment leur intérêt en clients.",
+    "J'accompagne entreprises, PME, agences, coachs, infopreneurs et freelances dans la création de sites web stratégiques qui valorisent leur activité, attirent les bons visiteurs et transforment leur intérêt en clients.",
   url: normalizeUrl(process.env.NEXT_PUBLIC_SITE_URL, DEFAULT_SITE_URL),
   email: "stevensakpovi@gmail.com",
   // Événement Calendly réel du compte stevensakpovi — rendez-vous
@@ -70,14 +70,14 @@ export const PAGES = {
     label: "Méthode",
     title: "Méthode — Comment je travaille | Stevens Akpovi",
     description:
-      "Découvrez la méthode de collaboration de Stevens Akpovi : échange et compréhension, parcours utilisateur, conception visuelle, rédaction, développement, mise en ligne et génération de trafic.",
+      "Découvrez la méthode de collaboration de Stevens Akpovi : échange et compréhension, parcours de vos visiteurs, conception visuelle, rédaction, développement, mise en ligne et arrivée des premiers visiteurs.",
   },
   referencement: {
     hash: "#/referencement-seo",
     label: "Référencement SEO",
     title: "Référencement SEO — Positionnement Google | Stevens Akpovi",
     description:
-      "Améliorez votre positionnement sur Google, renforcez votre visibilité et développez une présence organique durable grâce à une stratégie de référencement adaptée à votre marché.",
+      "Améliorez votre positionnement sur Google, renforcez votre visibilité et attirez des visiteurs sur la durée, sans dépendre de la publicité, grâce à une stratégie de référencement adaptée à votre marché.",
   },
   publicite: {
     hash: "#/publicite-meta-ads",

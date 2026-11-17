@@ -6,13 +6,18 @@ import { z } from "zod";
  */
 
 export const LEAD_TYPES = ["quote", "audit", "contact"] as const;
+/** Options du champ « Service souhaité » du formulaire — les deux
+ *  intitulés les moins évidents pour un prospect portent une
+ *  précision entre parenthèses (17/11/2026, chasse au jargon) :
+ *  « Landing page » et « Système d'acquisition client » peuvent
+ *  prêter à confusion avec « Page de vente » sans cette précision. */
 export const SERVICE_TYPES = [
   "Site vitrine professionnel",
   "Site web multipages",
-  "Landing page",
+  "Landing page (une page, une action précise)",
   "Page de vente",
   "Refonte de site web",
-  "Système d'acquisition client",
+  "Système d'acquisition client (plusieurs pages et parcours)",
   "Autre / je ne sais pas encore",
 ] as const;
 /** Comment le visiteur a découvert Stevens Akpovi (formulaire de

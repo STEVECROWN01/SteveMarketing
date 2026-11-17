@@ -38,8 +38,8 @@ function CheckOne({ className = "" }: { className?: string }) {
  * « Obtenir Un Devis » pleine largeur.
  */
 const BENEFITS = [
-  "Attirer des visiteurs qualifiés",
-  "Convertir les visiteurs en clients",
+  "Attirer les bons visiteurs",
+  "Transformer les visiteurs en clients",
   "Présenter votre activité avec professionnalisme",
 ];
 
@@ -67,7 +67,7 @@ export function DevisPage() {
             <Reveal direction="up" delay={0.14}>
               <p className="text-body mx-auto mt-6 max-w-2xl on-paper-muted">
                 Je prends des sites web obsolètes et les transforme en sites web
-                qui attirent davantage de visiteurs, convertissent ces visiteurs en
+                qui attirent davantage de visiteurs, transforment ces visiteurs en
                 clients et valorisent votre image de marque.
               </p>
             </Reveal>

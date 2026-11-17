@@ -12,7 +12,7 @@ export const HERO = {
   /** Partie du titre en gras (700) — le reste reste en graisse normale. */
   h1Bold: "qui Génèrent des Ventes.",
   text:
-    "Votre activité mérite un site web qui travaille pour vous. Attirez des clients qualifiés, valorisez bien vos services et transformez vos visiteurs en opportunités commerciales grâce à un site web professionnel élégant conçu pour convertir.",
+    "Votre activité mérite un site web qui travaille pour vous. Attirez les bons clients, valorisez bien vos services et transformez vos visiteurs en opportunités commerciales grâce à un site web professionnel élégant conçu pour convertir.",
   /** Première phrase de la description — affichée en gras (demande de
    *  l'éditeur, 15/11/2026). */
   textBold: "Votre activité mérite un site web qui travaille pour vous.",
@@ -106,14 +106,14 @@ export const TRANSFORMATION = {
  *  l'éditeur, 16/11/2026). La page Méthode réutilise `steps`. */
 export const SOLUTION = {
   title: "Comment Je Travaille",
-  text: "Je ne crée pas simplement des sites web. Je conçois des sites pensés pour convaincre et convertir.",
+  text: "Je ne crée pas simplement des sites web. Je conçois des sites pensés pour convaincre et transformer vos visiteurs en clients.",
   steps: [
     {
       name: "Échange & Compréhension",
       text: "Chaque projet commence par une compréhension réelle de votre activité.\n\nJe cherche à comprendre votre marché, vos services, vos clients et vos objectifs pour construire un site qui présente clairement votre valeur et facilite la prise de décision de vos visiteurs.",
     },
     {
-      name: "Planification du Parcours Utilisateur",
+      name: "Le Parcours de Vos Visiteurs",
       text: "Le premier élément, et le plus important à prendre en compte, est le parcours que suit un visiteur sur votre site web.\n\nQuelles questions se pose-t-il lorsqu'il arrive sur votre site ? Quelles hésitations ou objections faut-il lever ? Comment instaurer un climat de confiance avec lui ?\n\nJ'aborde toutes ces questions dès le premier jour du projet, lors d'un atelier d'environ 1h, au cours duquel je vous présente la structure du site web et nous échangeons nos idées.",
     },
     {
@@ -129,8 +129,8 @@ export const SOLUTION = {
       text: "Durant cette phase, je transforme les maquettes graphiques que j'ai conçues en un site web fonctionnel, grâce au code.\n\nJe veille à ce que votre site web offre un rendu impeccable sur tous les formats d'écran : ordinateurs, tablettes et smartphones.\n\nUne fois le développement initial terminé, je vous présente le site pour recueillir vos retours et intégrer les éventuels ajustements ou personnalisations souhaités. Après validation et finalisation, je procède à sa mise en ligne afin de le rendre accessible à vos visiteurs sur Internet.",
     },
     {
-      name: "Génération de trafic",
-      text: "Maintenant que votre site web est optimisé, il est temps d'attirer des visiteurs.\n\nJ'optimise votre site pour les moteurs de recherche (SEO) et génère du trafic grâce aux campagnes publicitaires Meta Ads.",
+      name: "Attirer des visiteurs",
+      text: "Maintenant que votre site web est prêt, il est temps de le faire connaître.\n\nJ'optimise votre site pour les moteurs de recherche (SEO) et attire des visiteurs grâce aux campagnes publicitaires Meta Ads.",
     },
   ],
   cta1: "Démarrons Votre Projet",
@@ -141,7 +141,7 @@ export const SOLUTION = {
    (section « MON APPROCHE », trois piliers). */
 export const ABOUT_APPROACH = {
   eyebrow: "MON APPROCHE",
-  title: "Je ne crée pas simplement des sites web. Je conçois des sites pensés pour convaincre et convertir.",
+  title: "Je ne crée pas simplement des sites web. Je conçois des sites pensés pour convaincre et transformer vos visiteurs en clients.",
   pillars: [
     {
       name: "Stratégie",
@@ -222,7 +222,7 @@ export const INCLUDED = {
   title: "Votre site est livré avec ses textes professionnels et ses bases de référencement.",
   items: [
     {
-      title: "Copywriting inclus",
+      title: "Rédaction professionnelle incluse",
       text: "Vous n'avez pas besoin de chercher un rédacteur supplémentaire.\n\nJe rédige les contenus de votre site pour mettre en valeur votre activité, présenter vos offres et encourager vos visiteurs à vous contacter.",
     },
     {
@@ -246,7 +246,7 @@ export const COMPLEMENTARY = {
     },
     {
       title: "Référencement approfondi sur les moteurs de recherche",
-      text: "Améliorez votre positionnement sur Google, renforcez votre visibilité et développez une présence organique durable grâce à une stratégie de référencement adaptée à votre marché.",
+      text: "Améliorez votre positionnement sur Google, renforcez votre visibilité et attirez des visiteurs sur la durée, sans dépendre de la publicité, grâce à une stratégie de référencement adaptée à votre marché.",
     },
   ],
   cta: "Discuter De Ma Stratégie Digitale",
@@ -270,7 +270,7 @@ export const METHOD = {
     { name: "Échange et compréhension", text: "Je discute de votre activité, de vos besoins et de vos objectifs." },
     { name: "Stratégie et organisation", text: "Je définis le message, les pages, les contenus et la structure de votre futur site." },
     { name: "Design et conception", text: "Je construis une expérience visuelle cohérente avec votre identité et votre audience." },
-    { name: "Développement", text: "Je transforme la conception en un site fonctionnel, responsive et performant." },
+    { name: "Développement", text: "Je transforme la conception en un site fonctionnel, performant et impeccable sur tous les formats d'écran." },
     { name: "Tests et optimisation", text: "Je vérifie le comportement du site, ses liens, ses formulaires et son affichage sur tous les appareils." },
     { name: "Mise en ligne", text: "Votre site est publié et prêt à accueillir ses premiers visiteurs." },
   ],
@@ -322,7 +322,7 @@ export const FAQ = {
     },
     {
       q: "Comment réserver un échange ?",
-      a: "Il suffit de choisir un créneau disponible sur Calendly. Le premier échange dure 30 minutes, est gratuit et sans engagement.",
+      a: "Il suffit de choisir un créneau disponible sur mon agenda en ligne (Calendly). Le premier échange dure 30 minutes, est gratuit et sans engagement.",
     },
     {
       q: "Combien coûte un site web ?",

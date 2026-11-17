@@ -28,7 +28,7 @@ import { Reveal } from "@/components/motion/Reveal";
  * Contenu éditorial dérivé des éléments validés du site : « Meta
  * Ads — développez votre présence sur Facebook et Instagram grâce à
  * des campagnes publicitaires ciblées et structurées autour de vos
- * objectifs » et l'étape « Génération de trafic » de la méthode —
+ * objectifs » et l'étape « Attirer des visiteurs » de la méthode —
  * aucune statistique ni promesse inventée.
  */
 
@@ -165,9 +165,9 @@ export function MetaAdsPage() {
                   Référencement SEO
                 </h3>
                 <p className="mt-4 text-[15px] leading-relaxed text-[#c8c8c8]">
-                  Une présence organique durable : votre site gagne en positionnement sur les
-                  recherches de vos futurs clients et continue de travailler pour vous sur la
-                  durée.
+                  Une visibilité qui ne dépend pas de la publicité : votre site gagne en
+                  positionnement sur les recherches de vos futurs clients et continue de
+                  travailler pour vous sur la durée.
                 </p>
                 <span className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-white">
                   Découvrir le Référencement SEO
