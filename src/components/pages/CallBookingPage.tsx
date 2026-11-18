@@ -15,6 +15,12 @@ import { SITE } from "@/lib/site";
  * points de l'échange ; à droite l'embed Calendly avec les VRAIES
  * disponibilités du calendrier. On y arrive notamment après l'envoi
  * du formulaire de contact.
+ *
+ * AUDIT INTÉGRAL (18/11/2026) : cette page était la SEULE du site
+ * sans H1 (SectionHeading rend h2 par défaut) et son
+ * aria-labelledby="calendly-titre" désignait un identifiant qui
+ * n'existait nulle part. Le titre passe en H1 (as="h1") et porte
+ * enfin l'id "calendly-titre" que la section référence.
  */
 export function CallBookingPage() {
   return (
@@ -30,6 +36,8 @@ export function CallBookingPage() {
               eyebrow="APPEL STRATÉGIQUE · 30 MINUTES"
               title="Réservez votre créneau en une minute."
               tone="dark"
+              as="h1"
+              titleId="calendly-titre"
             />
             <Reveal direction="up" delay={0.15}>
               <p className="text-body mt-6 max-w-md on-dark-muted">

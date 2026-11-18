@@ -50,6 +50,8 @@ export function SectionHeading({
   align = "left",
   tone = "dark",
   className = "",
+  as = "h2",
+  titleId,
 }: {
   eyebrow: string;
   title: string;
@@ -57,6 +59,15 @@ export function SectionHeading({
   align?: "left" | "center";
   tone?: "dark" | "light";
   className?: string;
+  /** Niveau du titre : h2 par défaut (en-tête de SECTION) ; h1
+   *  lorsque la section porte le titre PRINCIPAL de la page —
+   *  ex. page Réservation d'appel, seule page sans PageHero
+   *  (audit intégral du 18/11/2026 : chaque page doit avoir
+   *  exactement un H1). */
+  as?: "h1" | "h2" | "h3";
+  /** Identifiant DOM du titre — quand une section le désigne par
+   *  aria-labelledby (aria brisée sinon). */
+  titleId?: string;
 }) {
   const centered = align === "center";
   return (
@@ -65,9 +76,10 @@ export function SectionHeading({
         <p className="text-eyebrow">{eyebrow}</p>
       </Reveal>
       <RevealText
-        as="h2"
+        as={as}
         text={title}
         delay={0.05}
+        id={titleId}
         className={`text-section-title mt-4 ${tone === "dark" ? "text-white" : "on-paper"}`}
       />
       {intro && (

@@ -110,7 +110,10 @@ export function ContactPage() {
                   value="clients-existants"
                   className="rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] px-6 sm:px-7 data-[state=open]:border-[#e4e4e4]/35"
                 >
-                  <AccordionTrigger className="py-6 text-left font-display text-xl font-medium text-white hover:text-[#e4e4e4] hover:no-underline sm:text-2xl">
+                  <AccordionTrigger
+                    headingLevel="h2"
+                    className="py-6 text-left font-display text-xl font-medium text-white hover:text-[#e4e4e4] hover:no-underline sm:text-2xl"
+                  >
                     Clients existants
                   </AccordionTrigger>
                   <AccordionContent className="pb-7 text-[15px] leading-relaxed text-[#c8c8c8]">
@@ -153,7 +156,10 @@ export function ContactPage() {
                   value="nouveaux-clients"
                   className="rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] px-6 sm:px-7 data-[state=open]:border-[#e4e4e4]/35"
                 >
-                  <AccordionTrigger className="py-6 text-left font-display text-xl font-medium text-white hover:text-[#e4e4e4] hover:no-underline sm:text-2xl">
+                  <AccordionTrigger
+                    headingLevel="h2"
+                    className="py-6 text-left font-display text-xl font-medium text-white hover:text-[#e4e4e4] hover:no-underline sm:text-2xl"
+                  >
                     Nouveaux clients
                   </AccordionTrigger>
                   <AccordionContent className="pb-7 text-[15px] leading-relaxed text-[#c8c8c8]">
@@ -183,7 +189,10 @@ export function ContactPage() {
                   value="deja-un-site"
                   className="rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] px-6 sm:px-7 data-[state=open]:border-[#e4e4e4]/35"
                 >
-                  <AccordionTrigger className="py-6 text-left font-display text-xl font-medium text-white hover:text-[#e4e4e4] hover:no-underline sm:text-2xl">
+                  <AccordionTrigger
+                    headingLevel="h2"
+                    className="py-6 text-left font-display text-xl font-medium text-white hover:text-[#e4e4e4] hover:no-underline sm:text-2xl"
+                  >
                     Vous avez déjà un site&nbsp;?
                   </AccordionTrigger>
                   <AccordionContent className="pb-7 text-[15px] leading-relaxed text-[#c8c8c8]">

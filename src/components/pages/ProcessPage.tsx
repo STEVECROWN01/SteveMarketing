@@ -75,45 +75,22 @@ export function ProcessPage() {
           <div
             className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 xl:gap-20"
           >
-            {/* Colonne gauche : les trois cadres actuels de l'offre
-                (ex-page Services), reproduits en colonne — les mêmes
-                cartes que la section « DES SOLUTIONS ADAPTÉES À VOS
-                OBJECTIFS » de l'accueil (demande de l'éditeur). */}
-            <div className="flex flex-col gap-4">
-              {SERVICES_SUMMARY.items.map((service, i) => {
-                const Icon = SERVICE_ICONS[i] ?? Building2;
-                return (
-                  <Reveal key={service.title} direction="up" delay={i * 0.05} as="article">
-                    <div className="group flex h-full flex-col gap-4 rounded-2xl border border-[#e4e4e4] bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_50px_-28px_rgba(28,28,28,0.3)] sm:flex-row sm:items-start sm:gap-5 sm:p-7">
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1c1c1c] text-[#e4e4e4] transition-colors duration-300 group-hover:bg-[#e4e4e4] group-hover:text-[#1c1c1c]">
-                        <Icon className="h-5 w-5" aria-hidden="true" />
-                      </span>
-                      <div>
-                        <div className="flex items-center gap-3">
-                          <h3 className="font-display text-lg font-semibold text-[#1c1c1c]">
-                            {service.title}
-                          </h3>
-                          <span className="font-display text-sm font-semibold text-[#525252]">
-                            {String(i + 1).padStart(2, "0")}
-                          </span>
-                        </div>
-                        <p className="mt-2.5 text-sm leading-relaxed text-[#555555]">
-                          {service.text}
-                        </p>
-                      </div>
-                    </div>
-                  </Reveal>
-                );
-              })}
-            </div>
-
-            {/* Colonne droite : titre + bouton de descente. La
+          {/* ORDRE DU DOM (audit intégral du 18/11/2026) : la
+              colonne TITRE (h2) est PREMIÈRE dans le DOM pour que la
+              hiérarchie des titres soit correcte (h1 → h2 « Voici
+              comment… » → h3 des cartes — les cartes venaient AVANT
+              le h2 de leur propre section) ; les classes order-1 /
+              order-2 conservent le rendu VISUEL À L'IDENTIQUE :
+              cartes à gauche (colonne 1, 1.05fr) et titre à droite
+              (colonne 2, 0.95fr) sur bureau, cartes puis titre sur
+              mobile — exactement comme avant. */}
+            {/* Colonne TITRE + bouton de descente. La
                 flèche sinusoïdale des 16-17/11 est SUPPRIMÉE
                 (demande de l'éditeur, 17/11/2026) : c'est désormais
                 le BOUTON qui dirige vers la section « Comment Je
                 Travaille » ci-dessous — défilement fluide vers
                 l'ancre interne #comment-je-travaille. */}
-            <div className="flex flex-col justify-center lg:py-4">
+            <div className="order-2 flex flex-col justify-center lg:py-4">
               <Reveal direction="left">
                 <p className="text-eyebrow">DES SITES WEB QUI VENDENT</p>
               </Reveal>
@@ -139,6 +116,38 @@ export function ProcessPage() {
                   </CTAButton>
                 </div>
               </Reveal>
+            </div>
+
+            {/* Colonne CARTES : les trois cadres actuels de l'offre
+                (ex-page Services), reproduits en colonne — les mêmes
+                cartes que la section « DES SOLUTIONS ADAPTÉES À VOS
+                OBJECTIFS » de l'accueil (demande de l'éditeur). */}
+            <div className="order-1 flex flex-col gap-4">
+              {SERVICES_SUMMARY.items.map((service, i) => {
+                const Icon = SERVICE_ICONS[i] ?? Building2;
+                return (
+                  <Reveal key={service.title} direction="up" delay={i * 0.05} as="article">
+                    <div className="group flex h-full flex-col gap-4 rounded-2xl border border-[#e4e4e4] bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_50px_-28px_rgba(28,28,28,0.3)] sm:flex-row sm:items-start sm:gap-5 sm:p-7">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#1c1c1c] text-[#e4e4e4] transition-colors duration-300 group-hover:bg-[#e4e4e4] group-hover:text-[#1c1c1c]">
+                        <Icon className="h-5 w-5" aria-hidden="true" />
+                      </span>
+                      <div>
+                        <div className="flex items-center gap-3">
+                          <h3 className="font-display text-lg font-semibold text-[#1c1c1c]">
+                            {service.title}
+                          </h3>
+                          <span className="font-display text-sm font-semibold text-[#525252]">
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                        </div>
+                        <p className="mt-2.5 text-sm leading-relaxed text-[#555555]">
+                          {service.text}
+                        </p>
+                      </div>
+                    </div>
+                  </Reveal>
+                );
+              })}
             </div>
           </div>
         </div>

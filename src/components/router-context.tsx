@@ -101,6 +101,56 @@ function getServerHash(): string {
   return SERVER_HASH;
 }
 
+/* ---------- Garde-fou anti-écrasement des métadonnées ----------
+   (audit intégral du site, 18/11/2026). Constat : au CHARGEMENT
+   DIRECT d'une page profonde (lien partagé #/methode, sitemap,
+   indexation), le useEffect ci-dessous applique le bon <title> —
+   puis l'hydratation des métadonnées STATIQUES de Next.js
+   (layout.tsx : titre et description de l'accueil) le RÉÉCRIT
+   ~50 ms plus tard. Résultat : mauvais titre et mauvaise
+   description d'onglet pour toute entrée autre que #/accueil,
+   contrairement à l'objectif du dispositif SEO du 16/11 (« les
+   moteurs et aperçus qui exécutent le JavaScript voient les méta
+   de CHAQUE page »). Solution : un MutationObserver sur <head>
+   ré-applique les métadonnées attendues de la page courante dès
+   qu'une écriture externe les remplace. Boucle impossible : on
+   n'écrit QUE lorsque la valeur courante diffère de l'attendue —
+   la ré-écriture converge et l'observateur se calme. */
+let metaAttendue: { titre: string; description: string } | null = null;
+let metaGardeInstallee = false;
+
+function installerGardeMeta(): void {
+  if (metaGardeInstallee || typeof document === "undefined") return;
+  metaGardeInstallee = true;
+  const reappliquer = () => {
+    if (!metaAttendue) return;
+    const titre = document.querySelector("title");
+    if (titre && titre.textContent !== metaAttendue.titre) {
+      titre.textContent = metaAttendue.titre;
+    }
+    const cibles: Array<[string, string]> = [
+      ['meta[name="description"]', metaAttendue.description],
+      ['meta[property="og:title"]', metaAttendue.titre],
+      ['meta[property="og:description"]', metaAttendue.description],
+      ['meta[name="twitter:title"]', metaAttendue.titre],
+      ['meta[name="twitter:description"]', metaAttendue.description],
+    ];
+    for (const [sel, attendu] of cibles) {
+      const el = document.querySelector(sel);
+      if (el && el.getAttribute("content") !== attendu) {
+        el.setAttribute("content", attendu);
+      }
+    }
+  };
+  new MutationObserver(reappliquer).observe(document.head, {
+    subtree: true,
+    childList: true,
+    characterData: true,
+    attributes: true,
+    attributeFilter: ["content"],
+  });
+}
+
 function parseHash(hash: string): RouterState {
   const clean = hash.replace(/^#\/?/, "");
   if (!clean || clean === "accueil") return { page: "accueil", section: null };
@@ -142,6 +192,11 @@ export function RouterProvider({ children }: { children: React.ReactNode }) {
      *  exécutent le JavaScript voient ainsi les méta de CHAQUE page,
      *  pas seulement celles de l'accueil. */
     const applyMeta = (title: string, description: string) => {
+      // Enregistrer les valeurs attendues AVANT d'écrire : la garde
+      // anti-écrasement (installée au premier passage) les
+      // ré-appliquera si l'hydratation Next.js les écrase ensuite.
+      metaAttendue = { titre: title, description };
+      installerGardeMeta();
       document.title = title;
       const setContent = (selector: string, value: string) => {
         document

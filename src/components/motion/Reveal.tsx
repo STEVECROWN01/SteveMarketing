@@ -157,12 +157,17 @@ export function RevealText({
   className,
   as: Tag = "span",
   delay = 0,
+  id,
 }: {
   text: string;
   boldText?: string;
   className?: string;
   as?: "span" | "h1" | "h2" | "h3" | "p";
   delay?: number;
+  /** Identifiant DOM du titre — nécessaire quand une section le
+   *  désigne par aria-labelledby (ex. page Réservation d'appel,
+   *  audit intégral du 18/11/2026). */
+  id?: string;
 }) {
   const reduce = useReducedMotion();
   const { ref, inView, animated } = useInView<HTMLElement>(0.3);
@@ -173,7 +178,7 @@ export function RevealText({
 
   if (reduce) {
     return (
-      <Comp className={className} ref={ref}>
+      <Comp className={className} ref={ref} id={id}>
         {hasBold ? (
           <>
             {text.slice(0, boldStart)}
@@ -200,7 +205,7 @@ export function RevealText({
     : text.split(" ").map((word) => ({ word, bold: false }));
 
   return (
-    <Comp className={className} ref={ref}>
+    <Comp className={className} ref={ref} id={id}>
       {entries.map(({ word, bold }, i) => {
         const wordDelay = delay + i * 35;
         const transition = animated

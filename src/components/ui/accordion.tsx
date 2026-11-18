@@ -28,21 +28,34 @@ function AccordionItem({
 function AccordionTrigger({
   className,
   children,
+  headingLevel = "h3",
   ...props
-}: React.ComponentProps<typeof AccordionPrimitive.Trigger>) {
+}: React.ComponentProps<typeof AccordionPrimitive.Trigger> & {
+  /** Niveau sémantique du titre d'item. Radix rend un h3 par
+   *  défaut — correct quand l'accordéon suit un titre de section
+   *  (FAQ, étapes de la méthode). Passez "h2" quand l'accordéon
+   *  est posé DIRECTEMENT sous le H1 de la page (page Contact :
+   *  saut de hiérarchie h1→h3 relevé par l'audit intégral du
+   *  18/11/2026). Aucun impact visuel — seul le niveau du titre
+   *  change. */
+  headingLevel?: "h2" | "h3" | "h4";
+}) {
+  const Titre = headingLevel;
   return (
-    <AccordionPrimitive.Header className="flex">
-      <AccordionPrimitive.Trigger
-        data-slot="accordion-trigger"
-        className={cn(
-          "focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180",
-          className
-        )}
-        {...props}
-      >
-        {children}
-        <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0 translate-y-0.5 transition-transform duration-200" />
-      </AccordionPrimitive.Trigger>
+    <AccordionPrimitive.Header asChild>
+      <Titre className="flex">
+        <AccordionPrimitive.Trigger
+          data-slot="accordion-trigger"
+          className={cn(
+            "focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180",
+            className
+          )}
+          {...props}
+        >
+          {children}
+          <ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0 translate-y-0.5 transition-transform duration-200" />
+        </AccordionPrimitive.Trigger>
+      </Titre>
     </AccordionPrimitive.Header>
   )
 }
