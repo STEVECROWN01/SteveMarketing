@@ -302,13 +302,27 @@ export function LeadForm({ kind }: { kind: FormKind }) {
   const labelQuote = "mb-2 block font-sans text-[15px] font-medium text-[#2c3345]";
   const labelContact = "mb-[15px] block font-display text-[17px] font-medium tracking-[0.34px] text-white";
   const labelBase = isQuote ? labelQuote : isContact ? labelContact : "mb-1.5 block text-sm font-medium text-white";
-  const errorBase = "mt-1.5 text-xs text-[#ea384c]";
+  /* Texte d'erreur par variante — accessibilité 1.4.3 (audit intégral du
+     19/11/2026, suite a11y) : #ea384c à 12 px ne faisait que 4,06:1 sur la
+     carte blanche du devis et 3,87–4,19:1 sur les fonds sombres (requis
+     AA : 4,5:1). Carte blanche → rouge foncé #c53030 (5,47:1) ; fonds
+     sombres → rouge clair #f87171 (5,7 à 6,2:1). Même famille de rouge,
+     seule la profondeur change selon le fond. */
+  const errorBase = isQuote
+    ? "mt-1.5 text-xs text-[#c53030]"
+    : "mt-1.5 text-xs text-[#f87171]";
 
   /* ---------- Confirmation (devis / audit) ---------- */
   if (done) {
     return (
       <div
         id={`${kind}-confirmation`}
+        /* Accessibilité 4.1.3 « Messages d'état » (audit du 19/11/2026) :
+           le toast de succès n'est pas annoncé aux lecteurs d'écran dans
+           cette version de Radix (aucune zone aria-live dans le DOM,
+           mesuré) — le bloc de confirmation porte désormais role=status :
+           son apparition est annoncée dès le montage. */
+        role="status"
         className={
           isLight
             ? "rounded-2xl border border-[#e4e4e4] bg-white p-8 text-center sm:p-10"
@@ -974,7 +988,15 @@ export function LeadForm({ kind }: { kind: FormKind }) {
       {errors.form && (
         <p
           role="alert"
-          className="mt-5 flex items-start gap-2.5 rounded-lg border border-[#ea384c]/40 bg-[#ea384c]/10 px-4 py-3 text-sm text-[#ffdede]"
+          className={
+            /* Accessibilité 1.4.3 (audit du 19/11/2026) : #ffdede est
+               conçu pour les fonds sombres (13,6:1) mais devient quasi
+               invisible sur la CARTE BLANCHE du devis (1,25:1). Le texte
+               suit désormais la variante — mesuré après correctif :
+               #c53030 sur la carte ≈ 5,2:1. */
+            "mt-5 flex items-start gap-2.5 rounded-lg border border-[#ea384c]/40 bg-[#ea384c]/10 px-4 py-3 text-sm " +
+              (isQuote ? "text-[#c53030]" : "text-[#ffdede]")
+          }
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
           {errors.form}
@@ -1012,7 +1034,15 @@ export function LeadForm({ kind }: { kind: FormKind }) {
           <button
             type="submit"
             disabled={submitting}
-            className="btn-fill inline-flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-[8px] bg-[#039855] px-7 font-display text-[17px] font-medium tracking-[0.01em] text-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-3 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 [&::before]:bg-[#026d43]"
+            className="btn-fill inline-flex min-h-[52px] w-full items-center justify-center gap-2.5 rounded-[8px] bg-[#026d43] px-7 font-display text-[17px] font-medium tracking-[0.01em] text-white shadow-[0_1px_2px_rgba(0,0,0,0.12)] transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-3 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 [&::before]:bg-[#024d3a]"
+            /* Accessibilité 1.4.3 (audit du 19/11/2026) : blanc 17 px/500
+               sur #039855 ne faisait que 3,73:1 (requis AA : 4,5). Le repos
+               passe au vert #026d43 — DÉJÀ la couleur de remplissage du
+               survol dans cette même bouton (même famille, un cran plus
+               profond : 5,88:1) — et le remplissage progressif du survol
+               descend d'un cran encore (#024d3a : 9,88:1) : l'effet
+               « progressif vert foncé » approuvé le 15/11 est conservé,
+               la teinte de repos seulement s'assombrit d'un cran. */
           >
             {submitting ? (
               <span className="inline-flex items-center gap-2.5">

@@ -1,0 +1,1186 @@
+{
+  "meta": {
+    "date": "2026-11-19",
+    "base": "http://127.0.0.1:3100",
+    "build": "f690a43 local"
+  },
+  "a11y": {
+    "routes": [
+      {
+        "route": "#/accueil",
+        "lang": "fr",
+        "landmarks": {
+          "header": true,
+          "footer": true,
+          "main": true,
+          "navs": 3,
+          "navLabels": [
+            "Navigation principale",
+            "Services — pied de page",
+            "Professionnel — pied de page"
+          ]
+        },
+        "skipLink": true,
+        "h1": 1,
+        "h1Text": "Je crée des Sites Web Professionnels qui Génèrent des Ventes.",
+        "iframes": [],
+        "overflowX": false,
+        "tapTargets": {
+          "total": 51,
+          "under24": [],
+          "smallest": [
+            {
+              "name": "Conception de Sites Web",
+              "w": 210,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Référencement SEO",
+              "w": 166,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Publicité Meta Ads",
+              "w": 157,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Portfolio",
+              "w": 71,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Contact",
+              "w": 66,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "À propos",
+              "w": 77,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            }
+          ]
+        },
+        "textContrast": {
+          "samples": 151,
+          "failures": []
+        },
+        "consoleErrors": []
+      },
+      {
+        "route": "#/methode",
+        "lang": "fr",
+        "landmarks": {
+          "header": true,
+          "footer": true,
+          "main": true,
+          "navs": 3,
+          "navLabels": [
+            "Navigation principale",
+            "Services — pied de page",
+            "Professionnel — pied de page"
+          ]
+        },
+        "skipLink": true,
+        "h1": 1,
+        "h1Text": "Des sites web qui transforment vos visiteurs en clients.",
+        "iframes": [],
+        "overflowX": false,
+        "tapTargets": {
+          "total": 32,
+          "under24": [],
+          "smallest": [
+            {
+              "name": "Conception de Sites Web",
+              "w": 210,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Référencement SEO",
+              "w": 166,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Publicité Meta Ads",
+              "w": 157,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Portfolio",
+              "w": 71,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Contact",
+              "w": 66,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "À propos",
+              "w": 77,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            }
+          ]
+        },
+        "textContrast": {
+          "samples": 92,
+          "failures": []
+        },
+        "consoleErrors": []
+      },
+      {
+        "route": "#/referencement-seo",
+        "lang": "fr",
+        "landmarks": {
+          "header": true,
+          "footer": true,
+          "main": true,
+          "navs": 3,
+          "navLabels": [
+            "Navigation principale",
+            "Services — pied de page",
+            "Professionnel — pied de page"
+          ]
+        },
+        "skipLink": true,
+        "h1": 1,
+        "h1Text": "Référencement SEO : être trouvé par ceux qui vous cherchent.",
+        "iframes": [],
+        "overflowX": false,
+        "tapTargets": {
+          "total": 24,
+          "under24": [],
+          "smallest": [
+            {
+              "name": "Conception de Sites Web",
+              "w": 210,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Référencement SEO",
+              "w": 166,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Publicité Meta Ads",
+              "w": 157,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Portfolio",
+              "w": 71,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Contact",
+              "w": 66,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "À propos",
+              "w": 77,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            }
+          ]
+        },
+        "textContrast": {
+          "samples": 103,
+          "failures": []
+        },
+        "consoleErrors": []
+      },
+      {
+        "route": "#/publicite-meta-ads",
+        "lang": "fr",
+        "landmarks": {
+          "header": true,
+          "footer": true,
+          "main": true,
+          "navs": 3,
+          "navLabels": [
+            "Navigation principale",
+            "Services — pied de page",
+            "Professionnel — pied de page"
+          ]
+        },
+        "skipLink": true,
+        "h1": 1,
+        "h1Text": "Meta Ads : faites connaître votre activité sur Facebook et Instagram.",
+        "iframes": [],
+        "overflowX": false,
+        "tapTargets": {
+          "total": 23,
+          "under24": [],
+          "smallest": [
+            {
+              "name": "Conception de Sites Web",
+              "w": 210,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Référencement SEO",
+              "w": 166,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Publicité Meta Ads",
+              "w": 157,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Portfolio",
+              "w": 71,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Contact",
+              "w": 66,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "À propos",
+              "w": 77,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            }
+          ]
+        },
+        "textContrast": {
+          "samples": 96,
+          "failures": []
+        },
+        "consoleErrors": []
+      },
+      {
+        "route": "#/realisations",
+        "lang": "fr",
+        "landmarks": {
+          "header": true,
+          "footer": true,
+          "main": true,
+          "navs": 3,
+          "navLabels": [
+            "Navigation principale",
+            "Services — pied de page",
+            "Professionnel — pied de page"
+          ]
+        },
+        "skipLink": true,
+        "h1": 1,
+        "h1Text": "Des réalisations concrètes. Des expériences digitales pensées avec intention.",
+        "iframes": [],
+        "overflowX": false,
+        "tapTargets": {
+          "total": 27,
+          "under24": [],
+          "smallest": [
+            {
+              "name": "Conception de Sites Web",
+              "w": 210,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Référencement SEO",
+              "w": 166,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Publicité Meta Ads",
+              "w": 157,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Portfolio",
+              "w": 71,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Contact",
+              "w": 66,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "À propos",
+              "w": 77,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            }
+          ]
+        },
+        "textContrast": {
+          "samples": 51,
+          "failures": []
+        },
+        "consoleErrors": []
+      },
+      {
+        "route": "#/projet/mrsteveenglish",
+        "lang": "fr",
+        "landmarks": {
+          "header": true,
+          "footer": true,
+          "main": true,
+          "navs": 3,
+          "navLabels": [
+            "Navigation principale",
+            "Services — pied de page",
+            "Professionnel — pied de page"
+          ]
+        },
+        "skipLink": true,
+        "h1": 1,
+        "h1Text": "MR STEVE ENGLISH",
+        "iframes": [],
+        "overflowX": false,
+        "tapTargets": {
+          "total": 25,
+          "under24": [],
+          "smallest": [
+            {
+              "name": "Conception de Sites Web",
+              "w": 210,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Référencement SEO",
+              "w": 166,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Publicité Meta Ads",
+              "w": 157,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Portfolio",
+              "w": 71,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Contact",
+              "w": 66,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "À propos",
+              "w": 77,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            }
+          ]
+        },
+        "textContrast": {
+          "samples": 54,
+          "failures": []
+        },
+        "consoleErrors": []
+      },
+      {
+        "route": "#/a-propos",
+        "lang": "fr",
+        "landmarks": {
+          "header": true,
+          "footer": true,
+          "main": true,
+          "navs": 3,
+          "navLabels": [
+            "Navigation principale",
+            "Services — pied de page",
+            "Professionnel — pied de page"
+          ]
+        },
+        "skipLink": true,
+        "h1": 1,
+        "h1Text": "Je suis Stevens Akpovi. Et je crois qu'un bon site web doit servir le business qu'il repré",
+        "iframes": [],
+        "overflowX": false,
+        "tapTargets": {
+          "total": 25,
+          "under24": [],
+          "smallest": [
+            {
+              "name": "Conception de Sites Web",
+              "w": 210,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Référencement SEO",
+              "w": 166,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Publicité Meta Ads",
+              "w": 157,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Portfolio",
+              "w": 71,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Contact",
+              "w": 66,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "À propos",
+              "w": 77,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            }
+          ]
+        },
+        "textContrast": {
+          "samples": 130,
+          "failures": []
+        },
+        "consoleErrors": []
+      },
+      {
+        "route": "#/contact",
+        "lang": "fr",
+        "landmarks": {
+          "header": true,
+          "footer": true,
+          "main": true,
+          "navs": 3,
+          "navLabels": [
+            "Navigation principale",
+            "Services — pied de page",
+            "Professionnel — pied de page"
+          ]
+        },
+        "skipLink": true,
+        "h1": 1,
+        "h1Text": "Contact",
+        "iframes": [],
+        "overflowX": false,
+        "tapTargets": {
+          "total": 29,
+          "under24": [],
+          "smallest": [
+            {
+              "name": "Conception de Sites Web",
+              "w": 210,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Référencement SEO",
+              "w": 166,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Publicité Meta Ads",
+              "w": 157,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Portfolio",
+              "w": 71,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Contact",
+              "w": 66,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "À propos",
+              "w": 77,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            }
+          ]
+        },
+        "textContrast": {
+          "samples": 41,
+          "failures": []
+        },
+        "consoleErrors": []
+      },
+      {
+        "route": "#/demander-un-devis",
+        "lang": "fr",
+        "landmarks": {
+          "header": true,
+          "footer": true,
+          "main": true,
+          "navs": 3,
+          "navLabels": [
+            "Navigation principale",
+            "Services — pied de page",
+            "Professionnel — pied de page"
+          ]
+        },
+        "skipLink": true,
+        "h1": 1,
+        "h1Text": "Optimisez Votre Site Web Pour Augmenter Vos Ventes",
+        "iframes": [],
+        "overflowX": false,
+        "tapTargets": {
+          "total": 38,
+          "under24": [],
+          "smallest": [
+            {
+              "name": "Réservez un appel de 30 minute",
+              "w": 235,
+              "h": 17,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Conception de Sites Web",
+              "w": 210,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Référencement SEO",
+              "w": 166,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Publicité Meta Ads",
+              "w": 157,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Portfolio",
+              "w": 71,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Contact",
+              "w": 66,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            }
+          ]
+        },
+        "textContrast": {
+          "samples": 60,
+          "failures": []
+        },
+        "consoleErrors": []
+      },
+      {
+        "route": "#/audit-gratuit",
+        "lang": "fr",
+        "landmarks": {
+          "header": true,
+          "footer": true,
+          "main": true,
+          "navs": 3,
+          "navLabels": [
+            "Navigation principale",
+            "Services — pied de page",
+            "Professionnel — pied de page"
+          ]
+        },
+        "skipLink": true,
+        "h1": 1,
+        "h1Text": "Découvrez Pourquoi Votre Site Ne Vous Apporte Pas Assez De Clients.",
+        "iframes": [],
+        "overflowX": false,
+        "tapTargets": {
+          "total": 28,
+          "under24": [],
+          "smallest": [
+            {
+              "name": "Réservez un appel de 30 minute",
+              "w": 235,
+              "h": 17,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Conception de Sites Web",
+              "w": 210,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Référencement SEO",
+              "w": 166,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Publicité Meta Ads",
+              "w": 157,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Portfolio",
+              "w": 71,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Contact",
+              "w": 66,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            }
+          ]
+        },
+        "textContrast": {
+          "samples": 53,
+          "failures": []
+        },
+        "consoleErrors": []
+      },
+      {
+        "route": "#/reserver-un-appel",
+        "lang": "fr",
+        "landmarks": {
+          "header": true,
+          "footer": true,
+          "main": true,
+          "navs": 3,
+          "navLabels": [
+            "Navigation principale",
+            "Services — pied de page",
+            "Professionnel — pied de page"
+          ]
+        },
+        "skipLink": true,
+        "h1": 1,
+        "h1Text": "Réservez votre créneau en une minute.",
+        "iframes": [
+          {
+            "title": "Select a Date & Time - Calendly",
+            "src": "https://calendly.com/stevensakpovi/30min?embed_domain=127.0."
+          }
+        ],
+        "overflowX": false,
+        "tapTargets": {
+          "total": 18,
+          "under24": [],
+          "smallest": [
+            {
+              "name": "Conception de Sites Web",
+              "w": 210,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Référencement SEO",
+              "w": 166,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Publicité Meta Ads",
+              "w": 157,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Portfolio",
+              "w": 71,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Contact",
+              "w": 66,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "À propos",
+              "w": 77,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            }
+          ]
+        },
+        "textContrast": {
+          "samples": 29,
+          "failures": []
+        },
+        "consoleErrors": []
+      },
+      {
+        "route": "#/mentions-legales",
+        "lang": "fr",
+        "landmarks": {
+          "header": true,
+          "footer": true,
+          "main": true,
+          "navs": 3,
+          "navLabels": [
+            "Navigation principale",
+            "Services — pied de page",
+            "Professionnel — pied de page"
+          ]
+        },
+        "skipLink": true,
+        "h1": 1,
+        "h1Text": "Mentions légales",
+        "iframes": [],
+        "overflowX": false,
+        "tapTargets": {
+          "total": 20,
+          "under24": [],
+          "smallest": [
+            {
+              "name": "stevensakpovi@gmail.com",
+              "w": 185,
+              "h": 19,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "vercel.com",
+              "w": 78,
+              "h": 19,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Conception de Sites Web",
+              "w": 210,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Référencement SEO",
+              "w": 166,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Publicité Meta Ads",
+              "w": 157,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            },
+            {
+              "name": "Portfolio",
+              "w": 71,
+              "h": 26,
+              "inline": true,
+              "under24": false
+            }
+          ]
+        },
+        "textContrast": {
+          "samples": 51,
+          "failures": []
+        },
+        "consoleErrors": []
+      }
+    ],
+    "focus": [
+      {
+        "route": "#/accueil",
+        "steps": [
+          {
+            "end": false,
+            "el": "Aller au contenu principal",
+            "outline": "solid 2px rgb(228, 228, 228)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(228,228,228)",
+            "outlineVsBg": 1
+          },
+          {
+            "end": false,
+            "el": "Stevens Akpovi — retour à l'accueil",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Méthode",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Référencement",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Publicité",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Portfolio",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Démarrer Un Projet",
+            "outline": "solid 2px rgb(228, 228, 228)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(255,255,255)",
+            "outlineVsBg": 1.27
+          },
+          {
+            "end": false,
+            "el": "Ouvrir le menu",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Réserver Un Appel",
+            "outline": "solid 2px rgb(228, 228, 228)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(255,255,255)",
+            "outlineVsBg": 1.27
+          },
+          {
+            "end": false,
+            "el": "Voir Mes Réalisations",
+            "outline": "solid 2px rgb(228, 228, 228)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(0,0,0)",
+            "outlineVsBg": 16.52
+          }
+        ]
+      },
+      {
+        "route": "#/demander-un-devis",
+        "steps": [
+          {
+            "end": false,
+            "el": "Aller au contenu principal",
+            "outline": "solid 2px rgb(228, 228, 228)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(228,228,228)",
+            "outlineVsBg": 1
+          },
+          {
+            "end": false,
+            "el": "Stevens Akpovi — retour à l'accueil",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Méthode",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Référencement",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Publicité",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Portfolio",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Démarrer Un Projet",
+            "outline": "solid 2px rgb(228, 228, 228)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(255,255,255)",
+            "outlineVsBg": 1.27
+          },
+          {
+            "end": false,
+            "el": "Ouvrir le menu",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "input",
+            "outline": "none 0px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "0px",
+            "visible": false,
+            "bg": "rgb(255,255,255)",
+            "outlineVsBg": 1.13
+          },
+          {
+            "end": false,
+            "el": "input",
+            "outline": "none 0px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "0px",
+            "visible": false,
+            "bg": "rgb(255,255,255)",
+            "outlineVsBg": 1.13
+          }
+        ]
+      },
+      {
+        "route": "#/contact",
+        "steps": [
+          {
+            "end": false,
+            "el": "Aller au contenu principal",
+            "outline": "solid 2px rgb(228, 228, 228)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(228,228,228)",
+            "outlineVsBg": 1
+          },
+          {
+            "end": false,
+            "el": "Stevens Akpovi — retour à l'accueil",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Méthode",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Référencement",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Publicité",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Portfolio",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Démarrer Un Projet",
+            "outline": "solid 2px rgb(228, 228, 228)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(255,255,255)",
+            "outlineVsBg": 1.27
+          },
+          {
+            "end": false,
+            "el": "Ouvrir le menu",
+            "outline": "solid 2px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(28,28,28)",
+            "outlineVsBg": 4.32
+          },
+          {
+            "end": false,
+            "el": "Demander Un Devis Personnalisé",
+            "outline": "solid 2px rgb(228, 228, 228)",
+            "outlineWidthPx": "2px",
+            "visible": true,
+            "bg": "rgb(255,255,255)",
+            "outlineVsBg": 1.27
+          },
+          {
+            "end": false,
+            "el": "Clients existants",
+            "outline": "none 0px oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+            "outlineWidthPx": "0px",
+            "visible": false,
+            "bg": "rgb(35,35,35)",
+            "outlineVsBg": 4.15
+          }
+        ]
+      }
+    ],
+    "iframes": [],
+    "reducedMotion": {
+      "lenisHtmlClass": "hoverable lenis",
+      "lenisActive": true
+    }
+  },
+  "forms": [],
+  "perf": []
+}

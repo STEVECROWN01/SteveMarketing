@@ -1,0 +1,764 @@
+{
+  "meta": {
+    "date": "2026-11-19",
+    "base": "http://127.0.0.1:3100",
+    "build": "f690a43 local"
+  },
+  "a11y": {
+    "routes": [],
+    "focus": [],
+    "iframes": [],
+    "reducedMotion": null
+  },
+  "forms": [
+    {
+      "variant": "devis",
+      "hash": "#/demander-un-devis",
+      "submitButton": "Obtenir Un Devis",
+      "formStructure": [
+        {
+          "tag": "input",
+          "type": "text",
+          "name": "societe_verification",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Prénom *",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "text",
+          "name": "firstName",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Nom *",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "text",
+          "name": "lastName",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Email professionnel *",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "email",
+          "name": "email",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Téléphone *",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "tel",
+          "name": "phone",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "En cochant cette case, j'a",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "checkbox",
+          "name": "smsConsent",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Il n'est pas attrayant vis",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "radio",
+          "name": "whyNow",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Trop peu de visiteurs devi",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "radio",
+          "name": "whyNow",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Pas assez de visiteurs",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "radio",
+          "name": "whyNow",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Je n'ai pas encore de site",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "radio",
+          "name": "whyNow",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Problèmes techniques (bugs",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "radio",
+          "name": "whyNow",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Moins de 50 000 $/mois",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "radio",
+          "name": "revenue",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "50 000 – 100 000 $/mois",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "radio",
+          "name": "revenue",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "100 000 – 200 000 $/mois",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "radio",
+          "name": "revenue",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "200 000 – 500 000 $/mois",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "radio",
+          "name": "revenue",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Plus de 500 000 $/mois",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "radio",
+          "name": "revenue",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Dès que possible",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "radio",
+          "name": "quoteTimeline",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Dans les 1 à 3 prochains m",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "radio",
+          "name": "quoteTimeline",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Dans 4 mois ou plus",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "radio",
+          "name": "quoteTimeline",
+          "visible": false
+        },
+        {
+          "tag": "button",
+          "type": "submit",
+          "name": "Obtenir Un Devis",
+          "visible": true
+        }
+      ],
+      "fields": [
+        {
+          "tag": "input",
+          "type": "text",
+          "name": "firstName",
+          "labelled": true,
+          "autocomplete": "given-name",
+          "required": true
+        },
+        {
+          "tag": "input",
+          "type": "text",
+          "name": "lastName",
+          "labelled": true,
+          "autocomplete": "family-name",
+          "required": true
+        },
+        {
+          "tag": "input",
+          "type": "email",
+          "name": "email",
+          "labelled": true,
+          "autocomplete": "email",
+          "required": true
+        },
+        {
+          "tag": "input",
+          "type": "tel",
+          "name": "phone",
+          "labelled": true,
+          "autocomplete": "tel",
+          "required": true
+        }
+      ],
+      "honeypot": {
+        "found": true,
+        "visible": false,
+        "tabIndex": -1,
+        "ariaHidden": "true",
+        "autocomplete": "off"
+      },
+      "emptySubmit": {
+        "errorsShown": [
+          "Indiquez votre prénom.",
+          "Indiquez votre nom.",
+          "Indiquez une adresse email valide.",
+          "Indiquez votre numéro de téléphone.",
+          "Choisissez la principale raison.",
+          "Indiquez votre chiffre d'affaires mensuel."
+        ],
+        "firstInputInvalid": {
+          "ariaInvalid": null,
+          "describedby": null,
+          "describedbyResolves": null
+        },
+        "roleAlerts": 2
+      },
+      "mockedSuccess": {
+        "toastRoleStatus": true,
+        "toastText": [
+          "Votre demande a bien été enregistrée.Merci pour votre confiance. Je reviens vers vous très rapidement pour préparer votr",
+          "Demande enregistréeVotre demande a bien été envoyée. Un accusé de réception vous est adressé par email."
+        ],
+        "toastAriaLive": null,
+        "ariaLiveZones": [],
+        "toastLiAttrs": "tabindex,data-state,data-swipe-direction,role,class,data-radix-collection-item,style",
+        "formStillVisible": false,
+        "formCleared": null,
+        "confirmationRole": "status",
+        "confirmationText": [
+          "Votre demande a bien été enregistrée.",
+          "Merci pour votre confiance. Je reviens vers vous très rapidement pour préparer votre devis",
+          "Demande enregistrée"
+        ],
+        "fillErrors": []
+      },
+      "realSubmit": {
+        "responseFeedback": [
+          "L'enregistrement n'a pas pu être finalisé. Merci de réessayer dans quelques instants, de réserver un appel via Calendly, ou de m'écrire directement à stevensakpovi@gmail.com.",
+          "Envoi impossibleL'enregistrement n'a pas pu être finalisé. Merci de réessayer dans quelques instants, de réserver un appel via Calendly, ou de m'écrire directement à stevensakpovi@gmail.com."
+        ],
+        "anyTextMention": [
+          "Réservez un appel de 30 minutes",
+          "L'enregistrement n'a pas pu être finalisé. Merci de réessayer dans quelques instants, de réserver un appel via Calendly, ou de m'écrire directement à stevensakp"
+        ],
+        "buttonEnabled": true,
+        "spinnerStillAlone": false
+      }
+    },
+    {
+      "variant": "contact",
+      "hash": "#/contact",
+      "submitButton": "Envoyer Mon Message",
+      "formStructure": [
+        {
+          "tag": "input",
+          "type": "text",
+          "name": "societe_verification",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Nom complet *",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "text",
+          "name": "name",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Téléphone *",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "tel",
+          "name": "phone",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Email professionnel *",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "email",
+          "name": "email",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Entreprise *",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "text",
+          "name": "company",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Comment m'avez-vous découv",
+          "visible": true
+        },
+        {
+          "tag": "select",
+          "type": "select-one",
+          "name": "discovery",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Comment puis-je vous aider",
+          "visible": true
+        },
+        {
+          "tag": "textarea",
+          "type": "textarea",
+          "name": "message",
+          "visible": true
+        },
+        {
+          "tag": "button",
+          "type": "submit",
+          "name": "Envoyer Mon Message",
+          "visible": true
+        }
+      ],
+      "fields": [
+        {
+          "tag": "input",
+          "type": "text",
+          "name": "name",
+          "labelled": true,
+          "autocomplete": "name",
+          "required": true
+        },
+        {
+          "tag": "input",
+          "type": "tel",
+          "name": "phone",
+          "labelled": true,
+          "autocomplete": "tel",
+          "required": true
+        },
+        {
+          "tag": "input",
+          "type": "email",
+          "name": "email",
+          "labelled": true,
+          "autocomplete": "email",
+          "required": true
+        },
+        {
+          "tag": "input",
+          "type": "text",
+          "name": "company",
+          "labelled": true,
+          "autocomplete": "organization",
+          "required": true
+        },
+        {
+          "tag": "select",
+          "type": "select-one",
+          "name": "discovery",
+          "labelled": true,
+          "autocomplete": null,
+          "required": true
+        },
+        {
+          "tag": "textarea",
+          "type": "textarea",
+          "name": "message",
+          "labelled": true,
+          "autocomplete": null,
+          "required": true
+        }
+      ],
+      "honeypot": {
+        "found": true,
+        "visible": false,
+        "tabIndex": -1,
+        "ariaHidden": "true",
+        "autocomplete": "off"
+      },
+      "emptySubmit": {
+        "errorsShown": [
+          "Indiquez votre nom complet.",
+          "Indiquez votre numéro de téléphone.",
+          "Indiquez une adresse email valide.",
+          "Indiquez le nom de votre entreprise ou activité.",
+          "Indiquez comment vous m'avez découvert.",
+          "Décrivez votre besoin en quelques mots (10 caractères minimum)."
+        ],
+        "firstInputInvalid": {
+          "ariaInvalid": null,
+          "describedby": null,
+          "describedbyResolves": null
+        },
+        "roleAlerts": 0
+      },
+      "mockedSuccess": {
+        "toastRoleStatus": true,
+        "toastText": [
+          "Message envoyéMerci ! Votre message est bien parti. Réservez maintenant votre créneau d'appel stratégique."
+        ],
+        "toastAriaLive": null,
+        "ariaLiveZones": [],
+        "toastLiAttrs": "tabindex,data-state,data-swipe-direction,role,class,data-radix-collection-item,style",
+        "formStillVisible": false,
+        "formCleared": null,
+        "confirmationRole": "(absent)",
+        "confirmationText": [
+          "Message envoyé",
+          "Merci ! Votre message est bien parti. Réservez maintenant votre créneau d'appel stratégiqu"
+        ],
+        "fillErrors": []
+      },
+      "realSubmit": {
+        "responseFeedback": [
+          "L'enregistrement n'a pas pu être finalisé. Merci de réessayer dans quelques instants, de réserver un appel via Calendly, ou de m'écrire directement à stevensakpovi@gmail.com.",
+          "Envoi impossibleL'enregistrement n'a pas pu être finalisé. Merci de réessayer dans quelques instants, de réserver un appel via Calendly, ou de m'écrire directement à stevensakpovi@gmail.com."
+        ],
+        "anyTextMention": [
+          "L'enregistrement n'a pas pu être finalisé. Merci de réessayer dans quelques instants, de réserver un appel via Calendly, ou de m'écrire directement à stevensakp"
+        ],
+        "buttonEnabled": true,
+        "spinnerStillAlone": false
+      }
+    },
+    {
+      "variant": "audit",
+      "hash": "#/audit-gratuit",
+      "submitButton": "Envoyer Ma Demande D'Audit",
+      "formStructure": [
+        {
+          "tag": "input",
+          "type": "text",
+          "name": "societe_verification",
+          "visible": false
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Nom complet *",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "text",
+          "name": "name",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Email *",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "email",
+          "name": "email",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Téléphone (optionnel)",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "tel",
+          "name": "phone",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "URL de votre site actuel *",
+          "visible": true
+        },
+        {
+          "tag": "input",
+          "type": "url",
+          "name": "website",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Service souhaité *",
+          "visible": true
+        },
+        {
+          "tag": "select",
+          "type": "select-one",
+          "name": "serviceType",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Budget envisagé (optionnel",
+          "visible": true
+        },
+        {
+          "tag": "select",
+          "type": "select-one",
+          "name": "budget",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Échéance souhaitée (option",
+          "visible": true
+        },
+        {
+          "tag": "select",
+          "type": "select-one",
+          "name": "timeline",
+          "visible": true
+        },
+        {
+          "tag": "label",
+          "type": null,
+          "name": "Votre site et vos objectif",
+          "visible": true
+        },
+        {
+          "tag": "textarea",
+          "type": "textarea",
+          "name": "message",
+          "visible": true
+        },
+        {
+          "tag": "button",
+          "type": "submit",
+          "name": "Envoyer Ma Demande D'Audit",
+          "visible": true
+        }
+      ],
+      "fields": [
+        {
+          "tag": "input",
+          "type": "text",
+          "name": "name",
+          "labelled": true,
+          "autocomplete": "name",
+          "required": true
+        },
+        {
+          "tag": "input",
+          "type": "email",
+          "name": "email",
+          "labelled": true,
+          "autocomplete": "email",
+          "required": true
+        },
+        {
+          "tag": "input",
+          "type": "tel",
+          "name": "phone",
+          "labelled": true,
+          "autocomplete": "tel",
+          "required": false
+        },
+        {
+          "tag": "input",
+          "type": "url",
+          "name": "website",
+          "labelled": true,
+          "autocomplete": null,
+          "required": true
+        },
+        {
+          "tag": "select",
+          "type": "select-one",
+          "name": "serviceType",
+          "labelled": true,
+          "autocomplete": null,
+          "required": true
+        },
+        {
+          "tag": "select",
+          "type": "select-one",
+          "name": "budget",
+          "labelled": true,
+          "autocomplete": null,
+          "required": false
+        },
+        {
+          "tag": "select",
+          "type": "select-one",
+          "name": "timeline",
+          "labelled": true,
+          "autocomplete": null,
+          "required": false
+        },
+        {
+          "tag": "textarea",
+          "type": "textarea",
+          "name": "message",
+          "labelled": true,
+          "autocomplete": null,
+          "required": true
+        }
+      ],
+      "honeypot": {
+        "found": true,
+        "visible": false,
+        "tabIndex": -1,
+        "ariaHidden": "true",
+        "autocomplete": "off"
+      },
+      "emptySubmit": {
+        "errorsShown": [
+          "Indiquez votre nom complet.",
+          "Indiquez une adresse email valide.",
+          "L'URL de votre site actuel est nécessaire pour l'audit.",
+          "Décrivez votre besoin en quelques mots (10 caractères minimum)."
+        ],
+        "firstInputInvalid": {
+          "ariaInvalid": null,
+          "describedby": null,
+          "describedbyResolves": null
+        },
+        "roleAlerts": 0
+      },
+      "mockedSuccess": {
+        "toastRoleStatus": true,
+        "toastText": [
+          "Votre demande a bien été enregistrée.Merci pour votre confiance. Je reviens vers vous très rapidement avec les premières",
+          "Demande enregistréeVotre demande a bien été envoyée. Un accusé de réception vous est adressé par email."
+        ],
+        "toastAriaLive": null,
+        "ariaLiveZones": [],
+        "toastLiAttrs": "tabindex,data-state,data-swipe-direction,role,class,data-radix-collection-item,style",
+        "formStillVisible": false,
+        "formCleared": null,
+        "confirmationRole": "status",
+        "confirmationText": [
+          "Votre demande a bien été enregistrée.",
+          "Merci pour votre confiance. Je reviens vers vous très rapidement avec les premières observ",
+          "Demande enregistrée"
+        ],
+        "fillErrors": []
+      },
+      "realSubmit": {
+        "responseFeedback": [
+          "L'enregistrement n'a pas pu être finalisé. Merci de réessayer dans quelques instants, de réserver un appel via Calendly, ou de m'écrire directement à stevensakpovi@gmail.com.",
+          "Envoi impossibleL'enregistrement n'a pas pu être finalisé. Merci de réessayer dans quelques instants, de réserver un appel via Calendly, ou de m'écrire directement à stevensakpovi@gmail.com."
+        ],
+        "anyTextMention": [
+          "Réservez un appel de 30 minutes",
+          "L'enregistrement n'a pas pu être finalisé. Merci de réessayer dans quelques instants, de réserver un appel via Calendly, ou de m'écrire directement à stevensakp"
+        ],
+        "buttonEnabled": true,
+        "spinnerStillAlone": false
+      }
+    }
+  ],
+  "perf": []
+}

@@ -1,0 +1,380 @@
+{
+  "interactifs": [
+    {
+      "route": "#/accueil",
+      "defauts": [],
+      "champs": []
+    },
+    {
+      "route": "#/methode",
+      "defauts": [],
+      "champs": []
+    },
+    {
+      "route": "#/referencement-seo",
+      "defauts": [],
+      "champs": []
+    },
+    {
+      "route": "#/publicite-meta-ads",
+      "defauts": [],
+      "champs": []
+    },
+    {
+      "route": "#/realisations",
+      "defauts": [],
+      "champs": []
+    },
+    {
+      "route": "#/projet/mrsteveenglish",
+      "defauts": [],
+      "champs": []
+    },
+    {
+      "route": "#/a-propos",
+      "defauts": [],
+      "champs": []
+    },
+    {
+      "route": "#/contact",
+      "defauts": [],
+      "champs": [
+        {
+          "type": "champ",
+          "nom": "name",
+          "fond": "rgb(255,255,255)",
+          "ratioFond": 1
+        },
+        {
+          "type": "champ",
+          "nom": "phone",
+          "fond": "rgb(255,255,255)",
+          "ratioFond": 1
+        },
+        {
+          "type": "champ",
+          "nom": "email",
+          "fond": "rgb(255,255,255)",
+          "ratioFond": 1
+        },
+        {
+          "type": "champ",
+          "nom": "company",
+          "fond": "rgb(255,255,255)",
+          "ratioFond": 1
+        },
+        {
+          "type": "champ",
+          "nom": "discovery",
+          "fond": "rgb(255,255,255)",
+          "ratioFond": 1
+        },
+        {
+          "type": "champ",
+          "nom": "message",
+          "fond": "rgb(255,255,255)",
+          "ratioFond": 1
+        }
+      ]
+    },
+    {
+      "route": "#/demander-un-devis",
+      "defauts": [],
+      "champs": [
+        {
+          "type": "champ",
+          "nom": "firstName",
+          "fond": "rgb(255,255,255)",
+          "ratioFond": 1
+        },
+        {
+          "type": "champ",
+          "nom": "lastName",
+          "fond": "rgb(255,255,255)",
+          "ratioFond": 1
+        },
+        {
+          "type": "champ",
+          "nom": "email",
+          "fond": "rgb(255,255,255)",
+          "ratioFond": 1
+        },
+        {
+          "type": "champ",
+          "nom": "phone",
+          "fond": "rgb(255,255,255)",
+          "ratioFond": 1
+        }
+      ]
+    },
+    {
+      "route": "#/audit-gratuit",
+      "defauts": [],
+      "champs": [
+        {
+          "type": "champ",
+          "nom": "name",
+          "fond": "rgb(28,28,28)",
+          "ratioFond": 17.04
+        },
+        {
+          "type": "champ",
+          "nom": "email",
+          "fond": "rgb(28,28,28)",
+          "ratioFond": 17.04
+        },
+        {
+          "type": "champ",
+          "nom": "phone",
+          "fond": "rgb(28,28,28)",
+          "ratioFond": 17.04
+        },
+        {
+          "type": "champ",
+          "nom": "website",
+          "fond": "rgb(28,28,28)",
+          "ratioFond": 17.04
+        },
+        {
+          "type": "champ",
+          "nom": "serviceType",
+          "fond": "rgb(28,28,28)",
+          "ratioFond": 17.04
+        },
+        {
+          "type": "champ",
+          "nom": "budget",
+          "fond": "rgb(28,28,28)",
+          "ratioFond": 17.04
+        },
+        {
+          "type": "champ",
+          "nom": "timeline",
+          "fond": "rgb(28,28,28)",
+          "ratioFond": 17.04
+        },
+        {
+          "type": "champ",
+          "nom": "message",
+          "fond": "rgb(28,28,28)",
+          "ratioFond": 17.04
+        }
+      ]
+    },
+    {
+      "route": "#/reserver-un-appel",
+      "defauts": [],
+      "champs": []
+    },
+    {
+      "route": "#/mentions-legales",
+      "defauts": [],
+      "champs": []
+    }
+  ],
+  "erreurs": [
+    {
+      "route": "#/demander-un-devis",
+      "erreurs": [
+        {
+          "texte": "Indiquez votre prénom.",
+          "couleur": "rgb(197, 48, 48)",
+          "fond": "rgb(255,255,255)",
+          "ratio": 5.47,
+          "besoin": 4.5,
+          "taille": 12
+        },
+        {
+          "texte": "Indiquez votre nom.",
+          "couleur": "rgb(197, 48, 48)",
+          "fond": "rgb(255,255,255)",
+          "ratio": 5.47,
+          "besoin": 4.5,
+          "taille": 12
+        },
+        {
+          "texte": "Indiquez une adresse email valide.",
+          "couleur": "rgb(197, 48, 48)",
+          "fond": "rgb(255,255,255)",
+          "ratio": 5.47,
+          "besoin": 4.5,
+          "taille": 12
+        },
+        {
+          "texte": "Indiquez votre numéro de téléphone.",
+          "couleur": "rgb(197, 48, 48)",
+          "fond": "rgb(255,255,255)",
+          "ratio": 5.47,
+          "besoin": 4.5,
+          "taille": 12
+        },
+        {
+          "texte": "Choisissez la principale raison.",
+          "couleur": "rgb(197, 48, 48)",
+          "fond": "rgb(255,255,255)",
+          "ratio": 5.47,
+          "besoin": 4.5,
+          "taille": 12
+        },
+        {
+          "texte": "Indiquez votre chiffre d'affaires mensue",
+          "couleur": "rgb(197, 48, 48)",
+          "fond": "rgb(255,255,255)",
+          "ratio": 5.47,
+          "besoin": 4.5,
+          "taille": 12
+        }
+      ]
+    },
+    {
+      "route": "#/contact",
+      "erreurs": [
+        {
+          "texte": "Indiquez votre nom complet.",
+          "couleur": "rgb(248, 113, 113)",
+          "fond": "rgb(28,28,28)",
+          "ratio": 6.16,
+          "besoin": 4.5,
+          "taille": 12
+        },
+        {
+          "texte": "Indiquez votre numéro de téléphone.",
+          "couleur": "rgb(248, 113, 113)",
+          "fond": "rgb(28,28,28)",
+          "ratio": 6.16,
+          "besoin": 4.5,
+          "taille": 12
+        },
+        {
+          "texte": "Indiquez une adresse email valide.",
+          "couleur": "rgb(248, 113, 113)",
+          "fond": "rgb(28,28,28)",
+          "ratio": 6.16,
+          "besoin": 4.5,
+          "taille": 12
+        },
+        {
+          "texte": "Indiquez le nom de votre entreprise ou a",
+          "couleur": "rgb(248, 113, 113)",
+          "fond": "rgb(28,28,28)",
+          "ratio": 6.16,
+          "besoin": 4.5,
+          "taille": 12
+        },
+        {
+          "texte": "Indiquez comment vous m'avez découvert.",
+          "couleur": "rgb(248, 113, 113)",
+          "fond": "rgb(28,28,28)",
+          "ratio": 6.16,
+          "besoin": 4.5,
+          "taille": 12
+        },
+        {
+          "texte": "Décrivez votre besoin en quelques mots (",
+          "couleur": "rgb(248, 113, 113)",
+          "fond": "rgb(28,28,28)",
+          "ratio": 6.16,
+          "besoin": 4.5,
+          "taille": 12
+        }
+      ]
+    },
+    {
+      "route": "#/audit-gratuit",
+      "erreurs": [
+        {
+          "texte": "Indiquez votre nom complet.",
+          "couleur": "rgb(248, 113, 113)",
+          "fond": "rgb(35,35,35)",
+          "ratio": 5.68,
+          "besoin": 4.5,
+          "taille": 12
+        },
+        {
+          "texte": "Indiquez une adresse email valide.",
+          "couleur": "rgb(248, 113, 113)",
+          "fond": "rgb(35,35,35)",
+          "ratio": 5.68,
+          "besoin": 4.5,
+          "taille": 12
+        },
+        {
+          "texte": "L'URL de votre site actuel est nécessair",
+          "couleur": "rgb(248, 113, 113)",
+          "fond": "rgb(35,35,35)",
+          "ratio": 5.68,
+          "besoin": 4.5,
+          "taille": 12
+        },
+        {
+          "texte": "Décrivez votre besoin en quelques mots (",
+          "couleur": "rgb(248, 113, 113)",
+          "fond": "rgb(35,35,35)",
+          "ratio": 5.68,
+          "besoin": 4.5,
+          "taille": 12
+        }
+      ]
+    }
+  ],
+  "focusInputs": [
+    {
+      "route": "#/demander-un-devis",
+      "avant": {
+        "border": "rgb(172, 172, 172)",
+        "outline": "none|0px|lab(90.5889 0 0.0000119209 / 0.5)",
+        "shadow": "none"
+      },
+      "apres": {
+        "border": "rgb(172, 172, 172)",
+        "outline": "none|0px|oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+        "shadow": "none"
+      }
+    },
+    {
+      "route": "#/contact",
+      "avant": {
+        "border": "rgba(228, 228, 228, 0.14)",
+        "outline": "none|0px|lab(90.5889 0 0.0000119209 / 0.5)",
+        "shadow": "none"
+      },
+      "apres": {
+        "border": "rgba(228, 228, 228, 0.14)",
+        "outline": "none|0px|rgb(228, 228, 228)",
+        "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0"
+      }
+    },
+    {
+      "route": "#/audit-gratuit",
+      "avant": {
+        "border": "lab(90.5889 0 0.0000119209 / 0.18)",
+        "outline": "none|0px|lab(90.5889 0 0.0000119209 / 0.5)",
+        "shadow": "none"
+      },
+      "apres": {
+        "border": "oklab(0.918868 -0.0000089407 0.0000215173 / 0.18)",
+        "outline": "none|0px|oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+        "shadow": "none"
+      }
+    }
+  ],
+  "outlineBrut": {
+    "el": "",
+    "outlineStyle": "solid",
+    "outlineWidth": "2px",
+    "outlineColor": "oklab(0.918868 -0.0000089407 0.0000215173 / 0.5)",
+    "outlineOffset": "3px"
+  },
+  "reducedMotion": {
+    "mediaQuery": true,
+    "lenisActive": false,
+    "htmlClass": "hoverable"
+  },
+  "calendly": [
+    {
+      "title": "Select a Date & Time - Calendly",
+      "src": "https://calendly.com/stevensakpovi/30min?embed_domain=127.0.0.1%3A3100",
+      "visible": true
+    }
+  ]
+}

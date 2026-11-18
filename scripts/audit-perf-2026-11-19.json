@@ -1,0 +1,562 @@
+{
+  "meta": {
+    "date": "2026-11-19",
+    "base": "http://127.0.0.1:3100",
+    "build": "f690a43 local"
+  },
+  "a11y": {
+    "routes": [],
+    "focus": [],
+    "iframes": [],
+    "reducedMotion": null
+  },
+  "forms": [],
+  "perf": [
+    {
+      "device": "desktop",
+      "page": "accueil",
+      "fcp": 328,
+      "lcp": 1100,
+      "lcpEl": "p.hero-desc 576x96",
+      "cls": 0.003,
+      "atLoad": {
+        "requests": 23,
+        "js": {
+          "n": 10,
+          "bytes": 240129
+        },
+        "css": {
+          "n": 2,
+          "bytes": 26209
+        },
+        "img": {
+          "n": 6,
+          "bytes": 714091
+        },
+        "fonts": {
+          "n": 4,
+          "bytes": 172260
+        }
+      },
+      "afterPrefetch": {
+        "requests": 35,
+        "totalBytes": 1227922
+      },
+      "loadWallMs": 322,
+      "images": [
+        {
+          "src": "logo-blanc.png?v=2026-11-15",
+          "loading": "(eager)",
+          "hasDims": true,
+          "aspectRatio": "auto 240 / 192",
+          "complete": true
+        },
+        {
+          "src": "stevens-akpovi-portrait.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "auto 1024 / 1536",
+          "complete": true
+        },
+        {
+          "src": "stevens-akpovi-portrait-long.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "auto 1672 / 941",
+          "complete": false
+        },
+        {
+          "src": "mrsteveenglish-desktop.webp",
+          "loading": "eager",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": true
+        },
+        {
+          "src": "afribayit-mobile.webp",
+          "loading": "eager",
+          "hasDims": true,
+          "aspectRatio": "390 / 844",
+          "complete": true
+        },
+        {
+          "src": "problem-no-website.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "900 / 1350",
+          "complete": true
+        },
+        {
+          "src": "problem-ineffective-website.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1280 / 853",
+          "complete": true
+        },
+        {
+          "src": "benefit-business-growth.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1280 / 853",
+          "complete": true
+        },
+        {
+          "src": "mrsteveenglish-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": true
+        },
+        {
+          "src": "prelaunch-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": false
+        },
+        {
+          "src": "afribayit-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": false
+        },
+        {
+          "src": "stevens-akpovi-portrait.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1024 / 1536",
+          "complete": true
+        },
+        {
+          "src": "stevens-akpovi-workspace.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1536 / 1024",
+          "complete": false
+        },
+        {
+          "src": "logo-blanc.png?v=2026-11-15",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "auto 240 / 192",
+          "complete": true
+        }
+      ],
+      "clsVerdict": "OK (≤0,1)"
+    },
+    {
+      "device": "desktop",
+      "page": "methode",
+      "fcp": 340,
+      "lcp": 1844,
+      "lcpEl": "p.mt-2.5 449x46",
+      "cls": 0.6,
+      "atLoad": {
+        "requests": 23,
+        "js": {
+          "n": 10,
+          "bytes": 240129
+        },
+        "css": {
+          "n": 2,
+          "bytes": 26209
+        },
+        "img": {
+          "n": 6,
+          "bytes": 714091
+        },
+        "fonts": {
+          "n": 4,
+          "bytes": 172260
+        }
+      },
+      "afterPrefetch": {
+        "requests": 36,
+        "totalBytes": 1319906
+      },
+      "loadWallMs": 335,
+      "images": [
+        {
+          "src": "logo-blanc.png?v=2026-11-15",
+          "loading": "(eager)",
+          "hasDims": true,
+          "aspectRatio": "auto 240 / 192",
+          "complete": true
+        },
+        {
+          "src": "mrsteveenglish-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": true
+        },
+        {
+          "src": "prelaunch-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": true
+        },
+        {
+          "src": "afribayit-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": false
+        },
+        {
+          "src": "logo-blanc.png?v=2026-11-15",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "auto 240 / 192",
+          "complete": true
+        }
+      ],
+      "clsVerdict": "DÉFAUT (>0,1)"
+    },
+    {
+      "device": "desktop",
+      "page": "realisations",
+      "fcp": 308,
+      "lcp": 1776,
+      "lcpEl": "p.text-body 672x30",
+      "cls": 0.6,
+      "atLoad": {
+        "requests": 23,
+        "js": {
+          "n": 10,
+          "bytes": 240129
+        },
+        "css": {
+          "n": 2,
+          "bytes": 26209
+        },
+        "img": {
+          "n": 6,
+          "bytes": 714091
+        },
+        "fonts": {
+          "n": 4,
+          "bytes": 172260
+        }
+      },
+      "afterPrefetch": {
+        "requests": 37,
+        "totalBytes": 1461148
+      },
+      "loadWallMs": 312,
+      "images": [
+        {
+          "src": "logo-blanc.png?v=2026-11-15",
+          "loading": "(eager)",
+          "hasDims": true,
+          "aspectRatio": "auto 240 / 192",
+          "complete": true
+        },
+        {
+          "src": "mrsteveenglish-desktop.webp",
+          "loading": "eager",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": true
+        },
+        {
+          "src": "prelaunch-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": true
+        },
+        {
+          "src": "afribayit-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": true
+        },
+        {
+          "src": "logo-blanc.png?v=2026-11-15",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "auto 240 / 192",
+          "complete": true
+        }
+      ],
+      "clsVerdict": "DÉFAUT (>0,1)"
+    },
+    {
+      "device": "mobile-iphone13",
+      "page": "accueil",
+      "fcp": 312,
+      "lcp": 1152,
+      "lcpEl": "p.hero-desc 350x90",
+      "cls": 0,
+      "atLoad": {
+        "requests": 22,
+        "js": {
+          "n": 10,
+          "bytes": 240129
+        },
+        "css": {
+          "n": 2,
+          "bytes": 26209
+        },
+        "img": {
+          "n": 5,
+          "bytes": 542293
+        },
+        "fonts": {
+          "n": 4,
+          "bytes": 172260
+        }
+      },
+      "afterPrefetch": {
+        "requests": 34,
+        "totalBytes": 1056124
+      },
+      "loadWallMs": 371,
+      "images": [
+        {
+          "src": "logo-blanc.png?v=2026-11-15",
+          "loading": "(eager)",
+          "hasDims": true,
+          "aspectRatio": "auto 240 / 192",
+          "complete": true
+        },
+        {
+          "src": "stevens-akpovi-portrait.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "auto 1024 / 1536",
+          "complete": false
+        },
+        {
+          "src": "stevens-akpovi-portrait-long.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "auto 1672 / 941",
+          "complete": true
+        },
+        {
+          "src": "mrsteveenglish-desktop.webp",
+          "loading": "eager",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": true
+        },
+        {
+          "src": "afribayit-mobile.webp",
+          "loading": "eager",
+          "hasDims": true,
+          "aspectRatio": "390 / 844",
+          "complete": true
+        },
+        {
+          "src": "problem-no-website.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "900 / 1350",
+          "complete": true
+        },
+        {
+          "src": "problem-ineffective-website.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1280 / 853",
+          "complete": true
+        },
+        {
+          "src": "benefit-business-growth.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1280 / 853",
+          "complete": false
+        },
+        {
+          "src": "mrsteveenglish-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": true
+        },
+        {
+          "src": "prelaunch-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": false
+        },
+        {
+          "src": "afribayit-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": false
+        },
+        {
+          "src": "stevens-akpovi-portrait.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1024 / 1536",
+          "complete": false
+        },
+        {
+          "src": "stevens-akpovi-workspace.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1536 / 1024",
+          "complete": false
+        },
+        {
+          "src": "logo-blanc.png?v=2026-11-15",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "auto 240 / 192",
+          "complete": true
+        }
+      ],
+      "clsVerdict": "OK (≤0,1)"
+    },
+    {
+      "device": "mobile-iphone13",
+      "page": "methode",
+      "fcp": 236,
+      "lcp": 236,
+      "lcpEl": "img.h-[50px] 63x50",
+      "cls": 0.599,
+      "atLoad": {
+        "requests": 22,
+        "js": {
+          "n": 10,
+          "bytes": 240129
+        },
+        "css": {
+          "n": 2,
+          "bytes": 26209
+        },
+        "img": {
+          "n": 5,
+          "bytes": 542293
+        },
+        "fonts": {
+          "n": 4,
+          "bytes": 172260
+        }
+      },
+      "afterPrefetch": {
+        "requests": 35,
+        "totalBytes": 1148108
+      },
+      "loadWallMs": 300,
+      "images": [
+        {
+          "src": "logo-blanc.png?v=2026-11-15",
+          "loading": "(eager)",
+          "hasDims": true,
+          "aspectRatio": "auto 240 / 192",
+          "complete": true
+        },
+        {
+          "src": "mrsteveenglish-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": true
+        },
+        {
+          "src": "prelaunch-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": true
+        },
+        {
+          "src": "afribayit-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": false
+        },
+        {
+          "src": "logo-blanc.png?v=2026-11-15",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "auto 240 / 192",
+          "complete": true
+        }
+      ],
+      "clsVerdict": "DÉFAUT (>0,1)"
+    },
+    {
+      "device": "mobile-iphone13",
+      "page": "realisations",
+      "fcp": 256,
+      "lcp": 1720,
+      "lcpEl": "p.text-body 350x53",
+      "cls": 0.599,
+      "atLoad": {
+        "requests": 22,
+        "js": {
+          "n": 10,
+          "bytes": 240129
+        },
+        "css": {
+          "n": 2,
+          "bytes": 26209
+        },
+        "img": {
+          "n": 5,
+          "bytes": 542293
+        },
+        "fonts": {
+          "n": 4,
+          "bytes": 172260
+        }
+      },
+      "afterPrefetch": {
+        "requests": 36,
+        "totalBytes": 1289350
+      },
+      "loadWallMs": 309,
+      "images": [
+        {
+          "src": "logo-blanc.png?v=2026-11-15",
+          "loading": "(eager)",
+          "hasDims": true,
+          "aspectRatio": "auto 240 / 192",
+          "complete": true
+        },
+        {
+          "src": "mrsteveenglish-desktop.webp",
+          "loading": "eager",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": true
+        },
+        {
+          "src": "prelaunch-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": true
+        },
+        {
+          "src": "afribayit-desktop.webp",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "1440 / 900",
+          "complete": true
+        },
+        {
+          "src": "logo-blanc.png?v=2026-11-15",
+          "loading": "lazy",
+          "hasDims": true,
+          "aspectRatio": "auto 240 / 192",
+          "complete": true
+        }
+      ],
+      "clsVerdict": "DÉFAUT (>0,1)"
+    }
+  ]
+}

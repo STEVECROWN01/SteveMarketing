@@ -48,6 +48,15 @@ const Toast = React.forwardRef<
   return (
     <ToastPrimitives.Root
       ref={ref}
+      /* Accessibilité 4.1.3 « Messages d'état » (audit du 19/11/2026) :
+         cette version de Radix ne rend AUCUNE zone aria-live dans le DOM
+         (mesuré : li sans role, aucune région [aria-live] pendant l'affichage
+         d'un toast) — les messages de succès (« Message envoyé » du formulaire
+         de contact, qui n'a pas de bloc de confirmation) et les toasts
+         destructifs n'étaient donc pas annoncés aux lecteurs d'écran.
+         role=status sur l'élément racine du toast : chaque toast devient
+         une région d'annonce dès son apparition. */
+      role="status"
       className={cn(toastVariants({ variant }), className)}
       {...props}
     />
