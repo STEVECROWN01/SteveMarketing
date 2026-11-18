@@ -430,7 +430,17 @@ async function auditForms(context) {
             out.errorsShown.push(txt.slice(0, 80));
         }
         out.errorsShown = [...new Set(out.errorsShown)].slice(0, 10);
-        const first = form.querySelector("input:not([type='hidden'])");
+        /* Correctif du 19/11 (creusement de l'audit) : le premier input
+           non-hidden du formulaire est le HONEYPOT (type=text caché
+           hors écran, aria-hidden="true" — il n'a bien sûr NI
+           aria-invalid NI aria-describedby), pas le premier champ
+           réel : la mesure initiale lisait donc ses attributs et
+           rapportait un faux « ariaInvalid: null ». On exclut le
+           honeypot et tout champ réellement invisible pour mesurer
+           le PREMIER CHAMP UTILISATEUR. */
+        const first = form.querySelector(
+          "input:not([type='hidden']):not([aria-hidden='true'])",
+        );
         if (first)
           out.firstInputInvalid = {
             ariaInvalid: first.getAttribute("aria-invalid"),

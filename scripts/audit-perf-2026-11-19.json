@@ -15,23 +15,23 @@
     {
       "device": "desktop",
       "page": "accueil",
-      "fcp": 328,
-      "lcp": 1100,
+      "fcp": 168,
+      "lcp": 1256,
       "lcpEl": "p.hero-desc 576x96",
       "cls": 0.003,
       "atLoad": {
-        "requests": 23,
+        "requests": 20,
         "js": {
           "n": 10,
-          "bytes": 240129
+          "bytes": 240145
         },
         "css": {
           "n": 2,
-          "bytes": 26209
+          "bytes": 26220
         },
         "img": {
-          "n": 6,
-          "bytes": 714091
+          "n": 3,
+          "bytes": 263563
         },
         "fonts": {
           "n": 4,
@@ -40,9 +40,9 @@
       },
       "afterPrefetch": {
         "requests": 35,
-        "totalBytes": 1227922
+        "totalBytes": 1227973
       },
-      "loadWallMs": 322,
+      "loadWallMs": 387,
       "images": [
         {
           "src": "logo-blanc.png?v=2026-11-15",
@@ -148,19 +148,19 @@
     {
       "device": "desktop",
       "page": "methode",
-      "fcp": 340,
-      "lcp": 1844,
+      "fcp": 348,
+      "lcp": 1904,
       "lcpEl": "p.mt-2.5 449x46",
-      "cls": 0.6,
+      "cls": 0,
       "atLoad": {
         "requests": 23,
         "js": {
           "n": 10,
-          "bytes": 240129
+          "bytes": 240145
         },
         "css": {
           "n": 2,
-          "bytes": 26209
+          "bytes": 26220
         },
         "img": {
           "n": 6,
@@ -173,9 +173,9 @@
       },
       "afterPrefetch": {
         "requests": 36,
-        "totalBytes": 1319906
+        "totalBytes": 1319957
       },
-      "loadWallMs": 335,
+      "loadWallMs": 386,
       "images": [
         {
           "src": "logo-blanc.png?v=2026-11-15",
@@ -213,28 +213,28 @@
           "complete": true
         }
       ],
-      "clsVerdict": "DÉFAUT (>0,1)"
+      "clsVerdict": "OK (≤0,1)"
     },
     {
       "device": "desktop",
       "page": "realisations",
-      "fcp": 308,
-      "lcp": 1776,
+      "fcp": 112,
+      "lcp": 1676,
       "lcpEl": "p.text-body 672x30",
-      "cls": 0.6,
+      "cls": 0,
       "atLoad": {
-        "requests": 23,
+        "requests": 32,
         "js": {
-          "n": 10,
-          "bytes": 240129
+          "n": 22,
+          "bytes": 315402
         },
         "css": {
           "n": 2,
-          "bytes": 26209
+          "bytes": 26220
         },
         "img": {
-          "n": 6,
-          "bytes": 714091
+          "n": 3,
+          "bytes": 263563
         },
         "fonts": {
           "n": 4,
@@ -243,9 +243,9 @@
       },
       "afterPrefetch": {
         "requests": 37,
-        "totalBytes": 1461148
+        "totalBytes": 1461199
       },
-      "loadWallMs": 312,
+      "loadWallMs": 449,
       "images": [
         {
           "src": "logo-blanc.png?v=2026-11-15",
@@ -283,24 +283,24 @@
           "complete": true
         }
       ],
-      "clsVerdict": "DÉFAUT (>0,1)"
+      "clsVerdict": "OK (≤0,1)"
     },
     {
       "device": "mobile-iphone13",
       "page": "accueil",
-      "fcp": 312,
-      "lcp": 1152,
+      "fcp": 272,
+      "lcp": 1132,
       "lcpEl": "p.hero-desc 350x90",
       "cls": 0,
       "atLoad": {
         "requests": 22,
         "js": {
           "n": 10,
-          "bytes": 240129
+          "bytes": 240145
         },
         "css": {
           "n": 2,
-          "bytes": 26209
+          "bytes": 26220
         },
         "img": {
           "n": 5,
@@ -313,9 +313,9 @@
       },
       "afterPrefetch": {
         "requests": 34,
-        "totalBytes": 1056124
+        "totalBytes": 1056175
       },
-      "loadWallMs": 371,
+      "loadWallMs": 363,
       "images": [
         {
           "src": "logo-blanc.png?v=2026-11-15",
@@ -421,19 +421,19 @@
     {
       "device": "mobile-iphone13",
       "page": "methode",
-      "fcp": 236,
-      "lcp": 236,
+      "fcp": 284,
+      "lcp": 284,
       "lcpEl": "img.h-[50px] 63x50",
-      "cls": 0.599,
+      "cls": 0,
       "atLoad": {
         "requests": 22,
         "js": {
           "n": 10,
-          "bytes": 240129
+          "bytes": 240145
         },
         "css": {
           "n": 2,
-          "bytes": 26209
+          "bytes": 26220
         },
         "img": {
           "n": 5,
@@ -446,9 +446,9 @@
       },
       "afterPrefetch": {
         "requests": 35,
-        "totalBytes": 1148108
+        "totalBytes": 1148159
       },
-      "loadWallMs": 300,
+      "loadWallMs": 350,
       "images": [
         {
           "src": "logo-blanc.png?v=2026-11-15",
@@ -486,24 +486,24 @@
           "complete": true
         }
       ],
-      "clsVerdict": "DÉFAUT (>0,1)"
+      "clsVerdict": "OK (≤0,1)"
     },
     {
       "device": "mobile-iphone13",
       "page": "realisations",
-      "fcp": 256,
-      "lcp": 1720,
+      "fcp": 244,
+      "lcp": 1724,
       "lcpEl": "p.text-body 350x53",
-      "cls": 0.599,
+      "cls": 0,
       "atLoad": {
         "requests": 22,
         "js": {
           "n": 10,
-          "bytes": 240129
+          "bytes": 240145
         },
         "css": {
           "n": 2,
-          "bytes": 26209
+          "bytes": 26220
         },
         "img": {
           "n": 5,
@@ -516,9 +516,9 @@
       },
       "afterPrefetch": {
         "requests": 36,
-        "totalBytes": 1289350
+        "totalBytes": 1289401
       },
-      "loadWallMs": 309,
+      "loadWallMs": 317,
       "images": [
         {
           "src": "logo-blanc.png?v=2026-11-15",
@@ -556,7 +556,7 @@
           "complete": true
         }
       ],
-      "clsVerdict": "DÉFAUT (>0,1)"
+      "clsVerdict": "OK (≤0,1)"
     }
   ]
 }

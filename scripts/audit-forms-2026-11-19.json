@@ -296,9 +296,9 @@
           "Indiquez votre chiffre d'affaires mensuel."
         ],
         "firstInputInvalid": {
-          "ariaInvalid": null,
-          "describedby": null,
-          "describedbyResolves": null
+          "ariaInvalid": "true",
+          "describedby": "quote-error-firstName",
+          "describedbyResolves": true
         },
         "roleAlerts": 2
       },
@@ -491,9 +491,9 @@
           "Décrivez votre besoin en quelques mots (10 caractères minimum)."
         ],
         "firstInputInvalid": {
-          "ariaInvalid": null,
-          "describedby": null,
-          "describedbyResolves": null
+          "ariaInvalid": "true",
+          "describedby": "contact-error-name",
+          "describedbyResolves": true
         },
         "roleAlerts": 0
       },
@@ -721,9 +721,9 @@
           "Décrivez votre besoin en quelques mots (10 caractères minimum)."
         ],
         "firstInputInvalid": {
-          "ariaInvalid": null,
-          "describedby": null,
-          "describedbyResolves": null
+          "ariaInvalid": "true",
+          "describedby": "audit-error-name",
+          "describedbyResolves": true
         },
         "roleAlerts": 0
       },

@@ -139,10 +139,20 @@ function PageSwitch() {
       >
         {/* Attente discrète pendant le (rare) chargement d'un morceau :
             les morceaux sont préchargés à l'inactivité, la navigation
-            normale reste instantanée. */}
+            normale reste instantanée.
+            CLS (audit perf du 19/11, sonde diagnostic-cls-2026-11-19.js) :
+            à 70vh, l'écran d'attente plaçait le pied de page PILE dans
+            la zone visible (70vh + 270px de footer = 100vh) — or au
+            chargement direct d'une page profonde, la hauteur du contenu
+            oscille (écran d'attente SSR → contenu streamé → retour à
+            l'écran d'attente pendant le lazy → page cible), et CHAQUE
+            oscillation déplaçait le footer visible : CLS 0,9 mesuré
+            (seuil Google 0,1). À 100svh+2px, le footer reste SOUS le
+            pli pendant toute la séquence : plus rien de visible ne
+            bouge, CLS 0. */}
         <Suspense
           fallback={
-            <div className="flex min-h-[70vh] items-center justify-center" aria-hidden="true">
+            <div className="flex min-h-[calc(100svh+2px)] items-center justify-center" aria-hidden="true">
               <span className="h-8 w-8 animate-spin rounded-full border-2 border-[#e4e4e4]/30 border-t-[#e4e4e4]" />
             </div>
           }

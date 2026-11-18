@@ -1,0 +1,487 @@
+{
+ "meta": {
+  "date": "2026-11-19",
+  "base": "http://127.0.0.1:3100",
+  "build": "f690a43+ local"
+ },
+ "results": [
+  {
+   "device": "desktop-1440",
+   "route": "#/accueil",
+   "note": "témoin sain (CLS 0.003)",
+   "cls": 0.003,
+   "shiftCount": 1,
+   "shifts": [
+    {
+     "t": 1593,
+     "value": 0.003,
+     "sources": [
+      {
+       "node": "P.hero-desc.relative.max-w-xl.text-[12px].leading-[1.5].text-[#c8c8c8].transition-[top].duration-300.ease-[cubic",
+       "prev": {
+        "x": 136,
+        "y": 550,
+        "w": 576,
+        "h": 96
+       },
+       "cur": {
+        "x": 136,
+        "y": 494,
+        "w": 576,
+        "h": 96
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "device": "desktop-1440",
+   "route": "#/methode",
+   "note": "défaut (CLS 0.6)",
+   "cls": 0,
+   "shiftCount": 1,
+   "shifts": [
+    {
+     "t": 524,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 426,
+        "y": 73,
+        "w": 39,
+        "h": 1
+       },
+       "cur": {
+        "x": 418,
+        "y": 73,
+        "w": 56,
+        "h": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "device": "desktop-1440",
+   "route": "#/realisations",
+   "note": "défaut (CLS 0.6)",
+   "cls": 0,
+   "shiftCount": 6,
+   "shifts": [
+    {
+     "t": 323,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 747,
+        "y": 73,
+        "w": 12,
+        "h": 1
+       },
+       "cur": {
+        "x": 743,
+        "y": 73,
+        "w": 20,
+        "h": 1
+       }
+      }
+     ]
+    },
+    {
+     "t": 339,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 743,
+        "y": 73,
+        "w": 20,
+        "h": 1
+       },
+       "cur": {
+        "x": 738,
+        "y": 73,
+        "w": 30,
+        "h": 1
+       }
+      }
+     ]
+    },
+    {
+     "t": 372,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 738,
+        "y": 73,
+        "w": 30,
+        "h": 1
+       },
+       "cur": {
+        "x": 734,
+        "y": 73,
+        "w": 39,
+        "h": 1
+       }
+      }
+     ]
+    },
+    {
+     "t": 373,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 734,
+        "y": 73,
+        "w": 39,
+        "h": 1
+       },
+       "cur": {
+        "x": 730,
+        "y": 73,
+        "w": 46,
+        "h": 1
+       }
+      }
+     ]
+    },
+    {
+     "t": 433,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 727,
+        "y": 73,
+        "w": 51,
+        "h": 1
+       },
+       "cur": {
+        "x": 724,
+        "y": 73,
+        "w": 58,
+        "h": 1
+       }
+      }
+     ]
+    },
+    {
+     "t": 542,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 724,
+        "y": 73,
+        "w": 58,
+        "h": 1
+       },
+       "cur": {
+        "x": 720,
+        "y": 73,
+        "w": 66,
+        "h": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "device": "desktop-1440",
+   "route": "#/contact",
+   "note": "non mesurée par l'audit — délimitation",
+   "cls": 0,
+   "shiftCount": 0,
+   "shifts": []
+  },
+  {
+   "device": "desktop-1440",
+   "route": "#/a-propos",
+   "note": "non mesurée par l'audit — délimitation",
+   "cls": 0,
+   "shiftCount": 0,
+   "shifts": []
+  },
+  {
+   "device": "desktop-1440",
+   "route": "#/referencement-seo",
+   "note": "non mesurée par l'audit — délimitation",
+   "cls": 0,
+   "shiftCount": 10,
+   "shifts": [
+    {
+     "t": 288,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 556,
+        "y": 73,
+        "w": 4,
+        "h": 1
+       },
+       "cur": {
+        "x": 553,
+        "y": 73,
+        "w": 10,
+        "h": 1
+       }
+      }
+     ]
+    },
+    {
+     "t": 304,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 553,
+        "y": 73,
+        "w": 10,
+        "h": 1
+       },
+       "cur": {
+        "x": 547,
+        "y": 73,
+        "w": 21,
+        "h": 1
+       }
+      }
+     ]
+    },
+    {
+     "t": 321,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 547,
+        "y": 73,
+        "w": 21,
+        "h": 1
+       },
+       "cur": {
+        "x": 540,
+        "y": 73,
+        "w": 36,
+        "h": 1
+       }
+      }
+     ]
+    },
+    {
+     "t": 338,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 540,
+        "y": 73,
+        "w": 36,
+        "h": 1
+       },
+       "cur": {
+        "x": 531,
+        "y": 73,
+        "w": 53,
+        "h": 1
+       }
+      }
+     ]
+    },
+    {
+     "t": 354,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 531,
+        "y": 73,
+        "w": 53,
+        "h": 1
+       },
+       "cur": {
+        "x": 523,
+        "y": 73,
+        "w": 69,
+        "h": 1
+       }
+      }
+     ]
+    },
+    {
+     "t": 372,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 523,
+        "y": 73,
+        "w": 69,
+        "h": 1
+       },
+       "cur": {
+        "x": 517,
+        "y": 73,
+        "w": 81,
+        "h": 1
+       }
+      }
+     ]
+    },
+    {
+     "t": 388,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 517,
+        "y": 73,
+        "w": 81,
+        "h": 1
+       },
+       "cur": {
+        "x": 512,
+        "y": 73,
+        "w": 91,
+        "h": 1
+       }
+      }
+     ]
+    },
+    {
+     "t": 438,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 512,
+        "y": 73,
+        "w": 91,
+        "h": 1
+       },
+       "cur": {
+        "x": 509,
+        "y": 73,
+        "w": 98,
+        "h": 1
+       }
+      }
+     ]
+    },
+    {
+     "t": 450,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 509,
+        "y": 73,
+        "w": 98,
+        "h": 1
+       },
+       "cur": {
+        "x": 504,
+        "y": 73,
+        "w": 108,
+        "h": 1
+       }
+      }
+     ]
+    },
+    {
+     "t": 569,
+     "value": 0,
+     "sources": [
+      {
+       "node": "::after",
+       "prev": {
+        "x": 504,
+        "y": 73,
+        "w": 108,
+        "h": 1
+       },
+       "cur": {
+        "x": 499,
+        "y": 73,
+        "w": 117,
+        "h": 1
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "device": "mobile-iphone13",
+   "route": "#/accueil",
+   "note": "témoin sain (CLS 0.003)",
+   "cls": 0,
+   "shiftCount": 0,
+   "shifts": []
+  },
+  {
+   "device": "mobile-iphone13",
+   "route": "#/methode",
+   "note": "défaut (CLS 0.6)",
+   "cls": 0,
+   "shiftCount": 0,
+   "shifts": []
+  },
+  {
+   "device": "mobile-iphone13",
+   "route": "#/realisations",
+   "note": "défaut (CLS 0.6)",
+   "cls": 0,
+   "shiftCount": 0,
+   "shifts": []
+  },
+  {
+   "device": "mobile-iphone13",
+   "route": "#/contact",
+   "note": "non mesurée par l'audit — délimitation",
+   "cls": 0,
+   "shiftCount": 0,
+   "shifts": []
+  },
+  {
+   "device": "mobile-iphone13",
+   "route": "#/a-propos",
+   "note": "non mesurée par l'audit — délimitation",
+   "cls": 0,
+   "shiftCount": 0,
+   "shifts": []
+  },
+  {
+   "device": "mobile-iphone13",
+   "route": "#/referencement-seo",
+   "note": "non mesurée par l'audit — délimitation",
+   "cls": 0,
+   "shiftCount": 0,
+   "shifts": []
+  }
+ ]
+}
