@@ -58,8 +58,8 @@ export function DevisPage() {
 
             <RevealText
               as="h1"
-              text="Optimisez Votre Site Web Pour Augmenter Les Ventes"
-              boldText="Augmenter Les Ventes"
+              text="Optimisez Votre Site Web Pour Augmenter Vos Ventes"
+              boldText="Augmenter Vos Ventes"
               delay={0.06}
               className="text-hero-title on-paper mt-5"
             />
