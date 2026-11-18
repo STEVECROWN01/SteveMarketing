@@ -4,7 +4,7 @@ import React from "react";
 import { Reveal } from "@/components/motion/Reveal";
 import { SectionHeading, CTAButton, CTAIcons } from "@/components/marketing/Marketing";
 import { ProjectCard } from "@/components/marketing/ProjectCard";
-import { WORKS } from "@/content/site-content";
+import { CTA_LABELS, WORKS } from "@/content/site-content";
 import { PROJECTS } from "@/lib/site";
 
 /**
@@ -48,7 +48,7 @@ export function WorksSection() {
                 size="lg"
                 icon={CTAIcons.quote}
               >
-                Demander Un Devis Personnalisé
+                {CTA_LABELS.devis}
               </CTAButton>
               <CTAButton
                 action={{ kind: "page", page: "realisations" }}
@@ -56,7 +56,7 @@ export function WorksSection() {
                 size="lg"
                 icon={CTAIcons.works}
               >
-                Voir Mes Réalisations
+                {CTA_LABELS.realisations}
               </CTAButton>
             </div>
           </Reveal>

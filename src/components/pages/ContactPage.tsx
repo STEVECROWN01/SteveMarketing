@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/accordion";
 import { useRouter } from "@/components/router-context";
 import { SITE } from "@/lib/site";
+import { CTA_LABELS } from "@/content/site-content";
 
 /**
  * PAGE CONTACT — présentation calquée sur « /contact-us » de
@@ -80,7 +81,7 @@ export function ContactPage() {
                   size="lg"
                   icon={CTAIcons.quote}
                 >
-                  Demander Un Devis Personnalisé
+                  {CTA_LABELS.devis}
                 </CTAButton>
               </div>
             </Reveal>

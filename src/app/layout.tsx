@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Inter, Sora } from "next/font/google";
 import "./globals.css";
-import { ASSETS, SITE } from "@/lib/site";
+import { ASSETS, PAGES, SITE } from "@/lib/site";
 
 /* Polices : Sora (titres) + Inter (texte / interface), chargement optimisé */
 const inter = Inter({
@@ -23,11 +23,15 @@ const sora = Sora({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
-    default: "Stevens Akpovi — Votre activité mérite un site web qui travaille pour vous",
+    // Métadonnées STATIQUES = celles de l'accueil, puisées dans PAGES
+    // (source unique — recommandation de l'audit intégral du 18/11) :
+    // la valeur SSR, celle que voient les crawleurs sans JavaScript et
+    // les aperçus de partage, ne peut plus diverger de la valeur que
+    // le routeur applique à l'accueil une fois hydraté.
+    default: PAGES.accueil.title,
     template: "%s",
   },
-  description:
-    "J'accompagne entreprises, PME, agences, coachs, infopreneurs et freelances dans la création de sites web stratégiques : sites vitrines, multipages, landing pages, pages de vente, refontes. Copywriting et SEO de base inclus.",
+  description: PAGES.accueil.description,
   keywords: [
     "création site web professionnel",
     "concepteur de sites web",
@@ -50,24 +54,22 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     url: SITE.url,
     siteName: "Stevens Akpovi",
-    title: "Stevens Akpovi — Votre activité mérite un site web qui travaille pour vous",
-    description:
-      "Sites web professionnels orientés conversion : stratégie, design, copywriting inclus et SEO de base. Appelez Stevens Akpovi — 30 minutes, gratuit, sans engagement.",
+    title: PAGES.accueil.title,
+    description: PAGES.accueil.description,
     images: [
       {
         url: ASSETS.ogImage,
         width: 1254,
         height: 1254,
-        alt: "Stevens Akpovi — Votre activité mérite un site web qui travaille pour vous",
+        alt: PAGES.accueil.title,
         type: "image/jpeg",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Stevens Akpovi — Votre activité mérite un site web qui travaille pour vous",
-    description:
-      "Sites web professionnels orientés conversion. Copywriting et SEO de base inclus.",
+    title: PAGES.accueil.title,
+    description: PAGES.accueil.description,
     images: [ASSETS.ogImage],
   },
   robots: {

@@ -21,6 +21,7 @@ import {
   ReassuranceBar,
 } from "@/components/marketing/Marketing";
 import { Reveal } from "@/components/motion/Reveal";
+import { CTA_LABELS } from "@/content/site-content";
 
 /**
  * PAGE RÉFÉRENCEMENT SEO (demande de l'éditeur, 15/11/2026) — page
@@ -95,10 +96,10 @@ export function SeoPage() {
       >
         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
-            Réserver Un Appel
+            {CTA_LABELS.appel}
           </CTAButton>
           <CTAButton action={{ kind: "page", page: "devis" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
-            Demander Un Devis Personnalisé
+            {CTA_LABELS.devis}
           </CTAButton>
         </div>
         <ReassuranceBar className="mt-6" />
@@ -289,10 +290,10 @@ export function SeoPage() {
           <Reveal direction="up" delay={0.12}>
             <div className="mt-9 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
               <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
-                Réserver Un Appel
+                {CTA_LABELS.appel}
               </CTAButton>
               <CTAButton action={{ kind: "page", page: "devis" }} variant="secondary" size="lg" icon={CTAIcons.quote}>
-                Demander Un Devis Personnalisé
+                {CTA_LABELS.devis}
               </CTAButton>
             </div>
             <ReassuranceBar className="mt-7 justify-center" />

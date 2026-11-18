@@ -4,6 +4,28 @@
  * Aucun témoignage, chiffre ou résultat inventé.
  */
 
+/* ============================ LIBELLÉS CTA CANONIQUES ============================ */
+
+/** Les 4 libellés d'action canoniques du site (unifiés le 18/11/2026
+ *  lors de la résolution des freins CTA — « même libellé = même
+ *  comportement partout »). Source UNIQUE de vérité : les composants
+ *  qui affichent l'un de ces libellés référencent CTA_LABELS, ou une
+ *  constante de section qui y renvoie (HERO.ctaPrimary, FINAL_CTA.cta1,
+ *  QUESTIONING.cta, SOLUTION.cta2) — plus AUCUN libellé canonique en
+ *  dur dans les composants (recommandation de l'audit intégral du
+ *  18/11/2026 : WorksSection et FaqFinal duraient leurs libellés au
+ *  lieu des variables ; généralisé aux 9 fichiers concernés). Un
+ *  changement ici se propage partout, sans risque de divergence.
+ *  Les libellés CONTEXTUELS de section (PROBLEM.cta, INCLUDED.cta,
+ *  SERVICES_SUMMARY.cta, ABOUT.cta…) restent définis dans leur
+ *  section : ils sont volontairement spécifiques à son message. */
+export const CTA_LABELS = {
+  appel: "Réserver Un Appel",
+  devis: "Demander Un Devis Personnalisé",
+  realisations: "Voir Mes Réalisations",
+  audit: "Demander Mon Audit Gratuit",
+} as const;
+
 /* ============================ HERO ============================ */
 
 export const HERO = {
@@ -16,12 +38,12 @@ export const HERO = {
   /** Première phrase de la description — affichée en gras (demande de
    *  l'éditeur, 15/11/2026). */
   textBold: "Votre activité mérite un site web qui travaille pour vous.",
-  ctaPrimary: "Réserver Un Appel",
+  ctaPrimary: CTA_LABELS.appel,
   /** « Voir Mes Réalisations » — libellé unifié (18/11/2026) :
    *  « Voir Mes Travaux » désignait la même page sous un autre
    *  nom ; le libellé s'aligne sur le menu (« Mes Réalisations »)
    *  et sur le bouton de la section Projets Réalisés. */
-  ctaTertiary: "Voir Mes Réalisations",
+  ctaTertiary: CTA_LABELS.realisations,
   reassurance: "30 minutes · Gratuit · Sans engagement",
   portraitAlt:
     "Portrait professionnel de Stevens Akpovi, concepteur de sites web orientés conversion",
@@ -67,7 +89,7 @@ export const QUESTIONING = {
   ],
   conclusion:
     "Un site web ne devrait pas être une simple décoration numérique. Il devrait être un véritable outil au service de votre entreprise.",
-  cta: "Demander Mon Audit Gratuit",
+  cta: CTA_LABELS.audit,
 } as const;
 
 /* ============================ 04 — LA TRANSFORMATION ============================ */
@@ -138,7 +160,7 @@ export const SOLUTION = {
     },
   ],
   cta1: "Démarrons Votre Projet",
-  cta2: "Voir Mes Réalisations",
+  cta2: CTA_LABELS.realisations,
 } as const;
 
 /* Résumé de l'ancienne approche — conservé pour la page « À propos »
@@ -345,14 +367,14 @@ export const FINAL_CTA = {
   eyebrow: "IL EST TEMPS DE DONNER UNE NOUVELLE DIMENSION À VOTRE ACTIVITÉ",
   title: "Votre activité mérite un site web qui travaille pour vous. Et cela peut commencer aujourd'hui.",
   text: "Construisons une présence en ligne professionnelle qui donne à votre entreprise les moyens de mieux se présenter, de toucher de nouvelles personnes et de transformer davantage d'intérêt en clients.",
-  cta1: "Réserver Un Appel",
-  cta2: "Demander Un Devis Personnalisé",
+  cta1: CTA_LABELS.appel,
+  cta2: CTA_LABELS.devis,
   /** cta3 « Demander Un Audit Gratuit » : PLUS RENDU depuis le
    *  18/11/2026 (bande finale à deux CTA) — l'audit vit désormais
    *  via son bouton dédié dans « Vous avez déjà un site ? »,
    *  qui mène à la page #/audit-gratuit. Conservé ici pour
    *  référence. */
-  cta3: "Demander Un Audit Gratuit",
+  cta3: CTA_LABELS.audit,
   mention: "30 minutes · Gratuit · Sans engagement",
 } as const;
 

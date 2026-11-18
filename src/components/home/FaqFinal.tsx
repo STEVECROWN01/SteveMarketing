@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/accordion";
 import { Reveal } from "@/components/motion/Reveal";
 import { SectionHeading, CTAButton, CTAIcons, ReassuranceBar, RichText } from "@/components/marketing/Marketing";
-import { FAQ, FINAL_CTA } from "@/content/site-content";
+import { CTA_LABELS, FAQ, FINAL_CTA } from "@/content/site-content";
 
 /**
  * SECTION 12 — FAQ (fond sombre)
@@ -41,7 +41,7 @@ export function FaqSection() {
                   className="mt-5"
                   icon={CTAIcons.calendar}
                 >
-                  Réserver Un Appel
+                  {CTA_LABELS.appel}
                 </CTAButton>
                 <p className="mt-4 text-xs font-medium text-[#1c1c1c]/70">
                   30 minutes · Gratuit · Sans engagement.

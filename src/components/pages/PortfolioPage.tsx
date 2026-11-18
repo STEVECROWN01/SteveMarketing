@@ -6,7 +6,7 @@ import { PageHero, CTAButton, CTAIcons, ReassuranceBar } from "@/components/mark
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { MonoImage } from "@/components/media/Media";
 import { useRouter } from "@/components/router-context";
-import { WORKS } from "@/content/site-content";
+import { CTA_LABELS, WORKS } from "@/content/site-content";
 import { PROJECTS } from "@/lib/site";
 
 /**
@@ -157,10 +157,10 @@ export function PortfolioPage() {
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
                 <CTAButton action={{ kind: "calendly" }} variant="dark" size="lg" icon={CTAIcons.calendar}>
-                  Réserver Un Appel
+                  {CTA_LABELS.appel}
                 </CTAButton>
                 <CTAButton action={{ kind: "page", page: "devis" }} variant="ghostDark" size="lg" icon={CTAIcons.quote}>
-                  Demander Un Devis Personnalisé
+                  {CTA_LABELS.devis}
                 </CTAButton>
               </div>
               <ReassuranceBar tone="light" className="mt-6 justify-center" />

@@ -4,7 +4,7 @@ import React from "react";
 import { PageHero, SectionHeading, CTAButton, CTAIcons, ReassuranceBar, RichText } from "@/components/marketing/Marketing";
 import { Reveal } from "@/components/motion/Reveal";
 import { MonoImage } from "@/components/media/Media";
-import { ABOUT, ABOUT_APPROACH, METHOD, FAQ } from "@/content/site-content";
+import { ABOUT, ABOUT_APPROACH, CTA_LABELS, METHOD, FAQ } from "@/content/site-content";
 import { ASSETS, SITE } from "@/lib/site";
 import {
   Accordion,
@@ -81,7 +81,7 @@ export function AboutPage() {
                   </p>
                   <div className="mt-5">
                     <CTAButton action={{ kind: "calendly" }} variant="primary" icon={CTAIcons.calendar}>
-                      Réserver Un Appel
+                      {CTA_LABELS.appel}
                     </CTAButton>
                   </div>
                   <p className="mt-4 text-xs text-[#c8c8c8]">{SITE.calendlyMention}</p>

@@ -6,6 +6,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { BrowserMockup, PhoneMockup } from "@/components/media/Media";
 import { ProjectCard } from "@/components/marketing/ProjectCard";
 import { PROJECTS, SITE } from "@/lib/site";
+import { CTA_LABELS } from "@/content/site-content";
 
 /**
  * PAGE DE PRÉSENTATION D'UN PROJET (#/projet/<id>)
@@ -45,7 +46,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
             size="lg"
             icon={CTAIcons.quote}
           >
-            Demander Un Devis Personnalisé
+            {CTA_LABELS.devis}
           </CTAButton>
         </div>
         <ReassuranceBar className="mt-6" />
@@ -191,7 +192,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
                 icon={CTAIcons.calendar}
                 ariaLabel={`Réserver un appel de 30 minutes sur Calendly — ${SITE.calendlyMention}`}
               >
-                Réserver Un Appel
+                {CTA_LABELS.appel}
               </CTAButton>
               <CTAButton
                 action={{ kind: "page", page: "devis" }}
@@ -199,7 +200,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
                 size="lg"
                 icon={CTAIcons.quote}
               >
-                Demander Un Devis Personnalisé
+                {CTA_LABELS.devis}
               </CTAButton>
             </div>
           </Reveal>

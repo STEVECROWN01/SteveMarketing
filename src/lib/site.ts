@@ -56,28 +56,33 @@ export const SITE = {
   },
 } as const;
 
-/** Pages du site (routes du routeur applicatif). */
+/** Pages virtuelles du site (métadonnées SEO par page).
+ *  CONTRAT DE LONGUEUR (recommandation de l'audit intégral du
+ *  18/11/2026, appliquée le même jour) : title ≤ 60 caractères et
+ *  description ≤ 155 caractères — seuils de troncature de Google,
+ *  qui coupe vers 60 pour le titre d'onglet et 155-160 pour l'extrait.
+ *  Vérification : python3 scripts/mesurer-metas-2026-11-18.py. */
 export const PAGES = {
   accueil: {
     hash: "#/accueil",
     label: "Accueil",
-    title: "Stevens Akpovi — Votre activité mérite un site web qui travaille pour vous",
+    title: "Stevens Akpovi — Votre site web qui travaille pour vous",
     description:
-      "Sites vitrines, multipages, landing pages et pages de vente pensés pour convertir. Copywriting et SEO de base inclus. Appelez Stevens Akpovi ou demandez votre devis.",
+      "Sites vitrines, multipages, landing pages et pages de vente pensés pour convertir. Copywriting et SEO de base inclus. Demandez votre devis personnalisé.",
   },
   processus: {
     hash: "#/methode",
     label: "Méthode",
     title: "Méthode — Comment je travaille | Stevens Akpovi",
     description:
-      "Découvrez la méthode de collaboration de Stevens Akpovi : échange et compréhension, parcours de vos visiteurs, conception visuelle, rédaction, développement, mise en ligne et arrivée des premiers visiteurs.",
+      "La méthode de Stevens Akpovi : compréhension de votre activité, parcours de vos visiteurs, conception, rédaction, développement et mise en ligne.",
   },
   referencement: {
     hash: "#/referencement-seo",
     label: "Référencement SEO",
     title: "Référencement SEO — Positionnement Google | Stevens Akpovi",
     description:
-      "Améliorez votre positionnement sur Google, renforcez votre visibilité et attirez des visiteurs sur la durée, sans dépendre de la publicité, grâce à une stratégie de référencement adaptée à votre marché.",
+      "Améliorez votre positionnement sur Google et attirez des visiteurs sur la durée, sans dépendre de la publicité : référencement adapté à votre marché.",
   },
   publicite: {
     hash: "#/publicite-meta-ads",
@@ -98,7 +103,7 @@ export const PAGES = {
     label: "À propos",
     title: "À propos — Stevens Akpovi, concepteur de sites web",
     description:
-      "Je suis Stevens Akpovi. Je conçois des sites web professionnels qui servent le business qu'ils représentent. Collaboration à distance, au-delà des frontières.",
+      "Je conçois des sites web professionnels qui servent le business qu'ils représentent. Collaboration à distance, au-delà des frontières.",
   },
   contact: {
     hash: "#/contact",
@@ -119,7 +124,7 @@ export const PAGES = {
     label: "Audit Gratuit",
     title: "Audit Gratuit De Votre Site — Stevens Akpovi",
     description:
-      "Votre site actuel vous rapporte-t-il assez de clients ? Recevez un regard professionnel et concret sur votre site : ce qui fonctionne, ce qui freine vos visiteurs et les améliorations à prioriser — gratuitement.",
+      "Votre site vous rapporte-t-il assez de clients ? Recevez un audit concret : ce qui fonctionne, ce qui freine vos visiteurs, les priorités — gratuitement.",
   },
   appel: {
     hash: "#/reserver-un-appel",

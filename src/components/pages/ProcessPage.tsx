@@ -7,7 +7,7 @@ import { PageHero, CTAButton, RichText } from "@/components/marketing/Marketing"
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { StartProjectButton } from "@/components/marketing/StartProjectButton";
 import { ProjectCard } from "@/components/marketing/ProjectCard";
-import { SERVICES_SUMMARY, SOLUTION } from "@/content/site-content";
+import { CTA_LABELS, SERVICES_SUMMARY, SOLUTION } from "@/content/site-content";
 import { PROJECTS } from "@/lib/site";
 
 const SERVICE_ICONS = [Building2, ShoppingCart, RefreshCcw];
@@ -59,7 +59,7 @@ export function ProcessPage() {
             droite) — ouvre la réservation d'appel Calendly, comme le
             libellé l'annonce. */}
         <StartProjectButton
-          label="Réserver Un Appel"
+          label={CTA_LABELS.appel}
           ariaLabel="Réserver un appel stratégique de 30 minutes avec Stevens Akpovi"
           onClick={() => calendly.openCalendly()}
           className="min-h-[52px]"
@@ -342,10 +342,10 @@ export function ProcessPage() {
           <Reveal direction="up" delay={0.12}>
             <div className="mt-9 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
               <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg">
-                Réserver Un Appel
+                {CTA_LABELS.appel}
               </CTAButton>
               <CTAButton action={{ kind: "page", page: "devis" }} variant="secondary" size="lg">
-                Demander Un Devis Personnalisé
+                {CTA_LABELS.devis}
               </CTAButton>
             </div>
           </Reveal>
