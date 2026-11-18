@@ -45,10 +45,18 @@ export function ProblemSection() {
             {/* Visuel : image principale « problème » + seconde
                 illustration épinglée PAR-DESSUS, en bas, de façon
                 oblique — agrandie encore davantage (74 % de la largeur,
-                demande de l'éditeur, 13/11/2026). Comme toutes les
-                images du site (16/11/2026) : noir et blanc au repos
-                sur bureau avec couleur au survol, couleur d'origine
-                sur tablette et mobile. */}
+                demande de l'éditeur, 13/11/2026).
+                Image PRINCIPALE : comportement standard du site
+                (16/11/2026) — noir et blanc au repos sur bureau,
+                couleur au survol, couleur d'origine sur tablette et
+                mobile.
+                Image ÉPINGLÉE : EXCLUSIVEMENT en noir et blanc
+                (demande de l'éditeur, 18/11/2026 : « Je veux que
+                l'image épinglée […] soit exclusivement en
+                blanc-noir ») — forceMono verrouille le filtre sur
+                TOUS les écrans, mobile et tablette compris, et
+                supprime la couleur au survol ; seul le zoom léger
+                du survol (bureau) subsiste. */}
           <div className="relative mx-auto w-full max-w-md lg:max-w-none lg:self-start">
             <Reveal direction="left" delay={0.1}>
               <MonoImage
@@ -65,6 +73,7 @@ export function ProblemSection() {
                 alt="Illustration : site web inefficace qui n'apporte pas de résultats"
                 width={1280}
                 height={853}
+                forceMono
                 className="rotate-[3deg] rounded-2xl border border-[#e4e4e4]/15 bg-[#1c1c1c] shadow-[0_30px_70px_-25px_rgba(0,0,0,0.8)]"
               />
             </Reveal>

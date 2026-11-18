@@ -309,11 +309,16 @@ html.hoverable .media-group:where(:hover, :focus-within) .mono-media > .media-fi
 }
 
 /* ---------- Variante .mono-locked : noir et blanc PERMANENT ----------
-   Mockups du hero, captures de la section PROJETS RÉALISÉS et
-   deuxième image de « VOTRE ACTIVITÉ MÉRITE… » : exclusivement en
-   noir et blanc — aucune couleur au survol, sur aucun écran.
-   Règles placées après les règles de survol .mono-media : même
-   spécificité, ordre ultérieur gagnant. */
+   Image épinglée de la section « VOTRE ACTIVITÉ MÉRITE D'ÊTRE
+   DAVANTAGE VISIBLE » (demande de l'éditeur, 18/11/2026 : « Je
+   veux que l'image épinglée […] soit exclusivement en
+   blanc-noir ») : exclusivement en noir et blanc — aucune couleur
+   au survol, sur aucun écran (mobile et tablette comprises ; le
+   retour au comportement standard du 16/11 est annulé). Prop
+   forceMono de MonoImage, également disponible sur les mockups
+   (aucune utilisation active à ce jour). Règles placées après les
+   règles de survol .mono-media : même spécificité, ordre
+   ultérieur gagnant. */
 .mono-locked > img,
 .mono-locked > .media-fill {
   filter: grayscale(1);

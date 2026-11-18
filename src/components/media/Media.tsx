@@ -30,6 +30,14 @@ interface MonoImageProps {
    *  repos ni de transition au survol : l'image s'affiche dans ses
    *  couleurs d'origine sur tous les écrans. */
   color?: boolean;
+  /** NOIR ET BLANC PERMANENT sur tous les écrans (mobile et
+   *  tablette comprises) — aucune couleur au survol : l'image
+   *  reste exclusivement en noir et blanc. Classe .mono-locked
+   *  (demande de l'éditeur, 18/11/2026 : image épinglée de la
+   *  section « VOTRE ACTIVITÉ MÉRITE D'ÊTRE DAVANTAGE VISIBLE »
+   *  « exclusivement en blanc-noir »). Le zoom léger au survol
+   *  (bureau) est conservé — seul le filtre couleur est verrouillé. */
+  forceMono?: boolean;
   /** Tailles d'affichage CSS (attribut sizes) — combinée au srcset
    *  en descripteurs de largeur, elle évite aux mobiles de
    *  télécharger la variante @2x surdimensionnée (performance,
@@ -52,6 +60,7 @@ export function MonoImage({
   eager = false,
   decorative = false,
   color = false,
+  forceMono = false,
   sizes,
   src2xWidth,
 }: MonoImageProps) {
@@ -69,8 +78,16 @@ export function MonoImage({
   // `color` : pas de classe mono-media — donc ni filtre noir et
   // blanc ni zoom au survol, la couleur d'origine s'affiche
   // directement (mockups projets en couleur, 16/11/2026).
+  // `forceMono` : mono-media + mono-locked — noir et blanc
+  // verrouillé sur TOUS les écrans, aucune couleur au survol
+  // (image épinglée de la section problème, 18/11/2026) ; le
+  // zoom léger au survol de .mono-media reste actif.
   return (
-    <span className={`${color ? "block" : "mono-media block"} ${className}`}>
+    <span
+      className={`${color ? "block" : "mono-media block"} ${
+        forceMono ? "mono-locked" : ""
+      } ${className}`}
+    >
       <img
         src={src}
         srcSet={srcSet}
