@@ -1,0 +1,3450 @@
+{
+  "meta": {
+    "date": "2026-11-19",
+    "base": "http://127.0.0.1:3100",
+    "passes": 3
+  },
+  "mesures": [
+    {
+      "device": "desktop",
+      "route": "accueil",
+      "lcpMedian": 220,
+      "lcpToutes": [
+        416,
+        184,
+        220
+      ],
+      "cible": 1000,
+      "conforme": true,
+      "passes": [
+        {
+          "fcp": 416,
+          "lcp": 416,
+          "lcpEl": "p.hero-desc.relative.max-w-xl 51796px²",
+          "lcpCandidates": [
+            {
+              "t": 416,
+              "size": 51796,
+              "el": "p.hero-desc.relative.max-w-xl",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": null,
+            "levé": null
+          },
+          "cls": 0.003,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 40,
+            "domInteractive": 238,
+            "domContentLoaded": 238,
+            "load": 292
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 45,
+              "end": 95,
+              "ms": 50,
+              "kb": 8
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 45,
+              "end": 116,
+              "ms": 71,
+              "kb": 48
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 45,
+              "end": 143,
+              "ms": 98,
+              "kb": 70
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 45,
+              "end": 107,
+              "ms": 62,
+              "kb": 4
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 45,
+              "end": 110,
+              "ms": 65,
+              "kb": 5
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 45,
+              "end": 124,
+              "ms": 79,
+              "kb": 3
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 45,
+              "end": 126,
+              "ms": 80,
+              "kb": 12
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 45,
+              "end": 141,
+              "ms": 96,
+              "kb": 12
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 45,
+              "end": 172,
+              "ms": 127,
+              "kb": 9
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 45,
+              "end": 179,
+              "ms": 134,
+              "kb": 64
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 415,
+              "end": 423,
+              "ms": 8,
+              "kb": 3
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 415,
+              "end": 430,
+              "ms": 15,
+              "kb": 4
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 415,
+              "end": 433,
+              "ms": 17,
+              "kb": 4
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 416,
+              "end": 433,
+              "ms": 18,
+              "kb": 2
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 416,
+              "end": 434,
+              "ms": 18,
+              "kb": 2
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 416,
+              "end": 435,
+              "ms": 19,
+              "kb": 2
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 416,
+              "end": 445,
+              "ms": 29,
+              "kb": 8
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 416,
+              "end": 474,
+              "ms": 57,
+              "kb": 31
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 416,
+              "end": 475,
+              "ms": 59,
+              "kb": 7
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 417,
+              "end": 475,
+              "ms": 59,
+              "kb": 7
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 417,
+              "end": 481,
+              "ms": 64,
+              "kb": 2
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 417,
+              "end": 481,
+              "ms": 64,
+              "kb": 2
+            }
+          ]
+        },
+        {
+          "fcp": 184,
+          "lcp": 184,
+          "lcpEl": "p.hero-desc.relative.max-w-xl 51796px²",
+          "lcpCandidates": [
+            {
+              "t": 184,
+              "size": 51796,
+              "el": "p.hero-desc.relative.max-w-xl",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": null,
+            "levé": null
+          },
+          "cls": 0.003,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 7,
+            "domInteractive": 25,
+            "domContentLoaded": 25,
+            "load": 43
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 183,
+              "end": 183,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 184,
+              "end": 184,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 184,
+              "end": 184,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 184,
+              "end": 184,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 184,
+              "end": 184,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 184,
+              "end": 184,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 185,
+              "end": 185,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 185,
+              "end": 185,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 185,
+              "end": 185,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 185,
+              "end": 185,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 185,
+              "end": 185,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 185,
+              "end": 185,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        },
+        {
+          "fcp": 220,
+          "lcp": 220,
+          "lcpEl": "p.hero-desc.relative.max-w-xl 51796px²",
+          "lcpCandidates": [
+            {
+              "t": 220,
+              "size": 51796,
+              "el": "p.hero-desc.relative.max-w-xl",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": null,
+            "levé": null
+          },
+          "cls": 0.003,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 5,
+            "domInteractive": 24,
+            "domContentLoaded": 24,
+            "load": 28
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 221,
+              "end": 221,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 222,
+              "end": 222,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 222,
+              "end": 222,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 222,
+              "end": 222,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 225,
+              "end": 225,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 225,
+              "end": 225,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 226,
+              "end": 226,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 226,
+              "end": 226,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 226,
+              "end": 226,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 226,
+              "end": 226,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 226,
+              "end": 226,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 226,
+              "end": 226,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "device": "desktop",
+      "route": "methode",
+      "lcpMedian": 448,
+      "lcpToutes": [
+        448,
+        460,
+        444
+      ],
+      "cible": 1000,
+      "conforme": true,
+      "passes": [
+        {
+          "fcp": 68,
+          "lcp": 448,
+          "lcpEl": "p.mt-2.5.text-sm.leading-relaxed 12488px²",
+          "lcpCandidates": [
+            {
+              "t": 68,
+              "size": 6480,
+              "el": "img.h-[50px].w-auto.lg:h-[72px]",
+              "url": "logo-blanc.png?v=2026-11-15"
+            },
+            {
+              "t": 448,
+              "size": 12488,
+              "el": "p.mt-2.5.text-sm.leading-relaxed",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": 18,
+            "levé": 87
+          },
+          "cls": 0,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 5,
+            "domInteractive": 25,
+            "domContentLoaded": 25,
+            "load": 29
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 82,
+              "end": 82,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 95,
+              "end": 95,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 95,
+              "end": 95,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 95,
+              "end": 95,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 96,
+              "end": 96,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 96,
+              "end": 96,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 96,
+              "end": 96,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 96,
+              "end": 96,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 96,
+              "end": 96,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 96,
+              "end": 96,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 96,
+              "end": 96,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 96,
+              "end": 96,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        },
+        {
+          "fcp": 68,
+          "lcp": 460,
+          "lcpEl": "p.mt-2.5.text-sm.leading-relaxed 12488px²",
+          "lcpCandidates": [
+            {
+              "t": 68,
+              "size": 6480,
+              "el": "img.h-[50px].w-auto.lg:h-[72px]",
+              "url": "logo-blanc.png?v=2026-11-15"
+            },
+            {
+              "t": 460,
+              "size": 12488,
+              "el": "p.mt-2.5.text-sm.leading-relaxed",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": 22,
+            "levé": 87
+          },
+          "cls": 0,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 8,
+            "domInteractive": 27,
+            "domContentLoaded": 27,
+            "load": 31
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 85,
+              "end": 85,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 100,
+              "end": 100,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 100,
+              "end": 100,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 100,
+              "end": 100,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 100,
+              "end": 100,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 100,
+              "end": 100,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 100,
+              "end": 100,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 100,
+              "end": 100,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 101,
+              "end": 101,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 101,
+              "end": 101,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 101,
+              "end": 101,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 101,
+              "end": 101,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        },
+        {
+          "fcp": 80,
+          "lcp": 444,
+          "lcpEl": "p.mt-2.5.text-sm.leading-relaxed 12488px²",
+          "lcpCandidates": [
+            {
+              "t": 80,
+              "size": 6480,
+              "el": "img.h-[50px].w-auto.lg:h-[72px]",
+              "url": "logo-blanc.png?v=2026-11-15"
+            },
+            {
+              "t": 444,
+              "size": 12488,
+              "el": "p.mt-2.5.text-sm.leading-relaxed",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": 20,
+            "levé": 83
+          },
+          "cls": 0,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 5,
+            "domInteractive": 24,
+            "domContentLoaded": 25,
+            "load": 28
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 82,
+              "end": 82,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "device": "desktop",
+      "route": "realisations",
+      "lcpMedian": 448,
+      "lcpToutes": [
+        448,
+        452,
+        440
+      ],
+      "cible": 1000,
+      "conforme": true,
+      "passes": [
+        {
+          "fcp": 80,
+          "lcp": 448,
+          "lcpEl": "p.text-body.mt-6.max-w-2xl 8904px²",
+          "lcpCandidates": [
+            {
+              "t": 80,
+              "size": 6480,
+              "el": "img.h-[50px].w-auto.lg:h-[72px]",
+              "url": "logo-blanc.png?v=2026-11-15"
+            },
+            {
+              "t": 448,
+              "size": 8904,
+              "el": "p.text-body.mt-6.max-w-2xl",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": 16,
+            "levé": 84
+          },
+          "cls": 0,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 5,
+            "domInteractive": 24,
+            "domContentLoaded": 24,
+            "load": 28
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 11,
+              "end": 11,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 11,
+              "end": 11,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 11,
+              "end": 11,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 11,
+              "end": 11,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 11,
+              "end": 11,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 11,
+              "end": 11,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 11,
+              "end": 11,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 11,
+              "end": 11,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 11,
+              "end": 11,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 11,
+              "end": 11,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 82,
+              "end": 82,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 94,
+              "end": 94,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 94,
+              "end": 94,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 95,
+              "end": 95,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 95,
+              "end": 95,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 95,
+              "end": 95,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 95,
+              "end": 95,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 95,
+              "end": 95,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 95,
+              "end": 95,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 96,
+              "end": 96,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 96,
+              "end": 96,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 96,
+              "end": 96,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        },
+        {
+          "fcp": 68,
+          "lcp": 452,
+          "lcpEl": "p.text-body.mt-6.max-w-2xl 8904px²",
+          "lcpCandidates": [
+            {
+              "t": 68,
+              "size": 6480,
+              "el": "img.h-[50px].w-auto.lg:h-[72px]",
+              "url": "logo-blanc.png?v=2026-11-15"
+            },
+            {
+              "t": 452,
+              "size": 8904,
+              "el": "p.text-body.mt-6.max-w-2xl",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": 22,
+            "levé": 84
+          },
+          "cls": 0,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 5,
+            "domInteractive": 26,
+            "domContentLoaded": 26,
+            "load": 29
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 82,
+              "end": 82,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        },
+        {
+          "fcp": 68,
+          "lcp": 440,
+          "lcpEl": "p.text-body.mt-6.max-w-2xl 8904px²",
+          "lcpCandidates": [
+            {
+              "t": 68,
+              "size": 6480,
+              "el": "img.h-[50px].w-auto.lg:h-[72px]",
+              "url": "logo-blanc.png?v=2026-11-15"
+            },
+            {
+              "t": 440,
+              "size": 8904,
+              "el": "p.text-body.mt-6.max-w-2xl",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": 23,
+            "levé": 85
+          },
+          "cls": 0,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 5,
+            "domInteractive": 27,
+            "domContentLoaded": 27,
+            "load": 30
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 84,
+              "end": 84,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 92,
+              "end": 92,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 92,
+              "end": 92,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 92,
+              "end": 92,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 92,
+              "end": 92,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 92,
+              "end": 92,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 92,
+              "end": 92,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 92,
+              "end": 92,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 92,
+              "end": 92,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 93,
+              "end": 93,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 93,
+              "end": 93,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 93,
+              "end": 93,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "device": "mobile-iphone13",
+      "route": "accueil",
+      "lcpMedian": 168,
+      "lcpToutes": [
+        276,
+        160,
+        168
+      ],
+      "cible": 1000,
+      "conforme": true,
+      "passes": [
+        {
+          "fcp": 276,
+          "lcp": 276,
+          "lcpEl": "p.hero-desc.relative.max-w-xl 29145px²",
+          "lcpCandidates": [
+            {
+              "t": 276,
+              "size": 29145,
+              "el": "p.hero-desc.relative.max-w-xl",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": null,
+            "levé": null
+          },
+          "cls": 0,
+          "longTasks": [
+            {
+              "t": 76,
+              "dur": 90
+            },
+            {
+              "t": 224,
+              "dur": 51
+            }
+          ],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 8,
+            "domInteractive": 69,
+            "domContentLoaded": 69,
+            "load": 224
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 18,
+              "end": 60,
+              "ms": 42,
+              "kb": 8
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 18,
+              "end": 87,
+              "ms": 70,
+              "kb": 48
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 18,
+              "end": 83,
+              "ms": 66,
+              "kb": 4
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 18,
+              "end": 105,
+              "ms": 87,
+              "kb": 70
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 18,
+              "end": 84,
+              "ms": 66,
+              "kb": 5
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 18,
+              "end": 84,
+              "ms": 66,
+              "kb": 3
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 18,
+              "end": 84,
+              "ms": 66,
+              "kb": 12
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 18,
+              "end": 115,
+              "ms": 97,
+              "kb": 64
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 18,
+              "end": 110,
+              "ms": 91,
+              "kb": 12
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 18,
+              "end": 110,
+              "ms": 92,
+              "kb": 9
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 335,
+              "end": 338,
+              "ms": 3,
+              "kb": 3
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 336,
+              "end": 359,
+              "ms": 24,
+              "kb": 4
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 336,
+              "end": 360,
+              "ms": 24,
+              "kb": 4
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 336,
+              "end": 360,
+              "ms": 24,
+              "kb": 2
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 336,
+              "end": 360,
+              "ms": 24,
+              "kb": 2
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 336,
+              "end": 360,
+              "ms": 24,
+              "kb": 2
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 336,
+              "end": 371,
+              "ms": 35,
+              "kb": 8
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 337,
+              "end": 375,
+              "ms": 38,
+              "kb": 31
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 337,
+              "end": 370,
+              "ms": 33,
+              "kb": 7
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 337,
+              "end": 371,
+              "ms": 34,
+              "kb": 7
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 337,
+              "end": 372,
+              "ms": 34,
+              "kb": 2
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 338,
+              "end": 373,
+              "ms": 35,
+              "kb": 2
+            }
+          ]
+        },
+        {
+          "fcp": 160,
+          "lcp": 160,
+          "lcpEl": "p.hero-desc.relative.max-w-xl 29145px²",
+          "lcpCandidates": [
+            {
+              "t": 160,
+              "size": 29145,
+              "el": "p.hero-desc.relative.max-w-xl",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": null,
+            "levé": null
+          },
+          "cls": 0,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 5,
+            "domInteractive": 24,
+            "domContentLoaded": 24,
+            "load": 41
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 161,
+              "end": 161,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 161,
+              "end": 161,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 162,
+              "end": 162,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 162,
+              "end": 162,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 162,
+              "end": 162,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 162,
+              "end": 162,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 162,
+              "end": 162,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 162,
+              "end": 162,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 163,
+              "end": 163,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 163,
+              "end": 163,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 163,
+              "end": 163,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 163,
+              "end": 163,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        },
+        {
+          "fcp": 168,
+          "lcp": 168,
+          "lcpEl": "p.hero-desc.relative.max-w-xl 29145px²",
+          "lcpCandidates": [
+            {
+              "t": 168,
+              "size": 29145,
+              "el": "p.hero-desc.relative.max-w-xl",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": null,
+            "levé": null
+          },
+          "cls": 0,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 4,
+            "domInteractive": 29,
+            "domContentLoaded": 29,
+            "load": 31
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 14,
+              "end": 14,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 18,
+              "end": 18,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 18,
+              "end": 18,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 166,
+              "end": 166,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 167,
+              "end": 167,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 167,
+              "end": 167,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 167,
+              "end": 167,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 167,
+              "end": 167,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 168,
+              "end": 168,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 168,
+              "end": 168,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 168,
+              "end": 168,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 168,
+              "end": 168,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 168,
+              "end": 168,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 169,
+              "end": 169,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 169,
+              "end": 169,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "device": "mobile-iphone13",
+      "route": "methode",
+      "lcpMedian": 428,
+      "lcpToutes": [
+        428,
+        420,
+        440
+      ],
+      "cible": 1000,
+      "conforme": true,
+      "passes": [
+        {
+          "fcp": 76,
+          "lcp": 428,
+          "lcpEl": "p.mt-2.5.text-sm.leading-relaxed 17856px²",
+          "lcpCandidates": [
+            {
+              "t": 76,
+              "size": 3100,
+              "el": "img.h-[50px].w-auto.lg:h-[72px]",
+              "url": "logo-blanc.png?v=2026-11-15"
+            },
+            {
+              "t": 428,
+              "size": 17856,
+              "el": "p.mt-2.5.text-sm.leading-relaxed",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": 16,
+            "levé": 81
+          },
+          "cls": 0,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 4,
+            "domInteractive": 21,
+            "domContentLoaded": 21,
+            "load": 25
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 78,
+              "end": 78,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 90,
+              "end": 90,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        },
+        {
+          "fcp": 68,
+          "lcp": 420,
+          "lcpEl": "p.mt-2.5.text-sm.leading-relaxed 17856px²",
+          "lcpCandidates": [
+            {
+              "t": 68,
+              "size": 3100,
+              "el": "img.h-[50px].w-auto.lg:h-[72px]",
+              "url": "logo-blanc.png?v=2026-11-15"
+            },
+            {
+              "t": 420,
+              "size": 17856,
+              "el": "p.mt-2.5.text-sm.leading-relaxed",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": 18,
+            "levé": 82
+          },
+          "cls": 0,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 4,
+            "domInteractive": 22,
+            "domContentLoaded": 22,
+            "load": 25
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 80,
+              "end": 80,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 98,
+              "end": 98,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 99,
+              "end": 99,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 99,
+              "end": 99,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 99,
+              "end": 99,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 99,
+              "end": 99,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 99,
+              "end": 99,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 99,
+              "end": 99,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 99,
+              "end": 99,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 99,
+              "end": 99,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 100,
+              "end": 100,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 100,
+              "end": 100,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        },
+        {
+          "fcp": 76,
+          "lcp": 440,
+          "lcpEl": "p.mt-2.5.text-sm.leading-relaxed 17856px²",
+          "lcpCandidates": [
+            {
+              "t": 76,
+              "size": 3100,
+              "el": "img.h-[50px].w-auto.lg:h-[72px]",
+              "url": "logo-blanc.png?v=2026-11-15"
+            },
+            {
+              "t": 440,
+              "size": 17856,
+              "el": "p.mt-2.5.text-sm.leading-relaxed",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": 25,
+            "levé": 90
+          },
+          "cls": 0,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 5,
+            "domInteractive": 30,
+            "domContentLoaded": 30,
+            "load": 33
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 18,
+              "end": 18,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 18,
+              "end": 18,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 18,
+              "end": 18,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 88,
+              "end": 88,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 97,
+              "end": 97,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 97,
+              "end": 97,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 97,
+              "end": 97,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 97,
+              "end": 97,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 97,
+              "end": 97,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 98,
+              "end": 98,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 98,
+              "end": 98,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 98,
+              "end": 98,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 98,
+              "end": 98,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 98,
+              "end": 98,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 98,
+              "end": 98,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "device": "mobile-iphone13",
+      "route": "realisations",
+      "lcpMedian": 428,
+      "lcpToutes": [
+        428,
+        428,
+        424
+      ],
+      "cible": 1000,
+      "conforme": true,
+      "passes": [
+        {
+          "fcp": 68,
+          "lcp": 428,
+          "lcpEl": "p.text-body.mt-6.max-w-2xl 14940px²",
+          "lcpCandidates": [
+            {
+              "t": 68,
+              "size": 3100,
+              "el": "img.h-[50px].w-auto.lg:h-[72px]",
+              "url": "logo-blanc.png?v=2026-11-15"
+            },
+            {
+              "t": 428,
+              "size": 14940,
+              "el": "p.text-body.mt-6.max-w-2xl",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": 16,
+            "levé": 79
+          },
+          "cls": 0,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 5,
+            "domInteractive": 20,
+            "domContentLoaded": 20,
+            "load": 24
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 12,
+              "end": 12,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 77,
+              "end": 77,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 85,
+              "end": 85,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 85,
+              "end": 85,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 85,
+              "end": 85,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 85,
+              "end": 85,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 85,
+              "end": 85,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 86,
+              "end": 86,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 86,
+              "end": 86,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 86,
+              "end": 86,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 86,
+              "end": 86,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 86,
+              "end": 86,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 86,
+              "end": 86,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        },
+        {
+          "fcp": 100,
+          "lcp": 428,
+          "lcpEl": "p.text-body.mt-6.max-w-2xl 14940px²",
+          "lcpCandidates": [
+            {
+              "t": 100,
+              "size": 3100,
+              "el": "img.h-[50px].w-auto.lg:h-[72px]",
+              "url": "logo-blanc.png?v=2026-11-15"
+            },
+            {
+              "t": 428,
+              "size": 14940,
+              "el": "p.text-body.mt-6.max-w-2xl",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": 22,
+            "levé": 91
+          },
+          "cls": 0,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 5,
+            "domInteractive": 28,
+            "domContentLoaded": 28,
+            "load": 32
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 16,
+              "end": 16,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 89,
+              "end": 89,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 98,
+              "end": 98,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 98,
+              "end": 98,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 98,
+              "end": 98,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 98,
+              "end": 98,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 99,
+              "end": 99,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 99,
+              "end": 99,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 99,
+              "end": 99,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 99,
+              "end": 99,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 99,
+              "end": 99,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 99,
+              "end": 99,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 99,
+              "end": 99,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        },
+        {
+          "fcp": 84,
+          "lcp": 424,
+          "lcpEl": "p.text-body.mt-6.max-w-2xl 14940px²",
+          "lcpCandidates": [
+            {
+              "t": 84,
+              "size": 3100,
+              "el": "img.h-[50px].w-auto.lg:h-[72px]",
+              "url": "logo-blanc.png?v=2026-11-15"
+            },
+            {
+              "t": 424,
+              "size": 14940,
+              "el": "p.text-body.mt-6.max-w-2xl",
+              "url": null
+            }
+          ],
+          "boot": {
+            "posé": 23,
+            "levé": 82
+          },
+          "cls": 0,
+          "longTasks": [],
+          "mutations": [],
+          "nav": {
+            "responseEnd": 4,
+            "domInteractive": 27,
+            "domContentLoaded": 27,
+            "load": 30
+          },
+          "js": [
+            {
+              "file": "1r8o32q13stub.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "449j2p09fl_i1.js",
+              "start": 13,
+              "end": 13,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "440pi0f88609d.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "turbopack-2u1d16houkiyo.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1n8002xsathlf.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2ngmgoye_1a_v.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1yjg3yj-nd15e.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "39x6ppicbgr6i.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3umzopzvustu0.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2w8znotl97d5d.js",
+              "start": 15,
+              "end": 15,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3ca4m62dw3f_v.js",
+              "start": 80,
+              "end": 80,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2fgmpllvyb9kt.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "14-bg04qc-9rt.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "1zsgz6xfmm9me.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0kyijxfmfatsd.js",
+              "start": 91,
+              "end": 91,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2pl83y1b3dpsz.js",
+              "start": 92,
+              "end": 92,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "3-xxkp_95wp37.js",
+              "start": 92,
+              "end": 92,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "42-ujand46wa1.js",
+              "start": 92,
+              "end": 92,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0c6k67jc9ixq2.js",
+              "start": 92,
+              "end": 92,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0xogg5lxv4bzl.js",
+              "start": 92,
+              "end": 92,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "2r0qdi1c4j27m.js",
+              "start": 92,
+              "end": 92,
+              "ms": 0,
+              "kb": null
+            },
+            {
+              "file": "0r8aerr2ltah4.js",
+              "start": 92,
+              "end": 92,
+              "ms": 0,
+              "kb": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useEffect } from "react";
+import React, { Suspense, useEffect, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { RouterProvider, useRouter } from "@/components/router-context";
 import { CalendlyProvider } from "@/components/calendly/CalendlyContext";
@@ -126,8 +126,26 @@ function PageSwitch() {
   // identifiant pour que la transition se joue entre deux projets.
   const pageKey = page === "projet" ? `projet-${section}` : page;
 
+  /* PREMIÈRE RÉSOLUTION SANS ANIMATION DE SORTIE (volet 7 de
+   * l'audit, 19/11/2026 — LCP ≤ 1 s). Au chargement DIRECT d'une
+   * page profonde (lien partagé #/methode, résultat de recherche),
+   * le serveur ne voit jamais le fragment : il sert le HTML de
+   * l'ACCUEIL, que l'hydratation remplace aussitôt par la page
+   * demandée. AnimatePresence mode="wait" attendait pourtant
+   * l'animation de SORTIE de ce contenu intermédiaire (320 ms)
+   * avant de monter la page cible — 320 ms perdues sur le chemin
+   * critique du LCP pour fondre un contenu que le visiteur n'a
+   * pas eu le temps de voir. La clé « boot » → « app » REMONTE
+   * AnimatePresence à la première résolution d'une page ≠ accueil
+   * : l'ancien contenu est démonté immédiatement, la page cible
+   * monte aussitôt (initial={false} : pas d'animation d'entrée
+   * non plus). Les navigations SUIVANTES gardent le comportement
+   * normal — sortie PUIS entrée — car la clé ne change plus. */
+  const routeResolue = useRef(false);
+  if (pageKey !== "accueil") routeResolue.current = true;
+
   return (
-    <AnimatePresence mode="wait" initial={false}>
+    <AnimatePresence mode="wait" initial={false} key={routeResolue.current ? "app" : "boot"}>
       <motion.main
         key={pageKey}
         id="contenu-principal"
@@ -137,6 +155,10 @@ function PageSwitch() {
         exit={reduce ? { opacity: 0 } : { opacity: 0, y: -10 }}
         transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
       >
+        {/* Volet 7 : lève l'écran d'amorçage des liens profonds dès
+            que la page demandée est réellement montée — voir
+            NettoyageAmorcage en bas de fichier. */}
+        {pageKey !== "accueil" && <NettoyageAmorcage />}
         {/* Attente discrète pendant le (rare) chargement d'un morceau :
             les morceaux sont préchargés à l'inactivité, la navigation
             normale reste instantanée.
@@ -188,6 +210,10 @@ function Shell() {
   if (page === "admin") {
     return (
       <div className="section-deep flex min-h-screen flex-col">
+        {/* Volet 7 : l'écran d'amorçage des liens profonds concerne
+            aussi #/admin — la branche publique (PageSwitch) n'étant
+            pas rendue ici, la levée y est portée par ce clone. */}
+        <NettoyageAmorcage />
         <AdminPage />
         <Footer />
       </div>
@@ -215,4 +241,28 @@ export default function App() {
       </CalendlyProvider>
     </RouterProvider>
   );
+}
+
+/* ---------- Levée de l'écran d'amorçage (volet 7) ----------
+   Le script « boot-deep-route » (layout.tsx, beforeInteractive)
+   détecte au chargement direct d'une page profonde que le HTML
+   servi (celui de l'accueil — le serveur ne voit pas le fragment)
+   n'est PAS la page demandée : il pose alors l'attribut
+   data-boot="deep" sur <html> — le visuel (voile + spinner) est
+   porté par les règles CSS statiques de globals.css, AUCUN nœud
+   n'est inséré (React hydrate <html>/<body> : une insertion
+   casserait l'hydratation à la racine — mesuré au volet 7).
+   Ce composant retire l'attribut AU MOMENT où la page demandée
+   est réellement montée — rendu UNIQUEMENT dans le main d'une page
+   ≠ accueil (ou dans la branche admin) : au chargement direct, le
+   main hydraté (accueil SSR) ne le contient pas, donc l'écran
+   couvre sans interruption toute la séquence : SSR caché →
+   résolution de route → page cible. Sans attribut data-boot
+   (chargement normal de l'accueil ou navigation interne), il ne
+   fait rien. */
+function NettoyageAmorcage() {
+  useEffect(() => {
+    document.documentElement.removeAttribute("data-boot");
+  }, []);
+  return null;
 }

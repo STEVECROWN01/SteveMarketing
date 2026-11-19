@@ -65,6 +65,20 @@ import { ASSETS, PROJECTS } from "@/lib/site";
  * classes .hero-anim-* / .mockup-sway) : elle démarre dès le premier
  * rendu, sans attendre l'hydratation, et `prefers-reduced-motion`
  * fait tout apparaître immédiatement (règle globale du site).
+ *
+ * COLONNE TEXTE (volet 7 de l'audit, 19/11/2026 — LCP ≤ 1 s) : les
+ * cinq révélations du bloc texte (note 4,9/5, titre, description,
+ * CTA, réassurance) passent en mode « aboveFold » — animations CSS
+ * .reveal-fold-* démarrées au premier rendu, au lieu d'attendre
+ * l'hydratation + IntersectionObserver comme les révélations au
+ * scroll (le paragraphe .hero-desc, élément LCP de l'accueil, n'était
+ * peint qu'à ~950 ms pour un FCP à 168 ms). Mêmes courbes, durées et
+ * décalages : la cascade étoiles → titre → description → CTA →
+ * réassurance est conservée ; elle démarre simplement dès la
+ * première frame, pendant que la plaque du bloc visuel surgit
+ * (0-1 s), au lieu d'après l'hydratation. Tout ce qui est PLUS BAS
+ * que le premier écran reste en révélations au scroll (comportement
+ * inchangé sur tout le reste du site).
  */
 export function Hero() {
   /* Équilibrage vertical de la description (bureau uniquement) :
@@ -155,8 +169,9 @@ export function Hero() {
               jamais sous son léger voile gris (16/11/2026). */}
           <div className="order-1 lg:col-start-1 lg:row-start-1 lg:relative lg:z-10">
             {/* Cinq étoiles — la cinquième à moitié remplie horizontalement —
-                suivies de « 4,9/5 » (remplace l'ancien eyebrow). */}
-            <Reveal direction="up">
+                suivies de « 4,9/5 » (remplace l'ancien eyebrow). aboveFold :
+                voir le commentaire d'en-tête (volet 7 — LCP). */}
+            <Reveal direction="up" aboveFold>
               <p
                 className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] font-medium tracking-[0.02em] text-[#c8c8c8] sm:text-sm"
                 aria-label="Note moyenne de 4,9 sur 5"
@@ -182,6 +197,7 @@ export function Hero() {
               text={HERO.h1}
               boldText={HERO.h1Bold}
               delay={0.08}
+              aboveFold
               className="text-hero-title-viewport mt-1.5 text-white sm:mt-4"
             />
           </div>
@@ -354,7 +370,12 @@ export function Hero() {
               qu'il y ait autant d'espace au-dessus qu'au-dessous —
               sans bouger le titre ni les boutons. */}
           <div className="order-3 mt-[clamp(0.75rem,2.5svh,1.75rem)] lg:col-start-1 lg:row-start-2 lg:mt-0 lg:relative lg:z-10">
-            <Reveal direction="up" delay={0.18}>
+            {/* aboveFold="rise" — translation sans fondu : ce
+                paragraphe est l'ÉLÉMENT LCP du site, il doit être
+                PEINT dès la première frame (voir Reveal.tsx et
+                globals.css, volet 7) ; les autres révélations du
+                hero gardent le fondu. */}
+            <Reveal direction="up" delay={0.18} aboveFold="rise">
               <p
                 ref={descRef}
                 className="hero-desc relative max-w-xl text-[12px] leading-[1.5] text-[#c8c8c8] transition-[top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] sm:text-[15px] lg:text-[15px] xl:text-base"
@@ -375,7 +396,7 @@ export function Hero() {
                 flèche du premier et l'icône œil du second sont
                 masquées). Réservation d'appel (blanc, fenêtre
                 Calendly) + découverte des réalisations (noir). */}
-            <Reveal direction="up" delay={0.24}>
+            <Reveal direction="up" delay={0.24} aboveFold>
               <div
                 ref={ctaRowRef}
                 className="hero-cta mt-2.5 flex flex-nowrap items-center gap-2 sm:mt-5 sm:gap-3 lg:mt-5"
@@ -409,7 +430,7 @@ export function Hero() {
               </div>
             </Reveal>
 
-            <Reveal direction="up" delay={0.3}>
+            <Reveal direction="up" delay={0.3} aboveFold>
               <ReassuranceBar mention={HERO.reassurance} className="mt-2 sm:mt-4 lg:mt-5" />
             </Reveal>
           </div>

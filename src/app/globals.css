@@ -541,6 +541,102 @@ html.hoverable .mockup-zoom:where(:hover, :focus-within) > span > img {
   }
 }
 
+/* ---------- RÉVÉLATION AU-DESSUS DU PLI SANS JAVASCRIPT ----------
+   (volet 7 de l'audit intégral, 19/11/2026 — LCP ≤ 1 s)
+   Le texte du hero de l'accueil (élément LCP du site) était servi à
+   opacity: 0 par les révélations au scroll : il ne devenait visible
+   qu'APRÈS le chargement du JavaScript, l'hydratation et le retour de
+   l'IntersectionObserver — mesuré ~950 ms en laboratoire pour un FCP
+   à 168 ms. Ces deux animations CSS reproduisent EXACTEMENT les
+   courbes des révélations JS (Reveal.tsx : 700 ms, décalage 28 px,
+   cubic-bezier(0.22,1,0.36,1) ; mots : 550 ms, 0.9 em, cadence
+   35 ms) mais démarrent AU PREMIER RENDU, comme la chorégraphie du
+   bloc visuel (.hero-anim-*) : le premier visiteur sans JavaScript
+   comme le moteur de mesure voient le texte dès la première frame.
+   animation-fill-mode: both → l'élément tient son état initial
+   pendant son délai (animationDelay posé en inline par Reveal.tsx).
+   En prefers-reduced-motion, la règle globale du site (durée 0,01 ms)
+   fait tout apparaître immédiatement. */
+@keyframes reveal-fold-up {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes reveal-fold-word {
+  from { opacity: 0; transform: translateY(0.9em); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* Variante « rise » — TRANSFORM SEUL, sans fondu — réservée à
+   l'ÉLÉMENT LCP (le paragraphe .hero-desc). Pourquoi : les
+   animations d'opacité sont pilotées par le compositeur — aucune
+   repaint n'est émise pendant le fondu, donc l'API LCP n'enregistre
+   l'élément qu'à la prochaine paint forcée (mesuré : 1584 ms alors
+   que le texte était visible dès ~200 ms). En animant uniquement
+   transform, l'élément est PEINT dès le premier rendu (opacité 1,
+   position décalée) : candidate LCP dès la première frame, FCP ≈
+   LCP. Le fondu reste sur les éléments voisins (étoiles, mots du
+   titre, CTA, réassurance) — plus petits que le paragraphe, ils ne
+   peuvent pas lui disputer le statut d'élément LCP. */
+@keyframes reveal-fold-rise {
+  from { transform: translateY(28px); }
+  to { transform: none; }
+}
+.reveal-fold--up {
+  animation: reveal-fold-up 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.reveal-fold-word {
+  animation: reveal-fold-word 550ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.reveal-fold-rise {
+  animation: reveal-fold-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ---------- ÉCRAN D'AMORÇAGE DES LIENS PROFONDS (volet 7) ----------
+   Au chargement direct d'une page profonde (/#/methode…), le
+   serveur ne voit pas le fragment : il sert le HTML de l'ACCUEIL.
+   Le script boot-deep-route (layout.tsx) pose alors l'attribut
+   data-boot="deep" sur <html> — et TOUT le visuel de l'écran
+   d'amorçage est porté par ces règles statiques : AUCUN nœud n'est
+   inséré dans le DOM. C'est délibéré : dans l'App Router, React
+   hydrate <html> et <body> eux-mêmes — insérer un élément avant
+   l'hydratation (première version de ce volet) provoquait un
+   mismatch à la RACINE et un re-rendu client complet de l'arbre
+   (LCP mesuré 1284-2524 ms). L'attribut seul suit le modèle
+   éprouvé du script detect-hoverable (classe .hoverable sur <html>,
+   toléré par suppressHydrationWarning). body::before = spinner
+   (même esthétique que l'attente de morceau de page.tsx),
+   body::after = voile opaque #1c1c1c. La levée est portée par
+   <NettoyageAmorcage /> (page.tsx) au montage de la page demandée ;
+   le script pose un filet de sécurité à 6 s (retrait de l'attribut)
+   pour ne jamais laisser un visiteur sur un écran figé si
+   l'application ne prend pas la main. */
+html[data-boot="deep"] #contenu-principal {
+  visibility: hidden;
+}
+html[data-boot="deep"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #1c1c1c;
+}
+html[data-boot="deep"] body::before {
+  content: "";
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 32px;
+  height: 32px;
+  margin: -16px 0 0 -16px;
+  border-radius: 9999px;
+  border: 2px solid rgba(228, 228, 228, 0.3);
+  border-top-color: #e4e4e4;
+  animation: bootspin 0.8s linear infinite;
+  z-index: 10000;
+}
+@keyframes bootspin {
+  to { transform: rotate(360deg); }
+}
+
 /* ---------- HERO : chorégraphie d'apparition du bloc visuel ----------
    Demande de l'éditeur (15/11/2026) — 4 s au total, chaque élément
    en exactement 1 s : la plaque grise surgit sur place depuis un
