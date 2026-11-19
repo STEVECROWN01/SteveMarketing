@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { useRouter } from "@/components/router-context";
 import { ASSETS, NAV_ITEMS, SITE } from "@/lib/site";
@@ -80,6 +80,22 @@ export function Header() {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const reduce = useReducedMotion();
+  // Bouton hamburger — référence pour la RESTAURATION DU FOCUS à la
+  // fermeture du menu (audit clavier du 19/11 : après Échap, le focus
+  // tombait sur un lien du pied de page sous l'overlay).
+  const burgerRef = useRef<HTMLButtonElement>(null);
+
+  /** Ferme le menu et rend le focus au bouton qui l'a ouvert — le
+   *  pattern dialog du WAI-ARIA : à la fermeture d'un dialogue modal,
+   *  le focus retourne sur son déclencheur (sinon l'utilisateur
+   *  clavier repart du début du document). La restauration ne joue
+   *  QUE si le menu était ouvert : le logo et le bouton « Démarrer
+   *  un projet » appellent cette fonction même menu fermé, et un
+   *  clic ordinaire ne doit jamais déplacer le focus. */
+  const closeMenu = () => {
+    if (menuOpen) burgerRef.current?.focus();
+    setMenuOpen(false);
+  };
 
   // Bloque le défilement quand le menu plein écran est ouvert —
   // y compris le défilement fluide Lenis (événement de contrôle).
@@ -94,11 +110,63 @@ export function Header() {
     };
   }, [menuOpen]);
 
-  // Fermeture au clavier (Échap) et lors d'une navigation par fragment
+  // Clavier quand le menu est ouvert (audit du 19/11 — sixième volet) :
+  //  - Échap ferme le menu ;
+  //  - Tab/Shift+Tab restent PIÉGÉS dans l'en-tête : le menu plein
+  //    écran est un overlay modal opaque — sans piège, 14 des 25 Tab
+  //    mesurés sortaient vers des éléments de la page INVISIBLES sous
+  //    l'overlay (liens du main, CTA du pied de page…) : l'utilisateur
+  //    clavier tabulait dans le vide (WCAG 2.1.2 pas de piège inattendu
+  //    — ici le piège est ATTENDU, le menu étant modal ; 2.4.3 ordre de
+  //    focus). Le piège couvre tout l'en-tête (le menu y est imbriqué
+  //    dans le DOM) : le hamburger-croix, la croix dédiée, les liens
+  //    des deux colonnes et les trois pastilles sociales restent
+  //    atteignables, le reste du site ne l'est plus tant que le menu
+  //    est ouvert — exactement ce que voit un utilisateur voyant.
+  //  La navigation par fragment ferme aussi le menu.
   useEffect(() => {
     if (!menuOpen) return;
+    const header = document.querySelector("header");
+    const focusablesInHeader = (): HTMLElement[] =>
+      header
+        ? Array.from(
+            header.querySelectorAll<HTMLElement>(
+              'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+            ),
+          ).filter(
+            // tabIndex -1 = inerte par choix (lien d'évitement quand le
+            // menu est ouvert) ; aria-hidden = retiré des lecteurs
+            // d'écran — aucun des deux ne doit entrer dans le cycle du
+            // piège, sinon le wrap y POSE le focus (flash du lien
+            // d'évitement + Enter mène sous l'overlay).
+            (el) =>
+              el.tabIndex !== -1 &&
+              el.getAttribute("aria-hidden") !== "true" &&
+              el.getClientRects().length > 0,
+          )
+        : [];
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMenuOpen(false);
+      if (e.key === "Escape") {
+        closeMenu();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const list = focusablesInHeader();
+      if (!list.length) return;
+      const first = list[0];
+      const last = list[list.length - 1];
+      const active = document.activeElement as HTMLElement | null;
+      if (e.shiftKey) {
+        if (active === first || !header?.contains(active)) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else {
+        if (active === last || !header?.contains(active)) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
     const onHash = () => setMenuOpen(false);
     window.addEventListener("keydown", onKey);
@@ -107,6 +175,7 @@ export function Header() {
       window.removeEventListener("keydown", onKey);
       window.removeEventListener("hashchange", onHash);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuOpen]);
 
   const isActive = (key: string) => router.page === key;
@@ -115,13 +184,13 @@ export function Header() {
    *  (#/demander-un-devis) — demande de l'éditeur, 13/11/2026. */
   const startProject = (e?: React.MouseEvent) => {
     e?.preventDefault();
-    setMenuOpen(false);
+    closeMenu();
     router.navigate("devis");
   };
 
   const goPage = (e: React.MouseEvent, key: string, section?: string) => {
     e.preventDefault();
-    setMenuOpen(false);
+    closeMenu();
     router.navigate(key as never, section ?? null);
   };
 
@@ -137,8 +206,15 @@ export function Header() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
+      {/* Lien d'évitement — INERTE quand le menu plein écran est ouvert
+          (audit clavier du 19/11) : sa cible (#contenu-principal) est
+          sous l'overlay opaque, invisible et inert — l'activer menu
+          ouvert enverrait le focus « au contenu » caché. Il redevient
+          le premier focusable dès le menu fermé. */}
       <a
         href="#contenu-principal"
+        tabIndex={menuOpen ? -1 : 0}
+        aria-hidden={menuOpen}
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-[#e4e4e4] focus:px-5 focus:py-2.5 focus:text-sm focus:font-medium focus:text-[#1c1c1c]"
       >
         Aller au contenu principal
@@ -208,6 +284,7 @@ export function Header() {
             mobile, 16/11/2026) — les deux pastilles restent
             symétriques. */}
         <button
+          ref={burgerRef}
           type="button"
           onClick={() => setMenuOpen((v) => !v)}
           aria-expanded={menuOpen}
@@ -227,6 +304,9 @@ export function Header() {
         {menuOpen && (
           <motion.div
             id="menu-plein-ecran"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu de navigation"
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: -18, scale: 0.995 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: -14, scale: 0.997 }}
@@ -239,7 +319,7 @@ export function Header() {
                   bouton du header (remplissage #e4e4e4, croix sombre). */}
               <button
                 type="button"
-                onClick={() => setMenuOpen(false)}
+                onClick={closeMenu}
                 aria-label="Fermer le menu"
                 className="absolute right-4 top-4 flex h-12 w-12 items-center justify-center rounded-full border border-[#e4e4e4]/25 bg-[#232323] text-white transition-colors duration-300 hover:border-[#c9baac] hover:bg-[#e4e4e4] hover:text-[#1c1c1c] focus-visible:outline-2 focus-visible:outline-offset-4 sm:h-14 sm:w-14"
               >

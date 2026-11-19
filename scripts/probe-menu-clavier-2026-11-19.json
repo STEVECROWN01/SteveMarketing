@@ -1,0 +1,205 @@
+{
+ "consoleErrors": [],
+ "focusAvantOuverture": "Ouvrir le menu",
+ "menuOuvert": true,
+ "ariaExpandedApresOuverture": "true",
+ "focusApresOuverture": {
+  "el": "Fermer le menu",
+  "dansMenu": false
+ },
+ "dialogAria": {
+  "role": "dialog",
+  "ariaModal": "true",
+  "ariaLabel": "Menu de navigation",
+  "ariaLabelledby": null
+ },
+ "tabSortiesDuHeader": 0,
+ "trajetTab": [
+  {
+   "label": "Fermer le menu",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Méthode",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Référencement SEO",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Publicité Meta Ads",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Mes Réalisations",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "À propos",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Contact",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Mentions légales",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Écrire un email à Stevens Akpovi — stevensakpovi@gmail.com",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "LinkedIn — Stevens Akpovi",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "WhatsApp — Stevens Akpovi",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Stevens Akpovi — retour à l'accueil",
+   "dansMenu": false,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Méthode",
+   "dansMenu": false,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Référencement",
+   "dansMenu": false,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Publicité",
+   "dansMenu": false,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Portfolio",
+   "dansMenu": false,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Démarrer Un Projet — page de demande de devis",
+   "dansMenu": false,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Fermer le menu",
+   "dansMenu": false,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Fermer le menu",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Méthode",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Référencement SEO",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Publicité Meta Ads",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Mes Réalisations",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "À propos",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Contact",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Mentions légales",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Écrire un email à Stevens Akpovi — stevensakpovi@gmail.com",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "LinkedIn — Stevens Akpovi",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "WhatsApp — Stevens Akpovi",
+   "dansMenu": true,
+   "dansHeader": true,
+   "visible": true
+  },
+  {
+   "label": "Stevens Akpovi — retour à l'accueil",
+   "dansMenu": false,
+   "dansHeader": true,
+   "visible": true
+  }
+ ],
+ "shiftTabDepuisPremier": {
+  "atteint": "WhatsApp — Stevens Akpovi",
+  "dernierAttendu": "WhatsApp — Stevens Akpovi"
+ },
+ "menuFermeParEscape": true,
+ "focusApresFermeture": "Ouvrir le menu"
+}

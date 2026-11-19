@@ -7,39 +7,89 @@ import crypto from "crypto";
  * Variables d'environnement serveur :
  *   ADMIN_PASSWORD         — mot de passe d'accès
  *   ADMIN_SESSION_SECRET   — secret de signature des sessions
+ *
+ * FAIL-CLOSED (audit du 19/11 — sixième volet) : ce dépôt est PUBLIC.
+ * Les valeurs de repli historiques (« stevens-admin-2026 » et
+ * « stevens-admin-session-secret-change-me »), lisibles par quiconque
+ * sur GitHub, rendaient l'admin accessible par défaut dès qu'une
+ * variable manquait — VÉRIFIÉ EN PRODUCTION le 19/11 : un jeton de
+ * session forgé avec le secret public du dépôt passait
+ * verifySessionToken() (la requête atteignait la base, réponse 503 au
+ * lieu du 401 attendu ; ADMIN_SESSION_SECRET n'était pas défini sur
+ * Vercel, seule l'absence de base connectée limitait l'impact).
+ * Depuis ce correctif, chaque primitive REFUSE quand sa variable
+ * est absente ou trop courte :
+ *   - verifyPassword()    → false sans ADMIN_PASSWORD : personne ne
+ *     peut ouvrir de session, quel que soit le mot de passe soumis ;
+ *   - verifySessionToken() → false sans ADMIN_SESSION_SECRET : aucun
+ *     jeton existant ne peut être validé, forgé ou non ;
+ *   - createSessionToken() → lève une erreur explicite (la route
+ *     login répond 503 avec un message actionnable, voir
+ *     src/app/api/admin/login/route.ts).
+ * La route login refuse en amont toute configuration incomplète
+ * (message générique, sans préciser QUELLE variable manque — cette
+ * information n'appartient qu'au propriétaire via DEPLOIEMENT.md).
  */
 
 const COOKIE_NAME = "stevens_admin_session";
 const SESSION_TTL_MS = 1000 * 60 * 60 * 8; // 8 heures
 
-function getSecret(): string {
-  return process.env.ADMIN_SESSION_SECRET ?? "stevens-admin-session-secret-change-me";
+/** Longueur minimale acceptée pour le secret de signature. */
+const MIN_SECRET_LENGTH = 16;
+
+function getSessionSecret(): string | null {
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  if (!secret || secret.length < MIN_SECRET_LENGTH) return null;
+  return secret;
+}
+
+/** Configuration admin complète ? (utilisée par la route login pour
+ *  refuser proprement une configuration incomplète, sans oracle.) */
+export function isAuthConfigured(): boolean {
+  return Boolean(process.env.ADMIN_PASSWORD) && getSessionSecret() !== null;
 }
 
 export function verifyPassword(password: string): boolean {
-  const expected = process.env.ADMIN_PASSWORD ?? "stevens-admin-2026";
+  const expected = process.env.ADMIN_PASSWORD;
+  // Fail-closed : sans mot de passe configuré, AUCUNE soumission
+  // n'est acceptée (le dépôt public ne peut plus servir de mot de passe).
+  if (!expected) return false;
   const a = Buffer.from(password);
   const b = Buffer.from(expected);
   if (a.length !== b.length) return false;
   return crypto.timingSafeEqual(a, b);
 }
 
-/** Crée un jeton de session signé avec expiration. */
+/** Crée un jeton de session signé avec expiration.
+ *  Lève une erreur si le secret de signature n'est pas configuré —
+ *  appelée uniquement après un mot de passe vérifié, cette erreur
+ *  signale une configuration incomplète au lieu de signer avec un
+ *  secret public. */
 export function createSessionToken(): string {
+  const secret = getSessionSecret();
+  if (!secret) {
+    throw new Error(
+      "ADMIN_SESSION_SECRET absent ou trop court (< 16 caractères) — voir DEPLOIEMENT.md.",
+    );
+  }
   const payload = `admin.${Date.now() + SESSION_TTL_MS}`;
-  const sig = crypto.createHmac("sha256", getSecret()).update(payload).digest("base64url");
+  const sig = crypto.createHmac("sha256", secret).update(payload).digest("base64url");
   return `${payload}.${sig}`;
 }
 
-/** Vérifie un jeton de session (signature + expiration). */
+/** Vérifie un jeton de session (signature + expiration).
+ *  Fail-closed : sans secret configuré, AUCUN jeton n'est valide —
+ *  un jeton forgé avec l'ancien secret public du dépôt est refusé. */
 export function verifySessionToken(token: string | undefined | null): boolean {
+  const secret = getSessionSecret();
+  if (!secret) return false;
   if (!token) return false;
   const parts = token.split(".");
   if (parts.length !== 3) return false;
   const [prefix, expiry, sig] = parts;
   if (prefix !== "admin") return false;
   const payload = `${prefix}.${expiry}`;
-  const expected = crypto.createHmac("sha256", getSecret()).update(payload).digest("base64url");
+  const expected = crypto.createHmac("sha256", secret).update(payload).digest("base64url");
   const a = Buffer.from(sig);
   const b = Buffer.from(expected);
   if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return false;
