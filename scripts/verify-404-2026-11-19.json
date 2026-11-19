@@ -1,0 +1,64 @@
+{
+ "date": "2026-11-19",
+ "failures": 0,
+ "results": [
+  {
+   "device": "desktop-1440",
+   "status": 404,
+   "title": "Page introuvable — Stevens Akpovi",
+   "eyebrow": "Erreur 404",
+   "h1": "Cette page n'existe pas — ou a changé d'adresse.",
+   "h1Font": "Sora",
+   "cta": "Retour À L'Accueil",
+   "ctaBg": "rgb(255, 255, 255)",
+   "h1CenteredX": true,
+   "blockCenteredY": true,
+   "overflowX": false,
+   "bodyBg": "rgb(28, 28, 28)",
+   "consoleErrors": [],
+   "checks": {
+    "statut HTTP 404": true,
+    "titre d'onglet « Page introuvable — Stevens Akpovi »": true,
+    "eyebrow « Erreur 404 »": true,
+    "H1 français présent": true,
+    "police Sora sur le H1 (font-display)": true,
+    "CTA « Retour À L'Accueil » vers /": true,
+    "CTA fond blanc": true,
+    "H1 centré horizontalement": true,
+    "bloc centré verticalement": true,
+    "aucun débordement horizontal": true,
+    "zéro erreur console": true
+   },
+   "shot": "/tmp/404-desktop-1440.png"
+  },
+  {
+   "device": "mobile-iphone13",
+   "status": 404,
+   "title": "Page introuvable — Stevens Akpovi",
+   "eyebrow": "Erreur 404",
+   "h1": "Cette page n'existe pas — ou a changé d'adresse.",
+   "h1Font": "Sora",
+   "cta": "Retour À L'Accueil",
+   "ctaBg": "rgb(255, 255, 255)",
+   "h1CenteredX": true,
+   "blockCenteredY": true,
+   "overflowX": false,
+   "bodyBg": "rgb(28, 28, 28)",
+   "consoleErrors": [],
+   "checks": {
+    "statut HTTP 404": true,
+    "titre d'onglet « Page introuvable — Stevens Akpovi »": true,
+    "eyebrow « Erreur 404 »": true,
+    "H1 français présent": true,
+    "police Sora sur le H1 (font-display)": true,
+    "CTA « Retour À L'Accueil » vers /": true,
+    "CTA fond blanc": true,
+    "H1 centré horizontalement": true,
+    "bloc centré verticalement": true,
+    "aucun débordement horizontal": true,
+    "zéro erreur console": true
+   },
+   "shot": "/tmp/404-mobile-iphone13.png"
+  }
+ ]
+}
