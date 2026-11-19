@@ -20,6 +20,13 @@ const sora = Sora({
   fallback: ["ui-sans-serif", "system-ui", "Arial", "sans-serif"],
 });
 
+/* Mesure d'audience Google Analytics 4 (volet 8 de l'audit,
+   19/11/2026) — INACTIVE PAR DÉFAUT : les scripts gtag ne sont
+   rendus que si NEXT_PUBLIC_GA_ID est définie au build (voir
+   DEPLOIEMENT.md). Aucun identifiant d'exemple, aucune requête
+   vers Google tant que la variable n'est pas renseignée. */
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID?.trim() || null;
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: {
@@ -77,6 +84,15 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
+  /* Vérification Google Search Console (volet 8 de l'audit,
+     19/11/2026) : la balise <meta name="google-site-verification">
+     n'est rendue QUE si NEXT_PUBLIC_GSC_VERIFICATION est définie au
+     build (voir DEPLOIEMENT.md — méthode « Balise HTML » de Search
+     Console). Aucun jeton d'exemple par défaut : la propriété est
+     ajoutée par l'éditeur quand il le décide. */
+  verification: process.env.NEXT_PUBLIC_GSC_VERIFICATION?.trim()
+    ? { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION.trim() }
+    : undefined,
   icons: {
     // Paramètre de version : force les navigateurs (cache favicon très
     // rétentif) à recharger l'icône. Version 2026-11-14-2 : fond noir
@@ -92,7 +108,12 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-/** Données structurées : Personne + service professionnel + site web. */
+/** Données structurées : Personne + service professionnel + site web.
+ *  (Volet 8 de l'audit, 19/11/2026 : complétées pour Google —
+ *  image sur Person et ProfessionalService (Knowledge Graph /
+ *  résultats enrichis), knowsLanguage (langue de travail du site),
+ *  telephone sur le service — dérivé du numéro WhatsApp PUBLIÉ sur
+ *  le site (SITE.whatsapp), aucune donnée inventée.) */
 const jsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -104,6 +125,8 @@ const jsonLd = {
       description: SITE.description,
       email: `mailto:${SITE.email}`,
       url: SITE.url,
+      image: `${SITE.url}${ASSETS.portrait}`,
+      knowsLanguage: "fr",
       sameAs: [SITE.linkedin],
       knowsAbout: [
         "Conception de sites web",
@@ -123,6 +146,8 @@ const jsonLd = {
       description: SITE.description,
       url: SITE.url,
       email: SITE.email,
+      image: `${SITE.url}${ASSETS.ogImage}`,
+      telephone: SITE.whatsapp.replace("https://wa.me/", "+"),
       provider: { "@id": `${SITE.url}/#person` },
       areaServed: "Worldwide",
       serviceType: [
@@ -202,6 +227,20 @@ export default function RootLayout({
           {`(function(){try{var mq=function(q){return window.matchMedia&&window.matchMedia(q).matches};var t='ontouchstart' in window||navigator.maxTouchPoints>0||mq('(pointer: coarse)')||(mq('(hover: none)')&&mq('(max-width: 820px)'));if(!t){document.documentElement.classList.add('hoverable')}}catch(e){}})()`}
         </Script>
         {children}
+        {/* Google Analytics 4 — rendu uniquement si NEXT_PUBLIC_GA_ID
+            est définie (voir constantes en tête de fichier) : aucune
+            balise, aucune requête réseau vers Google sinon. */}
+        {GA_ID ? (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}',{'anonymize_ip':true});`}
+            </Script>
+          </>
+        ) : null}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -1,0 +1,141 @@
+{
+  "date": "2026-11-19T14:44:47.809Z",
+  "sections": {
+    "crawl": [
+      {
+        "ok": true,
+        "label": "robots.txt annonce le sitemap",
+        "detail": null
+      },
+      {
+        "ok": true,
+        "label": "robots.txt exclut /api/",
+        "detail": null
+      },
+      {
+        "ok": true,
+        "label": "sitemap.xml : une seule entrée",
+        "detail": [
+          "https://stevensakpovi.vercel.app/"
+        ]
+      },
+      {
+        "ok": true,
+        "label": "sitemap.xml : l'entrée est la racine du domaine réel",
+        "detail": "https://stevensakpovi.vercel.app/"
+      },
+      {
+        "ok": true,
+        "label": "favicon.ico servi (200, non vide)",
+        "detail": "2643 octets"
+      }
+    ],
+    "meta": [
+      {
+        "ok": true,
+        "label": "JSON-LD : un seul bloc, syntaxe valide",
+        "detail": null
+      },
+      {
+        "ok": true,
+        "label": "JSON-LD : Person + ProfessionalService + WebSite",
+        "detail": [
+          "Person",
+          "ProfessionalService",
+          "WebSite"
+        ]
+      },
+      {
+        "ok": true,
+        "label": "Person.image = portrait réel (URL absolue)",
+        "detail": "https://stevensakpovi.vercel.app/assets/stevens-akpovi-portrait.webp"
+      },
+      {
+        "ok": true,
+        "label": "Person.knowsLanguage = fr",
+        "detail": null
+      },
+      {
+        "ok": true,
+        "label": "ProfessionalService.image = vignette de partage",
+        "detail": "https://stevensakpovi.vercel.app/assets/OG.jpg"
+      },
+      {
+        "ok": true,
+        "label": "ProfessionalService.telephone dérivé du WhatsApp publié",
+        "detail": "+2290199909258"
+      },
+      {
+        "ok": true,
+        "label": "robots googleBot : max-image-preview large (Discover)",
+        "detail": "index, follow, max-image-preview:large, max-snippet:-1"
+      },
+      {
+        "ok": true,
+        "label": "og:image : dimensions déclarées = dimensions réelles du fichier",
+        "detail": "déclaré 1254×1254, réel 1254×1254"
+      },
+      {
+        "ok": true,
+        "label": "google-site-verification absente sans variable (aucune balise vide)",
+        "detail": null
+      },
+      {
+        "ok": true,
+        "label": "aucun script gtag sans NEXT_PUBLIC_GA_ID (zéro requête Google Analytics)",
+        "detail": false
+      },
+      {
+        "ok": true,
+        "label": "WCAG 2.5.3 : chaque libellé visible est contenu dans le nom accessible (tous les aria-label de l'accueil)",
+        "detail": "13 éléments contrôlés, 0 divergence"
+      },
+      {
+        "ok": true,
+        "label": "CTA hero « Réserver Un Appel » : nom accessible réparé",
+        "detail": "Réserver Un Appel — 30 minutes, gratuit et sans engagement"
+      },
+      {
+        "ok": true,
+        "label": "zéro erreur console (accueil)",
+        "detail": []
+      }
+    ],
+    "images": [
+      {
+        "ok": true,
+        "label": "mockup navigateur : candidat 640w en tête de srcset",
+        "detail": "/assets/projects/mrsteveenglish-desktop-640.webp 640w, /assets/projects/mrsteveenglish-desktop.webp 1440w, /assets/projects/mrsteveenglish-desktop@2x.webp 1920w"
+      },
+      {
+        "ok": true,
+        "label": "mockup téléphone : candidat 290w en tête de srcset",
+        "detail": "/assets/projects/afribayit-mobile-290.webp 290w, /assets/projects/afribayit-mobile.webp 390w, /assets/projects/afribayit-mobile@2x.webp 780w"
+      },
+      {
+        "ok": true,
+        "label": "fichier servi : /assets/projects/mrsteveenglish-desktop-640.webp",
+        "detail": "200"
+      },
+      {
+        "ok": true,
+        "label": "fichier servi : /assets/projects/afribayit-mobile-290.webp",
+        "detail": "200"
+      }
+    ],
+    "choixMobile": [
+      {
+        "ok": true,
+        "label": "iPhone 13 : mockup navigateur → candidat 640w (au lieu de 1440w/80 Ko)",
+        "detail": "http://127.0.0.1:3100/assets/projects/mrsteveenglish-desktop-640.webp"
+      },
+      {
+        "ok": true,
+        "label": "iPhone 13 : mockup téléphone → candidat 290w (au lieu de 390w/52 Ko)",
+        "detail": "http://127.0.0.1:3100/assets/projects/afribayit-mobile-290.webp"
+      }
+    ]
+  },
+  "resultat": "TOUT OK",
+  "total": 24
+}

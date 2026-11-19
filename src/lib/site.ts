@@ -170,6 +170,10 @@ export const PROJECTS = [
     url: "https://mrsteveenglish.vercel.app",
     desktop: "/assets/projects/mrsteveenglish-desktop.webp",
     desktop2x: "/assets/projects/mrsteveenglish-desktop@2x.webp",
+    /* Variante légère 640 px (volet 8 de l'audit, 19/11/2026 —
+       Lighthouse image-delivery) : candidat d'entrée du srcset du
+       mockup navigateur du hero, affiché à 130-290 px CSS. */
+    desktopSmall: "/assets/projects/mrsteveenglish-desktop-640.webp",
     mobile: "/assets/projects/mrsteveenglish-mobile.webp",
     mobile2x: "/assets/projects/mrsteveenglish-mobile@2x.webp",
   },
@@ -198,6 +202,10 @@ export const PROJECTS = [
     desktop2x: "/assets/projects/afribayit-desktop@2x.webp",
     mobile: "/assets/projects/afribayit-mobile.webp",
     mobile2x: "/assets/projects/afribayit-mobile@2x.webp",
+    /* Variante légère 290 px (volet 8 de l'audit, 19/11/2026) :
+       candidat d'entrée du srcset du mockup téléphone du hero,
+       affiché à 68-145 px CSS (68 px × DPR 3 = 204 px ≤ 290 px). */
+    mobileSmall: "/assets/projects/afribayit-mobile-290.webp",
   },
 ] as const;
 

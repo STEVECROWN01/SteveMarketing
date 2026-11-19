@@ -115,6 +115,8 @@ export function MonoImage({
 export function BrowserMockup({
   src,
   src2x,
+  srcSmall,
+  srcSmallWidth,
   alt,
   url,
   className = "",
@@ -131,6 +133,15 @@ export function BrowserMockup({
   src: string;
   /** Variante haute densité @2x (voir MonoImage). */
   src2x?: string;
+  /** Variante LÉGÈRE (volet 8 de l'audit, 19/11/2026 — Lighthouse
+   *  image-delivery) : candidat de plus petite largeur inséré EN
+   *  TÊTE du srcset. Le mockup navigateur du hero s'affiche à
+   *  130-290 px CSS ; sans candidat petit, la plus petite source
+   *  disponible restait 1440 px — le mobile téléchargeait 80 Ko
+   *  pour 130 px affichés. Largeur réelle du fichier requise
+   *  (srcSmallWidth) pour le descripteur en pixels. */
+  srcSmall?: string;
+  srcSmallWidth?: number;
   alt: string;
   url: string;
   className?: string;
@@ -163,8 +174,9 @@ export function BrowserMockup({
 }) {
   const shortUrl = url.replace(/^https?:\/\//, "");
   // Fichiers réels : desktop 1440 px (1x) et 1920 px (@2x vraie densité)
+  // + candidat léger en tête quand il est fourni (voir srcSmall).
   const srcSet = src2x
-    ? `${src} 1440w, ${src2x} 1920w`
+    ? `${srcSmall && srcSmallWidth ? `${srcSmall} ${srcSmallWidth}w, ` : ""}${src} 1440w, ${src2x} 1920w`
     : undefined;
   return (
     <figure
@@ -224,6 +236,8 @@ export function BrowserMockup({
 export function PhoneMockup({
   src,
   src2x,
+  srcSmall,
+  srcSmallWidth,
   alt,
   className = "",
   width = 390,
@@ -239,6 +253,15 @@ export function PhoneMockup({
   src: string;
   /** Variante haute densité @2x (voir MonoImage). */
   src2x?: string;
+  /** Variante LÉGÈRE (volet 8 de l'audit, 19/11/2026 — Lighthouse
+   *  image-delivery) : candidat de plus petite largeur inséré EN
+   *  TÊTE du srcset. Le mockup navigateur du hero s'affiche à
+   *  130-290 px CSS ; sans candidat petit, la plus petite source
+   *  disponible restait 1440 px — le mobile téléchargeait 80 Ko
+   *  pour 130 px affichés. Largeur réelle du fichier requise
+   *  (srcSmallWidth) pour le descripteur en pixels. */
+  srcSmall?: string;
+  srcSmallWidth?: number;
   alt: string;
   className?: string;
   width?: number;
@@ -266,8 +289,10 @@ export function PhoneMockup({
   zoom?: boolean;
 }) {
   // Fichiers réels : mobile 390 px (1x) et 780 px (@2x vraie densité)
+  // + candidat léger en tête quand il est fourni (voir srcSmall) :
+  // le mockup téléphone du hero s'affiche à 68-145 px CSS.
   const srcSet = src2x
-    ? `${src} 390w, ${src2x} 780w`
+    ? `${srcSmall && srcSmallWidth ? `${srcSmall} ${srcSmallWidth}w, ` : ""}${src} 390w, ${src2x} 780w`
     : undefined;
   const radiusOuter = softRadius ? "rounded-[20px]" : "rounded-[14px]";
   const radiusInner = softRadius ? "rounded-[17px]" : "rounded-[11px]";

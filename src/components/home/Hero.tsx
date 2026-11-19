@@ -280,6 +280,26 @@ export function Hero() {
                       alt={HERO.portraitLongAlt}
                       width={1672}
                       height={941}
+                      /* PAS DE SRCSET SUR CETTE IMAGE — décision mesurée
+                         du volet 8 (19/11/2026, A/B sous Lighthouse/PSI
+                         en Slow 4G) : ajouter des candidats responsives
+                         (836w/1170w/1672w + sizes) ici provoquait un
+                         CLS 0,136 (seuil Google 0,1) dans 1 à 2 runs
+                         Lighthouse sur 3 — Chrome ne réserve pas la
+                         boîte d'une image loading=lazy avec sizes tant
+                         que le candidat choisi n'est pas connu, et la
+                         grille du hero (items-center) déplace alors
+                         tout son contenu (~208 px, la hauteur de
+                         l'image). Un style aspectRatio inline N'A PAS
+                         suffi à l'immuniser (1/3 runs encore en
+                         échec). Sans srcset : CLS 0 — 6/6 runs
+                         Lighthouse + sonde dédiée 12/12 à 0,000.
+                         L'économie de bande passante mobile est
+                         captée sur les MOCKUPS du hero (candidats
+                         640w/290w dans Media.tsx), mesurés sans
+                         aucun décalage : leur boîte est épinglée par
+                         un style aspectRatio ET ils n'ont pas
+                         height:auto (w-full object-cover). */
                       loading="lazy"
                       fetchPriority="high"
                       decoding="async"
@@ -324,6 +344,8 @@ export function Hero() {
                   <BrowserMockup
                     src={PROJECTS[0].desktop}
                     src2x={PROJECTS[0].desktop2x}
+                    srcSmall={PROJECTS[0].desktopSmall}
+                    srcSmallWidth={640}
                     alt={`Aperçu du site ${PROJECTS[0].name}`}
                     url={PROJECTS[0].url}
                     width={1440}
@@ -349,6 +371,8 @@ export function Hero() {
                   <PhoneMockup
                     src={PROJECTS[2].mobile}
                     src2x={PROJECTS[2].mobile2x}
+                    srcSmall={PROJECTS[2].mobileSmall}
+                    srcSmallWidth={290}
                     alt={`Aperçu mobile du site ${PROJECTS[2].name}`}
                     width={390}
                     height={844}
@@ -406,7 +430,7 @@ export function Hero() {
                   variant="secondary"
                   size="lg"
                   hideArrowBelowSm
-                  ariaLabel="Réserver mon appel de 30 minutes — gratuit et sans engagement"
+                  ariaLabel="Réserver Un Appel — 30 minutes, gratuit et sans engagement"
                   className="px-2 text-[length:clamp(10px,3vw,12px)] sm:px-7 sm:text-[15px]"
                 >
                   {HERO.ctaPrimary}

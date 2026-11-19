@@ -116,7 +116,7 @@ export function FinalCtaSection() {
               variant="primary"
               size="lg"
               icon={CTAIcons.calendar}
-              ariaLabel="Réserver mon appel de 30 minutes — gratuit et sans engagement"
+              ariaLabel="Réserver Un Appel — 30 minutes, gratuit et sans engagement"
             >
               {FINAL_CTA.cta1}
             </CTAButton>
