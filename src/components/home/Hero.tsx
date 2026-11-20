@@ -144,10 +144,24 @@ export function Hero() {
     >
       {/* Préchargement des images du hero (performance) : chaque
           variante n'est préchargée que sur les écrans qui
-          l'affichent (attribut media). */}
+          l'affichent (attribut media).
+          NOTE (correctif du 20/11/2026, volet 9) : le mockup
+          navigateur n'a PLUS de preload manuel — l'ancien
+          `<link rel="preload" href={PROJECTS[0].desktop}>` (vestige
+          du travail LCP) téléchargeait le fichier 1440w (80 Ko) sur
+          TOUS les écrans, y compris mobile où le mockup s'affiche à
+          130 px : il défaisait l'économie du candidat 640w et forçait
+          un double téléchargement (preload 1440w + candidat 640w de
+          l'img). React 19 génère automatiquement, pour tout
+          <img fetchPriority="high"> avec srcset/sizes, un preload
+          RESPONSIVE (imageSrcSet + imageSizes — vérifié dans le HTML
+          servi) qui sélectionne le bon candidat par écran : mobile
+          → 640w, bureau étroit → 640w, bureaux très denses → 1440w.
+          Les deux preloads du portrait (media queries) restent :
+          fichiers à source unique, la sélection responsive n'a pas
+          d'intérêt. */}
       <link rel="preload" as="image" href={ASSETS.portraitLong} media="(max-width: 1023px)" fetchPriority="high" />
       <link rel="preload" as="image" href={ASSETS.portrait} media="(min-width: 1024px)" fetchPriority="high" />
-      <link rel="preload" as="image" href={PROJECTS[0].desktop} fetchPriority="high" />
 
       {/* Décor : grille discrète + halo neutre */}
       <div className="bg-grid-dark absolute inset-0" aria-hidden="true" />
@@ -341,6 +355,21 @@ export function Hero() {
                   (portrait vertical). */}
               <div className="hero-anim-browser absolute -bottom-2 -left-[4%] z-10 w-[36%] sm:-bottom-4 sm:-left-[10%] sm:w-[40%] lg:-bottom-5 lg:-left-[13%] lg:w-[52%]">
                 <div className="mockup-sway">
+                  {/* ATTRIBUTS 640×400 (ratio 1.6 IDENTIQUE à 1440×900 —
+                      correctif du 20/11/2026, volet 9) : cet img est
+                      eager+sync+fetchPriority=high ; quand la sélection
+                      du candidat srcset gagne la course contre la mise
+                      en page (comportement non déterministe observé 6/6
+                      puis 0/6 selon l'environnement Chrome), le
+                      navigateur retombe sur la largeur INTRINSÈQUE de
+                      l'attribut width. Avec 1440, il choisissait le
+                      candidat 1440w (80 Ko) pour 130 px affichés sur
+                      iPhone ; avec 640, le pire cas devient le candidat
+                      léger 640w (30 Ko) — et le cas normal (sélection
+                      après layout, via sizes) reste exact. La réserve
+                      de place ne change pas : elle vient du ratio
+                      (aspect-ratio 640/400 = 1440/900), pas des
+                      valeurs absolues. Aucun changement visuel. */}
                   <BrowserMockup
                     src={PROJECTS[0].desktop}
                     src2x={PROJECTS[0].desktop2x}
@@ -348,8 +377,8 @@ export function Hero() {
                     srcSmallWidth={640}
                     alt={`Aperçu du site ${PROJECTS[0].name}`}
                     url={PROJECTS[0].url}
-                    width={1440}
-                    height={900}
+                    width={640}
+                    height={400}
                     pinMono
                     priority
                     sizes="(max-width: 640px) 130px, (max-width: 1023px) 290px, 230px"
@@ -368,14 +397,21 @@ export function Hero() {
                   vertical). */}
               <div className="hero-anim-phone absolute -top-2 -right-[4%] z-10 w-[19%] sm:-top-4 sm:-right-[8%] sm:w-[20%] lg:-top-5 lg:-right-[10%] lg:w-[24%]">
                 <div className="mockup-sway mockup-sway--phone">
+                  {/* ATTRIBUTS 290×628 (correctif du 20/11/2026, volet 9 —
+                      même mécanisme que le mockup navigateur ci-dessus) :
+                      290×628 conserve le ratio du cadre 390×844 à 0,07 %
+                      près (imperceptible) et aligne la largeur
+                      intrinsèque sur le candidat léger 290w : le pire
+                      cas de la course sélection-vs-layout devient le
+                      candidat 290w (~20 Ko) au lieu de 390w (52 Ko). */}
                   <PhoneMockup
                     src={PROJECTS[2].mobile}
                     src2x={PROJECTS[2].mobile2x}
                     srcSmall={PROJECTS[2].mobileSmall}
                     srcSmallWidth={290}
                     alt={`Aperçu mobile du site ${PROJECTS[2].name}`}
-                    width={390}
-                    height={844}
+                    width={290}
+                    height={628}
                     pinMono
                     priority
                     sizes="(max-width: 640px) 68px, (max-width: 1023px) 145px, 104px"

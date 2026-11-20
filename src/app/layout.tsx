@@ -66,10 +66,13 @@ export const metadata: Metadata = {
     images: [
       {
         url: ASSETS.ogImage,
-        /* 1200×630 — ratio 1,91:1 recommandé par Facebook et LinkedIn
-         * (correctif du 20/11 : l'ancienne vignette carrée 1254×1254
-         * produisait des aperçus de partage intermittents ; cf
-         * scripts/og-1200x630-2026-11-20.py). */
+        /* 1200×630 — ratio 1,91:1 recommandé par Facebook et LinkedIn.
+         * Correctif de l'aperçu de partage intermittent (20/11) :
+         * l'ancienne vignette carrée 1254×1254 n'était pas au ratio
+         * attendu ; depuis la deuxième itération du correctif, la
+         * vignette est la COMPOSITION DE L'ÉDITEUR (OG-image.png,
+         * dérivée en JPEG optimisé — cf
+         * scripts/og-editeur-2026-11-20.py). */
         width: 1200,
         height: 630,
         alt: PAGES.accueil.title,
