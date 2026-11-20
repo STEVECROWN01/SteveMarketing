@@ -698,6 +698,55 @@ html[data-boot="deep"] body::before {
   animation-delay: -0.9s;
 }
 
+/* ---------- BADGES « À QUI JE VENDS » DU HERO (20/11/2026) ----------
+   « PMEs » à cheval sur le bord gauche de l'image, « PROFESSIONNELS »
+   à cheval sur le bord droit (demande de l'éditeur, 20/11/2026 —
+   volet 10 : la cible commerciale doit se lire au premier écran).
+   Pilule sombre semi-opaque + flou arrière, même langage visuel que
+   la mention « Stevens Akpovi » épinglée. PAS de text-transform :
+   la casse exacte de l'éditeur est respectée (« PMEs » garde son s
+   bas-de-casse). Chaque badge glisse depuis son bord vers l'image
+   et se pose en fondu — 2,6 s et 3,2 s, dans la chorégraphie des
+   épinglés (2-4 s) ; pas de balancement continu (sobriété). En
+   `prefers-reduced-motion`, la règle globale du site les fait
+   apparaître immédiatement. */
+@keyframes hero-badge-in-left {
+  from { opacity: 0; transform: translateX(-22px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes hero-badge-in-right {
+  from { opacity: 0; transform: translateX(22px); }
+  to { opacity: 1; transform: none; }
+}
+.hero-anim-badge--left {
+  animation: hero-badge-in-left 0.7s cubic-bezier(0.22, 1, 0.36, 1) 2.6s both;
+}
+.hero-anim-badge--right {
+  animation: hero-badge-in-right 0.7s cubic-bezier(0.22, 1, 0.36, 1) 3.2s both;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  border-radius: 9999px;
+  border: 1px solid rgba(228, 228, 228, 0.22);
+  background: rgba(7, 7, 7, 0.78);
+  padding: 0.42rem 0.75rem;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  line-height: 1;
+  color: #e4e4e4;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+@media (min-width: 640px) {
+  .hero-badge { padding: 0.5rem 0.85rem; font-size: 11px; }
+}
+@media (min-width: 1024px) {
+  .hero-badge { padding: 0.55rem 0.95rem; font-size: 12.5px; }
+}
+
 /* ---------- BANDE DÉFILANTE NOIRE (accueil, entre « Projets
    Réalisés » et la section suivante — demande de l'éditeur,
    16/11/2026) ----------

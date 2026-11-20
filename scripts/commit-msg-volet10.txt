@@ -1,0 +1,77 @@
+VOLET 10 DE L'AUDIT INTÉGRAL — LE PREMIER ÉCRAN RÉPOND ENFIN À « À QUI JE VENDS » ET « COMMENT JE LIVRE »
+
+Diagnostic du hero (20/11/2026) : sur les 4 questions du test du
+prospect froid, deux étaient automatiques (ce que je vends — H1 +
+mockups ; le bénéfice — « Génèrent des Ventes » en gras) et deux
+échouaient : « à qui je le vends » (aucune cible nommée au premier
+écran — « votre activité » ne désigne personne) et « les
+spécificités de mon service » (la seule affichée concernait l'appel,
+pas le service). Deux corrections, à la demande de l'éditeur :
+
+1. « À QUI JE VENDS » — badges épinglés sur l'image du hero
+   (demande de l'éditeur : « sur l'image du héros à gauche tu vas
+   épingler un bouton de texte "PMEs" et à droite un bouton de
+   texte "PROFESSIONNELS" ») :
+   - « PMEs » à cheval sur le bord GAUCHE, zone haute (le mockup
+     navigateur occupe le bas-gauche) ;
+   - « PROFESSIONNELS » à cheval sur le bord DROIT à mi-hauteur sur
+     bureau (≥ 1024 px : le smartphone n'y occupe que ~35 % de la
+     hauteur de l'image) ; sur MOBILE/TABLETTE le bord droit est
+     saturé de haut en bas (smartphone jusqu'à ~70 %, mention
+     « Stevens Akpovi » de ~82 % à ~97 % de la hauteur de la photo
+     horizontale, plus basse) — le badge s'y pose donc SUR l'image,
+     centre-droit, immédiatement sous-gauche du smartphone :
+     « à droite » reste vrai, aucun épinglé n'est masqué.
+   - Environ la moitié du badge à cheval recouvre l'image (autorisé
+     par l'éditeur : « peut couvrir l'image juste à moitié de gauche
+     à droite ») ; débords plafonnés pour ne jamais sortir du
+     viewport mobile (padding conteneur 20 px) ni empîter sur la
+     colonne de texte à 1024 px (gap 28 px).
+   - Pilule sombre semi-opaque + flou arrière (même langage visuel
+     que la mention « Stevens Akpovi » épinglée) ; casse exacte de
+     l'éditeur respectée (« PMEs » garde son s bas-de-casse) ;
+     fondu-glissement d'entrée à 2,6 s et 3,2 s, dans la
+     chorégraphie des épinglés (2-4 s), sans balancement continu ;
+     figée immédiatement en prefers-reduced-motion (règle globale).
+
+2. « SPÉCIFICITÉ » — description du hero réécrite (demande de
+   l'éditeur, 20/11/2026) :
+   « Votre activité mérite un site web qui travaille pour vous.
+   Attirez les bons clients, valorisez bien vos services et
+   transformez vos visiteurs en clients grâce à un site web
+   professionnel conçu avec du code pur dans un délai très court. »
+   - « code pur » et « délai très court » en gras EN PLUS de la
+     première phrase : la méthode de fabrication et la rapidité de
+     livraison deviennent visibles au premier écran (nouveauté
+     HERO.textBoldSpans, rendu par découpage RegExp dans Hero.tsx).
+   - « transformez vos visiteurs en clients » remplace « en
+     opportunités commerciales » : plus concret, aligné sur le H1
+     « qui Génèrent des Ventes ».
+   - DEUX CORRECTIONS ORTHOGRAPHIQUES apportées à la formulation
+     demandée : « code pur » (et non « code pure ») et « délai » au
+     singulier (et non « délais ») — le site vend une rédaction
+     professionnelle incluse : une faute dans le hero détruirait
+     cette promesse.
+   - « élégant » et « conçu pour convertir » retirés : le H1 porte
+     déjà la promesse de conversion, les maquettes montrent
+     l'élégance (choix éditorial assumé).
+
+TECHNIQUE : HERO.textBoldSpans / HERO.badgeLeft / HERO.badgeRight
+(src/content/site-content.ts) ; renderer de segments gras + deux
+badges positionnés en % de la largeur de l'image (src/components/
+home/Hero.tsx) ; keyframes hero-badge-in-left/right + classe
+.hero-badge responsive 10/11/12,5 px (src/app/globals.css) ; sonde
+de contrôle géométrique scripts/visuel-badges-hero-2026-11-20.js
+(6 viewports : 360×640, 390×844, 768×1024, 1024×768, 1280×800,
+1440×900).
+
+VÉRIFICATIONS : tsc ✓ ; build ✓ ; sonde Google 24/24 ✓ ; sonde CTA
+47/47 ✓ ; contrôle badges 0 échec sur les 6 viewports — C1 aucun
+débordement horizontal du document, C2 badges entiers dans le
+viewport, C3 aucun chevauchement avec les mockups navigateur/
+smartphone ni la mention « Stevens Akpovi », C4 sur bureau aucun
+empîtement sur le titre ni la description ; fractions mesurées :
+PMEs 62-73 % sur l'image, PROFESSIONNELS 81-83 % sur bureau
+(à cheval) et 100 % sur mobile/tablette (posé) ; double lecture
+VLM des captures mobile + bureau : lisible, élégant, cohérent avec
+le langage des épinglés, visage et corps dégagés.

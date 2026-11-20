@@ -61,6 +61,17 @@ import { ASSETS, PROJECTS } from "@/lib/site";
  * Après leur apparition, les deux mockups gardent une animation
  * continue : un léger balancement gauche-droite, comme une image
  * épinglée au mur (rotation autour du point d'appui haut).
+ *
+ * BADGES « À QUI JE VENDS » (demande de l'éditeur, 20/11/2026 —
+ * volet 10) : « PMEs » à cheval sur le bord GAUCHE en zone haute
+ * (le mockup navigateur occupe le bas-gauche), « PROFESSIONNELS »
+ * à cheval sur le bord DROIT à mi-hauteur (le smartphone occupe le
+ * haut-droit, la mention « Stevens Akpovi » le bas-droit). Environ
+ * la moitié de chaque badge recouvre l'image, le reste dépasse à
+ * l'extérieur : la cible commerciale se lit au premier écran sans
+ * masquer la photo. Pilule sombre + flou (même langage que la
+ * mention nom), fondu-glissement à 2,6 s et 3,2 s, sans
+ * balancement continu.
  * Toute la chorégraphie est en ANIMATIONS CSS (globals.css,
  * classes .hero-anim-* / .mockup-sway) : elle démarre dès le premier
  * rendu, sans attendre l'hydratation, et `prefers-reduced-motion`
@@ -132,9 +143,23 @@ export function Hero() {
     };
   }, []);
 
-  /* Description : première phrase en gras, suite normale. */
+  /* Description : première phrase en gras, suite normale — plus des
+     segments internes en gras (HERO.textBoldSpans, demande de
+     l'éditeur, 20/11/2026 : « code pur » et « délai très court »).
+     Découpage par RegExp de capture : les segments correspondants
+     ressortent du split et sont rendus en <strong> blanc, le reste
+     en texte normal — l'ordre du DOM suit exactement la phrase. */
   const rest =
     HERO.text.startsWith(HERO.textBold) ? HERO.text.slice(HERO.textBold.length).trim() : HERO.text;
+  const boldSpans = HERO.textBoldSpans as readonly string[];
+  const restParts = boldSpans.length
+    ? rest.split(
+        new RegExp(
+          `(${boldSpans.map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})`,
+          "g",
+        ),
+      )
+    : [rest];
 
   return (
     <section
@@ -418,6 +443,39 @@ export function Hero() {
                   />
                 </div>
               </div>
+
+              {/* Badges « à qui je vends » épinglés à cheval sur les
+                  bords de l'image (demande de l'éditeur, 20/11/2026 —
+                  volet 10 : « à qui je le vends » devait se lire au
+                  premier écran). « PMEs » : bord GAUCHE, zone haute —
+                  le mockup navigateur occupe le bas-gauche.
+                  « PROFESSIONNELS » : bord DROIT, mi-hauteur — le
+                  smartphone occupe le haut-droit, la mention
+                  « Stevens Akpovi » le bas-droit. BUREAU (≥ 1024 px,
+                  portrait vertical) : à cheval sur le bord droit, le
+                  smartphone n'y occupe que ~35 % de la hauteur.
+                  MOBILE/TABLETTE (photo horizontale, plus basse) : le
+                  bord droit est saturé de haut en bas (smartphone
+                  jusqu'à ~70 % de la hauteur, mention de ~82 % à
+                  ~97 %) — le badge se pose alors SUR l'image,
+                  centre-droit, immédiatement sous-gauche du
+                  smartphone (right 16/18 %) : « à droite » reste
+                  vrai, aucun épinglé n'est masqué. Chevauchement
+                  image : environ la moitié du badge à cheval
+                  (autorisé par l'éditeur : « peut couvrir l'image
+                  juste à moitié de gauche à droite »), plafonné sur
+                  mobile par le padding conteneur (20 px) pour ne
+                  jamais sortir du viewport. Pilule sombre
+                  semi-opaque + flou (même langage que la mention
+                  nom) ; fondu-glissement 2,6 s / 3,2 s, dans la
+                  chorégraphie des épinglés (2-4 s), sans
+                  balancement continu. */}
+              <span className="hero-anim-badge--left absolute left-[-4.5%] top-[15%] z-10 sm:left-[-5%] sm:top-[14%] lg:left-[-6%] lg:top-[15%]">
+                <span className="hero-badge">{HERO.badgeLeft}</span>
+              </span>
+              <span className="hero-anim-badge--right absolute right-[16%] top-[52%] z-10 sm:right-[18%] sm:top-[50%] lg:right-[-7%] lg:top-[44%]">
+                <span className="hero-badge">{HERO.badgeRight}</span>
+              </span>
             </div>
           </div>
 
@@ -441,7 +499,15 @@ export function Hero() {
                 className="hero-desc relative max-w-xl text-[12px] leading-[1.5] text-[#c8c8c8] transition-[top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] sm:text-[15px] lg:text-[15px] xl:text-base"
               >
                 <strong className="font-semibold text-white">{HERO.textBold}</strong>{" "}
-                {rest}
+                {restParts.map((part, i) =>
+                  boldSpans.includes(part) ? (
+                    <strong key={i} className="font-semibold text-white">
+                      {part}
+                    </strong>
+                  ) : (
+                    <React.Fragment key={i}>{part}</React.Fragment>
+                  ),
+                )}
               </p>
             </Reveal>
 

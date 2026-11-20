@@ -34,10 +34,25 @@ export const HERO = {
   /** Partie du titre en gras (700) — le reste reste en graisse normale. */
   h1Bold: "qui Génèrent des Ventes.",
   text:
-    "Votre activité mérite un site web qui travaille pour vous. Attirez les bons clients, valorisez bien vos services et transformez vos visiteurs en opportunités commerciales grâce à un site web professionnel élégant conçu pour convertir.",
+    "Votre activité mérite un site web qui travaille pour vous. Attirez les bons clients, valorisez bien vos services et transformez vos visiteurs en clients grâce à un site web professionnel conçu avec du code pur dans un délai très court.",
   /** Première phrase de la description — affichée en gras (demande de
    *  l'éditeur, 15/11/2026). */
   textBold: "Votre activité mérite un site web qui travaille pour vous.",
+  /** Segments supplémentaires en gras DANS la suite de la description
+   *  (demande de l'éditeur, 20/11/2026) : « code pur » (la méthode de
+   *  fabrication) et « délai très court » (la rapidité de livraison) —
+   *  les deux spécificités de service deviennent visibles dès le
+   *  premier écran. Orthographe corrigée par rapport à la formulation
+   *  demandée : « code pur » (et non « code pure ») et « délai » au
+   *  singulier (et non « délais ») — une faute dans le hero coûterait
+   *  cher à un site qui vend une rédaction professionnelle incluse. */
+  textBoldSpans: ["code pur", "délai très court"],
+  /** Badges « à qui je vends » épinglés sur l'image du hero (demande
+   *  de l'éditeur, 20/11/2026 — volet 10 : la cible commerciale
+   *  devait être lisible au premier écran). « PMEs » à cheval sur le
+   *  bord gauche, « PROFESSIONNELS » à cheval sur le bord droit. */
+  badgeLeft: "PMEs",
+  badgeRight: "PROFESSIONNELS",
   ctaPrimary: CTA_LABELS.appel,
   /** « Voir Mes Réalisations » — libellé unifié (18/11/2026) :
    *  « Voir Mes Travaux » désignait la même page sous un autre
