@@ -66,8 +66,12 @@ export const metadata: Metadata = {
     images: [
       {
         url: ASSETS.ogImage,
-        width: 1254,
-        height: 1254,
+        /* 1200×630 — ratio 1,91:1 recommandé par Facebook et LinkedIn
+         * (correctif du 20/11 : l'ancienne vignette carrée 1254×1254
+         * produisait des aperçus de partage intermittents ; cf
+         * scripts/og-1200x630-2026-11-20.py). */
+        width: 1200,
+        height: 630,
         alt: PAGES.accueil.title,
         type: "image/jpeg",
       },

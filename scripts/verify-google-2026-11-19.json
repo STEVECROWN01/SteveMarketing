@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-19T14:44:47.809Z",
+  "date": "2026-11-20T08:31:26.216Z",
   "sections": {
     "crawl": [
       {
@@ -58,7 +58,7 @@
       {
         "ok": true,
         "label": "ProfessionalService.image = vignette de partage",
-        "detail": "https://stevensakpovi.vercel.app/assets/OG.jpg"
+        "detail": "https://stevensakpovi.vercel.app/assets/OG-2026-11-20.jpg"
       },
       {
         "ok": true,
@@ -73,7 +73,7 @@
       {
         "ok": true,
         "label": "og:image : dimensions déclarées = dimensions réelles du fichier",
-        "detail": "déclaré 1254×1254, réel 1254×1254"
+        "detail": "déclaré 1200×630, réel 1200×630"
       },
       {
         "ok": true,

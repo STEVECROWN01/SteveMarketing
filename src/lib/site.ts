@@ -236,12 +236,18 @@ export const ASSETS = {
   /** Logo officiel — version noire sur fond TRANSPARENT (RGBA, fond
    *  blanc supprimé du fichier, 15/11/2026) pour fonds clairs. */
   logoDark: "/assets/logo-noir.png?v=2026-11-15",
-  /** Vignette de partage de lien (Open Graph) — dérivé JPEG optimisé
-   *  (216 Ko) de la vignette fournie par l'éditeur : WhatsApp
-   *  n'affiche pas les aperçus au-delà d'environ 600 Ko et le PNG
-   *  original (1,9 Mo) échouait silencieusement au partage. Nouveau
-   *  nom de fichier = contournement des caches des plateformes. La
-   *  source PNG (OG.png) est conservée dans le dépôt
-   *  (scripts/optimize-og-image-2026-11-16.py). */
-  ogImage: "/assets/OG.jpg",
+  /** Vignette de partage de lien (Open Graph) — 1200×630, 77 Ko
+   *  (correctif du 20/11/2026 : l'aperçu de partage s'affichait de
+   *  façon INTERMITTENTE sur les réseaux sociaux — l'image carrée
+   *  1254×1254 de 216 Ko n'était pas au ratio 1,91:1 attendu par
+   *  Facebook/LinkedIn, et les caches edge des plateformes conservaient
+   *  des scrapes obsolètes ; cf scripts/og-1200x630-2026-11-20.py pour
+   *  le diagnostic complet et la composition — le visuel carré de
+   *  l'éditeur est intégralement préservé, centré sur la toile au
+   *  #1c1c1c du site. NOUVEAU NOM DE FICHIER DATÉ = parade éprouvée
+   *  contre les caches (même méthode que le 16/11) : chaque plateforme
+   *  est forcée de re-télécharger. La source PNG (OG.png) et l'ancien
+   *  dérivé (OG.jpg) restent dans le dépôt — d'anciens caches de
+   *  plateformes pointent encore vers eux.) */
+  ogImage: "/assets/OG-2026-11-20.jpg",
 } as const;

@@ -156,7 +156,10 @@ const check = (ok, label, detail) => {
   meta.push(check(!!person && !!service && !!website, "JSON-LD : Person + ProfessionalService + WebSite", graph.map((n) => n["@type"])));
   meta.push(check(!!person?.image && /stevens-akpovi-portrait\.webp$/.test(person.image), "Person.image = portrait réel (URL absolue)", person?.image));
   meta.push(check(person?.knowsLanguage === "fr", "Person.knowsLanguage = fr"));
-  meta.push(check(!!service?.image && /OG\.jpg$/.test(service.image), "ProfessionalService.image = vignette de partage", service?.image));
+  // 20/11 : le nom de la vignette est désormais daté (OG-2026-11-20.jpg,
+  // parade aux caches des plateformes) — le motif accepte toute déclinaison
+  // OG…jpg (l'ancien OG.jpg reste servi pour les caches anciens).
+  meta.push(check(!!service?.image && /\/OG[^/]*\.jpg$/.test(service.image), "ProfessionalService.image = vignette de partage", service?.image));
   meta.push(
     check(!!service?.telephone && /^\+229\d+$/.test(service.telephone), "ProfessionalService.telephone dérivé du WhatsApp publié", service?.telephone),
   );
@@ -169,17 +172,23 @@ const check = (ok, label, detail) => {
       dom.googleBot || dom.metaRobots,
     ),
   );
-  // og:image déclarée = dimensions réelles du fichier
+  // og:image déclarée = dimensions réelles du fichier servi. 20/11 :
+  // l'URL og:image du DOM est ABSOLUE (metadataBase → domaine de
+  // production) — le fichier local vient d'être régénéré et n'est pas
+  // encore déployé : charger l'URL production faisait échouer la sonde
+  // AVANT tout rapport (onerror → reject d'un Event brut). On mesure
+  // donc le MÊME chemin sur le serveur local de la sonde.
   if (dom.ogImage) {
-    const real = await page.evaluate(async (url) => {
+    const ogChemin = new URL(dom.ogImage).pathname;
+    const real = await page.evaluate(async (chemin) => {
       const im = new Image();
-      im.src = url;
+      im.src = chemin;
       await new Promise((res, rej) => {
         im.onload = res;
-        im.onerror = rej;
+        im.onerror = () => rej(new Error("image introuvable sur le serveur local : " + chemin));
       });
       return { w: im.naturalWidth, h: im.naturalHeight };
-    }, dom.ogImage);
+    }, ogChemin);
     meta.push(
       check(
         String(real.w) === dom.ogImageWidth && String(real.h) === dom.ogImageHeight,

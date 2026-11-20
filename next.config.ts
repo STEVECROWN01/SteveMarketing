@@ -56,6 +56,22 @@ const nextConfig: NextConfig = {
           { key: "Strict-Transport-Security", value: "max-age=31536000" },
         ],
       },
+      /* CACHE DES RESSOURCES STATIQUES /assets/ (correctif de l'aperçu
+         de partage intermittent, 20/11/2026) : Vercel sert les fichiers
+         de public/ avec « max-age=0, must-revalidate » par défaut —
+         chaque requête (y compris celles des scrapers de réseaux
+         sociaux, au timeout court) interroge l'origine. Un cache de
+         24 h aligne les décisions des crawleurs et des navigateurs
+         sur les serveurs edge, sans verrouiller longtemps : les
+         fichiers appelés à changer suivent la convention du projet —
+         nouveau nom daté (OG-2026-11-20.jpg) ou paramètre de version
+         (logo-blanc.png?v=2026-11-15, favicon.png?v=2026-11-14-2). La
+         règle vient APRÈS la règle générale : pour /assets/*, ses
+         clés s'ajoutent aux en-têtes de sécurité ci-dessus. */
+      {
+        source: "/assets/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400" }],
+      },
     ];
   },
 };
