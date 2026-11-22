@@ -1,0 +1,37 @@
+VOLET 12 DE L'AUDIT INTÉGRAL — LA MENTION « — PMEs / PROFESSIONNELS » PASSE DU RANG D'LIGNE ISOLÉE AU FIL DE LA DESCRIPTION
+
+Demande de l'éditeur (22/11/2026) : « Le "— PMEs / PROFESSIONNELS"
+devrait être dans la description et on aura "Votre activité mérite
+un site web qui travaille pour vous. Attirez les bons clients,
+valorisez bien vos services et transformez vos visiteurs en clients
+grâce à un site web professionnel conçu avec du code pur dans un
+délai très court. — PMEs / PROFESSIONNELS" ».
+
+CORRECTIF (minimal — une seule ligne de rendu change) :
+- le <br/> du volet 11 est SUPPRIMÉ : la mention italique
+  (« {" "} » + <em>) s'enchaîne désormais directement après
+  « …délai très court. » dans le flux du paragraphe — la
+  description complète se lit d'une traite, exactement comme
+  formulée par l'éditeur ;
+- elle reste en italique (volet 11) et DANS le même paragraphe :
+  l'équilibrage vertical bureau (descriptionEquilibree, qui mesure
+  ce paragraphe) reste exact sans changement de code ;
+- inline, la hauteur du paragraphe ne peut qu'être ≤ celle du
+  volet 11 (mention sur sa propre ligne) — le risque de rognage du
+  hero (section min-h-svh + overflow-hidden) est donc nul par
+  construction.
+
+SONDE — scripts/visuel-hero-mention-2026-11-22.js adaptée : C3
+vérifie désormais la description COMPLETE du paragraphe, caractère
+pour caractère (constante TEXTE_COMPLET = formulation exacte de
+l'éditeur), avec 1 seul <em> italique et AUCUN <br> dans le
+paragraphe (l'assertion « propre ligne » du volet 11 est retirée).
+
+VÉRIFICATIONS : tsc ✓ ; build ✓ ; sonde Google 24/24 ✓ ; sonde CTA
+47/47 ✓ ; sonde mention 4/4 sur les 6 viewports (360×640 →
+1440×900) — texte du paragraphe EXACT partout, 0 badge restant, 0
+débordement, barre de réassurance entière ; marges sous le hero :
+32 px (360×640, contre 25 px au volet 11 : le flux inline libère
+même un peu d'espace), 125/167/106/107/137 px ailleurs ; lecture
+VLM des captures mobile + bureau : enchaînement direct confirmé,
+aucune césure disgracieuse, aucun chevauchement ni débordement.

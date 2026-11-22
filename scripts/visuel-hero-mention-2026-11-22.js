@@ -1,16 +1,14 @@
 /**
  * CONTRÔLE VISUEL ET GÉOMÉTRIQUE — MENTION « À QUI JE VENDS » EN
- * ITALIQUE À LA SUITE DE LA DESCRIPTION + SUPPRESSION DES BADGES
- * (volet 11 de l'audit intégral, 22/11/2026).
+ * ITALIQUE DANS LE FIL DE LA DESCRIPTION + SUPPRESSION DES BADGES
+ * (volets 11-12 de l'audit intégral, 22/11/2026).
  *
- * La mention « — PMEs / PROFESSIONNELS » (italic, propre ligne dans
- * le paragraphe de description) remplace les deux badges épinglés du
- * volet 10 (supprimés). Le point sensible : le hero doit rester
- * ENTIÈREMENT visible sans défilement sur toutes les tailles (la
- * section est min-h-svh + overflow-hidden — tout dépassement serait
- * ROGNÉ, invisible) ; la mention ajoute une ligne de texte sous la
- * description, d'où une mesure AVANT/après du bas de la barre de
- * réassurance.
+ * La mention « — PMEs / PROFESSIONNELS » (italic, INLINE à la suite
+ * de « …délai très court. » — volet 12) remplace les deux badges
+ * épinglés du volet 10 (supprimés). Le point sensible : le hero
+ * doit rester ENTIÈREMENT visible sans défilement sur toutes les
+ * tailles (la section est min-h-svh + overflow-hidden — tout
+ * dépassement serait ROGNÉ, invisible).
  *
  * Deux modes :
  *  - `node script.js mesure` : mesures seules (aucune assertion) —
@@ -24,8 +22,10 @@
  *       ni pilule .hero-badge dans le DOM ;
  *  C3 — la mention italique existe EXACTEMENT une fois, DANS le
  *       paragraphe .hero-desc, texte exact « — PMEs / PROFESSIONNELS »,
- *       rendue en italique, et posée sur sa propre ligne (bord
- *       gauche de la boîte aligné sur le paragraphe) ;
+ *       rendue en italique, INLINE dans le fil de la description
+ *       (volet 12 : aucun <br> — le texte complet du paragraphe
+ *       doit être EXACTEMENT la description demandée par l'éditeur,
+ *       mention comprise) ;
  *  C4 — le hero tient dans le viewport : bas de la barre de
  *       réassurance (dernier élément de la colonne texte) ≤ hauteur
  *       du viewport (tolérance 1 px — au-delà, la barre est rognée
@@ -52,6 +52,13 @@ const VIEWPORTS = [
   { name: "bureau-1440x900", width: 1440, height: 900 },
 ];
 const MENTION = "— PMEs / PROFESSIONNELS";
+/** Texte complet attendu du paragraphe .hero-desc — la description
+ *  exacte demandée par l'éditeur (volets 10-12), mention inline
+ *  comprise. Le blanc avant le tiret cadratin vient du rendu
+ *  ({" "} + <em>) ; la normalisation des blancs du textContent rend
+ *  la comparaison robuste aux espaces du DOM. */
+const TEXTE_COMPLET =
+  "Votre activité mérite un site web qui travaille pour vous. Attirez les bons clients, valorisez bien vos services et transformez vos visiteurs en clients grâce à un site web professionnel conçu avec du code pur dans un délai très court. — PMEs / PROFESSIONNELS";
 
 (async () => {
   fs.mkdirSync(OUT, { recursive: true });
@@ -86,11 +93,12 @@ const MENTION = "— PMEs / PROFESSIONNELS";
         em: rect(em),
         emText: em ? em.textContent.trim() : null,
         emItalic: em ? getComputedStyle(em).fontStyle : null,
-        emOwnLine: null, // calculé hors evaluate (comparaison des gauches)
+        emCount: p ? p.querySelectorAll("em").length : 0,
+        brCount: p ? p.querySelectorAll("br").length : -1,
+        pText: p ? p.textContent.replace(/\s+/g, " ").trim() : null,
         reassuranceBottom: reassurance ? rect(reassurance).bottom : null,
       };
     });
-    m.emOwnLine = m.p && m.em ? Math.abs(m.em.left - m.p.left) < 2 : false;
     m.margeDescMention = m.p && m.em ? Math.round(m.em.top - m.p.top) : null;
 
     const checks = [];
@@ -98,9 +106,10 @@ const MENTION = "— PMEs / PROFESSIONNELS";
     push("C1 aucun débordement horizontal", m.scrollW <= m.vw, `scrollWidth ${m.scrollW} / viewport ${m.vw}`);
     push("C2 aucun badge épinglé restant", m.badgesAnciens === 0 && m.pilules === 0,
       `hero-anim-badge ${m.badgesAnciens}, .hero-badge ${m.pilules}`);
-    push("C3 mention italique exacte, une fois, dans la description",
-      m.emText === MENTION && m.emItalic === "italic" && m.emOwnLine,
-      `texte « ${m.emText} », fontStyle ${m.emItalic}, propre ligne ${m.emOwnLine}`);
+    push("C3 mention italique inline, description complète exacte",
+      m.emText === MENTION && m.emItalic === "italic" && m.emCount === 1 &&
+      m.brCount === 0 && m.pText === TEXTE_COMPLET,
+      `mention « ${m.emText} » (${m.emItalic}, ${m.emCount} em, ${m.brCount} br) — texte paragraphe ${m.pText === TEXTE_COMPLET ? "exact" : "≠ attendu"}`);
     if (m.reassuranceBottom !== null) {
       push("C4 barre de réassurance entière dans le viewport", m.reassuranceBottom <= m.vh + 1,
         `bas ${Math.round(m.reassuranceBottom)} / hauteur ${m.vh} — marge ${Math.round(m.vh - m.reassuranceBottom)} px`);

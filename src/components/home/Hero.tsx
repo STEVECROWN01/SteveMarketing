@@ -62,11 +62,12 @@ import { ASSETS, PROJECTS } from "@/lib/site";
  * continue : un léger balancement gauche-droite, comme une image
  * épinglée au mur (rotation autour du point d'appui haut).
  *
- * MENTION « À QUI JE VENDS » (volet 11, demande de l'éditeur,
- * 22/11/2026) : « — PMEs / PROFESSIONNELS » en italique, à la
- * suite de la description, sur sa propre ligne dans le même
- * paragraphe. Elle remplace les deux badges épinglés du volet 10
- * (supprimés à la demande de l'éditeur) : la cible commerciale
+ * MENTION « À QUI JE VENDS » (volets 11-12, demande de l'éditeur,
+ * 22/11/2026) : « — PMEs / PROFESSIONNELS » en italique, DANS le
+ * fil de la description — à la suite de « …délai très court. »,
+ * sans saut de ligne (volet 11 : sur sa propre ligne ; volet 12 :
+ * inline, à la demande de l'éditeur). Elle remplace les deux
+ * badges épinglés du volet 10 (supprimés) : la cible commerciale
  * reste lisible au premier écran, et l'image redevient entièrement
  * dégagée — seuls les deux mockups et la mention « Stevens Akpovi »
  * y restent épinglés.
@@ -473,14 +474,21 @@ export function Hero() {
                     <React.Fragment key={i}>{part}</React.Fragment>
                   ),
                 )}
-                {/* Mention « à qui je vends » — italique, propre ligne
-                    dans le même paragraphe (demande de l'éditeur,
-                    22/11/2026 — volet 11) : remplace les badges du
-                    volet 10. Dans le MÊME paragraphe (et non en bloc
-                    séparé) pour que l'équilibrage vertical bureau
+                {/* Mention « à qui je vends » — italique, DANS le fil
+                    de la description (demande de l'éditeur,
+                    22/11/2026 — volet 12) : à la suite de
+                    « …délai très court. », sans saut de ligne — la
+                    description se lit d'une traite : « … conçu avec du
+                    code pur dans un délai très court. — PMEs /
+                    PROFESSIONNELS ». Elle remplace les badges du
+                    volet 10 ; elle reste DANS le même paragraphe
+                    pour que l'équilibrage vertical bureau
                     (descriptionEquilibree, qui mesure ce paragraphe)
-                    reste exact. */}
-                <br />
+                    reste exact. Inline (et non bloc) : la hauteur
+                    du paragraphe ne peut qu’être ≤ celle du volet 11
+                    (mention sur sa propre ligne), déjà vérifiée
+                    sans rognage sur les 6 viewports. */}
+                {" "}
                 <em className="italic">{HERO.targetItalic}</em>
               </p>
             </Reveal>
