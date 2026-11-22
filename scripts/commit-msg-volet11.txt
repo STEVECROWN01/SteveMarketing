@@ -1,0 +1,54 @@
+VOLET 11 DE L'AUDIT INTÉGRAL — LA CIBLE COMMERCIALE QUITTE L'IMAGE POUR LE TEXTE : MENTION ITALIQUE « — PMEs / PROFESSIONNELS » À LA SUITE DE LA DESCRIPTION, BADGES DU VOLET 10 SUPPRIMÉS
+
+Décision de l'éditeur (22/11/2026), à la relecture du volet 10 :
+les deux badges épinglés sur la photo du hero (« PMEs » bord
+gauche, « PROFESSIONNELS » bord droit) cédaient leur place à une
+mention textuelle — la cible commerciale se lit désormais dans le
+texte, et l'image redevient entièrement dégagée (seuls les deux
+mockups et la mention « Stevens Akpovi » y restent épinglés).
+
+1. MENTION ITALIQUE (ajout) — « — PMEs / PROFESSIONNELS » (demande
+   de l'éditeur : « à la suite de la description du hero, ajoute
+   "— PMEs / PROFESSIONNELS" (en italic) ») :
+   - en italique, sur sa PROPRE ligne, DANS le même paragraphe que
+     la description (saut de ligne <br/> + <em>) : littéralement « à
+     la suite », et l'équilibrage vertical bureau
+     (descriptionEquilibree, qui mesure ce paragraphe) reste exact
+     sans aucun changement de code ;
+   - casse exacte de l'éditeur respectée (« PMEs » garde son s
+     bas-de-casse) ;
+   - aucune animation dédiée : elle apparaît avec le paragraphe de
+     description (révélation aboveFold « rise », élément LCP) — un
+     comportement de plus qui ne peut pas retarder la peinture.
+
+2. BADGES SUPPRIMÉS — les deux <span> épinglés du volet 10
+   (Hero.tsx), les constantes HERO.badgeLeft / HERO.badgeRight
+   (site-content.ts), et tout le bloc CSS associé (keyframes
+   hero-badge-in-left/right, classes .hero-anim-badge--left/--right
+   et .hero-badge + ses deux media queries — globals.css, remplacé
+   par une note documentaire). La sonde géométrique du volet 10
+   (scripts/visuel-badges-hero-2026-11-20.js) est supprimée : son
+   objet n'existe plus ; elle est remplacée par
+   scripts/visuel-hero-mention-2026-11-22.js.
+
+POINT SENSIBLE SURVEILLÉ : le hero doit rester entièrement visible
+sans défilement sur toutes les tailles (section min-h-svh +
+overflow-hidden : tout dépassement serait rogné). La mention ajoute
+une ligne sous la description — mesure AVANT/après du bas de la
+barre de réassurance sur 6 viewports :
+  360×640 : 32 px → 25 px de marge ; 390×844 : 125 → 116 ;
+  768×1024 : 179 → 167 ; 1024×768 : 106 → 100 ;
+  1280×800 : 107 → 101 ; 1440×900 : 137 → 131.
+Marge positive partout : rien n'est rogné, y compris sur le mobile
+le plus court.
+
+VÉRIFICATIONS : tsc ✓ ; build ✓ ; sonde Google 24/24 ✓ ; sonde CTA
+47/47 ✓ ; sonde visuel-hero-mention 4/4 sur les 6 viewports — C1
+aucun débordement horizontal, C2 AUCUN badge restant dans le DOM
+(hero-anim-badge / .hero-badge), C3 mention exacte « — PMEs /
+PROFESSIONNELS », italique, une seule occurrence, propre ligne
+dans le paragraphe de description, C4 barre de réassurance entière
+dans le viewport sur les 6 écrans ; mention mesurée 150×14 px
+(mobile 360) à 219×20 px (bureau 1440) ; lecture VLM des captures
+mobile + bureau : photo débarrassée des badges, mention lisible et
+élégante en signature de ciblage, aucun chevauchement ni coupure.

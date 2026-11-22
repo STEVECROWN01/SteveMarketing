@@ -47,12 +47,16 @@ export const HERO = {
    *  singulier (et non « délais ») — une faute dans le hero coûterait
    *  cher à un site qui vend une rédaction professionnelle incluse. */
   textBoldSpans: ["code pur", "délai très court"],
-  /** Badges « à qui je vends » épinglés sur l'image du hero (demande
-   *  de l'éditeur, 20/11/2026 — volet 10 : la cible commerciale
-   *  devait être lisible au premier écran). « PMEs » à cheval sur le
-   *  bord gauche, « PROFESSIONNELS » à cheval sur le bord droit. */
-  badgeLeft: "PMEs",
-  badgeRight: "PROFESSIONNELS",
+  /** Mention « à qui je vends » en ITALIQUE, à la suite de la
+   *  description, sur sa propre ligne dans le même paragraphe
+   *  (demande de l'éditeur, 22/11/2026 — volet 11) : « — PMEs /
+   *  PROFESSIONNELS » remplace les deux badges épinglés sur
+   *  l'image du hero (volet 10, supprimés à la demande de
+   *  l'éditeur après relecture : la cible commerciale se lit
+   *  désormais dans le texte et l'image redevient entièrement
+   *  dégagée). Casse exacte de l'éditeur respectée (« PMEs »
+   *  garde son s bas-de-casse). */
+  targetItalic: "— PMEs / PROFESSIONNELS",
   ctaPrimary: CTA_LABELS.appel,
   /** « Voir Mes Réalisations » — libellé unifié (18/11/2026) :
    *  « Voir Mes Travaux » désignait la même page sous un autre
