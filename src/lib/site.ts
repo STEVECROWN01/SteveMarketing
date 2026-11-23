@@ -158,7 +158,12 @@ export const NAV_ITEMS: { key: PageKey; label: string }[] = [
   { key: "contact", label: "Contact" },
 ];
 
-/** Les trois réalisations réelles — données factuelles uniquement. */
+/** Les quatre réalisations réelles — données factuelles uniquement.
+ *  Ajout du 24/11/2026 (volet 13) : ALEXANDRE MOREL
+ *  (journalistefr.vercel.app) AJOUTÉ EN FIN de tableau — l'ordre
+ *  compte : les mockups du hero référencent PROJECTS[0] (navigateur,
+ *  MR STEVE ENGLISH) et PROJECTS[2] (smartphone, AFRIBAYIT) par
+ *  index ; tout ajout en tête aurait CHANGÉ les images du hero. */
 export const PROJECTS = [
   {
     id: "mrsteveenglish",
@@ -206,6 +211,25 @@ export const PROJECTS = [
        candidat d'entrée du srcset du mockup téléphone du hero,
        affiché à 68-145 px CSS (68 px × DPR 3 = 204 px ≤ 290 px). */
     mobileSmall: "/assets/projects/afribayit-mobile-290.webp",
+  },
+  {
+    id: "journalistefr",
+    name: "ALEXANDRE MOREL",
+    category: "Site web professionnel pour journaliste",
+    description:
+      "Un espace professionnel consacré à un journaliste international : la présentation de son parcours, de ses reportages et documentaires, et de ses services en communication.",
+    cta: "Voir Le Site",
+    url: "https://journalistefr.vercel.app",
+    /* Captures du site live (24/11/2026, volet 13) — pipeline
+       identique aux autres projets :
+       scripts/capture-journalistefr-2026-11-24.js (Playwright, /fr,
+       attente polices+animations) + scripts/prepare-journalistefr-
+       2026-11-24.py (WebP q82). Le site redirige / → /fr (307,
+       next-intl) : l'URL ci-dessus reste celle donnée par l'éditeur. */
+    desktop: "/assets/projects/journalistefr-desktop.webp",
+    desktop2x: "/assets/projects/journalistefr-desktop@2x.webp",
+    mobile: "/assets/projects/journalistefr-mobile.webp",
+    mobile2x: "/assets/projects/journalistefr-mobile@2x.webp",
   },
 ] as const;
 

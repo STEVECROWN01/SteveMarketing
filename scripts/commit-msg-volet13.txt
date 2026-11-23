@@ -1,0 +1,93 @@
+VOLET 13 DE L'AUDIT INTÉGRAL — QUATRE CORRECTIFS DU HERO DEMANDÉS PAR L'ÉDITEUR + INTÉGRATION D'ALEXANDRE MOREL (journalistefr.vercel.app) DANS LES RÉALISATIONS
+
+1. ESPACE AU-DESSUS DE LA MENTION 5 ÉTOILES RÉDUIT (demande :
+   « je veux que tu réduises le dessus de la mention cinq
+   étoiles ») — le contenu du hero était VERTICALEMENT CENTRÉ
+   (justify-center) : l'écart mesuré entre le haut de l'écran et
+   les étoiles atteignait 84 px (360×640) à 217 px (1440×900).
+   Le conteneur passe en ANCRAGE HAUT (justify-start) avec un
+   padding-top calé sur la pastille logo fixe + respiration :
+   pt-[76px] (pastille 64 px + 12), lg:pt-[124px] (pastille
+   104 px + 20). Mesuré après : étoiles à 76 px sur mobile et
+   tablette (toutes hauteurs), 154-166 px sur bureau. Les
+   paddings-top des paliers « téléphones courts » suivent (54 →
+   76 px) : ancré en haut, le contenu part du padding.
+
+2. PHOTO DU HERO EN NOIR ET BLANC SUR MOBILE, COULEUR AU DOIGTÉ
+   (demande : « sur mobile que ce soit en blanc noir. Et quand on
+   pointe le doigt dessus, ça va afficher sa couleur originale. Et
+   quand on relâche, ça va revenir au blanc noir ») — nouvelle
+   variante .mono-touch (globals.css), posée EN PLUS de .mono-media
+   sur les deux figures du hero (portrait bureau + photo
+   horizontale mobile). Sur les écrans tactiles ((hover: none) /
+   (pointer: coarse)) : grayscale(1) par défaut, grayscale(0)
+   PENDANT L'APPUI (:active, doigt posé, sans zoom), retour au
+   noir et blanc au relâchement — transition douce 0,55 s héritée
+   de .mono-media. Les périphériques à survol gardent le
+   comportement historique (N&B par défaut, couleur + zoom au
+   survol). .mono-touch est exclu de l'annulation
+   prefers-reduced-motion (le N&B est un état, pas un mouvement).
+   La règle ne touche AUCUNE autre image du site (.mono-media
+   seul reste inchangé partout ailleurs).
+
+3. MOCKUPS ÉPINGLÉS EN COULEURS ORIGINALES PERMANENTES (demande :
+   « les deux mockups qui sont épinglés sur l'image seront
+   exclusivement en leurs couleurs originales ») — prop `color`
+   (rendu neutre, aucun filtre) remplace `pinMono` (mono-pin, N&B
+   permanent + couleur au survol, demande du 16/11 annulée) sur
+   les deux mockups du hero : navigateur MR STEVE ENGLISH et
+   smartphone AFRIBAYIT, en couleur sur TOUS les écrans.
+
+4. DESCRIPTION DU HERO À LA TAILLE DES SECTIONS (demande : « il
+   faut augmenter la taille de police de la description pour être
+   de même taille d'écriture et de même taille de police que les
+   textes du site ») — le paragraphe adopte la classe .text-body
+   des sections : MÊME clamp (0,95 → 1,075 rem), même interligne
+   1,75, par construction (avant : 12 px mobile / 15 px sm-lg /
+   16 px xl + interligne 1,5, et 11/10 px sur téléphones courts
+   par paliers). Mesuré après : 15,2 px = 15,2 px (mobile,
+   tablette, bureau étroit) et 17,2 px = 17,2 px (bureau large),
+   strictement identique aux descriptions des sections sur les 8
+   viewports de la sonde. CONTREPARTIE ASSUMÉE : la description
+   grandit d'environ 100 px de hauteur sur mobile — les paliers
+   « téléphones courts » compensent par la photo resserrée
+   (78 % / 70 % / 60 % de la largeur selon le palier), un
+   interligne resserré (1,5 / 1,45 / 1,35 — la TAILLE de police
+   reste .text-body partout) et des marges compactées ; le hero
+   tient sans défilement sur les 8 viewports mesurés (marges +5 à
+   +278 px, y compris 320×568 et l'écran de couverture Galaxy
+   Fold 280×653).
+
+5. NOUVELLE RÉALISATION : ALEXANDRE MOREL (demande : « je suis
+   entrain de travailler sur ce projet https://journalistefr.
+   vercel.app alors, intègre le dans les projets réalisés ») —
+   site live vérifié (redirige / → /fr, next-intl) : portfolio
+   d'un journaliste international, documentaires & communication,
+   20 ans d'expérience, partenaires ARTE/France 24/Al Jazeera.
+   Quatrième entrée de PROJECTS (site.ts), AJOUTÉE EN FIN — les
+   mockups du hero référencent PROJECTS[0] et PROJECTS[2] par
+   index : un ajout en tête aurait changé les images du hero
+   (contrôlé : mockups inchangés). Captures du site live par
+   scripts/capture-journalistefr-2026-11-24.js (Playwright : /fr,
+   1440×900, 1920×1200, 390×844, 780×1688 — dimensions du
+   pipeline existant) + scripts/prepare-journalistefr-2026-11-24.
+   py (WebP q82 : 79/101/38/86 Ko, dans la fourchette des autres
+   projets). Grille des réalisations : md:grid-cols-3 →
+   md:grid-cols-2 (2×2) — quatre cartes sur trois colonnes
+   auraient laissé la quatrième orpheline sur sa rangée. Page
+   détail #/projet/journalistefr opérationnelle.
+
+SONDE — scripts/visuel-hero-volet13-2026-11-24.js (nouvelle,
+8 viewports dont 320×568 et 280×653 + section projets) : C1
+étoiles sous les éléments fixes de l'en-tête, C2 N&B/couleur/N&B
+de la photo sur tactile (appui simulé), C3 mockups sans filtre,
+C4 taille de police description = sections, C5 hero entier dans
+le viewport, C6 aucun débordement, C7 quatre projets chargés +
+mockups du hero inchangés + page détail.
+
+VÉRIFICATIONS : tsc ✓ ; build ✓ ; sonde Google 24/24 ✓ ; sonde
+CTA 47/47 ✓ ; sonde volet 13 : 0 échec sur les 8 viewports ;
+lecture VLM des captures (mobile, bureau, grille complète) :
+photo désaturée et mockups en couleur confirmés, espacement du
+hero sain, grille 2×2 équilibrée, carte ALEXANDRE MOREL nette et
+cohérente (site sombre éditorial qui s'intègre naturellement).

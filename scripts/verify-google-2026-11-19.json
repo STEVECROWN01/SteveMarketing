@@ -1,5 +1,5 @@
 {
-  "date": "2026-11-22T12:35:20.087Z",
+  "date": "2026-11-23T21:55:45.509Z",
   "sections": {
     "crawl": [
       {
@@ -88,7 +88,7 @@
       {
         "ok": true,
         "label": "WCAG 2.5.3 : chaque libellé visible est contenu dans le nom accessible (tous les aria-label de l'accueil)",
-        "detail": "13 éléments contrôlés, 0 divergence"
+        "detail": "14 éléments contrôlés, 0 divergence"
       },
       {
         "ok": true,

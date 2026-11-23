@@ -34,19 +34,27 @@ import { ASSETS, PROJECTS } from "@/lib/site";
  * Sur TABLETTE/MOBILE elle reste rectangulaire : photo
  * horizontale + débord uniforme de 12 px sur les quatre côtés.
  *
- * EFFET DE SURVOL DE L'IMAGE : les deux variantes sont enveloppées
- * dans .mono-media — noir et blanc par défaut sur les périphériques
- * capables de survoler, retour progressif à la couleur + zoom léger
- * (scale 1.035) au survol ; couleur naturelle directe sur
- * mobile / tactile.
+ * EFFET DE SURVOL DE L'IMAGE (modifié le 24/11/2026 — volet 13) :
+ *   les deux variantes sont enveloppées dans .mono-media.mono-touch
+ *   — noir et blanc par défaut PARTOUT : sur les périphériques
+ *   capables de survoler, retour progressif à la couleur + zoom
+ *   léger (scale 1.035) au survol ; sur MOBILE/TACTILE (demande de
+ *   l'éditeur : « sur mobile que ce soit en blanc noir. Et quand
+ *   on pointe le doigt dessus, ça va afficher sa couleur
+ *   originale. Et quand on relâche, ça va revenir au blanc
+ *   noir »), la couleur n’apparaît que PENDANT L'APPUI du doigt
+ *   (:active), sans zoom, puis la photo revient au noir et blanc
+ *   au relâchement (règle .mono-touch de globals.css).
  *
- * MOCKUPS ÉPINGLÉS (demande de l'éditeur, 16/11/2026) :
- * exclusivement en noir et blanc sur TOUS les écrans et appareils
- * (variante .mono-pin), leur véritable couleur ne se révèle qu'au
- * survol. Le mockup NAVIGATEUR, trop large sur mobile (il cachait
- * l'image horizontale), est réduit : 36 % de la largeur de l'image
- * sur mobile, 40 % sur tablette, 52 % sur bureau (portrait
- * vertical) ; le SMARTPHONE reste modeste : 19 / 20 / 24 %.
+ * MOCKUPS ÉPINGLÉS (16/11/2026, modifié le 24/11/2026 — volet 13) :
+ *   les deux mockups (navigateur et smartphone) sont désormais
+ *   TOUJOURS en COULEURS ORIGINALES sur tous les écrans (prop
+ *   `color` — plus aucun noir et blanc) : demande de l'éditeur,
+ *   « les deux mockups qui sont épinglés sur l'image seront
+ *   exclusivement en leurs couleurs originales ». Le mockup
+ *   NAVIGATEUR reste réduit pour ne pas cacher l'image : 36 % de
+ *   la largeur de l'image sur mobile, 40 % sur tablette, 52 % sur
+ *   bureau (portrait vertical) ; le SMARTPHONE : 19 / 20 / 24 %.
  *
  * ANIMATION D'APPARITION (à chaque chargement, 4 s au total, chaque
  * élément en exactement 1 s — demande de l'éditeur, 15/11/2026) :
@@ -198,7 +206,7 @@ export function Hero() {
         className="pointer-events-none absolute bottom-[-20%] left-[-12%] h-[420px] w-[420px] rounded-full bg-[#e4e4e4] opacity-[0.05] blur-[110px]"
       />
 
-      <div className="container-site relative flex flex-1 flex-col justify-center pb-2 pt-[60px] sm:pb-8 sm:pt-[68px] lg:pb-8 lg:pt-[112px]">
+      <div className="container-site relative flex flex-1 flex-col justify-start pb-2 pt-[76px] sm:pb-8 lg:pb-8 lg:pt-[124px]">
         <div className="grid items-center gap-2.5 sm:gap-5 lg:grid-cols-[1.15fr_0.85fr] lg:gap-7 xl:gap-9">
           {/* ---------- Bloc texte haut : note 5 étoiles, titre ---------- */}
           {/* lg:relative + lg:z-10 : sur les bureaux étroits (≈ 1024 px),
@@ -293,7 +301,7 @@ export function Hero() {
                     téléphones courts (règles sans objet sur ces
                     écrans, la figure y est masquée). */}
                 <figure className="hero-portrait relative hidden overflow-hidden rounded-[1.75rem] border border-[#e4e4e4]/15 bg-[#232323] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.7)] lg:block">
-                  <span className="mono-media block">
+                  <span className="mono-media mono-touch block">
                     <img
                       src={ASSETS.portrait}
                       alt={HERO.portraitAlt}
@@ -312,7 +320,7 @@ export function Hero() {
                     hauteur naturelle (1672×941) : le hero reste
                     entièrement visible sans défilement. */}
                 <figure className="relative overflow-hidden rounded-[1.25rem] border border-[#e4e4e4]/15 bg-[#232323] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.7)] lg:hidden">
-                  <span className="mono-media block">
+                  <span className="mono-media mono-touch block">
                     <img
                       src={ASSETS.portraitLong}
                       alt={HERO.portraitLongAlt}
@@ -370,13 +378,14 @@ export function Hero() {
                   (arrive en gros, de face, et atterrit en rebond
                   pour l'épingler), puis balancement continu
                   gauche-droite autour de son point d'appui haut.
-                  Noir et blanc PERMANENT sur tous les écrans
-                  (mono-pin) — la couleur ne se révèle qu'au survol
-                  (demande de l'éditeur, 16/11/2026). RÉDUIT sur
-                  mobile — trop large, il cachait l'image
-                  horizontale : 36 % de la largeur de l'image sur
-                  mobile, 40 % sur tablette, 52 % sur bureau
-                  (portrait vertical). */}
+                  Couleurs originales PERMANENTES sur tous les écrans
+                  (volet 13, 24/11/2026 : prop `color` remplace
+                  `pinMono` — demande de l'éditeur : « les deux
+                  mockups […] exclusivement en leurs couleurs
+                  originales »). RÉDUIT sur mobile — trop large, il
+                  cachait l'image horizontale : 36 % de la largeur
+                  de l'image sur mobile, 40 % sur tablette, 52 % sur
+                  bureau (portrait vertical). */}
               <div className="hero-anim-browser absolute -bottom-2 -left-[4%] z-10 w-[36%] sm:-bottom-4 sm:-left-[10%] sm:w-[40%] lg:-bottom-5 lg:-left-[13%] lg:w-[52%]">
                 <div className="mockup-sway">
                   {/* ATTRIBUTS 640×400 (ratio 1.6 IDENTIQUE à 1440×900 —
@@ -403,7 +412,7 @@ export function Hero() {
                     url={PROJECTS[0].url}
                     width={640}
                     height={400}
-                    pinMono
+                    color
                     priority
                     sizes="(max-width: 640px) 130px, (max-width: 1023px) 290px, 230px"
                   />
@@ -413,8 +422,9 @@ export function Hero() {
               {/* Mockup smartphone épinglé — AFRIBAYIT (coin
                   haut-droit). Animation 3-4 s : jeté sur l'image à
                   son tour, puis balancement continu décalé.
-                  Noir et blanc PERMANENT sur tous les écrans
-                  (mono-pin) — couleur au survol uniquement.
+                  Couleurs originales PERMANENTES sur tous les écrans
+                  (volet 13, 24/11/2026 — prop `color` au lieu de
+                  `pinMono`, demande de l'éditeur).
                   Taille modeste pour ne pas recouvrir l'image : 19 %
                   sur mobile, 20 % sur tablette (l'image horizontale
                   étant courte), 24 % sur bureau (portrait
@@ -436,7 +446,7 @@ export function Hero() {
                     alt={`Aperçu mobile du site ${PROJECTS[2].name}`}
                     width={290}
                     height={628}
-                    pinMono
+                    color
                     priority
                     sizes="(max-width: 640px) 68px, (max-width: 1023px) 145px, 104px"
                   />
@@ -462,7 +472,7 @@ export function Hero() {
             <Reveal direction="up" delay={0.18} aboveFold="rise">
               <p
                 ref={descRef}
-                className="hero-desc relative max-w-xl text-[12px] leading-[1.5] text-[#c8c8c8] transition-[top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] sm:text-[15px] lg:text-[15px] xl:text-base"
+                className="hero-desc text-body relative max-w-xl text-[#c8c8c8] transition-[top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]"
               >
                 <strong className="font-semibold text-white">{HERO.textBold}</strong>{" "}
                 {restParts.map((part, i) =>

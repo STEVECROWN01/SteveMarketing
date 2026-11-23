@@ -62,9 +62,14 @@ export function WorksSection() {
           </Reveal>
         </div>
 
-        {/* Grille des projets — les trois projets présentés sur une seule
-            ligne (desktop) ; captures en COULEUR + « Voir Le Projet ». */}
-        <div className="mt-12 grid gap-5 sm:mt-14 md:grid-cols-3">
+        {/* Grille des projets — captures en COULEUR + « Voir Le
+            Projet ». QUATRE projets depuis le 24/11/2026 (volet 13 :
+            ajout d'ALEXANDRE MOREL) : la grille passe à DEUX colonnes
+            (2×2) au lieu de trois — quatre cartes sur une grille de
+            trois auraient laissé la quatrième seule orpheline sur sa
+            rangée ; deux rangées de deux restent équilibrées à
+            toutes les largeurs. */}
+        <div className="mt-12 grid gap-5 sm:mt-14 md:grid-cols-2">
           {PROJECTS.map((project, i) => (
             <ProjectCard key={project.id} project={project} index={i} />
           ))}
