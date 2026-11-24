@@ -53,6 +53,16 @@ VOLET 14 DE L'AUDIT INTÉGRAL — HERO (MOCKUPS IDENTIQUES, TITRE EN TROIS LIGNE
    hauteur d'écran, plaque grise comprise ; le hero continue de
    tenir sans défilement (l'image se dimensionne en svh, la marge
    aussi — contrôlé 1024×768 à 1920×1080).
+   PRÉCISION MÊME JOUR (relecture de l'éditeur : « pousse le bloc
+   d'image, l'ensemble même avec le fond arrière, un peu
+   légèrement en haut ») — la marge haute est réduite de moitié :
+   lg:mt-[clamp(0.75rem,2.25svh,1.75rem)], mesurée 17→18→20→24 px
+   sur 1024×768 / 1280×800 / 1440×900 / 1920×1080 (bloc remonté
+   de 17 à 24 px, plaque grise comprise) ; la sonde C6a mesure
+   désormais la marge calculée du bloc et la position de la plaque
+   RELATIVE à la grille (l'ancienne mesure plaque−conteneur
+   englobait les ~124 px de padding du conteneur, zone navbar
+   indépendante du volet). 157/157 contrôles verts.
 
 5. TOUTES LES IMAGES EN N&B → COULEUR, SUR TOUS LES ÉCRANS
    (demande : « dans toutes les images du site, sur desktop la
@@ -180,6 +190,11 @@ VOLET 14 DE L'AUDIT INTÉGRAL — HERO (MOCKUPS IDENTIQUES, TITRE EN TROIS LIGNE
       DEPUIS ce dépôt. Variable serveur : GITHUB_DOCS_TOKEN
       (jeton GitHub). Sans elle, la GÉNÉRATION fonctionne déjà ;
       seul l'archivage attend. AUCUNE base payante nécessaire.
+      GUIDE D'OBTENTION DU JETON (question de l'éditeur : « où
+      et comment l'obtenir ») ajouté à DEPLOIEMENT.md §3 bis :
+      jeton fine-grained limité au SEUL dépôt privé, permission
+      unique Contents Read/Write, copie dans Vercel
+      (GITHUB_DOCS_TOKEN, Production) puis Redeploy.
     - COPIE EMAIL (système K.Quotes) : chaque document généré est
       envoyé en PIÈCE JOINTE à stevensakpovi@gmail.com (Resend,
       RESEND_API_KEY déjà documentée) — non bloquante, résultat

@@ -1,0 +1,40 @@
+VOLET 14 — PRÉCISION MÊME JOUR : HERO REMONTÉ D'UN CRAN, SONDE C6A REFAITE, GUIDE DU JETON GITHUB_DOCS_TOKEN
+
+Relecture de l'éditeur juste après le poussé du volet 14 (2deed33),
+deux demandes :
+
+1. HERO — « pousse le bloc d'image (l'ensemble, même avec le fond
+   arrière) un peu légèrement en haut » : la marge haute FLUIDE du
+   bloc visuel (ajoutée ce même jour pour la respiration) est
+   réduite de moitié — lg:mt-[clamp(1.75rem,4.5svh,3.5rem)] →
+   lg:mt-[clamp(0.75rem,2.25svh,1.75rem)]. Mesuré sur les quatre
+   viewports bureau : 17 / 18 / 20 / 24 px (avant : 34 / 36 / 41 /
+   49 px) — le bloc ENTIER (portrait, plaque grise, mockups
+   épinglés) remonte de 17 à 24 px, la respiration reste. Mobile et
+   tablette inchangés (le bloc y est sous le titre, aucun réglage
+   demandé).
+
+2. SONDE C6A REFAITE : l'ancienne mesure « plaque − conteneur »
+   englobait les ~124 px de padding du conteneur (zone navbar,
+   indépendante du volet) et restait > 100 px quelle que soit la
+   marge — elle ne pouvait pas distinguer l'ancienne et la nouvelle
+   marge ; elle mesure désormais la marge CALCULÉE du bloc visuel
+   (12-28 px = bornes du clamp) et la position de la plaque
+   RELATIVE à la grille de contenu (≥ 4 px). Contrôle complet
+   re-joué : 157/157 contrôles verts (8 viewports + réalisations
+   5/5 + favicon 2/2 + admin 11/11 + API documents 7/7, stockage
+   GitHub privé vérifié puis nettoyé).
+
+3. GUIDE D'OBTENTION DU JETON GITHUB_DOCS_TOKEN (question de
+   l'éditeur : « dis-moi où et comment l'obtenir pour y ajouter »)
+   — ajouté à DEPLOIEMENT.md §3 bis : jeton fine-grained GitHub
+   limité au SEUL dépôt privé SteveMarketing-Documents, permission
+   unique Contents Read/Write, copie dans Vercel (Production) puis
+   Redeploy. Le dépôt privé existe déjà (créé au volet 14) ; sans
+   le jeton, la GÉNÉRATION de documents fonctionne, seul
+   l'archivage attend. RESEND_API_KEY est déjà en place côté
+   Vercel — la copie email des PDF sera active dès le premier
+   document généré.
+
+Le fichier scripts/commit-msg-volet14.txt (registre du volet) est
+complété aux sections 4 et 11 pour tracer cette précision.

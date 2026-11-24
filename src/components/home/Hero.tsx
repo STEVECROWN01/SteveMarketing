@@ -283,8 +283,15 @@ export function Hero() {
               qu'il y a au-dessus de l'ensemble de l'image, même avec
               le fond arrière, parce que ça ne respire pas ». La marge
               suit la hauteur de l'écran, comme l'image (svh) : le
-              hero continue de tenir sans défilement. */}
-          <div className="hero-visual order-2 relative mx-auto mt-5 w-full max-w-md sm:mt-7 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-[clamp(1.75rem,4.5svh,3.5rem)] lg:max-w-none">
+              hero continue de tenir sans défilement.
+              MÊME JOUR, PRÉCISION DE L'ÉDITEUR : « pousse le bloc
+              d'image (l'ensemble, même avec le fond arrière) un peu
+              légèrement en haut » — la marge haute est réduite de
+              moitié environ (1,75→0,75 / 4,5→2,25svh / 3,5→1,75rem) :
+              le bloc monte d'un à deux dixièmes de la hauteur
+              d'écran* environ, la respiration reste mais l'image
+              remonte légèrement. (*16 à 28 px selon l'écran.) */}
+          <div className="hero-visual order-2 relative mx-auto mt-5 w-full max-w-md sm:mt-7 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-[clamp(0.75rem,2.25svh,1.75rem)] lg:max-w-none">
             {/* Enveloppe « w-fit » : exactement la largeur de l'image —
                 les pourcentages des mockups épinglés (largeur,
                 décalages) se réfèrent donc à l'image elle-même. */}

@@ -70,6 +70,33 @@ y figurer : c'est le rôle du dépôt privé dédié (à créer une fois :
 `SteveMarketing-Documents`, privé, vide — le dossier `documents/`
 y est créé automatiquement au premier enregistrement).
 
+### Obtenir `GITHUB_DOCS_TOKEN` (jeton « fine-grained », 2 minutes)
+
+1. Sur github.com, connecté au compte **STEVECROWN01** : photo de
+   profil (haut à droite) → **Settings**.
+2. Tout en bas du menu de gauche : **Developer settings**.
+3. **Personal access tokens** → **Fine-grained tokens** →
+   **Generate new token**.
+4. **Token name** : `stevens-documents`. **Expiration** : *Custom*
+   → 1 an (ou *No expiration* ; notée pour renouvellement).
+5. **Repository access** : **Only select repositories** →
+   sélectionner **STEVECROWN01/SteveMarketing-Documents** (et lui
+   seul — le jeton ne peut alors toucher AUCUN autre dépôt).
+6. **Permissions** → *Repository permissions* → **Contents** :
+   **Read and write** (seule permission nécessaire).
+7. **Generate token** → COPIER tout de suite la valeur
+   (commence par `github_pat_…`) : elle n'est plus affichée ensuite.
+8. Dans Vercel : projet **stevensakpovi** → *Settings* →
+   *Environment Variables* → clé `GITHUB_DOCS_TOKEN`, valeur du
+   jeton, environnement **Production** → *Save*.
+9. Deployments → menu **⋯** du dernier déploiement → **Redeploy**
+   (les variables ne sont lues qu'au démarrage). L'état du système
+   sur `#/admin` confirme alors « stockage configuré ».
+
+`GITHUB_DOCS_REPO` et `GITHUB_DOCS_BRANCH` n'ont pas à être
+définies : leurs valeurs par défaut sont déjà celles du dépôt
+privé (`STEVECROWN01/SteveMarketing-Documents`, branche `main`).
+
 `ADMIN_SESSION_SECRET` (section 3) est devenu OPTIONNEL : sans
 elle, le secret de session est dérivé du mot de passe — la
 connexion à l'espace administrateur fonctionne avec le seul

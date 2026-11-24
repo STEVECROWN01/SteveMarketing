@@ -14,7 +14,11 @@
  *     au survol (bureau) ou à l'appui simple (tactile), retour N&B
  *     à l'appui extérieur ;
  *  6. RESPIRATION au-dessus de l'ensemble de l'image du hero
- *     (plaque comprise) sur bureau, sans rognage du hero ;
+ *     (plaque comprise) sur bureau, sans rognage du hero — précision
+ *     du même jour 24/11 : « pousse le bloc d'image un peu légèrement
+ *     en haut » → marge haute réduite de moitié (clamp
+ *     0,75rem→2,25svh→1,75rem), le bloc ENTIER (plaque comprise)
+ *     remonte d'environ 16 à 28 px selon la hauteur d'écran ;
  *  7. favicon à FOND NOIR coins arrondis référencé et servi ;
  *  8. grille des réalisations RÉDUITE sur bureau (max-w-5xl) ;
  *  9. page admin : icône œil, bouton « Ouvrir L'Espace », mot de
@@ -96,6 +100,7 @@ const LIGNES_ATTENDUES = ["Je crée des Sites Web", "Professionnels qui", "Gén�
       const container = document.querySelector("#hero > .container-site");
       const grille = document.querySelector("#hero .grid");
       const plaque = document.querySelector("#hero .hero-anim-plate");
+      const visual = document.querySelector("#hero .hero-visual");
       const photoFig = document.querySelector(
         window.matchMedia("(min-width: 1024px)").matches
           ? ".hero-visual figure.lg\\:block"
@@ -114,6 +119,8 @@ const LIGNES_ATTENDUES = ["Je crée des Sites Web", "Professionnels qui", "Gén�
           ? { ...(() => { const r = desc.getBoundingClientRect(); return { top: r.top - decalageDesc, bottom: r.bottom - decalageDesc }; })() }
           : null,
         container: rect(container), plaque: rect(plaque),
+        grilleRect: rect(grille),
+        visualMarginTop: cs(visual, "marginTop"),
         rowGap: cs(grille, "rowGap"), colGap: cs(grille, "columnGap"),
         photo: rect(photo), photoFilter: cs(photo, "filter"),
         heroBrowserSrc: document.querySelector(".hero-anim-browser img")?.getAttribute("src"),
@@ -273,9 +280,20 @@ const LIGNES_ATTENDUES = ["Je crée des Sites Web", "Professionnels qui", "Gén�
     /* ===== C6 — RESPIRATION AU-DESSUS DE L'IMAGE (bureau) + aucun rognage ===== */
     if (!vp.touch) {
       const respiration = m.plaque && m.container ? Math.round(m.plaque.top - m.container.top) : null;
-      push("C6a respiration au-dessus de l'ensemble image (plaque) ≥ 24 px",
-        respiration !== null && respiration >= 24,
-        `${respiration} px entre le haut du conteneur et la plaque`);
+      /* 24/11, précision même jour : « pousse le bloc d'image un peu
+         légèrement en haut » — la marge haute du bloc visuel est
+         réduite de moitié (clamp 1,75rem/4,5svh/3,5rem →
+         0,75rem/2,25svh/1,75rem). L'ANCIENNE mesure (plaque −
+         conteneur) englobait les ~124 px de padding du conteneur
+         (zone navbar, indépendante du volet) : elle restait > 100 px
+         quelle que soit la marge. On mesure désormais la marge
+         CALCULÉE du bloc visuel (12-28 px = bornes du clamp) et la
+         position de la plaque RELATIVE à la grille de contenu. */
+      const margeHaute = m.visualMarginTop !== null ? Math.round(parseFloat(m.visualMarginTop)) : null;
+      const plaqueGrille = m.plaque && m.grilleRect ? Math.round(m.plaque.top - m.grilleRect.top) : null;
+      push("C6a bloc visuel remonté : marge haute 12-28 px, plaque détachée du haut de grille",
+        margeHaute !== null && margeHaute >= 12 && margeHaute <= 28 && plaqueGrille !== null && plaqueGrille >= 4,
+        `marge ${margeHaute} px (avant précision : 34-49 px) / plaque à ${plaqueGrille} px sous le haut de grille / ancienne mesure conteneur : ${respiration} px`);
     }
     push("C6b hero sans rognage (réassurance dans le viewport)",
       m.reassurance && m.reassurance.bottom <= m.vh + 1,
