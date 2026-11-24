@@ -1,0 +1,227 @@
+VOLET 14 DE L'AUDIT INTÉGRAL — HERO (MOCKUPS IDENTIQUES, TITRE EN TROIS LIGNES, RYTHME RESPONSIVE), COULEUR DES IMAGES, FAVICON À FOND NOIR, GRILLE DES RÉALISATIONS, CORRECTIF ADMIN ET BACK-OFFICE COMPLET DE GÉNÉRATION DE DOCUMENTS COMMERCIAUX
+
+1. LES DEUX MOCKUPS ÉPINGLÉS PRÉSENTENT LE MÊME PROJET (demande :
+   « le mockup desktop sera le mockup du projet de la plateforme
+   immobilière, c'est-à-dire le même site, le même mockup que le
+   mockup téléphone qui est épinglé de l'autre côté. Donc ce sera
+   la version desktop du mockup téléphone. On ne veut pas avoir des
+   projets différents sur différents mockups ») — le mockup
+   NAVIGATEUR (bas-gauche) passe de MR STEVE ENGLISH à la version
+   DESKTOP d'AFRIBAYIT, la plateforme immobilière ; le SMARTPHONE
+   (haut-droit) garde sa version MOBILE : le MÊME projet sur deux
+   appareils. Candidat léger 640w régénéré pour ce projet
+   (afribayit-desktop-640.webp, 35 Ko — scripts/prepare-afribayit-
+   640-volet14.mjs) : le mobile continue de télécharger le plus
+   petit fichier suffisant (sonde Google 24/24).
+
+2. TITRE DU HERO TOUJOURS EN TROIS LIGNES EXACTES (demande : « peu
+   importe la taille d'écran mobile, tablette ou desktop, je veux
+   que le titre du hero soit toujours en trois lignes. La première
+   ligne : “Je crée des sites web”. La deuxième : “professionnels
+   qui”. La troisième : “génèrent des ventes” ») — nouvelle prop
+   `lines` de RevealText : chaque ligne imposée est un conteneur de
+   niveau bloc, la cascade de mots (35 ms/mot, aboveFold volet 7)
+   traverse les lignes sans repartir de zéro ; le repérage du
+   fragment en gras se fait sur le texte RECONSTITUÉ, il peut
+   chevaucher deux lignes. HERO.h1Lines ajouté (site-content),
+   casse d'origine conservée (SEO inchangé — texte complet du h1
+   contrôlé). Plancher du clamp des « téléphones courts » abaissé
+   1,4 → 1,25 rem : à 280 px (Galaxy Fold), « Je crée des Sites
+   Web » wrappait à 22,4 px (H1 de 120 px mesuré, réassurance à
+   −18 px) ; à 20 px chaque ligne tient entière (3 × 21,3 px).
+
+3. RYTHME VERTICAL RESPONSIVE ET COHÉRENT (demande : « l'espace
+   entre le titre et la description, entre la description et les
+   deux boutons CTA, et entre le titre et les cinq étoiles — il ne
+   faut pas qu'on arrive sur une taille d'écran et constate que
+   l'espace devient plus large. Il faut que ce soit normal,
+   cohérent, responsive et vraiment adaptable ») — les paliers
+   mt-1.5/sm:mt-4/… deviennent des clamp SANS AUCUN breakpoint :
+   étoiles→titre clamp(6→17 px), description→CTA clamp(10→22 px),
+   CTA→réassurance clamp(8→20 px), marge de RANGÉE titre→
+   description (bureau) clamp(20→36 px) via lg:gap-y — courbes
+   mesurées STRICTEMENT croissantes sur 8 viewports (320→1920) :
+   6,6,6,9,12,15,17,17 / 10,10,10,15,20,22,22,22 / 8,8,8,12,16,
+   20,20,20 / 20,26,29,36. L'équilibrage vertical de la
+   description (13/11) est conservé.
+
+4. RESPIRATION AU-DESSUS DE L'IMAGE SUR BUREAU (demande : « sur
+   desktop il faut augmenter l'espace qu'il y a au-dessus de
+   l'ensemble de l'image, même avec le fond arrière, parce que ça
+   ne respire pas ») — marge haute fluide du bloc visuel
+   lg:mt-[clamp(1.75rem,4.5svh,3.5rem)] : 34→49 px mesurés selon la
+   hauteur d'écran, plaque grise comprise ; le hero continue de
+   tenir sans défilement (l'image se dimensionne en svh, la marge
+   aussi — contrôlé 1024×768 à 1920×1080).
+
+5. TOUTES LES IMAGES EN N&B → COULEUR, SUR TOUS LES ÉCRANS
+   (demande : « dans toutes les images du site, sur desktop la
+   couleur originale se révèle au survol. Sur mobile et tablette,
+   c'est un appui sur l'image qui va faire révéler la vraie
+   couleur. Et quand on fait encore un appui à l'extérieur de
+   l'image, la couleur va revenir en blanc noir ») — .mono-media
+   est désormais grayscale(1) PAR DÉFAUT SUR TOUS LES ÉCRANS
+   (l'exception tactile « couleur directe » est supprimée ;
+   l'indirection --mono-filter n'a plus d'objet) : bureau =
+   couleur + zoom au SURVOL (inchangé) ; tactile = UN APPUI SIMPLE
+   révèle la couleur (classe .couleur-active, composant
+   InteractionCouleurs monté une fois dans la branche publique de
+   page.tsx), UN APPUI À L'EXTÉRIEUR ramène le noir et blanc, une
+   seule image colorée à la fois. Si l'image est dans un lien
+   (cartes de réalisation), le PREMIER appui ne fait que révéler —
+   l'écouteur est en PHASE DE CAPTURE avec preventDefault +
+   stopPropagation (le onClick du routeur s'exécutait avant tout
+   écouteur document en bulle — mesuré : navigation au premier
+   appui) ; l'appui suivant navigue. Le bloc .mono-touch du volet
+   13 (couleur seulement pendant l'appui) est supprimé ; les DEUX
+   MOCKUPS ÉPINGLÉS du hero (prop `color`) restent exclusivement
+   en couleur permanente. prefers-reduced-motion : le N&B est un
+   ÉTAT, il reste appliqué (seul le zoom est annulé).
+
+6. PLUS AUCUNE URL DANS LES ENTÊTES DES MOCKUPS NAVIGATEUR
+   (demande : « tous les mockups de projets affichés sur le site,
+   dans l'entête designée par défaut du mockup, l'URL est affichée.
+   Je ne veux pas que l'URL soit affichée. Comme pour les mockups
+   mobiles, les URL ne sont pas affichées ») — BrowserMockup ne
+   rend plus le texte d'adresse : la pastille reste MUETTE (un
+   point, aucun texte), silhouette de navigateur conservée ;
+   contrôlé hero, section réalisations et page projet.
+
+7. FAVICON À FOND NOIR CONSERVÉ + COINS ARRONDIS (demande :
+   « j'ai constaté que tu as enlevé le fond arrière du favicon.
+   Non. Je veux que tu utilises le favicon ayant un fond arrière
+   noir que j'ai uploadé dans le projet, tel qu'il est, sans
+   supprimer le fond arrière noir. Mais tu vas rogner ça pour que
+   ça ait des border radius ») — source public/assets/Logo
+   Favicon.png (1254×1254, fond noir plein, l'original de
+   l'éditeur) ; dérivée 512×512 à coins arrondis (rayon 22 %,
+   style icône applicative) par scripts/prepare-favicon-volet14.py
+   : glyphe et fond noir inchangés pixel pour pixel, seuls les
+   quatre coins deviennent transparents. Métadonnées pointant vers
+   le NOUVEAU nom daté favicon-fond-noir-2026-11-24.png (les
+   navigateurs et edges rechargent l'icône au lieu de servir
+   l'ancienne version transparente en cache).
+
+8. GRILLE DES RÉALISATIONS RÉDUITE SUR BUREAU (demande : « les
+   mockups des projets réalisés, sur desktop c'est trop trop
+   large. Réduis la taille un peu ») — la grille passe de la
+   pleine largeur du conteneur (cartes ~575 px à 1440 px) à
+   max-w-5xl centré (cartes ~502 px, −13 %) ; mobiles inchangés
+   (une colonne, largeur de l'écran). Mesuré 1024 px / carte 502.
+
+9. CORRECTIF ADMIN « ESPACE ADMINISTRATEUR NON CONFIGURÉ »
+   (incident de l'éditeur : « je mets exactement le mot de passe
+   des variables Vercel et ça met un panneau rouge “espace
+   administrateur non configuré sur cet environnement” ») — cause :
+   le fail-closed du 19/11 exigeait ADMIN_PASSWORD ET
+   ADMIN_SESSION_SECRET ; seul le mot de passe était défini.
+   ADMIN_SESSION_SECRET devient OPTIONNEL : à défaut, le secret de
+   session est DÉRIVÉ du mot de passe (HMAC-SHA256, sel interne) —
+   la connexion fonctionne avec le seul mot de passe défini, aucune
+   valeur publique n'entre dans le dépôt, et changer le mot de
+   passe invalide toutes les sessions. Un secret explicite (≥ 16
+   caractères) reste prioritaire. .env.example et DEPLOIEMENT.md
+   mis à jour.
+
+10. CONNEXION : ICÔNE ŒIL + « OUVRIR L'ESPACE » (demandes :
+    « ajoute une icône d'œil sur lequel on peut cliquer pour
+    afficher le mot de passe » ; « change le nom du bouton Ouvrir
+    la session en Ouvrir l'espace ») — bouton Œil/Masquer
+    (aria-label dynamique), type password↔text, libellé « Ouvrir
+    L'Espace » (et « Fermer L'Espace » en déconnexion).
+
+11. BACK-OFFICE COMPLET — GÉNÉRATION DE DOCUMENTS COMMERCIAUX
+    (demande : « je veux que tu implémentes l'espace admin, je
+    veux que tu le présentes comme un back-office. Il y aura une
+    option qui ouvre une zone où on pourra générer les documents
+    commerciaux : la proposition commerciale, le devis, et la
+    facture. Le devis et la facture sont complémentaires : c'est
+    quand on va finir de générer un devis qu'on pourra sur le
+    devis, chaque devis généré aura une option de génération de
+    facture ») — coquille back-office dans le DESIGN du site
+    (tableau de bord avec compteurs et état du système, Demandes
+    reçues [l'existant], Devis, Propositions, Factures & Documents).
+    - SYSTÈME COPIÉ DU PROJET K.QUOTES de l'éditeur (github.com/
+      STEVECROWN01/K.Quotes) : templates A4 fidèles (entête « Devis
+      D2600001 » 26 pt + logo et wordmark STEVENS AKPOVI, blocs
+      Émetteur/Destinataire, « Merci pour votre confiance. »,
+      tableau Détail à bandeau noir, bandeau TOTAL noir, Conditions/
+      Bon pour accord, page Coordonnées bancaires, « SHALOM
+      ALEIKHEM »), PDF produit par PUPPETEER (A4, marges nulles,
+      fond imprimé, polices attendues — networkidle0),
+      téléchargement AUTOMATIQUE, numérotation D/F/PC + année +
+      client sur 5 chiffres, facture = devis au préfixe près
+      (D2600004 → F2600004). Lignes de prestations LIBRES
+      (puces carrées, mention de délai) ; banque et émetteur de
+      l'éditeur pré-remplis (siennes, publiques dans K.Quotes) ;
+      SIGNATURE MANUSCRITE cursive « Stevens Akpovi » (Great
+      Vibes) sur chaque document + logo et filigrane.
+    - CACHET « PAYÉ » REPRODUIT DU PROJET MRSTEVEENGLISH
+      (github.com/STEVECROWN01/MrSteveEnglish — receipt.ts) :
+      cadre DOUBLE vert pur #008000 (150×58 pt, trait 2,4 pt ;
+      intérieur 0,9 pt), inclinaison MONTANTE « / » de −17°,
+      « PAYÉ » Times bold 38 pt + date « le JJ/MM/AAAA », opacité
+      0,92, bande dédiée sous les totaux — validé au contrôle
+      visuel (double cadre, date lisible, aucune ligne masquée).
+    - CHAQUE DEVIS de la liste porte son option « Générer la
+      facture » (statut Payé/En attente + date de règlement) : la
+      facture reprend exactement les prestations et le total du
+      devis, enregistrée et liée (devisSource) ; badge « Facturée
+      (F…) » sur le devis.
+    - STOCKAGE GITHUB — RÉPONSE À LA QUESTION DE L'ÉDITEUR
+      (« puisque le PostgreSQL de Railway est payant, j'aimerais
+      savoir s'il est possible de stocker les documents dans
+      GitHub ») : OUI, implémenté — chaque document est archivé
+      en JSON dans le dossier documents/ du DÉPÔT PRIVÉ DÉDIÉ
+      STEVECROWN01/SteveMarketing-Documents (créé pour cela : le
+      dépôt du site est PUBLIC, les clients n'y figurent jamais),
+      via l'API GitHub Contents ; le back-office liste, ouvre
+      (aperçu), télécharge et supprime les documents existants
+      DEPUIS ce dépôt. Variable serveur : GITHUB_DOCS_TOKEN
+      (jeton GitHub). Sans elle, la GÉNÉRATION fonctionne déjà ;
+      seul l'archivage attend. AUCUNE base payante nécessaire.
+    - COPIE EMAIL (système K.Quotes) : chaque document généré est
+      envoyé en PIÈCE JOINTE à stevensakpovi@gmail.com (Resend,
+      RESEND_API_KEY déjà documentée) — non bloquante, résultat
+      annoncé dans la confirmation (en-tête X-Email-Sent).
+    - EXEMPLE-MODÈLE (demande : « il y aura un exemplaire comme
+      modèle pour faire savoir ce que serait le document quand on
+      va le générer ») : bouton « Charger l'exemple-modèle »
+      (client fictif complet, deux lignes de prestations, déroulé)
+      dans les générateurs ; aperçu A4 EN DIRECT (le VRAI HTML du
+      PDF, une iframe par page — LivePreview de K.Quotes).
+    - Aperçu, suppression et facturation testés de bout en bout
+      en local contre le VRAI dépôt privé (création → liste →
+      facture → suppression, stockage propre à l'arrivée).
+
+SONDES — scripts/visuel-hero-volet14-2026-11-24.js (nouvelle, 8
+viewports 320→1920 + réalisations + favicon + admin + API
+documents) : C1 titre en 3 lignes exactes (contenu, une ligne
+visuelle par bloc, texte SEO inchangé), C2 planches de fluidité
+des 4 espacements, C3 mockups même projet AFRIBAYIT en couleur,
+C4 entêtes sans URL (hero + réalisations + page projet), C5 N&B/
+appui/extérieur/survol + carte projet (premier appui sans
+navigation), C6 respiration ≥ 24 px + aucun rognage, C7 favicon
+référencé et servi, C8 grille ≤ max-w-5xl et 4 projets, C9 admin
+(œil, « Ouvrir L'Espace », mauvais mot de passe → « Mot de passe
+incorrect. », back-office 5 sections, générateur + aperçu),
+C10 API documents (PDF %PDF, stockage GitHub, facture, liste,
+suppression, nettoyage). MISES À JOUR : sonde volet 13 (C2 →
+comportement appui bascule du volet 14 ; C7c → les deux mockups
+sur AFRIBAYIT) ; sonde Google (candidat 640w → afribayit).
+
+VÉRIFICATIONS : tsc ✓ (0 erreur hors examples/) ; build ✓ ;
+sonde Google 24/24 ✓ ; sonde CTA 47/47 ✓ ; sonde hero mention
+(volets 11-12) 0 échec ✓ ; sonde volet 13 : 0 échec sur 8
+viewports + projets ✓ ; sonde volet 14 : 0 échec (8 viewports ×
+16-17 contrôles + réalisations 5/5 + favicon 2/2 + admin 11/11 +
+API 7/7) ✓ ; lecture VLM des documents générés (devis 2 pages,
+facture) : template K.Quotes conforme, cachet PAYÉ exact,
+signature cursive (après correctif networkidle0 — la police
+Great Vibes n'était pas chargée à domcontentloaded), aucun
+chevauchement (après resserrage des espacements de la page
+facture : cachet, bloc Paiement et signature tiennent au-dessus
+du pied de page) ; lecture VLM des captures hero (mobile 360,
+bureau 1440) : trois lignes exactes, même site immobilier sur
+les deux appareils en couleur, portrait N&B, respiration
+confortable, aucune URL.

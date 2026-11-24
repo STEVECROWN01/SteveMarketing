@@ -31,6 +31,20 @@ export const CTA_LABELS = {
 export const HERO = {
   eyebrow: "CONCEPTION DE SITES WEB PROFESSIONNELS",
   h1: "Je crée des Sites Web Professionnels qui Génèrent des Ventes.",
+  /** VOLET 14 (24/11/2026) — titre TOUJOURS en TROIS LIGNES, sur
+   *  TOUTES les tailles d'écran (demande de l'éditeur : « peu
+   *  importe la taille d'écran mobile, tablette ou desktop, je veux
+   *  que le titre du hero soit toujours en trois lignes. La première
+   *  ligne ce sera la portion du titre “Je crée des sites web”. Et
+   *  la deuxième ligne sera la portion du titre “professionnels
+   *  qui” et la troisième ligne portera la portion du titre
+   *  “génèrent des ventes” »). La casse d'origine du titre (celle
+   *  que les moteurs indexent depuis le premier jour) est
+   *  conservée — seuls les SAUTS DE LIGNE sont imposés, par des
+   *  <span class="block"> (RevealText prop `lines`). h1 (ci-dessus)
+   *  reste la source du texte complet ; h1Lines doit vérifier
+   *  h1 === h1Lines.join(" ") (contrôle de cohérence en sonde). */
+  h1Lines: ["Je crée des Sites Web", "Professionnels qui", "Génèrent des Ventes."],
   /** Partie du titre en gras (700) — le reste reste en graisse normale. */
   h1Bold: "qui Génèrent des Ventes.",
   text:

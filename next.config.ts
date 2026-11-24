@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  /* VOLET 14 (24/11/2026) — GÉNÉRATION PDF DES DOCUMENTS (back-office)
+     via puppeteer-core : ces paquets embarquent un binaire Chromium
+     (@sparticuz/chromium, réservé au runtime serverless de Vercel)
+     et ne doivent PAS être groupés par le traceur de Next — ils
+     restent des dépendances externes du serveur. */
+  serverExternalPackages: ["puppeteer-core", "@sparticuz/chromium"],
   reactStrictMode: false,
   // Indicateur « N » de développement désactivé (n'apparaît pas en production)
   devIndicators: false,

@@ -68,8 +68,16 @@ export function WorksSection() {
             (2×2) au lieu de trois — quatre cartes sur une grille de
             trois auraient laissé la quatrième seule orpheline sur sa
             rangée ; deux rangées de deux restent équilibrées à
-            toutes les largeurs. */}
-        <div className="mt-12 grid gap-5 sm:mt-14 md:grid-cols-2">
+            toutes les largeurs.
+            VOLET 14 (24/11/2026) — LARGEUR RÉDUITE SUR BUREAU :
+            demande de l'éditeur (« les mockups des projets réalisés,
+            sur desktop c'est trop trop large. Tu vas réduire ça la
+            taille. Réduis la taille un peu ») : la grille passe de
+            la pleine largeur du conteneur (cartes de ~575 px à
+            1440 px) à max-w-5xl centré (~500 px par carte, −13 %) —
+            les captures desktop reprennent une échelle plus naturelle
+            sans toucher aux mobiles (une colonne, largeur de l'écran). */}
+        <div className="mx-auto mt-12 grid w-full max-w-5xl gap-5 sm:mt-14 md:grid-cols-2">
           {PROJECTS.map((project, i) => (
             <ProjectCard key={project.id} project={project} index={i} />
           ))}

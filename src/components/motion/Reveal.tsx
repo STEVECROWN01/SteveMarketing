@@ -223,9 +223,18 @@ export function Reveal({
 /** Révélation mot à mot pour les titres (dévoilement progressif des textes).
  *  `boldText` : fragment final du texte à afficher en gras (700) — le reste
  *  du titre reste en graisse normale (400), quel que soit le poids porté
- *  par la classe du conteneur. */
+ *  par la classe du conteneur.
+ *  `lines` (volet 14, 24/11/2026) : SAUTS DE LIGNE IMPOSÉS — chaque
+ *  chaîne du tableau occupe sa PROPRE LIGNE (<span class="block">),
+ *  quel que soit l'écran (demande de l'éditeur : le titre du hero
+ *  reste TOUJOURS en trois lignes, mobile / tablette / bureau).
+ *  `lines.join(" ")` doit reconstituer le texte complet ; le repérage
+ *  du fragment en gras se fait sur ce texte reconstitué, il peut donc
+ *  chevaucher deux lignes sans perdre un mot. Sans `lines`, le rendu
+ *  des appelants existants est strictement inchangé. */
 export function RevealText({
   text,
+  lines,
   boldText,
   className,
   as: Tag = "span",
@@ -234,6 +243,8 @@ export function RevealText({
   aboveFold = false,
 }: {
   text: string;
+  /** Découpage du texte en lignes imposées (optionnel — volet 14). */
+  lines?: string[];
   boldText?: string;
   className?: string;
   as?: "span" | "h1" | "h2" | "h3" | "p";
@@ -250,42 +261,106 @@ export function RevealText({
   const { ref, inView, animated } = useInView<HTMLElement>(0.3);
   const Comp = Tag as React.ElementType;
 
-  const boldStart = boldText ? text.indexOf(boldText) : -1;
+  const useLines = Boolean(lines && lines.length > 0);
+
+  // Découpage pur : tête (graisse normale) + partie en gras, dans
+  // l'ordre du texte d'origine. VOLET 14 : la construction se fait
+  // LIGNE PAR LIGNE avec des décalages cumulés sur le texte
+  // reconstitué — le fragment en gras reste gras exactement là où il
+  // se trouve, même à cheval sur deux lignes.
+  const sourceLines = useLines ? lines! : [text];
+  const fullText = sourceLines.join(" ");
+  const boldStart = boldText ? fullText.indexOf(boldText) : -1;
   const hasBold = boldStart >= 0;
 
+  const perLine: { word: string; bold: boolean }[][] = [];
+  let offset = 0;
+  for (const line of sourceLines) {
+    const wordsInLine: { word: string; bold: boolean }[] = [];
+    for (const word of line.split(" ")) {
+      if (!word) continue;
+      wordsInLine.push({
+        word,
+        bold: hasBold && offset >= boldStart && offset < boldStart + boldText!.length,
+      });
+      offset += word.length + 1;
+    }
+    perLine.push(wordsInLine);
+  }
+  const entries = perLine.flatMap((wordsInLine, line) =>
+    wordsInLine.map((e) => ({ ...e, line })),
+  );
+  const totalWords = entries.length;
+
   if (reduce) {
+    if (useLines) {
+      return (
+        <Comp className={className} ref={ref} id={id}>
+          {perLine.map((wordsInLine, li) => (
+            <span key={li} className="block">
+              {wordsInLine.map(({ word, bold }, k) => (
+                <React.Fragment key={`${k}-${word}`}>
+                  {k > 0 ? " " : ""}
+                  <span style={bold ? { fontWeight: 700 } : undefined}>{word}</span>
+                </React.Fragment>
+              ))}
+            </span>
+          ))}
+        </Comp>
+      );
+    }
     return (
       <Comp className={className} ref={ref} id={id}>
         {hasBold ? (
           <>
-            {text.slice(0, boldStart)}
+            {fullText.slice(0, boldStart)}
             <span style={{ fontWeight: 700 }}>{boldText}</span>
           </>
         ) : (
-          text
+          fullText
         )}
       </Comp>
     );
   }
-
-  // Découpage pur : tête (graisse normale) + partie en gras, dans
-  // l'ordre du texte d'origine.
-  const entries = hasBold
-    ? [
-        ...text
-          .slice(0, boldStart)
-          .trimEnd()
-          .split(" ")
-          .map((word) => ({ word, bold: false })),
-        ...boldText!.split(" ").map((word) => ({ word, bold: true })),
-      ]
-    : text.split(" ").map((word) => ({ word, bold: false }));
 
   if (aboveFold) {
     // Volet 7 : cascade de mots en animations CSS (reveal-fold-word)
     // — même cadence (35 ms/mot), même durée (550 ms), même courbe que
     // la version scroll, mais déclenchée au premier rendu (rien sur le
     // chemin critique : ni hydratation, ni IntersectionObserver).
+    // Volet 14 : avec `lines`, chaque ligne imposée est un conteneur
+    // de niveau BLOC — la cascade continue de mot à mot à travers les
+    // lignes (index global).
+    if (useLines) {
+      // Compteur global : la cadence de la cascade (35 ms/mot) traverse
+      // les lignes sans repartir de zéro à chaque ligne imposée.
+      let idx = 0;
+      return (
+        <Comp className={className} id={id}>
+          {perLine.map((wordsInLine, li) => (
+            <span key={li} className="block">
+              {wordsInLine.map(({ word, bold }) => {
+                const i = idx++;
+                return (
+                  <span key={`${i}-${word}`} className="inline-block overflow-hidden align-bottom">
+                    <span
+                      className="reveal-fold-word inline-block"
+                      style={{
+                        animationDelay: `${delay + i * 35}ms`,
+                        fontWeight: hasBold ? (bold ? 700 : 400) : undefined,
+                      }}
+                    >
+                      {word}
+                      {i < totalWords - 1 ? "\u00A0" : ""}
+                    </span>
+                  </span>
+                );
+              })}
+            </span>
+          ))}
+        </Comp>
+      );
+    }
     return (
       <Comp className={className} id={id}>
         {entries.map(({ word, bold }, i) => (

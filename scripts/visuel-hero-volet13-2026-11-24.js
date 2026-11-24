@@ -107,33 +107,52 @@ const VIEWPORTS = [
       };
     });
 
-    /* ---------- Appui simulé sur la photo (tactile) ---------- */
+    /* ---------- VOLET 14 : APPUI SIMPLE (bascule durable) puis
+       APPUI À L'EXTÉRIEUR (retour N&B) — le comportement « couleur
+       seulement pendant l'appui » (:active) du volet 13 est
+       remplacé. Sur bureau : survol. ---------- */
     let pressFilter = null;
     let releaseFilter = null;
+    let pressClasse = null;
+    let releaseClasse = null;
+    const lecturePhoto = () => page.evaluate(() => {
+      const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+      const fig = document.querySelector(
+        isDesktop ? ".hero-visual figure.lg\\:block" : ".hero-visual figure.lg\\:hidden",
+      );
+      const img = fig ? fig.querySelector("img") : null;
+      const enveloppe = img ? img.closest(".mono-media") : null;
+      return {
+        filter: img ? getComputedStyle(img).filter : null,
+        classeActive: enveloppe ? enveloppe.classList.contains("couleur-active") : null,
+      };
+    });
     if (vp.touch && m.photo) {
       const cx = m.photo.left + m.photo.w / 2;
       const cy = m.photo.top + Math.min(m.photo.h / 2, m.vh / 2);
-      await page.mouse.move(cx, cy);
-      await page.mouse.down();
+      await page.touchscreen.tap(cx, cy);
       await page.waitForTimeout(750); // transition filtre 0,55 s
-      pressFilter = await page.evaluate(() => {
-        const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
-        const fig = document.querySelector(
-          isDesktop ? ".hero-visual figure.lg\\:block" : ".hero-visual figure.lg\\:hidden",
-        );
-        const img = fig ? fig.querySelector("img") : null;
-        return img ? getComputedStyle(img).filter : null;
-      });
-      await page.mouse.up();
+      const apresTap = await lecturePhoto();
+      pressFilter = apresTap.filter;
+      // Appui À L'EXTÉRIEUR de l'image (en bas de l'écran, hors carte)
+      await page.touchscreen.tap(m.vw / 2, m.vh - 12);
       await page.waitForTimeout(900); // retour transition
-      releaseFilter = await page.evaluate(() => {
-        const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
-        const fig = document.querySelector(
-          isDesktop ? ".hero-visual figure.lg\\:block" : ".hero-visual figure.lg\\:hidden",
-        );
-        const img = fig ? fig.querySelector("img") : null;
-        return img ? getComputedStyle(img).filter : null;
-      });
+      const apresExterieur = await lecturePhoto();
+      releaseFilter = apresExterieur.filter;
+      pressClasse = apresTap.classeActive;
+      releaseClasse = apresExterieur.classeActive;
+    } else if (!vp.touch && m.photo) {
+      /* Bureau : la couleur se révèle AU SURVOL (CSS volet 14). */
+      await page.mouse.move(m.photo.left + m.photo.w / 2, m.photo.top + Math.min(m.photo.h / 2, m.vh / 2));
+      await page.waitForTimeout(750);
+      const survol = await lecturePhoto();
+      pressFilter = survol.filter;
+      await page.mouse.move(4, 4);
+      await page.waitForTimeout(900);
+      const apres = await lecturePhoto();
+      releaseFilter = apres.filter;
+      pressClasse = null;
+      releaseClasse = null;
     }
 
     const checks = [];
@@ -149,18 +168,20 @@ const VIEWPORTS = [
        l'appui, retour N&B au relâchement. */
     if (vp.touch) {
       const gs = (f) => typeof f === "string" && f.includes("grayscale(1)");
-      /* « couleur » = pas de grayscale actif : none OU grayscale(0)
-         (valeur ANNULÉE ≠ appliquée — bug de la première passe :
-         grayscale(0) contient la chaîne « grayscale » et était
-         compté comme noir et blanc). */
+      /* « couleur » = pas de grayscale actif : none OU grayscale(0). */
       const color = (f) => typeof f === "string" && (f === "none" || f.includes("grayscale(0)"));
       push("C2a photo N&B par défaut (tactile)", gs(m.photoFilter), `filter: ${m.photoFilter}`);
-      push("C2b photo en couleur pendant l'appui", color(pressFilter), `filter: ${pressFilter}`);
-      push("C2c photo retour N&B au relâchement", gs(releaseFilter), `filter: ${releaseFilter}`);
+      push("C2b photo en couleur après APPUI SIMPLE (volet 14)", color(pressFilter) && pressClasse === true,
+        `filter: ${pressFilter} / classe couleur-active: ${pressClasse}`);
+      push("C2c photo retour N&B après appui À L'EXTÉRIEUR (volet 14)", gs(releaseFilter) && releaseClasse === false,
+        `filter: ${releaseFilter} / classe couleur-active: ${releaseClasse}`);
     } else {
-      push("C2 photo bureau inchangée (N&B par défaut, survol → couleur)",
+      push("C2 photo bureau : N&B par défaut (volet 14 — tous écrans)",
         typeof m.photoFilter === "string" && m.photoFilter.includes("grayscale(1)"),
         `filter: ${m.photoFilter}`);
+      push("C2b photo bureau : couleur AU SURVOL (volet 14)",
+        typeof pressFilter === "string" && (pressFilter === "none" || pressFilter.includes("grayscale(0)")),
+        `filter au survol: ${pressFilter}`);
     }
 
     /* C3 — mockups en couleurs originales (aucun grayscale). */
@@ -237,8 +258,11 @@ const VIEWPORTS = [
     push("C7 quatre projets dans la grille", pj.nbCartes === 4, `${pj.nbCartes} cartes : ${pj.noms.join(" | ")}`);
     push("C7b captures toutes chargées", pj.imagesChargees === pj.imagesTotales && pj.imagesTotales >= 4,
       `${pj.imagesChargees}/${pj.imagesTotales} images chargées`);
-    push("C7c mockups du hero inchangés",
-      /mrsteveenglish/.test(pj.heroBrowserSrc || "") && /afribayit/.test(pj.heroPhoneSrc || ""),
+    /* VOLET 14 : les deux mockups épinglés présentent le MÊME
+       projet — AFRIBAYIT, la plateforme immobilière (le navigateur
+       montre sa version desktop, le smartphone sa version mobile). */
+    push("C7c mockups du hero : MÊME projet AFRIBAYIT (volet 14)",
+      /afribayit/.test(pj.heroBrowserSrc || "") && /afribayit/.test(pj.heroPhoneSrc || ""),
       `navigateur: ${(pj.heroBrowserSrc || "").split("/").pop()} / smartphone: ${(pj.heroPhoneSrc || "").split("/").pop()}`);
 
     /* Page de détail du nouveau projet. */

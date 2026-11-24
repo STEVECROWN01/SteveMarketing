@@ -222,13 +222,13 @@ const check = (ok, label, detail) => {
   // dans Hero.tsx ; l'économie est captée sur les mockups.)
   const images = [];
   images.push(
-    check((dom.browserMockSrcSet || "").startsWith("/assets/projects/mrsteveenglish-desktop-640.webp 640w"), "mockup navigateur : candidat 640w en tête de srcset", dom.browserMockSrcSet),
+    check((dom.browserMockSrcSet || "").startsWith("/assets/projects/afribayit-desktop-640.webp 640w"), "mockup navigateur : candidat 640w en tête de srcset (volet 14 : AFRIBAYIT)", dom.browserMockSrcSet),
   );
   images.push(
     check((dom.phoneMockSrcSet || "").startsWith("/assets/projects/afribayit-mobile-290.webp 290w"), "mockup téléphone : candidat 290w en tête de srcset", dom.phoneMockSrcSet),
   );
   for (const asset of [
-    "/assets/projects/mrsteveenglish-desktop-640.webp",
+    "/assets/projects/afribayit-desktop-640.webp",
     "/assets/projects/afribayit-mobile-290.webp",
   ]) {
     const r = await fetch(`${BASE}${asset}`);
@@ -258,7 +258,7 @@ const check = (ok, label, detail) => {
   const choix = [];
   choix.push(
     check(
-      (mcurrent.browser || "").includes("mrsteveenglish-desktop-640.webp"),
+      (mcurrent.browser || "").includes("afribayit-desktop-640.webp"),
       "iPhone 13 : mockup navigateur → candidat 640w (au lieu de 1440w/80 Ko)",
       mcurrent.browser,
     ),

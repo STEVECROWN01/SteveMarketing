@@ -43,6 +43,39 @@ GitHub `STEVECROWN01/SteveMarketing` (branche `main`).
 
 Le modèle commenté complet figure dans `.env.example`.
 
+## 3 bis. Back-office — documents commerciaux (volet 14, 24 novembre 2026)
+
+L'espace `#/admin` est un BACK-OFFICE complet : consultation des
+demandes, et GÉNÉRATION des documents commerciaux — proposition
+commerciale, devis et facture (la facture se génère DEPUIS un devis
+enregistré, avec cachet « PAYÉ »). Le système est celui du projet
+K.Quotes de l'éditeur : PDF A4 produit par le serveur (Puppeteer),
+téléchargement automatique dans le navigateur, copie du PDF par
+email (Resend) et archivage.
+
+Variables spécifiques (toutes OPTIONNELLES pour la génération) :
+
+| Variable | Rôle | Sans elle |
+| --- | --- | --- |
+| `GITHUB_DOCS_TOKEN` | Jeton GitHub (portée « repo ») : archivage des documents en JSON dans le dossier `documents/` du DÉPÔT PRIVÉ `STEVECROWN01/SteveMarketing-Documents` | La liste et l'archivage des documents existants attendent ; la GÉNÉRATION (PDF, téléchargement, email) fonctionne déjà |
+| `GITHUB_DOCS_REPO` | Dépôt de stockage (défaut : `STEVECROWN01/SteveMarketing-Documents`) | Valeur par défaut utilisée |
+| `GITHUB_DOCS_BRANCH` | Branche (défaut : `main`) | Valeur par défaut utilisée |
+
+Pourquoi GitHub plutôt qu'une base payante (Railway PostgreSQL,
+Supabase…) : les documents sont des JSON légers, le dépôt privé
+dédié les conserve gratuitement, versionnés, et le back-office les
+relit via l'API GitHub — aucune base managée n'est nécessaire. Le
+dépôt du site étant PUBLIC, les documents des clients ne peuvent
+y figurer : c'est le rôle du dépôt privé dédié (à créer une fois :
+`SteveMarketing-Documents`, privé, vide — le dossier `documents/`
+y est créé automatiquement au premier enregistrement).
+
+`ADMIN_SESSION_SECRET` (section 3) est devenu OPTIONNEL : sans
+elle, le secret de session est dérivé du mot de passe — la
+connexion à l'espace administrateur fonctionne avec le seul
+`ADMIN_PASSWORD` défini (correctif de l'incident « espace
+administrateur non configuré » du 24/11/2026).
+
 ## 4. Comportement des demandes (devis / audit) en production
 
 - **Avec `RESEND_API_KEY`** : chaque demande déclenche la notification à

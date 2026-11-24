@@ -38,20 +38,26 @@ import { ASSETS, PROJECTS } from "@/lib/site";
  *   les deux variantes sont enveloppées dans .mono-media.mono-touch
  *   — noir et blanc par défaut PARTOUT : sur les périphériques
  *   capables de survoler, retour progressif à la couleur + zoom
- *   léger (scale 1.035) au survol ; sur MOBILE/TACTILE (demande de
- *   l'éditeur : « sur mobile que ce soit en blanc noir. Et quand
- *   on pointe le doigt dessus, ça va afficher sa couleur
- *   originale. Et quand on relâche, ça va revenir au blanc
- *   noir »), la couleur n’apparaît que PENDANT L'APPUI du doigt
- *   (:active), sans zoom, puis la photo revient au noir et blanc
- *   au relâchement (règle .mono-touch de globals.css).
+ *   léger (scale 1.035) au survol. VOLET 14 (24/11/2026) : toutes
+ *   les images du site, celle-ci comprise, sont désormais en NOIR
+ *   ET BLANC PAR DÉFAUT SUR TOUS LES ÉCRANS (mobile et tablette
+ *   compris) — au SURVOL (bureau) ou à L'APPUI SIMPLE (mobile /
+ *   tablette : un appui révèle la couleur, un appui À L'EXTÉRIEUR
+ *   de l'image la fait revenir au noir et blanc), via la classe
+ *   .couleur-active et le composant InteractionCouleurs. L'ancien
+ *   comportement « couleur seulement pendant l'appui » (.mono-touch,
+ *   volet 13) est supprimé au profit de ce basculement durable.
  *
- * MOCKUPS ÉPINGLÉS (16/11/2026, modifié le 24/11/2026 — volet 13) :
- *   les deux mockups (navigateur et smartphone) sont désormais
- *   TOUJOURS en COULEURS ORIGINALES sur tous les écrans (prop
- *   `color` — plus aucun noir et blanc) : demande de l'éditeur,
- *   « les deux mockups qui sont épinglés sur l'image seront
- *   exclusivement en leurs couleurs originales ». Le mockup
+ * MOCKUPS ÉPINGLÉS (16/11/2026, volets 13 puis 14) : les deux
+ *   mockups (navigateur et smartphone) sont TOUJOURS en COULEURS
+ *   ORIGINALES sur tous les écrans (prop `color`). VOLET 14
+ *   (24/11/2026) : ils présentent désormais le MÊME projet —
+ *   AFRIBAYIT, la plateforme immobilière (demande de l'éditeur :
+ *   « le mockup desktop sera le mockup du projet de la plateforme
+ *   immobilière, c'est-à-dire le même site, le même mockup que le
+ *   mockup téléphone qui est épinglé de l'autre côté. Donc ce sera
+ *   la version desktop du mockup téléphone ») — jamais deux
+ *   projets différents sur les deux appareils épinglés. Le mockup
  *   NAVIGATEUR reste réduit pour ne pas cacher l'image : 36 % de
  *   la largeur de l'image sur mobile, 40 % sur tablette, 52 % sur
  *   bureau (portrait vertical) ; le SMARTPHONE : 19 / 20 / 24 %.
@@ -207,13 +213,21 @@ export function Hero() {
       />
 
       <div className="container-site relative flex flex-1 flex-col justify-start pb-2 pt-[76px] sm:pb-8 lg:pb-8 lg:pt-[124px]">
-        <div className="grid items-center gap-2.5 sm:gap-5 lg:grid-cols-[1.15fr_0.85fr] lg:gap-7 xl:gap-9">
+        <div className="grid items-center gap-2.5 sm:gap-5 lg:grid-cols-[1.15fr_0.85fr] lg:gap-x-7 lg:gap-y-[clamp(1.25rem,2vw,2.25rem)] xl:gap-x-9">
           {/* ---------- Bloc texte haut : note 5 étoiles, titre ---------- */}
           {/* lg:relative + lg:z-10 : sur les bureaux étroits (≈ 1024 px),
               la plaque carrée du portrait déborde jusqu'à la colonne de
               texte — le texte reste ainsi TOUJOURS au-dessus d'elle,
               jamais sous son léger voile gris (16/11/2026). */}
           <div className="order-1 lg:col-start-1 lg:row-start-1 lg:relative lg:z-10">
+            {/* VOLET 14 (24/11/2026) — RYTHME VERTICAL RESPONSIVE : les
+                espacements du bloc texte (étoiles→titre, titre→description,
+                description→CTA) sont des marges FLUIDES en clamp(), sans
+                aucun palier par breakpoint — demande de l'éditeur : « il ne
+                faut pas qu'on arrive sur une taille d'écran et constate que
+                l'espace devient plus large. Il faut que ce soit normal,
+                cohérent, responsive et vraiment adaptable » (mobile,
+                tablette ET bureau). */}
             {/* Cinq étoiles — la cinquième à moitié remplie horizontalement —
                 suivies de « 4,9/5 » (remplace l'ancien eyebrow). aboveFold :
                 voir le commentaire d'en-tête (volet 7 — LCP). */}
@@ -238,13 +252,19 @@ export function Hero() {
               </p>
             </Reveal>
 
+            {/* VOLET 14 : titre TOUJOURS en TROIS LIGNES imposées
+                (HERO.h1Lines, prop `lines` de RevealText) — « Je crée
+                des Sites Web » / « Professionnels qui » / « Génèrent
+                des Ventes. » — quelle que soit la taille d'écran ;
+                l'espace étoiles→titre devient fluide (clamp). */}
             <RevealText
               as="h1"
               text={HERO.h1}
+              lines={HERO.h1Lines as readonly string[] as unknown as string[]}
               boldText={HERO.h1Bold}
               delay={0.08}
               aboveFold
-              className="text-hero-title-viewport mt-1.5 text-white sm:mt-4"
+              className="text-hero-title-viewport mt-[clamp(0.375rem,1.2vw,1.05rem)] text-white"
             />
           </div>
 
@@ -255,8 +275,16 @@ export function Hero() {
               description, sur mobile/tablette) est RESPONSIVE : marge
               fluide en svh, la même proportion sur tous les écrans
               (demande de l'éditeur, 15/11/2026 — l'ancienne marge
-              fixe de 144 px sur tablette était trop spacieuse). */}
-          <div className="hero-visual order-2 relative mx-auto mt-5 w-full max-w-md sm:mt-7 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:max-w-none">
+              fixe de 144 px sur tablette était trop spacieuse).
+              VOLET 14 (24/11/2026) — RESPIRATION AU-DESSUS DE L'IMAGE
+              SUR BUREAU : marge haute FLUIDE (clamp en svh) au-dessus
+              du bloc visuel complet, plaque comprise — demande de
+              l'éditeur : « sur desktop il faut augmenter l'espace
+              qu'il y a au-dessus de l'ensemble de l'image, même avec
+              le fond arrière, parce que ça ne respire pas ». La marge
+              suit la hauteur de l'écran, comme l'image (svh) : le
+              hero continue de tenir sans défilement. */}
+          <div className="hero-visual order-2 relative mx-auto mt-5 w-full max-w-md sm:mt-7 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-[clamp(1.75rem,4.5svh,3.5rem)] lg:max-w-none">
             {/* Enveloppe « w-fit » : exactement la largeur de l'image —
                 les pourcentages des mockups épinglés (largeur,
                 décalages) se réfèrent donc à l'image elle-même. */}
@@ -290,10 +318,12 @@ export function Hero() {
                   (stevens-akpovi-portrait.webp) sur bureau, la PHOTO
                   HORIZONTALE (stevens-akpovi-portrait-long.webp) sur
                   mobile/tablette (demande de l'éditeur, 16/11/2026).
-                  Les deux sont enveloppées dans .mono-media : effet
-                  de survol — noir et blanc sur bureau, retour à la
-                  couleur + zoom léger au survol, couleur naturelle
-                  sur tactile. Celle qui est masquée en display:none
+                  Les deux sont enveloppées dans .mono-media : noir
+                  et blanc par défaut sur TOUS les écrans (volet 14),
+                  couleur + zoom léger au survol (bureau) ou à
+                  l'appui simple (mobile/tablette — .couleur-active,
+                  composant InteractionCouleurs). Celle qui est
+                  masquée en display:none
                   avec loading="lazy" n'est jamais téléchargée. */}
               <div className="hero-anim-img">
                 {/* Portrait vertical — BUREAU EXCLUSIVEMENT. Classe
@@ -301,7 +331,7 @@ export function Hero() {
                     téléphones courts (règles sans objet sur ces
                     écrans, la figure y est masquée). */}
                 <figure className="hero-portrait relative hidden overflow-hidden rounded-[1.75rem] border border-[#e4e4e4]/15 bg-[#232323] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.7)] lg:block">
-                  <span className="mono-media mono-touch block">
+                  <span className="mono-media block">
                     <img
                       src={ASSETS.portrait}
                       alt={HERO.portraitAlt}
@@ -320,7 +350,7 @@ export function Hero() {
                     hauteur naturelle (1672×941) : le hero reste
                     entièrement visible sans défilement. */}
                 <figure className="relative overflow-hidden rounded-[1.25rem] border border-[#e4e4e4]/15 bg-[#232323] shadow-[0_40px_90px_-30px_rgba(0,0,0,0.7)] lg:hidden">
-                  <span className="mono-media mono-touch block">
+                  <span className="mono-media block">
                     <img
                       src={ASSETS.portraitLong}
                       alt={HERO.portraitLongAlt}
@@ -373,19 +403,22 @@ export function Hero() {
                 </span>
               </span>
 
-              {/* Mockup navigateur épinglé — MR STEVE ENGLISH (coin
-                  bas-gauche). Animation 2-3 s : jeté sur l'image
-                  (arrive en gros, de face, et atterrit en rebond
-                  pour l'épingler), puis balancement continu
-                  gauche-droite autour de son point d'appui haut.
-                  Couleurs originales PERMANENTES sur tous les écrans
-                  (volet 13, 24/11/2026 : prop `color` remplace
-                  `pinMono` — demande de l'éditeur : « les deux
-                  mockups […] exclusivement en leurs couleurs
-                  originales »). RÉDUIT sur mobile — trop large, il
-                  cachait l'image horizontale : 36 % de la largeur
-                  de l'image sur mobile, 40 % sur tablette, 52 % sur
-                  bureau (portrait vertical). */}
+              {/* Mockup navigateur épinglé — AFRIBAYIT, VERSION
+                  DESKTOP du même projet que le mockup téléphone
+                  (coin bas-gauche). VOLET 14 (24/11/2026) : demande
+                  de l'éditeur — « on ne veut pas avoir des projets
+                  différents sur différents mockups. On veut le même
+                  projet affiché sur différents appareils ». Avant :
+                  MR STEVE ENGLISH (PROJECTS[0]) ; désormais :
+                  PROJECTS[2] — AFRIBAYIT, la plateforme immobilière,
+                  comme le smartphone épinglé de l'autre côté.
+                  Animation 2-3 s : jeté sur l'image (arrive en gros,
+                  de face, et atterrit en rebond pour l'épingler),
+                  puis balancement continu gauche-droite autour de
+                  son point d'appui haut. Couleurs originales
+                  PERMANENTES (prop `color`). RÉDUIT sur mobile : 36 %
+                  de la largeur de l'image sur mobile, 40 % sur
+                  tablette, 52 % sur bureau (portrait vertical). */}
               <div className="hero-anim-browser absolute -bottom-2 -left-[4%] z-10 w-[36%] sm:-bottom-4 sm:-left-[10%] sm:w-[40%] lg:-bottom-5 lg:-left-[13%] lg:w-[52%]">
                 <div className="mockup-sway">
                   {/* ATTRIBUTS 640×400 (ratio 1.6 IDENTIQUE à 1440×900 —
@@ -404,12 +437,12 @@ export function Hero() {
                       (aspect-ratio 640/400 = 1440/900), pas des
                       valeurs absolues. Aucun changement visuel. */}
                   <BrowserMockup
-                    src={PROJECTS[0].desktop}
-                    src2x={PROJECTS[0].desktop2x}
-                    srcSmall={PROJECTS[0].desktopSmall}
+                    src={PROJECTS[2].desktop}
+                    src2x={PROJECTS[2].desktop2x}
+                    srcSmall={PROJECTS[2].desktopSmall}
                     srcSmallWidth={640}
-                    alt={`Aperçu du site ${PROJECTS[0].name}`}
-                    url={PROJECTS[0].url}
+                    alt={`Aperçu du site ${PROJECTS[2].name} — plateforme immobilière`}
+                    url={PROJECTS[2].url}
                     width={640}
                     height={400}
                     color
@@ -419,12 +452,15 @@ export function Hero() {
                 </div>
               </div>
 
-              {/* Mockup smartphone épinglé — AFRIBAYIT (coin
-                  haut-droit). Animation 3-4 s : jeté sur l'image à
-                  son tour, puis balancement continu décalé.
-                  Couleurs originales PERMANENTES sur tous les écrans
-                  (volet 13, 24/11/2026 — prop `color` au lieu de
-                  `pinMono`, demande de l'éditeur).
+              {/* Mockup smartphone épinglé — AFRIBAYIT, VERSION
+                  MOBILE (coin haut-droit). VOLET 14 : le mockup
+                  navigateur affiche désormais la version DESKTOP de
+                  CE MÊME projet — les deux appareils épinglés
+                  présentent la même plateforme immobilière sur deux
+                  écrans différents. Animation 3-4 s : jeté sur
+                  l'image à son tour, puis balancement continu
+                  décalé. Couleurs originales PERMANENTES (prop
+                  `color`, volet 13).
                   Taille modeste pour ne pas recouvrir l'image : 19 %
                   sur mobile, 20 % sur tablette (l'image horizontale
                   étant courte), 24 % sur bureau (portrait
@@ -517,7 +553,7 @@ export function Hero() {
             <Reveal direction="up" delay={0.24} aboveFold>
               <div
                 ref={ctaRowRef}
-                className="hero-cta mt-2.5 flex flex-nowrap items-center gap-2 sm:mt-5 sm:gap-3 lg:mt-5"
+                className="hero-cta mt-[clamp(0.625rem,2vw,1.4rem)] flex flex-nowrap items-center gap-2 sm:gap-3"
               >
                 <CTAButton
                   action={{ kind: "calendly" }}
@@ -549,7 +585,7 @@ export function Hero() {
             </Reveal>
 
             <Reveal direction="up" delay={0.3} aboveFold>
-              <ReassuranceBar mention={HERO.reassurance} className="mt-2 sm:mt-4 lg:mt-5" />
+              <ReassuranceBar mention={HERO.reassurance} className="mt-[clamp(0.5rem,1.6vw,1.25rem)]" />
             </Reveal>
           </div>
         </div>

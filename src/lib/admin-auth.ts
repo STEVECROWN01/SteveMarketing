@@ -29,6 +29,20 @@ import crypto from "crypto";
  * La route login refuse en amont toute configuration incomplète
  * (message générique, sans préciser QUELLE variable manque — cette
  * information n'appartient qu'au propriétaire via DEPLOIEMENT.md).
+ *
+ * VOLET 14 (24/11/2026) — ADMIN_SESSION_SECRET DEVIENT OPTIONNEL.
+ * Incident de l'éditeur : « ça me met un panneau rouge “espace
+ * administrateur non configuré sur cet environnement” alors que
+ * j'ai exactement le mot de passe des variables Vercel ». Cause :
+ * le fail-closed ci-dessus exigeait DEUX variables ; seul
+ * ADMIN_PASSWORD était défini. Désormais, quand ADMIN_SESSION_SECRET
+ * est absent (ou trop court), le secret de signature est DÉRIVÉ du
+ * mot de passe lui-même (HMAC-SHA256 avec sel interne) : la
+ * connexion fonctionne avec le seul mot de passe défini, aucune
+ * valeur publique n'est introduite (le dépôt reste impossible à
+ * forger), et changer le mot de passe invalide toutes les sessions
+ * existantes. Un ADMIN_SESSION_SECRET explicite (≥ 16 caractères)
+ * reste prioritaire et annule la dérivation.
  */
 
 const COOKIE_NAME = "stevens_admin_session";
@@ -37,14 +51,25 @@ const SESSION_TTL_MS = 1000 * 60 * 60 * 8; // 8 heures
 /** Longueur minimale acceptée pour le secret de signature. */
 const MIN_SECRET_LENGTH = 16;
 
+/** Sel de dérivation — propre à ce déploiement : le condensat du
+ *  mot de passe ne peut pas être réutilisé tel quel ailleurs. */
+const SEL_DERIVATION = "stevens-admin-session::v1";
+
 function getSessionSecret(): string | null {
-  const secret = process.env.ADMIN_SESSION_SECRET;
-  if (!secret || secret.length < MIN_SECRET_LENGTH) return null;
-  return secret;
+  const explicit = process.env.ADMIN_SESSION_SECRET;
+  if (explicit && explicit.length >= MIN_SECRET_LENGTH) return explicit;
+  // VOLET 14 : secret dérivé du mot de passe — jamais public (ni le
+  // mot de passe ni le sel ne figurent dans le dépôt), et il change
+  // automatiquement quand l'éditeur change son mot de passe.
+  const password = process.env.ADMIN_PASSWORD;
+  if (!password) return null;
+  return crypto.createHmac("sha256", SEL_DERIVATION).update(password).digest("hex");
 }
 
 /** Configuration admin complète ? (utilisée par la route login pour
- *  refuser proprement une configuration incomplète, sans oracle.) */
+ *  refuser proprement une configuration incomplète, sans oracle.)
+ *  VOLET 14 : le MOT DE PASSE seul suffit — le secret de session se
+ *  dérive du mot de passe si ADMIN_SESSION_SECRET n'est pas défini. */
 export function isAuthConfigured(): boolean {
   return Boolean(process.env.ADMIN_PASSWORD) && getSessionSecret() !== null;
 }

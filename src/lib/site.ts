@@ -160,10 +160,13 @@ export const NAV_ITEMS: { key: PageKey; label: string }[] = [
 
 /** Les quatre réalisations réelles — données factuelles uniquement.
  *  Ajout du 24/11/2026 (volet 13) : ALEXANDRE MOREL
- *  (journalistefr.vercel.app) AJOUTÉ EN FIN de tableau — l'ordre
- *  compte : les mockups du hero référencent PROJECTS[0] (navigateur,
- *  MR STEVE ENGLISH) et PROJECTS[2] (smartphone, AFRIBAYIT) par
- *  index ; tout ajout en tête aurait CHANGÉ les images du hero. */
+ *  (journalistefr.vercel.app) AJOUTÉ EN FIN de tableau.
+ *  VOLET 14 (24/11/2026) : les DEUX mockups épinglés du hero
+ *  référencent désormais le MÊME projet — AFRIBAYIT (demande de
+ *  l'éditeur : « le même site, le même mockup que le mockup
+ *  téléphone […] la version desktop du mockup téléphone ») — le
+ *  navigateur et le smartphone référencent PROJECTS[2] par index.
+ *  Tout ajout EN TÊTE changerait donc les images du hero. */
 export const PROJECTS = [
   {
     id: "mrsteveenglish",
@@ -205,6 +208,12 @@ export const PROJECTS = [
     url: "https://afribayit.vercel.app",
     desktop: "/assets/projects/afribayit-desktop.webp",
     desktop2x: "/assets/projects/afribayit-desktop@2x.webp",
+    /* Variante légère 640 px (volet 14, 24/11/2026) : le mockup
+       NAVIGATEUR du hero affiche désormais ce projet (même projet
+       que le mockup téléphone, demande de l'éditeur) — candidat
+       d'entrée du srcset, affiché à 130-290 px CSS. Générée par
+       scripts/prepare-afribayit-640-volet14.mjs (WebP q82, 35 Ko). */
+    desktopSmall: "/assets/projects/afribayit-desktop-640.webp",
     mobile: "/assets/projects/afribayit-mobile.webp",
     mobile2x: "/assets/projects/afribayit-mobile@2x.webp",
     /* Variante légère 290 px (volet 8 de l'audit, 19/11/2026) :

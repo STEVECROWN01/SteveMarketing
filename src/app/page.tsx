@@ -7,6 +7,7 @@ import { CalendlyProvider } from "@/components/calendly/CalendlyContext";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HomePage } from "@/components/home/HomePage";
+import { InteractionCouleurs } from "@/components/media/InteractionCouleurs";
 import { Toaster } from "@/components/ui/toaster";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { PROJECTS } from "@/lib/site";
@@ -223,6 +224,12 @@ function Shell() {
   return (
     <div className="flex min-h-screen flex-col bg-[#1c1c1c] text-white">
       <Header />
+      {/* VOLET 14 (24/11/2026) — révélation de couleur à l'appui sur
+          les écrans tactiles : monté UNE fois ici (la branche publique),
+          il survit aux changements de page du routeur par fragment —
+          ses écouteurs couvrent toutes les images de toutes les pages
+          (voir le composant). Rend null : aucun nœud dans le DOM. */}
+      <InteractionCouleurs />
       <PageSwitch />
       <Footer />
     </div>

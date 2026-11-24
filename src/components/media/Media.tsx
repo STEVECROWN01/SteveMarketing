@@ -111,7 +111,14 @@ export function MonoImage({
  *  fine — ENCORE amincie à la demande de l'éditeur (15/11/2026 :
  *  « réduis l'épaisseur de l'entête appareil du mockup desktop ») :
  *  pastilles et retraits réduits, le contenu capturé occupe
- *  davantage du mockup. */
+ *  davantage du mockup.
+ *  VOLET 14 (24/11/2026) — PLUS D'URL DANS L'ENTÊTE : demande de
+ *  l'éditeur — « tous les mockups de projets affichés sur le site,
+ *  dans l'entête designée par défaut du mockup, l'URL est affichée.
+ *  Je ne veux pas que l'URL soit affichée. Comme pour les mockups
+ *  mobiles, les URL ne sont pas affichées. » La pastille de barre
+ *  d'adresse reste — MUETTE : un point, aucun texte. La prop `url`
+ *  est conservée (compatibilité des appelants) mais plus rendue. */
 export function BrowserMockup({
   src,
   src2x,
@@ -172,7 +179,9 @@ export function BrowserMockup({
    *  toujours l'effet de zoom qu'on a sur les mockups du site »). */
   zoom?: boolean;
 }) {
-  const shortUrl = url.replace(/^https?:\/\//, "");
+  // VOLET 14 : plus aucun rendu d'URL dans l'entête (voir la note
+  // de documentation ci-dessus) — la prop `url` reste acceptée
+  // (compatibilité des appelants) mais n'est plus affichée.
   // Fichiers réels : desktop 1440 px (1x) et 1920 px (@2x vraie densité)
   // + candidat léger en tête quand il est fourni (voir srcSmall).
   const srcSet = src2x
@@ -194,7 +203,6 @@ export function BrowserMockup({
         </span>
         <span className="mx-auto flex max-w-[70%] items-center gap-1.5 truncate rounded-md bg-[#1c1c1c] px-2 py-[2px] text-[7px] leading-none text-[#c8c8c8] sm:text-[9px]" aria-hidden="true">
           <span className="h-1 w-1 shrink-0 rounded-full bg-[#e4e4e4]" />
-          {shortUrl}
         </span>
       </figcaption>
       <span

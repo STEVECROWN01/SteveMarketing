@@ -250,13 +250,24 @@ html.lenis body {
 }
 
 /* ============================================================
-   COMPORTEMENT DES IMAGES
-   Desktop (périphériques avec survol) : noir et blanc par
-   défaut, retour progressif à la couleur + zoom léger au
-   survol. Mobile / tactile : couleur naturelle directe.
-   Double détection : media query standard + classe .hoverable
-   posée par un script inline dès le <head> (couvre aussi les
-   environnements sans signal de survol).
+   COMPORTEMENT DES IMAGES — VOLET 14 (24/11/2026)
+   TOUTES les images du site (hors les deux mockups épinglés du
+   hero, prop `color` — couleur permanente) sont en NOIR ET BLANC
+   PAR DÉFAUT, sur TOUS les écrans — mobile, tablette ET bureau
+   (demande de l'éditeur : « dans toutes les images du site, sur
+   desktop la couleur originale se révèle au survol. Sur mobile et
+   tablette, c'est un appui sur l'image qui va faire révéler la
+   vraie couleur de l'image. Et quand on fait encore un appui à
+   l'extérieur de l'image, la couleur va revenir en blanc noir ») :
+   - bureau (périphérique capable de survol) : la couleur
+     originale + un zoom léger se révèlent AU SURVOL ;
+   - mobile / tablette : UN APPUI SIMPLE sur l'image révèle la
+     couleur (classe .couleur-active, posée par le composant
+     InteractionCouleurs) ; UN APPUI À L'EXTÉRIEUR de l'image la
+     fait revenir au noir et blanc.
+   Double détection du survol : media query standard + classe
+   .hoverable posée par un script inline dès le <head> (couvre
+   aussi les environnements sans signal de survol).
    ============================================================ */
 .mono-media {
   overflow: hidden;
@@ -271,20 +282,22 @@ html.lenis body {
   transition:
     filter 0.55s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-  filter: var(--mono-filter, none);
-  transform: scale(var(--mono-scale, 1));
+  /* VOLET 14 : noir et blanc par défaut sur TOUS les écrans —
+     l'exception tactile « couleur directe » est supprimée ; la
+     couleur se révèle au survol (bureau) ou à l'appui simple
+     (.couleur-active). L'indirection --mono-filter n'a plus
+     d'objet : le filtre est explicite et universel. */
+  filter: grayscale(1);
+  transform: scale(1);
 }
-/* Périphériques desktop classiques (signal survol + pointeur précis) */
-@media (hover: hover) and (pointer: fine) {
-  :root {
-    --mono-filter: grayscale(1);
-    --mono-scale: 1;
-  }
-}
-/* Environnements sans signal tactile (script inline dans <head>) */
-html.hoverable {
-  --mono-filter: grayscale(1);
-  --mono-scale: 1;
+/* Appui simple (mobile / tablette) : couleur DURABLE — la classe
+   est posée par InteractionCouleurs au tap sur l'image, retirée au
+   tap ailleurs (ou sur une autre image : une seule couleur à la
+   fois). Aucun zoom ici : le doigt masque déjà l'image, et la
+   demande porte sur la couleur, pas sur l'échelle. */
+.mono-media.couleur-active > img,
+.mono-media.couleur-active > .media-fill {
+  filter: grayscale(0);
 }
 
 /* Retour progressif aux couleurs + zoom léger au survol —
@@ -359,36 +372,6 @@ html.hoverable .media-group:where(:hover, :focus-within) .mono-locked > .media-f
 html.hoverable .mono-pin:where(:hover, :focus-within) > img,
 html.hoverable .mono-pin:where(:hover, :focus-within) > .media-fill {
   filter: grayscale(0);
-}
-
-/* ---------- Variante .mono-touch : N&B AU DOIGTÉ (volet 13,
-   24/11/2026) — photo du hero ----------
-   Demande de l'éditeur : « je veux que mon image, l'image du hero,
-   mon image soit en blanc noir, sur mobile. Sur mobile que ce soit
-   en blanc noir. Et quand on pointe le doigt dessus, ça va
-   afficher sa couleur originale. Et quand on relâche, ça va
-   revenir au blanc noir. » Sur les écrans TACTILES, l'image
-   enveloppée dans .mono-touch (posée EN PLUS de .mono-media, voir
-   Hero.tsx) est en noir et blanc par défaut ; sa couleur
-   n’apparaît que PENDANT L'APPUI (:active — doigt posé), sans
-   zoom, puis elle retrouve le noir et blanc au relâchement. La
-   transition douce 0,55 s vient de la règle .mono-media de base.
-   Les périphériques à survol (bureau) ne correspondent PAS à la
-   media query : ils gardent le comportement historique (N&B par
-   défaut, couleur + zoom au survol). Placée APRÈS la règle de
-   base .mono-media > img (même spécificité, ordre ultérieur
-   gagnant). Le sélecteur .mono-touch est exclus de l'annulation
-   prefers-reduced-motion (voir ce bloc) : le noir et blanc est un
-   ÉTAT, pas un mouvement — il reste appliqué. */
-@media (hover: none), (pointer: coarse) {
-  .mono-touch > img,
-  .mono-touch > .media-fill {
-    filter: grayscale(1);
-  }
-  .mono-touch:where(:active) > img,
-  .mono-touch:where(:active) > .media-fill {
-    filter: grayscale(0);
-  }
 }
 
 /* ---------- Variante .mockup-zoom : zoom léger au survol ----------
@@ -490,9 +473,13 @@ html.hoverable .mockup-zoom:where(:hover, :focus-within) > span > img {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .mono-media:not(.mono-locked):not(.mono-touch) > img,
-  .mono-media:not(.mono-locked):not(.mono-touch) > .media-fill {
-    filter: none !important;
+  /* VOLET 14 : le noir et blanc est un ÉTAT, pas un mouvement —
+     il reste appliqué en mouvement réduit (plus de forçage couleur
+     par le reset) ; seul le ZOOM (mouvement) est annulé, et la
+     révélation .couleur-active reste pleinement fonctionnelle
+     (la durée de transition réduite à 0,01 ms la rend instantanée). */
+  .mono-media > img,
+  .mono-media > .media-fill {
     transform: none !important;
   }
   .mono-locked > img,
@@ -589,8 +576,14 @@ html.hoverable .mockup-zoom:where(:hover, :focus-within) > span > img {
   #hero .order-3 {
     margin-top: 0.25rem;
   }
+  /* VOLET 14 : plancher abaissé 1,4 → 1,25 rem — le titre est
+     désormais forcé en TROIS lignes : à 280 px (écran de couverture
+     Galaxy Fold), « Je crée des Sites Web » à 22,4 px débordait de
+     la largeur utile (240 px) et la ligne se coupait en deux (H1 de
+     120 px mesuré, marge réassurance à −18 px). À 20 px, chaque
+     ligne imposée tient entière : trois lignes × 21,3 px. */
   #hero h1 {
-    font-size: clamp(1.4rem, 0.55rem + 3vw, 1.6rem);
+    font-size: clamp(1.25rem, 0.55rem + 3vw, 1.6rem);
   }
   /* CTA resserrés : les deux boutons tiennent sur une seule ligne
      même à 280 px de large (demande de l'éditeur, 18/11/2026 :

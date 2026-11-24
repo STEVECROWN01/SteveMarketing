@@ -101,11 +101,24 @@ export const metadata: Metadata = {
     ? { google: process.env.NEXT_PUBLIC_GSC_VERIFICATION.trim() }
     : undefined,
   icons: {
-    // Paramètre de version : force les navigateurs (cache favicon très
-    // rétentif) à recharger l'icône. Version 2026-11-14-2 : fond noir
-    // retiré (PNG RGBA transparent, glyphe recadré sur son enveloppe).
-    icon: "/assets/favicon.png?v=2026-11-14-2",
-    apple: "/assets/favicon.png?v=2026-11-14-2",
+    // VOLET 14 (24/11/2026) — FAVICON À FOND NOIR CONSERVÉ + COINS
+    // ARRONDIS. Demande de l'éditeur : « je veux que tu utilises le
+    // favicon ayant un fond arrière noir que j'ai uploadé dans le
+    // projet. Je veux que tu l'utilises tel qu'il est, sans
+    // supprimer le fond arrière noir. Mais tu vas rogner ça pour
+    // que ça ait des border radius, le fond arrière noir ait des
+    // border radius. » Source : public/assets/Logo Favicon.png
+    // (1254×1254, fond noir plein — l'original de l'éditeur) ;
+    // dérivée à coins arrondis (rayon 22 %) par
+    // scripts/prepare-favicon-volet14.py : le glyphe ET le fond
+    // noir sont inchangés, seuls les quatre coins deviennent
+    // transparents. NOUVEAU NOM DATÉ (convention du projet) : les
+    // navigateurs et les edges rechargent l'icône au lieu de
+    // servir l'ancienne version transparente (2026-11-14-2) en
+    // cache. L'ancien favicon.png (fond supprimé le 14/11) reste
+    // dans le dépôt pour les caches déjà distribués.
+    icon: "/assets/favicon-fond-noir-2026-11-24.png?v=volet14",
+    apple: "/assets/favicon-fond-noir-2026-11-24.png?v=volet14",
   },
 };
 
