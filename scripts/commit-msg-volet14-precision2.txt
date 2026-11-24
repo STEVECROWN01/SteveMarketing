@@ -1,0 +1,46 @@
+VOLET 14 — PRÉCISIONS (3) : PAGE DE CONNEXION ADMIN — MESSAGE DE
+BIENVENUE PERSONNALISÉ + ŒIL À L'INTÉRIEUR DU CHAMP MOT DE PASSE
+
+Deux demandes de l'éditeur sur la page de connexion #/admin :
+
+1. MESSAGE DE BIENVENUE (demande : « corrige la description
+   "Accès réservé — back-office : demandes reçues, génération des
+   documents commerciaux (propositions, devis, factures). Cet espace
+   n'est pas listé dans la navigation publique." en message
+   professionnel de bienvenue à moi Stevens l'admin, qui m'adresse
+   directement, peut-être sur quoi gérer dans mon espace, très cool
+   accueillant et présentant ») — l'ancienne description technique
+   devient une salutation directe : « Bienvenue, Stevens. » (en
+   blanc, en graisse, hiérarchie visuelle) suivie de « Votre
+   back-office vous attend : retrouvez les demandes de vos clients,
+   générez vos propositions, devis et factures en quelques clics, et
+   pilotez chaque projet de la première prise de contact au
+   règlement. Tout est réuni ici, en privé, à l'écart de la
+   navigation publique — bonne session. »
+   Structure copywriting : salutation directe → ce que l'espace
+   permet (demandes, génération de documents, pilotage) → caractère
+   privé → signature « bonne session ». L'information « hors
+   navigation publique » est conservée, intégrée naturellement à la
+   phrase.
+
+2. ŒIL DANS LE CHAMP (demande : « le bouton d'affichage du mot de
+   passe devrait être dans le champ de mot de passe précisément à
+   droite, et non à l'extérieur du champ ») — le bouton vit
+   désormais À L'INTÉRIEUR du champ : enveloppe relative, bouton en
+   absolute centré verticalement (right-2, h-9 w-9, sans bordure
+   sur le fond sombre du champ), padding droit du champ pr-14 pour
+   que la saisie ne passe jamais sous l'icône. L'aria-label
+   « Afficher/Masquer le mot de passe » et le comportement
+   (password ↔ text) sont inchangés — la sonde C9c/C9d reste
+   verte sans modification de ses cibles.
+
+SONDE : deux contrôles nouveaux — C9c2 (message de bienvenue présent,
+ancien texte « Accès réservé » absent) et C9c3 (rectangle du bouton
+CONTENU dans celui du champ, aligné à droite, mesure boundingBox).
+Contrôle complet re-joué : 159/159 contrôles verts (8 viewports +
+réalisations 5/5 + favicon 2/2 + admin 13/13 + API documents 7/7).
+Lecture VLM des captures (admin-login-precision.png,
+admin-login-saisie.png) : texte conforme, « Bienvenue, Stevens. »
+bien détaché en blanc, icône dans le champ verticalement centrée,
+saisie longue s'arrête avant l'icône avec un espace net, aucun
+chevauchement ni texte coupé.

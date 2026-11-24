@@ -96,7 +96,9 @@ function formatDateHeure(iso: string): string {
 }
 
 /* ------------------------------------------------------------------
- * CONNEXION — icône œil (volet 14) + bouton « Ouvrir L'Espace »
+ * CONNEXION — message de bienvenue personnalisé (Stevens), icône
+ * œil À L'INTÉRIEUR du champ (volet 14 + précisions même jour),
+ * bouton « Ouvrir L'Espace »
  * ------------------------------------------------------------------ */
 function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
   const [password, setPassword] = useState("");
@@ -137,37 +139,57 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
           Espace administrateur
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-[#c8c8c8]">
-          Accès réservé — back-office : demandes reçues, génération des documents
-          commerciaux (propositions, devis, factures). Cet espace n&apos;est pas listé
-          dans la navigation publique.
+          {/* PRÉCISION VOLET 14 (24/11/2026) : l'ancienne description
+              technique (« Accès réservé — back-office : demandes
+              reçues… ») devient un message de bienvenue qui S'ADRESSE
+              DIRECTEMENT à l'éditeur (demande : « corrige la
+              description… en message professionnel de bienvenue à moi
+              Stevens l'admin, qui m'adresse directement, sur quoi
+              gérer dans mon espace, très cool accueillant et
+              présentant »). Structure copywriting : salutation → ce
+              que l'espace fait (demandes, génération, pilotage) →
+              signature « bonne session ». */}
+          <span className="font-medium text-white">Bienvenue, Stevens.</span>{" "}
+          Votre back-office vous attend : retrouvez les demandes de vos
+          clients, générez vos propositions, devis et factures en quelques
+          clics, et pilotez chaque projet de la première prise de contact
+          au règlement. Tout est réuni ici, en privé, à l&apos;écart de la
+          navigation publique — bonne session.
         </p>
         <form onSubmit={submit} className="mt-8 space-y-4">
           <div>
-            <label htmlFor="admin-password" className="mb-1.5 flex items-center justify-between text-sm font-medium text-white">
+            <label htmlFor="admin-password" className="mb-1.5 block text-sm font-medium text-white">
               Mot de passe
-              {/* VOLET 14 — icône œil : révéler / masquer le mot de passe
-                  (demande de l'éditeur : « ajoute une icône d'œil sur
-                  lequel on peut cliquer pour afficher le mot de passe »). */}
+            </label>
+            {/* VOLET 14 — icône œil : révéler / masquer le mot de passe
+                (demande de l'éditeur : « ajoute une icône d'œil sur
+                lequel on peut cliquer pour afficher le mot de passe »).
+                PRÉCISION MÊME JOUR : le bouton vit À L'INTÉRIEUR du
+                champ, aligné à droite (« et non à l'extérieur du
+                champ ») — enveloppe relative, bouton en absolute
+                centré verticalement, padding droit du champ (pr-14)
+                pour que la saisie ne passe jamais sous l'icône. */}
+            <div className="relative">
+              <input
+                id="admin-password"
+                type={voirMotDePasse ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="min-h-[48px] w-full rounded-lg border border-[#e4e4e4]/18 bg-[#1c1c1c] py-3 pl-4 pr-14 text-[15px] text-white placeholder:text-[#c8c8c8]/50 focus:border-[#e4e4e4] focus:outline-none"
+                placeholder="••••••••••••"
+              />
               <button
                 type="button"
                 onClick={() => setVoirMotDePasse((v) => !v)}
                 aria-label={voirMotDePasse ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                 aria-pressed={voirMotDePasse}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-white"
+                className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-[#c8c8c8] transition-colors hover:text-white"
               >
                 {voirMotDePasse ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
               </button>
-            </label>
-            <input
-              id="admin-password"
-              type={voirMotDePasse ? "text" : "password"}
-              autoComplete="current-password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="min-h-[48px] w-full rounded-lg border border-[#e4e4e4]/18 bg-[#1c1c1c] px-4 py-3 text-[15px] text-white placeholder:text-[#c8c8c8]/50 focus:border-[#e4e4e4] focus:outline-none"
-              placeholder="••••••••••••"
-            />
+            </div>
           </div>
           {error && (
             <p role="alert" className="rounded-lg border border-[#ea384c]/40 bg-[#ea384c]/10 px-4 py-2.5 text-sm text-[#ffdede]">

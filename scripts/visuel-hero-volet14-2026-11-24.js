@@ -24,7 +24,9 @@
  *  9. page admin : icône œil, bouton « Ouvrir L'Espace », mot de
  *     passe fonctionnel (plus jamais « non configuré »), back-office
  *     complet (tableau de bord, demandes, devis, propositions,
- *     factures & documents) ;
+ *     factures & documents) — PRÉCISIONS MÊME JOUR (2) : message de
+ *     bienvenue personnalisé à l'éditeur (Stevens) + œil À
+ *     L'INTÉRIEUR du champ de mot de passe, aligné à droite ;
  * 10. API documents : génération PDF devis (enregistrement GitHub),
  *     facture depuis devis (cachet PAYÉ), liste, suppression.
  *
@@ -409,8 +411,29 @@ const LIGNES_ATTENDUES = ["Je crée des Sites Web", "Professionnels qui", "Gén�
       (await page.locator("button[type=submit]", { hasText: "Ouvrir L'Espace" }).count()) > 0,
       "libellé exact du bouton de connexion");
     const oeil = page.locator('button[aria-label="Afficher le mot de passe"]');
-    push("C9c icône œil présente", (await oeil.count()) > 0, "bouton aria-label « Afficher le mot de passe »");
     const champ = page.locator("#admin-password");
+    push("C9c icône œil présente", (await oeil.count()) > 0, "bouton aria-label « Afficher le mot de passe »");
+    /* PRÉCISION MÊME JOUR (2) — message de bienvenue personnalisé :
+       l'ancienne description technique (« Accès réservé —
+       back-office… ») devient une salutation directe à l'éditeur. */
+    const bienvenue = await page.locator("p", { hasText: "Bienvenue, Stevens." }).first().textContent().catch(() => null);
+    push("C9c2 message de bienvenue personnalisé (ancienne description technique remplacée)",
+      Boolean(bienvenue && bienvenue.includes("Bienvenue, Stevens.") && bienvenue.includes("propositions, devis et factures") && !bienvenue.includes("Accès réservé")),
+      `texte: ${(bienvenue || "").replace(/\s+/g, " ").slice(0, 120)}…`);
+    /* PRÉCISION MÊME JOUR (2) — le bouton œil vit À L'INTÉRIEUR du
+       champ (aligné à droite), plus à l'extérieur : le rectangle du
+       bouton doit être CONTENU dans celui du champ. */
+    const champBoite = await champ.boundingBox();
+    const oeilBoite = await oeil.boundingBox();
+    const dedans = champBoite && oeilBoite &&
+      oeilBoite.x >= champBoite.x && oeilBoite.y >= champBoite.y &&
+      oeilBoite.x + oeilBoite.width <= champBoite.x + champBoite.width + 0.5 &&
+      oeilBoite.y + oeilBoite.height <= champBoite.y + champBoite.height + 0.5;
+    const aDroite = champBoite && oeilBoite &&
+      oeilBoite.x + oeilBoite.width > champBoite.x + champBoite.width - 28;
+    push("C9c3 œil À L'INTÉRIEUR du champ, aligné à droite",
+      Boolean(dedans && aDroite),
+      `champ ${champBoite ? Math.round(champBoite.x) + "×" + Math.round(champBoite.width) : "?"} / œil ${oeilBoite ? Math.round(oeilBoite.x) + "×" + Math.round(oeilBoite.width) : "?"} (contenu: ${dedans ? "oui" : "non"})`);
     const typeAvant = await champ.getAttribute("type");
     try {
       await oeil.click({ timeout: 8000 });
