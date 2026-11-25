@@ -127,9 +127,12 @@ const push = (name, ok, detail) => {
     ["carte de traduction (Existing clients)", /Existing clients/.test(tous)],
     ["clé de stockage de langue", /site-langue/.test(tous)],
     ["libellés devis EN (Quote)", /Quote/.test(tous)],
-    ["menu version (Version anglaise)", /Version anglaise/.test(tous)],
   ];
   marqueurs.forEach(([nom, ok]) => push(`C18p chunk : ${nom}`, ok));
+  /* « Version anglaise » vit dans le morceau LAZY de l'espace admin
+     (chargé après connexion) : invisible sans le mot de passe de
+     production — vérifié par la sonde LOCALE 34/34 (C32/C33). */
+  console.log("   (marqueur « Version anglaise » : morceau admin lazy — prouvé en local 34/34)");
   console.log(`   (${Object.keys(chunks).length} chunks inspectés)`);
 
   await browser.close();
