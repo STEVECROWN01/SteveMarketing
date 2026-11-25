@@ -9,6 +9,10 @@ import {
   LinkedInBrandIcon,
   WhatsAppBrandIcon,
 } from "@/components/media/BrandIcons";
+/* VOLET 18 — i18n : textes en dur via t()/tf() ; les libellés des
+   colonnes de liens (constantes module-level) sont enveloppés AU
+   RENDU pour rester réactifs à la langue. */
+import { useT } from "@/i18n";
 
 /** Liens de la colonne « Services » — à la demande de l'éditeur
  *  (15/11/2026) : trois services, chacun vers SA page dédiée —
@@ -77,6 +81,7 @@ const FOOTER_LINK_CLASS =
  */
 export function Footer() {
   const router = useRouter();
+  const { t, tf } = useT();
 
   const go = (e: React.MouseEvent, key: string) => {
     e.preventDefault();
@@ -111,12 +116,12 @@ export function Footer() {
                 <a
                   href={FOOTER_LINK_PAGES.accueil}
                   onClick={(e) => go(e, "accueil")}
-                  aria-label="Stevens Akpovi — retour à l'accueil"
+                  aria-label={t("Stevens Akpovi — retour à l'accueil")}
                   className="inline-flex shrink-0"
                 >
                   <img
                     src={ASSETS.logoLight}
-                    alt="Stevens Akpovi"
+                    alt={t("Stevens Akpovi")}
                     width={240}
                     height={192}
                     loading="lazy"
@@ -137,7 +142,7 @@ export function Footer() {
                 <div className="flex items-center gap-2.5 pb-2.5">
                   <a
                     href={`mailto:${SITE.email}`}
-                    aria-label={`Écrire un email à Stevens Akpovi — ${SITE.email}`}
+                    aria-label={tf("Écrire un email à Stevens Akpovi — {email}", { email: SITE.email })}
                     className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#1c1c1c] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 sm:h-9 sm:w-9"
                   >
                     <EmailBrandIcon className="h-[13px] w-[13px] sm:h-[15px] sm:w-[15px]" />
@@ -146,7 +151,7 @@ export function Footer() {
                     href={SITE.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="LinkedIn — Stevens Akpovi"
+                    aria-label={t("LinkedIn — Stevens Akpovi")}
                     className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#0A66C2] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 sm:h-9 sm:w-9"
                   >
                     <LinkedInBrandIcon className="h-[13px] w-[13px] sm:h-[15px] sm:w-[15px]" />
@@ -155,7 +160,7 @@ export function Footer() {
                     href={SITE.whatsapp}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label="WhatsApp — Stevens Akpovi"
+                    aria-label={t("WhatsApp — Stevens Akpovi")}
                     className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#25D366] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 sm:h-9 sm:w-9"
                   >
                     <WhatsAppBrandIcon className="h-[13px] w-[13px] sm:h-[15px] sm:w-[15px]" />
@@ -168,7 +173,7 @@ export function Footer() {
                   ravisé dans la foulée : gras retiré), à la place des
                   deux logos de reconnaissance de la référence. */}
               <p className="mt-5 max-w-[294px] text-sm leading-relaxed text-[#c8c8c8]">
-                Votre activité mérite un site web qui travaille pour vous.
+                {t("Votre activité mérite un site web qui travaille pour vous.")}
               </p>
             </div>
 
@@ -179,9 +184,9 @@ export function Footer() {
                 l'éditeur, 16/11/2026) ; sur téléphone, titres et liens
                 sont légèrement plus compacts pour tenir. */}
             <div className="grid grid-cols-2 gap-6 sm:gap-10 lg:gap-20">
-              <nav aria-label="Services — pied de page">
+              <nav aria-label={t("Services — pied de page")}>
                 <p className="font-display text-[20px] font-semibold text-white sm:text-[32px]">
-                  Services
+                  {t("Services")}
                 </p>
                 <ul className="mt-[25px]">
                   {FOOTER_SERVICES.map((item) => (
@@ -191,16 +196,16 @@ export function Footer() {
                         onClick={(e) => go(e, item.page)}
                         className={FOOTER_LINK_CLASS}
                       >
-                        {item.label}
+                        {t(item.label)}
                       </a>
                     </li>
                   ))}
                 </ul>
               </nav>
 
-              <nav aria-label="Professionnel — pied de page">
+              <nav aria-label={t("Professionnel — pied de page")}>
                 <p className="font-display text-[20px] font-semibold text-white sm:text-[32px]">
-                  Professionnel
+                  {t("Professionnel")}
                 </p>
                 <ul className="mt-[25px]">
                   {FOOTER_PROFESSIONAL.map((item) => (
@@ -210,7 +215,7 @@ export function Footer() {
                         onClick={(e) => go(e, item.page)}
                         className={FOOTER_LINK_CLASS}
                       >
-                        {item.label}
+                        {t(item.label)}
                       </a>
                     </li>
                   ))}
@@ -234,13 +239,13 @@ export function Footer() {
             taille de police est réduite (13 px) pour que les deux
             restent alignés sans retour à la ligne. */}
         <div className="flex items-center justify-between gap-3 py-[15px] text-[13px] sm:text-[18px]">
-          <p className="whitespace-nowrap text-[#f5f5f5]">© Stevens Akpovi - {new Date().getFullYear()}</p>
+          <p className="whitespace-nowrap text-[#f5f5f5]">{tf("© Stevens Akpovi - {annee}", { annee: new Date().getFullYear() })}</p>
           <a
             href={FOOTER_LINK_PAGES.legal}
             onClick={(e) => go(e, "legal")}
             className="relative inline-block w-fit whitespace-nowrap text-white after:absolute after:bottom-0 after:left-1/2 after:h-px after:w-0 after:bg-white after:transition-all after:duration-300 hover:after:left-0 hover:after:w-full focus-visible:outline-2 focus-visible:outline-offset-4"
           >
-            Mentions légales
+            {t("Mentions légales")}
           </a>
         </div>
       </div>

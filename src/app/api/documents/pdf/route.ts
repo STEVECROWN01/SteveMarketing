@@ -13,7 +13,7 @@ export const maxDuration = 60;
 
 /** POST /api/documents/pdf — génération du PDF d'un document
  *  commercial (proposition v2 / devis / facture) :
- *  - corps : { document, enregistrer?, envoyerEmail? } ;
+ *  - corps : { document, enregistrer?, envoyerEmail?, langueSortie? } ;
  *  - renvoie TOUJOURS le PDF (téléchargement automatique côté
  *    back-office) ;
  *  - effets secondaires NON BLOQUANTS :
@@ -21,7 +21,13 @@ export const maxDuration = 60;
  *    `envoyerEmail` → copie PDF à l'adresse personnelle de
  *    l'éditeur via Resend ;
  *  - en-tête X-Email-Sent : 1 si la copie est partie.
- */
+ *
+ *  VOLET 18 — `langueSortie` ("fr" | "en", optionnel) : langue de la
+ *  VERSION TÉLÉCHARGÉE choisie dans le back-office. Elle ne modifie
+ *  que le PDF rendu (et sa copie email jointe) — l'enregistrement
+ *  conserve la langue DU document (document.langue) : une version
+ *  de sortie n'écrase JAMAIS la langue enregistrée. Sans ce champ,
+ *  le PDF suit la langue du document (comportement historique). */
 export async function POST(req: NextRequest) {
   if (!verifySessionToken(req.cookies.get(SESSION_COOKIE)?.value)) {
     return NextResponse.json({ ok: false, error: "Non autorisé." }, { status: 401 });
@@ -35,10 +41,22 @@ export async function POST(req: NextRequest) {
 
   const enregistrer = Boolean(body?.enregistrer ?? true);
   const envoyerEmail = Boolean(body?.envoyerEmail ?? true);
+  /* VOLET 18 — langue de la VERSION DE SORTIE (uniquement "fr" ou
+   * "en" ; absent → la langue du document elle-même). */
+  const langueSortie: "fr" | "en" | null =
+    body?.langueSortie === "fr" || body?.langueSortie === "en" ? body.langueSortie : null;
 
   try {
     const document = completerDocument(brut) as ToutDocument;
-    const pdf = await generatePdf(document, LOGO_DATA_URI);
+    /* VOLET 18 — le PDF (et sa copie email) est rendu dans la langue
+     * CHOISIE ; le document ENREGISTRÉ garde sa propre langue.
+     * Les propositions commerciales ignorent la langue (template
+     * français uniquement — langueSortie jamais envoyée pour elles). */
+    const documentPdf: ToutDocument =
+      langueSortie && !estPropositionV2(document)
+        ? ({ ...document, langue: langueSortie } as ToutDocument)
+        : document;
+    const pdf = await generatePdf(documentPdf, LOGO_DATA_URI);
     const estProp = estPropositionV2(document);
     /* Proposition v2 : pas de fiche client — le nom de fichier et le
        libellé email portent le PROJET ; les autres documents gardent

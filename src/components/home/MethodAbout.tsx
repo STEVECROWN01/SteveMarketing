@@ -4,7 +4,8 @@ import React from "react";
 import { Reveal } from "@/components/motion/Reveal";
 import { SectionHeading, CTAButton, CTAIcons, RichText } from "@/components/marketing/Marketing";
 import { MonoImage } from "@/components/media/Media";
-import { ABOUT } from "@/content/site-content";
+/* VOLET 18 — i18n : ABOUT traduit via useContenu. */
+import { useContenu, useT } from "@/i18n";
 import { ASSETS } from "@/lib/site";
 
 /**
@@ -15,6 +16,9 @@ import { ASSETS } from "@/lib/site";
  *  (voir TransformationSolution.tsx).
  */
 export function AboutSection() {
+  const { ABOUT } = useContenu();
+  const { t } = useT();
+
   return (
     /* Padding supérieur réduit d'un cran (demande de l'éditeur,
        16/11/2026) : l'espace clair entre la bande noire défilante
@@ -42,7 +46,7 @@ export function AboutSection() {
             <Reveal direction="right">
               <MonoImage
                 src={ASSETS.portrait}
-                alt="Portrait professionnel de Stevens Akpovi, concepteur de sites web"
+                alt={t("Portrait professionnel de Stevens Akpovi, concepteur de sites web")}
                 width={1024}
                 height={1536}
                 className="relative rounded-2xl border border-[#e4e4e4] shadow-[0_30px_60px_-30px_rgba(28,28,28,0.4)]"
@@ -51,7 +55,7 @@ export function AboutSection() {
             <Reveal direction="up" delay={0.2} className="absolute -bottom-12 -left-3 w-[72%] sm:-left-6 lg:-left-8">
               <MonoImage
                 src={ASSETS.workspace}
-                alt="Espace de travail de Stevens Akpovi — conception web en situation réelle"
+                alt={t("Espace de travail de Stevens Akpovi — conception web en situation réelle")}
                 width={1536}
                 height={1024}
                 className="rotate-[3deg] rounded-2xl border border-[#e4e4e4] bg-white shadow-[0_25px_50px_-20px_rgba(28,28,28,0.5)]"

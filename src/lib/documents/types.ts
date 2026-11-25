@@ -98,6 +98,13 @@ export type DocumentRecord = {
   notes: string;
   lienPaiement?: string;
 
+  /** VOLET 18 (26/11/2026) — LANGUE DU DOCUMENT : "fr" (défaut) ou
+   *  "en". Donnée persistée avec le document ; le gabarit devis /
+   *  facture adapte ses LIBELLÉS, son montant en lettres et ses
+   *  textes par défaut. Les PROPOSITIONS commerciales restent
+   *  TOUJOURS en français ("fr", template calibré). */
+  langue?: "fr" | "en";
+
   banque: CoordonneesBancaires;
 
   /** Proposition commerciale : déroulé du projet (page 2). */

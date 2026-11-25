@@ -21,7 +21,10 @@ import {
   ReassuranceBar,
 } from "@/components/marketing/Marketing";
 import { Reveal } from "@/components/motion/Reveal";
-import { CTA_LABELS } from "@/content/site-content";
+/* VOLET 18 — i18n : CTA_LABELS via useContenu ; textes inline (y compris
+   les libellés des tableaux module-level, enveloppés AU RENDU pour
+   rester réactifs à la langue) via t()/tf(). */
+import { useContenu, useT } from "@/i18n";
 
 /**
  * PAGE RÉFÉRENCEMENT SEO (demande de l'éditeur, 15/11/2026) — page
@@ -85,14 +88,16 @@ const SEO_STEPS = [
 
 export function SeoPage() {
   const router = useRouter();
+  const { t, tf } = useT();
+  const { CTA_LABELS } = useContenu();
 
   return (
     <>
       {/* ---------- En-tête de page ---------- */}
       <PageHero
-        eyebrow="RÉFÉRENCEMENT · SEO"
-        title="Référencement SEO : être trouvé par ceux qui vous cherchent."
-        intro="Améliorez votre positionnement sur Google, renforcez votre visibilité et attirez des visiteurs sur la durée, sans dépendre de la publicité, grâce à une stratégie de référencement adaptée à votre marché."
+        eyebrow={t("RÉFÉRENCEMENT · SEO")}
+        title={t("Référencement SEO : être trouvé par ceux qui vous cherchent.")}
+        intro={t("Améliorez votre positionnement sur Google, renforcez votre visibilité et attirez des visiteurs sur la durée, sans dépendre de la publicité, grâce à une stratégie de référencement adaptée à votre marché.")}
       >
         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
@@ -106,11 +111,11 @@ export function SeoPage() {
       </PageHero>
 
       {/* ---------- Ce que comprend le référencement ---------- */}
-      <section aria-label="Ce que comprend une stratégie de référencement" className="section-light bg-grid-light py-20 sm:py-24 lg:py-28">
+      <section aria-label={t("Ce que comprend une stratégie de référencement")} className="section-light bg-grid-light py-20 sm:py-24 lg:py-28">
         <div className="container-site">
           <SectionHeading
-            eyebrow="RÉFÉRENCEMENT APPROFONDI"
-            title="Ce que comprend une stratégie de référencement."
+            eyebrow={t("RÉFÉRENCEMENT APPROFONDI")}
+            title={t("Ce que comprend une stratégie de référencement.")}
             tone="light"
           />
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -125,8 +130,8 @@ export function SeoPage() {
                       {String(i + 1).padStart(2, "0")}
                     </span>
                   </div>
-                  <h3 className="mt-5 font-display text-lg font-semibold text-[#1c1c1c]">{item.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-[#555555]">{item.text}</p>
+                  <h3 className="mt-5 font-display text-lg font-semibold text-[#1c1c1c]">{t(item.title)}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-[#555555]">{t(item.text)}</p>
                 </div>
               </Reveal>
             ))}
@@ -135,12 +140,12 @@ export function SeoPage() {
       </section>
 
       {/* ---------- SEO de base / référencement approfondi ---------- */}
-      <section aria-label="SEO de base et référencement approfondi" className="section-dark relative py-20 sm:py-24 lg:py-28">
+      <section aria-label={t("SEO de base et référencement approfondi")} className="section-dark relative py-20 sm:py-24 lg:py-28">
         <div aria-hidden="true" className="separator-fade absolute inset-x-0 top-0" />
         <div className="container-site">
           <SectionHeading
-            eyebrow="DEUX NIVEAUX, UNE MÊME EXIGENCE"
-            title="SEO de base ou référencement approfondi ?"
+            eyebrow={t("DEUX NIVEAUX, UNE MÊME EXIGENCE")}
+            title={t("SEO de base ou référencement approfondi ?")}
             tone="dark"
             align="center"
             className="mx-auto"
@@ -152,12 +157,10 @@ export function SeoPage() {
                   <Check className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <h3 className="mt-6 font-display text-xl font-semibold text-white">
-                  Optimisation SEO de base — incluse
+                  {t("Optimisation SEO de base — incluse")}
                 </h3>
                 <p className="mt-4 text-[15px] leading-relaxed text-[#c8c8c8]">
-                  Chaque site que je conçois est livré avec les optimisations essentielles :
-                  titres, descriptions, structure, images et éléments techniques de base. C'est
-                  le socle — sans facturation supplémentaire.
+                  {t("Chaque site que je conçois est livré avec les optimisations essentielles : titres, descriptions, structure, images et éléments techniques de base. C'est le socle — sans facturation supplémentaire.")}
                 </p>
               </div>
             </Reveal>
@@ -167,13 +170,10 @@ export function SeoPage() {
                   <Search className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <h3 className="mt-6 font-display text-xl font-semibold text-white">
-                  Référencement approfondi — prestation dédiée
+                  {t("Référencement approfondi — prestation dédiée")}
                 </h3>
                 <p className="mt-4 text-[15px] leading-relaxed text-[#c8c8c8]">
-                  Au-delà du socle : une stratégie de référencement complète, adaptée à votre
-                  marché, pour améliorer votre positionnement sur Google et attirer des
-                  visiteurs sur la durée, sans dépendre de la publicité. C'est le cœur de
-                  cette page.
+                  {t("Au-delà du socle : une stratégie de référencement complète, adaptée à votre marché, pour améliorer votre positionnement sur Google et attirer des visiteurs sur la durée, sans dépendre de la publicité. C'est le cœur de cette page.")}
                 </p>
               </div>
             </Reveal>
@@ -184,30 +184,27 @@ export function SeoPage() {
       {/* ---------- Référencement international ---------- */}
       <section
         id="seo-international"
-        aria-label="Référencement international SEO"
+        aria-label={t("Référencement international SEO")}
         className="section-bright scroll-mt-20 py-20 sm:py-24 lg:py-28"
       >
         <div className="container-site">
           <div className="grid items-center gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16">
             <div>
               <Reveal direction="up">
-                <p className="text-eyebrow">RÉFÉRENCEMENT INTERNATIONAL SEO</p>
+                <p className="text-eyebrow">{t("RÉFÉRENCEMENT INTERNATIONAL SEO")}</p>
               </Reveal>
               <Reveal direction="up" delay={0.08}>
                 <h2 className="text-section-title mt-4 text-[#1c1c1c]">
-                  Une visibilité au-delà de vos frontières.
+                  {t("Une visibilité au-delà de vos frontières.")}
                 </h2>
               </Reveal>
               <Reveal direction="up" delay={0.16}>
                 <p className="text-body mt-6 max-w-xl text-[#555555]">
-                  Vous visez des clients dans plusieurs pays ou plusieurs langues ? Le
-                  référencement international adapte votre présence à chaque marché : contenus
-                  adaptés à chaque audience, structure pensée pour les recherches locales et
-                  cohérence de votre image professionnelle d'un pays à l'autre.
+                  {t("Vous visez des clients dans plusieurs pays ou plusieurs langues ? Le référencement international adapte votre présence à chaque marché : contenus adaptés à chaque audience, structure pensée pour les recherches locales et cohérence de votre image professionnelle d'un pays à l'autre.")}
                 </p>
                 <div className="mt-8">
                   <CTAButton action={{ kind: "page", page: "devis" }} variant="ghostDark" size="lg">
-                    Discuter De Mon Projet International
+                    {t("Discuter De Mon Projet International")}
                   </CTAButton>
                 </div>
               </Reveal>
@@ -218,7 +215,7 @@ export function SeoPage() {
                   <Globe className="h-6 w-6" aria-hidden="true" />
                 </span>
                 <h3 className="mt-6 font-display text-xl font-semibold text-[#1c1c1c]">
-                  Concrètement, pour votre activité
+                  {t("Concrètement, pour votre activité")}
                 </h3>
                 <ul className="mt-5 space-y-4">
                   {[
@@ -229,7 +226,7 @@ export function SeoPage() {
                   ].map((point) => (
                     <li key={point} className="flex items-start gap-3 text-[15px] leading-relaxed text-[#555555]">
                       <Check className="mt-0.5 h-5 w-5 shrink-0 text-[#1c1c1c]" aria-hidden="true" />
-                      {point}
+                      {t(point)}
                     </li>
                   ))}
                 </ul>
@@ -240,12 +237,12 @@ export function SeoPage() {
       </section>
 
       {/* ---------- Comment je travaille ---------- */}
-      <section aria-label="Comment je travaille le référencement" className="section-dark relative py-20 sm:py-24 lg:py-28">
+      <section aria-label={t("Comment je travaille le référencement")} className="section-dark relative py-20 sm:py-24 lg:py-28">
         <div aria-hidden="true" className="separator-fade absolute inset-x-0 top-0" />
         <div className="container-site">
           <SectionHeading
-            eyebrow="MA MÉTHODE"
-            title="Comment je travaille votre référencement."
+            eyebrow={t("MA MÉTHODE")}
+            title={t("Comment je travaille votre référencement.")}
             tone="dark"
           />
           <ol className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -253,10 +250,10 @@ export function SeoPage() {
               <Reveal key={step.name} direction="up" delay={i * 0.05} as="li">
                 <div className="h-full rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-6">
                   <p className="text-[11px] font-semibold tracking-widest text-[#e4e4e4] uppercase">
-                    Étape {String(i + 1).padStart(2, "0")}
+                    {tf("Étape {num}", { num: String(i + 1).padStart(2, "0") })}
                   </p>
-                  <h3 className="mt-3 font-display text-lg font-semibold text-white">{step.name}</h3>
-                  <p className="mt-2.5 text-sm leading-relaxed text-[#c8c8c8]">{step.text}</p>
+                  <h3 className="mt-3 font-display text-lg font-semibold text-white">{t(step.name)}</h3>
+                  <p className="mt-2.5 text-sm leading-relaxed text-[#c8c8c8]">{t(step.text)}</p>
                 </div>
               </Reveal>
             ))}
@@ -270,7 +267,7 @@ export function SeoPage() {
               onClick={() => router.navigate("publicite")}
               className="group mt-10 inline-flex items-center gap-2 rounded-full border border-[#e4e4e4]/30 px-5 py-2.5 text-sm font-medium text-white transition-colors duration-300 hover:border-[#e4e4e4] hover:bg-[#e4e4e4] hover:text-[#1c1c1c]"
             >
-              Vous préférez une visibilité immédiate ? Publicité Meta Ads
+              {t("Vous préférez une visibilité immédiate ? Publicité Meta Ads")}
               <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
             </button>
           </Reveal>
@@ -278,13 +275,13 @@ export function SeoPage() {
       </section>
 
       {/* ---------- Appel à l'action final ---------- */}
-      <section aria-label="Parlons de votre visibilité" className="section-deep relative overflow-hidden py-20 sm:py-24 lg:py-28">
+      <section aria-label={t("Parlons de votre visibilité")} className="section-deep relative overflow-hidden py-20 sm:py-24 lg:py-28">
         <div className="bg-grid-dark absolute inset-0" aria-hidden="true" />
         <div className="container-site relative text-center">
           <Reveal direction="up">
-            <p className="text-eyebrow">PARLONS DE VOTRE VISIBILITÉ</p>
+            <p className="text-eyebrow">{t("PARLONS DE VOTRE VISIBILITÉ")}</p>
             <h2 className="text-section-title mx-auto mt-4 max-w-2xl text-white">
-              Votre site mérite d'être trouvé.
+              {t("Votre site mérite d'être trouvé.")}
             </h2>
           </Reveal>
           <Reveal direction="up" delay={0.12}>

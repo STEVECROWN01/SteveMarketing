@@ -7,8 +7,9 @@ import { PageHero, CTAButton, RichText } from "@/components/marketing/Marketing"
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { StartProjectButton } from "@/components/marketing/StartProjectButton";
 import { ProjectCard } from "@/components/marketing/ProjectCard";
-import { CTA_LABELS, SERVICES_SUMMARY, SOLUTION } from "@/content/site-content";
-import { PROJECTS } from "@/lib/site";
+/* VOLET 18 — i18n : CTA_LABELS / SERVICES_SUMMARY / SOLUTION via
+   useContenu, PROJECTS via useSite, textes inline via t()/tf(). */
+import { useContenu, useSite, useT } from "@/i18n";
 
 const SERVICE_ICONS = [Building2, ShoppingCart, RefreshCcw];
 
@@ -44,6 +45,9 @@ const SERVICE_ICONS = [Building2, ShoppingCart, RefreshCcw];
  */
 export function ProcessPage() {
   const calendly = useCalendly();
+  const { t } = useT();
+  const { CTA_LABELS, SERVICES_SUMMARY, SOLUTION } = useContenu();
+  const { PROJECTS } = useSite();
   // Une seule étape ouverte à la fois — la première par défaut,
   // comme le déroulé de lecture de la section d'accueil.
   const [open, setOpen] = useState<number | null>(0);
@@ -52,15 +56,15 @@ export function ProcessPage() {
     <>
       {/* ---------- 1. En-tête de page : titre + « Réserver Un Appel » ---------- */}
       <PageHero
-        eyebrow="Processus"
-        title="Des sites web qui transforment vos visiteurs en clients."
+        eyebrow={t("Processus")}
+        title={t("Des sites web qui transforment vos visiteurs en clients.")}
       >
         {/* Bouton blanc style header (pastille flèche ↗ à l'intérieur
             droite) — ouvre la réservation d'appel Calendly, comme le
             libellé l'annonce. */}
         <StartProjectButton
           label={CTA_LABELS.appel}
-          ariaLabel="Réserver un appel stratégique de 30 minutes avec Stevens Akpovi"
+          ariaLabel={t("Réserver un appel stratégique de 30 minutes avec Stevens Akpovi")}
           onClick={() => calendly.openCalendly()}
           className="min-h-[52px]"
         />
@@ -68,7 +72,7 @@ export function ProcessPage() {
 
       {/* ---------- 2. Les trois cadres de l'offre + titre/bouton ---------- */}
       <section
-        aria-label="Offre : site web professionnel, page de vente et refonte de site web"
+        aria-label={t("Offre : site web professionnel, page de vente et refonte de site web")}
         className="section-light bg-grid-light py-20 sm:py-24 lg:py-32"
       >
         <div className="container-site">
@@ -92,27 +96,26 @@ export function ProcessPage() {
                 l'ancre interne #comment-je-travaille. */}
             <div className="order-2 flex flex-col justify-center lg:py-4">
               <Reveal direction="left">
-                <p className="text-eyebrow">DES SITES WEB QUI VENDENT</p>
+                <p className="text-eyebrow">{t("DES SITES WEB QUI VENDENT")}</p>
               </Reveal>
               <RevealText
                 as="h2"
-                text="Voici comment je crée des sites web qui génèrent des ventes."
+                text={t("Voici comment je crée des sites web qui génèrent des ventes.")}
                 delay={0.08}
                 className="text-section-title mt-4 max-w-xl text-[#1c1c1c]"
               />
               <Reveal direction="up" delay={0.16}>
                 <p className="text-body mt-5 max-w-xl text-[#555555]">
-                  Chaque projet suit la même exigence : comprendre votre activité, concevoir un
-                  parcours clair et amener vos visiteurs à passer à l'action.
+                  {t("Chaque projet suit la même exigence : comprendre votre activité, concevoir un parcours clair et amener vos visiteurs à passer à l'action.")}
                 </p>
                 <div className="mt-8">
                   <CTAButton
                     action={{ kind: "anchor", sectionId: "comment-je-travaille" }}
                     variant="ghostDark"
                     size="lg"
-                    ariaLabel="Voir Comment Je Travaille — la méthode de collaboration, étape par étape"
+                    ariaLabel={t("Voir Comment Je Travaille — la méthode de collaboration, étape par étape")}
                   >
-                    Voir Comment Je Travaille
+                    {t("Voir Comment Je Travaille")}
                   </CTAButton>
                 </div>
               </Reveal>
@@ -185,7 +188,7 @@ export function ProcessPage() {
                 id="methode-processus-titre"
                 className="font-display text-[clamp(2.25rem,3vw,3.25rem)] font-bold leading-tight tracking-[0.01em] text-white [writing-mode:vertical-rl] rotate-180"
               >
-                Comment Je Travaille
+                {t("Comment Je Travaille")}
               </h2>
             </div>
 
@@ -199,7 +202,7 @@ export function ProcessPage() {
             {/* Titre horizontal (mobile/tablette) + trait fondu */}
             <div className="lg:hidden">
               <h2 id="methode-processus-titre" className="text-section-title text-white">
-                Comment Je Travaille
+                {t("Comment Je Travaille")}
               </h2>
               <div aria-hidden="true" className="separator-fade mt-6" />
             </div>
@@ -287,7 +290,7 @@ export function ProcessPage() {
           couleur, nom, catégorie, bouton « Voir Le Projet ») —
           alignés VERTICALEMENT, un projet par ligne. ---------- */}
       <section
-        aria-label="Sites web que j'ai créés — mes réalisations"
+        aria-label={t("Sites web que j'ai créés — mes réalisations")}
         className="section-bright py-20 sm:py-24 lg:py-32"
       >
         <div className="container-site">
@@ -295,11 +298,11 @@ export function ProcessPage() {
             {/* Colonne gauche : titre + bouton */}
             <div className="lg:sticky lg:top-28">
               <Reveal direction="up">
-                <p className="text-eyebrow">MES RÉALISATIONS</p>
+                <p className="text-eyebrow">{t("MES RÉALISATIONS")}</p>
               </Reveal>
               <RevealText
                 as="h2"
-                text="Sites web que j'ai créés."
+                text={t("Sites web que j'ai créés.")}
                 delay={0.08}
                 className="text-section-title mt-4 max-w-md text-[#1c1c1c]"
               />
@@ -310,7 +313,7 @@ export function ProcessPage() {
                     variant="dark"
                     size="lg"
                   >
-                    Voir Plus De Projets
+                    {t("Voir Plus De Projets")}
                   </CTAButton>
                 </div>
               </Reveal>
@@ -334,9 +337,9 @@ export function ProcessPage() {
         <div className="bg-grid-dark absolute inset-0" aria-hidden="true" />
         <div className="container-site relative text-center">
           <Reveal direction="up">
-            <p className="text-eyebrow">PARLONS DE VOTRE PROJET</p>
+            <p className="text-eyebrow">{t("PARLONS DE VOTRE PROJET")}</p>
             <h2 id="process-cta-titre" className="text-section-title mx-auto mt-4 max-w-2xl text-white">
-              Franchissons ensemble la première étape.
+              {t("Franchissons ensemble la première étape.")}
             </h2>
           </Reveal>
           <Reveal direction="up" delay={0.12}>

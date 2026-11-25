@@ -3,6 +3,9 @@
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { SITE } from "@/lib/site";
+/* VOLET 18 — i18n : textes de la popup via t()/tf() ; la mention
+   Calendly (traduite) est passée au gabarit tf(). */
+import { useSite, useT } from "@/i18n";
 
 /**
  * Intégration Calendly — embed officiel (widget.js) affichant les
@@ -26,6 +29,7 @@ interface CalendlyGlobal {
 /** Embed inline officiel Calendly (widget.js, API documentée). */
 export function CalendlyEmbed({ className = "" }: { className?: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { t } = useT();
 
   useEffect(() => {
     const container = containerRef.current;
@@ -86,13 +90,15 @@ export function CalendlyEmbed({ className = "" }: { className?: string }) {
       data-url={`${SITE.calendly}?${CALENDLY_PARAMS}`}
       style={{ minWidth: "280px", width: "100%", height: "100%" }}
       role="region"
-      aria-label="Calendly — Réservation d'un appel de 30 minutes avec Stevens Akpovi"
+      aria-label={t("Calendly — Réservation d'un appel de 30 minutes avec Stevens Akpovi")}
     />
   );
 }
 
 export function CalendlyProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
+  const { t, tf } = useT();
+  const { calendlyMention } = useSite().SITE;
 
   const openCalendly = useCallback(() => setOpen(true), []);
 
@@ -119,7 +125,7 @@ export function CalendlyProvider({ children }: { children: React.ReactNode }) {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="Réserver un appel de 30 minutes avec Stevens Akpovi"
+          aria-label={t("Réserver un appel de 30 minutes avec Stevens Akpovi")}
           className="fixed inset-0 z-[100] flex items-center justify-center bg-[#070707]/85 p-3 backdrop-blur-sm sm:p-8"
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false);
@@ -128,17 +134,16 @@ export function CalendlyProvider({ children }: { children: React.ReactNode }) {
           <div className="relative flex h-full max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-[#e4e4e4]/15 bg-[#1c1c1c] shadow-2xl">
             <div className="flex items-start justify-between gap-4 border-b border-[#e4e4e4]/10 px-5 py-4 sm:px-7">
               <div>
-                <p className="text-eyebrow">Appel découverte</p>
-                <h2 className="text-card-title mt-1 text-white">Réservez votre créneau</h2>
+                <p className="text-eyebrow">{t("Appel découverte")}</p>
+                <h2 className="text-card-title mt-1 text-white">{t("Réservez votre créneau")}</h2>
                 <p className="mt-1 text-sm text-[#c8c8c8]">
-                  {SITE.calendlyMention} Les disponibilités affichées sont les vraies
-                  disponibilités de Calendly.
+                  {tf("{calendlyMention} Les disponibilités affichées sont les vraies disponibilités de Calendly.", { calendlyMention })}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                aria-label="Fermer la fenêtre de réservation"
+                aria-label={t("Fermer la fenêtre de réservation")}
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#e4e4e4] bg-white text-[#1c1c1c] transition-[transform,border-color] duration-300 hover:scale-105 hover:border-[#c9baac] focus-visible:scale-105"
               >
                 <X className="h-4.5 w-4.5" aria-hidden="true" />

@@ -4,6 +4,7 @@ import React, { Suspense, useEffect, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { RouterProvider, useRouter } from "@/components/router-context";
 import { CalendlyProvider } from "@/components/calendly/CalendlyContext";
+import { LangProvider } from "@/i18n";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { HomePage } from "@/components/home/HomePage";
@@ -238,15 +239,17 @@ function Shell() {
 
 export default function App() {
   return (
-    <RouterProvider>
-      <CalendlyProvider>
-        {/* Défilement fluide à la sheragency (inertie douce de la
-            molette) — composant « sans rendu » monté une seule fois. */}
-        <SmoothScroll />
-        <Shell />
-        <Toaster />
-      </CalendlyProvider>
-    </RouterProvider>
+    <LangProvider>
+      <RouterProvider>
+        <CalendlyProvider>
+          {/* Défilement fluide à la sheragency (inertie douce de la
+              molette) — composant « sans rendu » monté une seule fois. */}
+          <SmoothScroll />
+          <Shell />
+          <Toaster />
+        </CalendlyProvider>
+      </RouterProvider>
+    </LangProvider>
   );
 }
 

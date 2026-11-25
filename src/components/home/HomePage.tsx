@@ -11,15 +11,18 @@ import { MarqueeBand } from "@/components/home/MarqueeBand";
 import { FaqSection, FinalCtaSection } from "@/components/home/FaqFinal";
 import { FadeSeparator } from "@/components/marketing/Marketing";
 import { Reveal } from "@/components/motion/Reveal";
-import { TARGETS } from "@/content/site-content";
+/* VOLET 18 — i18n : TARGETS traduit via useContenu, aria-label via t(). */
+import { useContenu, useT } from "@/i18n";
 
 /** Bandeau « à qui s'adressent les services » — sous le Hero.
  *  Plus de trait supérieur : le hero se fond dans cette section par un
  *  dégradé (demande de l'éditeur, 13/11/2026). */
 function AudienceStrip() {
+  const { t } = useT();
+  const { TARGETS } = useContenu();
   return (
     <section
-      aria-label="À qui s'adressent les services de Stevens Akpovi"
+      aria-label={t("À qui s'adressent les services de Stevens Akpovi")}
       className="section-dark py-10 sm:py-12"
     >
       <div className="container-site">

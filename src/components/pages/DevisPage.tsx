@@ -4,6 +4,11 @@ import React from "react";
 import { Star } from "lucide-react";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { LeadForm } from "@/components/forms/LeadForm";
+/* VOLET 18 — i18n : textes inline via t()/tf() ; la phrase croisée
+   « Vous préférez commencer par une conversation ?… » est traduite
+   ENTIÈRE (clé complète) puis découpée sur le libellé du lien pour
+   reconstruire le JSX (convention RECONSTITUTION de trad-ui-en.ts). */
+import { useT } from "@/i18n";
 
 /** Icône « coche pleine » (icon-park-solid:check-one) — celle de la
  *  liste de bénéfices de sheragency.com, reproduite en inline SVG
@@ -44,31 +49,37 @@ const BENEFITS = [
 ];
 
 export function DevisPage() {
+  const { t } = useT();
+  const libelleAppel = t("Réservez un appel de 30 minutes");
+  const [avantAppel, apresAppel] = (() => {
+    const phrase = t("Vous préférez commencer par une conversation\u00A0? Réservez un appel de 30 minutes — gratuit et sans engagement.");
+    const i = phrase.indexOf(libelleAppel);
+    return i === -1 ? [phrase, ""] : [phrase.slice(0, i), phrase.slice(i + libelleAppel.length)];
+  })();
+
   return (
     <>
       <section
-        aria-label="Demande de devis personnalisé"
+        aria-label={t("Demande de devis personnalisé")}
         className="section-bright relative overflow-hidden pb-20 pt-[128px] sm:pb-24 sm:pt-[150px] lg:pt-[160px]"
       >
         <div className="container-site">
           <div className="mx-auto max-w-3xl text-center">
             <Reveal direction="up">
-              <p className="text-eyebrow">DEMANDE DE DEVIS PERSONNALISÉ</p>
+              <p className="text-eyebrow">{t("DEMANDE DE DEVIS PERSONNALISÉ")}</p>
             </Reveal>
 
             <RevealText
               as="h1"
-              text="Optimisez Votre Site Web Pour Augmenter Vos Ventes"
-              boldText="Augmenter Vos Ventes"
+              text={t("Optimisez Votre Site Web Pour Augmenter Vos Ventes")}
+              boldText={t("Augmenter Vos Ventes")}
               delay={0.06}
               className="text-hero-title on-paper mt-5"
             />
 
             <Reveal direction="up" delay={0.14}>
               <p className="text-body mx-auto mt-6 max-w-2xl on-paper-muted">
-                Je prends des sites web obsolètes et les transforme en sites web
-                qui attirent davantage de visiteurs, transforment ces visiteurs en
-                clients et valorisent votre image de marque.
+                {t("Je prends des sites web obsolètes et les transforme en sites web qui attirent davantage de visiteurs, transforment ces visiteurs en clients et valorisent votre image de marque.")}
               </p>
             </Reveal>
 
@@ -83,7 +94,7 @@ export function DevisPage() {
                     className="flex items-center gap-3 text-left text-[16px] font-medium text-[#1c1c1c]"
                   >
                     <CheckOne className="h-[26px] w-[27px] shrink-0" />
-                    {benefit}
+                    {t(benefit)}
                   </li>
                 ))}
               </ul>
@@ -93,7 +104,7 @@ export function DevisPage() {
             <Reveal direction="up" delay={0.22}>
               <p
                 className="mt-8 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[13px] font-medium tracking-[0.02em] text-[#525252]"
-                aria-label="Note moyenne de 4,9 sur 5"
+                aria-label={t("Note moyenne de 4,9 sur 5")}
               >
                 <span className="flex items-center gap-1" aria-hidden="true">
                   {[0, 1, 2, 3].map((i) => (
@@ -106,7 +117,7 @@ export function DevisPage() {
                     </span>
                   </span>
                 </span>
-                <span>4,9/5</span>
+                <span>{t("4,9/5")}</span>
               </p>
             </Reveal>
           </div>
@@ -116,7 +127,7 @@ export function DevisPage() {
       {/* Bande gris clair pleine largeur portant la carte du formulaire —
           comme le widget GoHighLevel de sheragency.com/request-a-quote :
           bande #f5f5f5, carte blanche à ombre douce flottant dedans. */}
-      <section aria-label="Formulaire de demande de devis" className="section-light pb-24 pt-4 sm:pb-28">
+      <section aria-label={t("Formulaire de demande de devis")} className="section-light pb-24 pt-4 sm:pb-28">
         <div className="container-site">
           {/* Formulaire de devis — carte blanche façon sheragency
               (« New Client Application ») */}
@@ -128,14 +139,14 @@ export function DevisPage() {
 
           <Reveal direction="up" delay={0.3}>
             <p className="mx-auto mt-8 max-w-xl text-center text-sm on-paper-muted">
-              Vous préférez commencer par une conversation&nbsp;?{" "}
+              {avantAppel}
               <a
                 href="#/reserver-un-appel"
                 className="font-medium text-[#1c1c1c] underline underline-offset-4"
               >
-                Réservez un appel de 30 minutes
-              </a>{" "}
-              — gratuit et sans engagement.
+                {libelleAppel}
+              </a>
+              {apresAppel}
             </p>
           </Reveal>
         </div>

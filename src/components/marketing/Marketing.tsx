@@ -8,6 +8,9 @@ import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { SITE } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import type { AppPage } from "@/components/router-context";
+/* VOLET 18 — i18n : réassurance par défaut (barre sans mention)
+   traduite via t(). */
+import { useT } from "@/i18n";
 
 /* ============================ Texte multi-paragraphes ============================ */
 
@@ -259,7 +262,8 @@ export function ReassuranceBar({
   className?: string;
   mention?: string;
 }) {
-  const items = (mention ?? "30 minutes · Gratuit · Sans engagement").split(" · ");
+  const { t } = useT();
+  const items = (mention ?? t("30 minutes · Gratuit · Sans engagement")).split(" · ");
   return (
     <ul
       className={`flex flex-wrap items-center gap-x-3 gap-y-2 text-sm ${

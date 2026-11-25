@@ -1,4 +1,7 @@
 import React from "react";
+/* VOLET 18 — i18n : mots-clés et aria-label traduits via t() — la
+   piste défilante devient bilingue (valeurs de key non visibles). */
+import { useT } from "@/i18n";
 
 /**
  * BANDE DÉFILANTE NOIRE (demande de l'éditeur, 16/11/2026) — placée
@@ -42,9 +45,10 @@ const KEYWORDS: readonly string[] = [
 ] as const;
 
 export function MarqueeBand() {
+  const { t } = useT();
   return (
     <section
-      aria-label="Expertises de Stevens Akpovi — création de sites web, rédaction professionnelle, référencement SEO, publicité"
+      aria-label={t("Expertises de Stevens Akpovi — création de sites web, rédaction professionnelle, référencement SEO, publicité")}
       className="relative overflow-hidden bg-[#070707] py-4 sm:py-5"
     >
       {/* Liserés discrets en haut et en bas de la bande, comme les
@@ -70,7 +74,7 @@ export function MarqueeBand() {
             {KEYWORDS.map((keyword) => (
               <span key={`${copy}-${keyword}`} className="flex shrink-0 items-center">
                 <span className="whitespace-nowrap px-5 font-display text-[13px] font-semibold uppercase tracking-[0.14em] text-white sm:px-7 sm:text-base">
-                  {keyword}
+                  {t(keyword)}
                 </span>
                 {/* Gros point de séparation entre les mots-clés. */}
                 <span

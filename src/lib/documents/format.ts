@@ -7,15 +7,20 @@
 
 import type { DocType } from "./types";
 
-/** « 04 mai 2026 » — comme K.Quotes. */
-export function formatDate(iso: string): string {
+/** « 04 mai 2026 » — comme K.Quotes. VOLET 18 — la version ANGLAISE
+ *  abrège le mois (« 04 Nov 2026 ») ; le comportement FR (défaut,
+ *  tous les appels existants sans 2e argument) est inchangé. */
+export function formatDate(iso: string, langue: "fr" | "en" = "fr"): string {
   if (!iso) return "";
   const d = new Date(iso + "T00:00:00");
   if (isNaN(d.getTime())) return iso;
-  const mois = [
-    "janvier", "février", "mars", "avril", "mai", "juin",
-    "juillet", "août", "septembre", "octobre", "novembre", "décembre",
-  ];
+  const mois =
+    langue === "en"
+      ? ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+      : [
+          "janvier", "février", "mars", "avril", "mai", "juin",
+          "juillet", "août", "septembre", "octobre", "novembre", "décembre",
+        ];
   return `${String(d.getDate()).padStart(2, "0")} ${mois[d.getMonth()]} ${d.getFullYear()}`;
 }
 
@@ -172,16 +177,115 @@ const UNITES_MONNAIE: Record<string, [string, string, string | null, string | nu
   CHF: ["franc suisse", "francs suisses", "centime", "centimes"],
 };
 
+/* ------------------------------------------------------------------
+ * MONTANT EN LETTRES — ANGLAIS (VOLET 18)
+ *
+ * Mêmes règles d'arrondi que le français ; conventions britanniques
+ * pour la construction du nombre (« and » avant les dizaines/unités
+ * du dernier groupe, tirets entre dizaines et unités). Les échelles
+ * sont billion / million / thousand (mille → thousand, milliard →
+ * billion) et « hundred »/« thousand » restent invariables.
+ * ------------------------------------------------------------------ */
+
+const UNITES_MOTS_EN = [
+  "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+  "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen",
+];
+const DIZAINES_EN = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+
+/** 0-99 — « twenty-one » : tiret entre dizaines et unités. */
+function deuxChiffresEn(n: number): string {
+  if (n < 20) return UNITES_MOTS_EN[n];
+  const d = Math.floor(n / 10);
+  const u = n % 10;
+  return u === 0 ? DIZAINES_EN[d] : `${DIZAINES_EN[d]}-${UNITES_MOTS_EN[u]}`;
+}
+
+/** 0-999 — « one hundred and five » : « and » entre les centaines
+ *  et le reste DU groupe. */
+function troisChiffresEn(n: number): string {
+  const c = Math.floor(n / 100);
+  const r = n % 100;
+  let out = "";
+  if (c > 0) out = UNITES_MOTS_EN[c] + " hundred";
+  if (r > 0) out = out ? out + " and " + deuxChiffresEn(r) : deuxChiffresEn(r);
+  return out;
+}
+
+/** Entier en toutes lettres (anglais) — « three hundred and fifty
+ *  thousand », « two thousand and twenty-six » (le « and » final
+ *  n'apparaît que si le dernier groupe est inférieur à cent). */
+function entierEnLettresEn(n: number): string {
+  if (n <= 0) return "zero";
+  const echelles: [number, string][] = [
+    [1_000_000_000, "billion"],
+    [1_000_000, "million"],
+    [1_000, "thousand"],
+  ];
+  const parties: string[] = [];
+  let reste = n;
+  for (const [valeur, echelle] of echelles) {
+    const groupe = Math.floor(reste / valeur);
+    reste %= valeur;
+    if (groupe) parties.push(troisChiffresEn(groupe) + " " + echelle);
+  }
+  if (reste > 0) {
+    /* Dernier groupe < 100 → « and » devant (« two thousand and
+       twenty-six ») ; ≥ 100 → le « and » interne suffit (« one
+       thousand one hundred and five »). */
+    if (parties.length && reste < 100) parties.push("and " + deuxChiffresEn(reste));
+    else parties.push(troisChiffresEn(reste));
+  }
+  return parties.join(" ");
+}
+
+/** Unités monétaires ANGLAISES — [singulier, pluriel, subdivision
+ *  sing., subdivision pl.]. Le franc CFA garde sa subdivision nulle
+ *  (les montants XOF/XAF sont toujours entiers). */
+const UNITES_MONNAIE_EN: Record<string, [string, string, string | null, string | null]> = {
+  EUR: ["euro", "euros", "cent", "cents"],
+  XOF: ["CFA franc", "CFA francs", null, null],
+  XAF: ["CFA franc", "CFA francs", null, null],
+  USD: ["US dollar", "US dollars", "cent", "cents"],
+  CAD: ["Canadian dollar", "Canadian dollars", "cent", "cents"],
+  GBP: ["pound sterling", "pounds sterling", "penny", "pence"],
+  CHF: ["Swiss franc", "Swiss francs", "centime", "centimes"],
+};
+
 /** « 2 000 » → « deux mille euros » (devise accordée, centimes
- *  éventuels ; le franc CFA n'a pas de subdivision). */
-export function montantEnLettres(montant: number, devise: string = "EUR"): string {
-  const u = UNITES_MONNAIE[devise] ?? UNITES_MONNAIE.EUR;
+ *  éventuels ; le franc CFA n'a pas de subdivision).
+ *  VOLET 18 — 3e argument `langue` : "fr" (défaut, comportement
+ *  historique à l'identique pour tous les appels existants) ou
+ *  "en" — « three hundred and fifty thousand euros ». */
+export function montantEnLettres(
+  montant: number,
+  devise: string = "EUR",
+  langue: "fr" | "en" = "fr",
+): string {
   const arrondi = Math.round((Number(montant) || 0) * 100) / 100;
   const entier = Math.floor(arrondi);
   const centimes = Math.round((arrondi - entier) * 100);
+
+  /* -------------------- ANGLAIS (VOLET 18) --------------------
+   * Règles britanniques : « and » avant les dizaines/unités du
+   * dernier groupe (« one hundred and five », « two thousand and
+   * twenty-six »), tirets entre dizaines et unités (« twenty-one ») ;
+   * « euros » et « CFA francs » comme unités monétaires. */
+  if (langue === "en") {
+    const u = UNITES_MONNAIE_EN[devise] ?? UNITES_MONNAIE_EN.EUR;
+    const motUnite = entier > 1 ? u[1] : u[0];
+    let out = entierEnLettresEn(entier) + " " + motUnite;
+    if (centimes > 0 && u[2]) {
+      out += " and " + entierEnLettresEn(centimes) + " " + (centimes > 1 ? u[3] : u[2]);
+    }
+    return out;
+  }
+
+  /* -------------------- FRANÇAIS (historique) -------------------- */
+  const u = UNITES_MONNAIE[devise] ?? UNITES_MONNAIE.EUR;
+  const motUnite = entier > 1 ? u[1] : u[0];
   /* « un million D'euros » / « deux millions DE francs » : les
      échelles million/milliard exigent la préposition « de/d' ». */
-  const motUnite = entier > 1 ? u[1] : u[0];
   const liaison = entier >= 1_000_000 ? (/^[aeéèiouh]/i.test(motUnite) ? " d'" : " de ") : " ";
   let out = entierEnLettres(entier) + liaison + motUnite;
   if (centimes > 0 && u[2]) {

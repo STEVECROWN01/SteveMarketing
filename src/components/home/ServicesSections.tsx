@@ -14,7 +14,8 @@ import {
 } from "lucide-react";
 import { Reveal } from "@/components/motion/Reveal";
 import { SectionHeading, CTAButton, CTAIcons, RichText } from "@/components/marketing/Marketing";
-import { SERVICES_SUMMARY, INCLUDED } from "@/content/site-content";
+/* VOLET 18 — i18n : SERVICES_SUMMARY / INCLUDED traduits via useContenu. */
+import { useContenu, useT } from "@/i18n";
 import { useRouter } from "@/components/router-context";
 
 const SERVICE_ICONS = [Building2, LayoutGrid, MousePointerClick, ShoppingCart, RefreshCcw, Network];
@@ -34,6 +35,8 @@ const INCLUDED_ICONS = [PenTool, Search];
  */
 export function ServicesSection() {
   const router = useRouter();
+  const { t } = useT();
+  const { SERVICES_SUMMARY } = useContenu();
   return (
     <section
       id="services"
@@ -55,7 +58,7 @@ export function ServicesSection() {
               }}
               className="group inline-flex items-center gap-2 rounded-full border border-[#1c1c1c]/20 px-5 py-2.5 text-sm font-medium text-[#1c1c1c] transition-colors duration-300 hover:border-[#1c1c1c] hover:bg-[#1c1c1c] hover:text-white"
             >
-              Découvrir Ma Méthode
+              {t("Découvrir Ma Méthode")}
               <span aria-hidden="true" className="transition-transform duration-300 group-hover:translate-x-1">→</span>
             </a>
           </Reveal>
@@ -99,6 +102,9 @@ export function ServicesSection() {
 }
 
 export function IncludedSection() {
+  const { INCLUDED } = useContenu();
+  const { t } = useT();
+
   return (
     <section
       id="avantages-inclus"
@@ -126,7 +132,7 @@ export function IncludedSection() {
                   />
                   <p className="mt-auto inline-flex items-center gap-2 pt-6 text-xs font-medium tracking-widest text-[#e4e4e4]">
                     <BadgeCheck className="h-4 w-4" aria-hidden="true" />
-                    INCLUS SANS FRAIS SUPPLÉMENTAIRES
+                    {t("INCLUS SANS FRAIS SUPPLÉMENTAIRES")}
                   </p>
                 </div>
               </Reveal>

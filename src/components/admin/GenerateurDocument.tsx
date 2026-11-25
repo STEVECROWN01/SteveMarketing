@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Download, Inbox, Loader2, Plus, Save, Sparkles, Trash2 } from "lucide-react";
+import { Download, Inbox, Languages, Loader2, Plus, Save, Sparkles, Trash2 } from "lucide-react";
 import { ApercuDocument } from "./ApercuDocument";
 import { EditeurTexteRiche } from "./EditeurTexteRiche";
 import { BoutonAction, Carte, Champ, Pastille, TitreSection, styleInput } from "./elements";
@@ -17,6 +17,8 @@ import {
   devisParDefaut,
   propositionParDefaut,
   exempleModele,
+  TEXTES_DEFAUT,
+  type CleTexteDefaut,
 } from "@/lib/documents/defaults";
 
 /**
@@ -34,6 +36,14 @@ import {
  * VOLET 17 : plus de champ « Type » (toujours « Service », posé
  * automatiquement dans le tableau) ; la condition de règlement
  * reste « À réception » automatiquement.
+ *
+ * VOLET 18 — BILINGUE FR/EN (DEVIS uniquement) : un petit bouton
+ * FR/EN en tête du formulaire bascule la langue du document
+ * (donnée persistée avec l'enregistrement) ET traduit les champs
+ * qui contiennent encore le texte PAR DÉFAUT ; « Générer le PDF »
+ * propose ensuite le choix de la version téléchargée (française /
+ * anglaise) sans jamais écraser la langue enregistrée. Les
+ * PROPOSITIONS restent en français : ni bouton, ni menu.
  */
 
 type Formulaire = Omit<DocumentRecord, "id" | "numero" | "createdAt" | "updatedAt" | "docType">;
@@ -123,6 +133,8 @@ export function GenerateurDocument({
   );
   const [generation, setGeneration] = useState(false);
   const [enregistrement, setEnregistrement] = useState(false);
+  /* VOLET 18 — menu « version du PDF » ouvert par « Générer le PDF ». */
+  const [choixLanguePdf, setChoixLanguePdf] = useState(false);
 
   const enEdition = Boolean(initial);
   const libelle = docType === "proposition" ? "Proposition" : "Devis";
@@ -150,16 +162,54 @@ export function GenerateurDocument({
   const majItem = (id: string, patch: Partial<LigneDocument>) =>
     setForm((f) => ({ ...f, items: f.items.map((it) => (it.id === id ? { ...it, ...patch } : it)) }));
 
-  /* La condition de règlement est TOUJOURS « À réception ». */
+  /* VOLET 18 — BASCULE FR/EN DU DEVIS : la langue change ET chaque
+   * champ texte qui contient EXACTEMENT le texte PAR DÉFAUT de
+   * l'ancienne langue est remplacé par celui de la nouvelle — un
+   * texte PERSONNALISÉ n'est jamais écrasé. Le mode de paiement ne
+   * bouge pas : le sélecteur garde ses valeurs canoniques (le
+   * gabarit traduit « Virement bancaire » → « Bank transfer » à
+   * l'impression). */
+  const basculerLangue = () => {
+    setForm((f) => {
+      const ancienne = f.langue ?? "fr";
+      const nouvelle: "fr" | "en" = ancienne === "fr" ? "en" : "fr";
+      const traduire = (valeur: string | undefined, cle: CleTexteDefaut): string | undefined => {
+        const defaut = TEXTES_DEFAUT[ancienne][cle];
+        if (valeur === undefined || valeur.trim() !== defaut.trim()) return valeur;
+        return TEXTES_DEFAUT[nouvelle][cle];
+      };
+      return {
+        ...f,
+        langue: nouvelle,
+        intro: traduire(f.intro, "intro") ?? "",
+        conditionsReglement: traduire(f.conditionsReglement, "conditionsReglement") ?? f.conditionsReglement,
+        notes: traduire(f.notes, "notes") ?? "",
+        delaiEstime: traduire(f.delaiEstime, "delaiEstime"),
+        items: f.items.map((it) => ({
+          ...it,
+          designation: traduire(it.designation, "designationLigne") ?? it.designation,
+          description: traduire(it.description, "descriptionLigne"),
+        })),
+      };
+    });
+  };
+
+  /* La condition de règlement est TOUJOURS automatique — VOLET 18 :
+   * « À réception » en français, « Upon receipt » en anglais. */
   const corpsDocument = () => ({
     ...form,
-    conditionsReglement: "À réception",
+    conditionsReglement: TEXTES_DEFAUT[form.langue ?? "fr"].conditionsReglement,
     docType,
     numero,
     ...(initial ? { id: initial.id, createdAt: initial.createdAt } : {}),
   });
 
-  async function genererPdf() {
+  /* VOLET 18 — `langueSortie` : version du PDF téléchargé (et de sa
+   * copie email). L'ENREGISTREMENT garde la langue du document
+   * (form.langue, posée par le bouton FR/EN) : la version de sortie
+   * ne l'écrase jamais. Les propositions n'envoient pas ce champ
+   * (français seul). */
+  async function genererPdf(langueSortie: "fr" | "en") {
     if (generation) return;
     if (!form.client.nom.trim()) {
       toast({ title: "Nom du client requis", description: "Renseignez au moins le nom du client.", variant: "destructive" });
@@ -172,6 +222,7 @@ export function GenerateurDocument({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           document: corpsDocument(),
+          ...(docType === "devis" ? { langueSortie } : {}),
           enregistrer: true,
           envoyerEmail: true,
         }),
@@ -196,7 +247,7 @@ export function GenerateurDocument({
       toast({
         title: `${libelle} ${numero} ${enEdition ? "mis à jour" : "généré"}`,
         description: [
-          "Téléchargement lancé.",
+          `Version ${langueSortie === "en" ? "anglaise" : "française"} téléchargée.`,
           stockageOk ? "Enregistré dans le stockage." : "Stockage non effectué (non configuré).",
           emailOk ? "Copie envoyée par email." : "Copie email non envoyée (Resend non configuré).",
         ].join(" "),
@@ -242,6 +293,12 @@ export function GenerateurDocument({
     } finally {
       setEnregistrement(false);
     }
+  }
+
+  /* VOLET 18 — choix de la version dans le menu → génération. */
+  function lancerGeneration(langue: "fr" | "en") {
+    setChoixLanguePdf(false);
+    void genererPdf(langue);
   }
 
   function chargerExemple() {
@@ -291,7 +348,28 @@ export function GenerateurDocument({
 
         {/* 1 — Entête du document : client, date, introduction, délai */}
         <Carte className="p-5 sm:p-6">
-          <TitreSection note={`Numéro : ${numero}`}>Entête du document</TitreSection>
+          {/* VOLET 18 — en-tête du formulaire : numéro + bouton de
+              bascule de langue du document (FR/EN, DEVIS uniquement —
+              les propositions commerciales restent en français). */}
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <h3 className="font-display text-base font-semibold text-white sm:text-lg">Entête du document</h3>
+            <div className="flex items-center gap-2.5">
+              <p className="text-xs text-[#c8c8c8]">Numéro : {numero}</p>
+              {docType === "devis" ? (
+                <button
+                  type="button"
+                  onClick={basculerLangue}
+                  className="inline-flex min-h-[32px] items-center gap-1.5 rounded-full border border-[#e4e4e4]/25 px-3 py-1 text-xs font-medium text-white transition-colors hover:border-[#e4e4e4]"
+                  title="Basculer la langue du document (libellés et textes par défaut)"
+                  aria-label={`Basculer la langue du document — actuellement ${form.langue === "en" ? "anglais" : "français"}`}
+                  aria-pressed={form.langue === "en"}
+                >
+                  <Languages className="h-3.5 w-3.5" aria-hidden="true" />
+                  {form.langue === "en" ? "EN" : "FR"}
+                </button>
+              ) : null}
+            </div>
+          </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <Champ label="Nom complet *" indicatif="imprimé en gras">
               <input
@@ -460,7 +538,15 @@ export function GenerateurDocument({
 
         {/* Actions */}
         <div className="flex flex-wrap items-center gap-3">
-          <BoutonAction variant="principal" onClick={genererPdf} disabled={generation}>
+          <BoutonAction
+            variant="principal"
+            onClick={() =>
+              /* VOLET 18 — devis : menu « version du PDF » ; proposition :
+                 génération directe en français (comportement inchangé). */
+              docType === "devis" ? setChoixLanguePdf(true) : genererPdf("fr")
+            }
+            disabled={generation}
+          >
             {generation ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -496,6 +582,45 @@ export function GenerateurDocument({
       <div className="xl:sticky xl:top-6 xl:h-[calc(100vh-3rem)]">
         <ApercuDocument document={pourApercu} />
       </div>
+
+      {/* ---------------- VOLET 18 : version du PDF (devis) ---------------- */}
+      {choixLanguePdf ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Version du PDF"
+          onClick={(e) => e.target === e.currentTarget && setChoixLanguePdf(false)}
+        >
+          <div className="w-full max-w-sm rounded-2xl border border-[#e4e4e4]/15 bg-[#232323] p-6">
+            <p className="text-eyebrow">Générer le PDF</p>
+            <h3 className="mt-1 font-display text-xl font-semibold text-white">Version du document</h3>
+            <p className="mt-1 text-sm text-[#c8c8c8]">
+              {libelle} {numero} — la langue enregistrée du document reste le{" "}
+              {(form.langue ?? "fr") === "en" ? "anglais" : "français"}.
+            </p>
+            <div className="mt-5 space-y-3">
+              <BoutonAction
+                className="w-full"
+                variant={(form.langue ?? "fr") === "fr" ? "principal" : "secondaire"}
+                onClick={() => lancerGeneration("fr")}
+              >
+                Version française
+              </BoutonAction>
+              <BoutonAction
+                className="w-full"
+                variant={(form.langue ?? "fr") === "en" ? "principal" : "secondaire"}
+                onClick={() => lancerGeneration("en")}
+              >
+                Version anglaise
+              </BoutonAction>
+            </div>
+            <div className="mt-5 flex justify-end">
+              <BoutonAction onClick={() => setChoixLanguePdf(false)}>Annuler</BoutonAction>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

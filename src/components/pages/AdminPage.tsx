@@ -12,6 +12,7 @@ import {
   FileText,
   Handshake,
   Inbox,
+  Languages,
   LayoutDashboard,
   Loader2,
   LogOut,
@@ -251,11 +252,61 @@ function PanneauDemandes({
   onActualiser: () => void;
   onMajStatut: (id: string, status: string) => void;
   /** VOLET 16 : création d'un devis directement depuis une demande. */
-  onCreerDevis: (lead: Lead) => void;
+  onCreerDevis: (lead: Lead, messageTraduit?: string) => void;
 }) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+
+  /* VOLET 18 — TRADUCTION DES DEMANDES (back-office) : les demandes
+     sont affichées TELLES QUELLES (langue d'origine) ; quand un
+     message semble ANGLAIS, un bouton « Traduire en français »
+     apparaît dans le détail — la traduction s'affiche SOUS
+     l'original (jamais à la place) et pré-remplit le devis le cas
+     échéant. Le service passe par /api/translate (session admin
+     requise, MyMemory). */
+  const [traductions, setTraductions] = useState<Record<string, string>>({});
+  const [traductionEnCours, setTraductionEnCours] = useState<string | null>(null);
+  const [erreurTraduction, setErreurTraduction] = useState<string | null>(null);
+
+  /** Heuristique de langue : mots-outils discriminants FR vs EN
+   *  (le message est comparé en minuscules, mots entiers). Suffisant
+   *  pour proposer le bouton — la traduction reste toujours
+   *  accessible manuellement si l'heuristique se trompe (bouton
+   *  affiché aussi en français, cible alors l'anglais). */
+  function messageSembleAnglais(message: string): boolean {
+    const m = " " + message.toLowerCase().replace(/[\n\r]+/g, " ") + " ";
+    const motsEn = [" the ", " and ", " i ", " my ", " me ", " you ", " your ", " is ", " are ", " for ", " with ", " hello ", " hi ", " please ", " website ", " need ", " would ", " could ", " business "];
+    const motsFr = [" le ", " la ", " les ", " des ", " je ", " vous ", " votre ", " vos ", " et ", " pour ", " avec ", " bonjour ", " merci ", " site ", " besoin ", " entreprise ", " suis ", " avoir "];
+    const en = motsEn.reduce((n, w) => n + (m.includes(w) ? 1 : 0), 0);
+    const fr = motsFr.reduce((n, w) => n + (m.includes(w) ? 1 : 0), 0);
+    return en > fr;
+  }
+
+  async function traduireDemande(lead: Lead) {
+    setTraductionEnCours(lead.id);
+    setErreurTraduction(null);
+    try {
+      const res = await fetch("/api/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          texte: lead.message,
+          de: messageSembleAnglais(lead.message) ? "en" : "fr",
+          vers: "fr",
+        }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error ?? "Traduction impossible.");
+      }
+      setTraductions((prec) => ({ ...prec, [lead.id]: data.traduction as string }));
+    } catch (e) {
+      setErreurTraduction(e instanceof Error ? e.message : "Traduction impossible.");
+    } finally {
+      setTraductionEnCours(null);
+    }
+  }
 
   const filtered = useMemo(
     () =>
@@ -424,10 +475,10 @@ function PanneauDemandes({
                         {lead.type === "quote" ? (
                           <button
                             type="button"
-                            onClick={() => onCreerDevis(lead)}
+                            onClick={() => onCreerDevis(lead, traductions[lead.id])}
                             className="flex min-h-[36px] items-center gap-1.5 rounded-full border border-[#e4e4e4]/25 px-3.5 text-xs font-medium text-white transition-colors hover:border-[#e4e4e4]"
                             aria-label={`Créer un devis pour la demande de ${lead.name}`}
-                            title="Créer un devis (formulaire pré-rempli)"
+                            title={traductions[lead.id] ? "Créer un devis (formulaire pré-rempli, message traduit)" : "Créer un devis (formulaire pré-rempli)"}
                           >
                             <FilePlus2 className="h-3.5 w-3.5" aria-hidden="true" />
                             Créer un devis
@@ -472,6 +523,53 @@ function PanneauDemandes({
                           <div className="sm:col-span-2 lg:col-span-3">
                             <dt className="text-[11px] tracking-widest text-[#c8c8c8] uppercase">Message</dt>
                             <dd className="mt-1 whitespace-pre-line leading-relaxed text-[#d9d9d9]">{lead.message}</dd>
+                            {/* VOLET 18 — bloc de traduction : affiché SOUS
+                                l'original, jamais à sa place ; le bouton
+                                apparaît quand le message semble anglais
+                                (mais reste accessible pour tout message). */}
+                            <div className="mt-3">
+                              {!traductions[lead.id] ? (
+                                <button
+                                  type="button"
+                                  onClick={() => traduireDemande(lead)}
+                                  disabled={traductionEnCours === lead.id}
+                                  className="flex min-h-[36px] items-center gap-1.5 rounded-full border border-[#e4e4e4]/25 px-3.5 text-xs font-medium text-white transition-colors hover:border-[#e4e4e4] disabled:opacity-50"
+                                >
+                                  {traductionEnCours === lead.id ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                                  ) : (
+                                    <Languages className="h-3.5 w-3.5" aria-hidden="true" />
+                                  )}
+                                  {messageSembleAnglais(lead.message)
+                                    ? "Traduire en français"
+                                    : "Traduire en français (message français détecté — traduction de contrôle)"}
+                                </button>
+                              ) : (
+                                <div className="rounded-xl border border-[#e4e4e4]/12 bg-[#232323] p-4">
+                                  <p className="flex items-center gap-2 text-[11px] font-medium tracking-widest text-[#c8c8c8] uppercase">
+                                    <Languages className="h-3.5 w-3.5" aria-hidden="true" />
+                                    Traduction française (automatique)
+                                  </p>
+                                  <p className="mt-2 whitespace-pre-line leading-relaxed text-white">{traductions[lead.id]}</p>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setTraductions((prec) => {
+                                        const copie = { ...prec };
+                                        delete copie[lead.id];
+                                        return copie;
+                                      })
+                                    }
+                                    className="mt-3 text-xs text-[#c8c8c8] underline underline-offset-4 transition-colors hover:text-white"
+                                  >
+                                    Masquer la traduction
+                                  </button>
+                                </div>
+                              )}
+                              {erreurTraduction && traductionEnCours === null && (
+                                <p className="mt-2 text-xs text-[#ff8080]" role="alert">{erreurTraduction}</p>
+                              )}
+                            </div>
                           </div>
                         </dl>
                       </td>
@@ -737,8 +835,11 @@ export function AdminPage() {
 
   /** VOLET 16 — créer un devis DEPUIS UNE DEMANDE reçue : l'espace
       de création s'ouvre avec les coordonnées du demandeur
-      pré-remplies et un récapitulatif de sa demande. */
-  function creerDevisDepuisDemande(lead: Lead) {
+      pré-remplies et un récapitulatif de sa demande. VOLET 18 : si la
+      demande a été TRADUITE (client anglophone), le récapitulatif
+      affiche le message TRADUIT en français — la version d'origine
+      reste lisible dans le tableau des demandes. */
+  function creerDevisDepuisDemande(lead: Lead, messageTraduit?: string) {
     setSection("devis");
     setVueDocs("creation");
     setDocEnEdition(null);
@@ -756,7 +857,7 @@ export function AdminPage() {
         telephone: lead.phone,
         entreprise: lead.company,
         date: formatDateHeure(lead.createdAt),
-        message: lead.message,
+        message: messageTraduit ?? lead.message,
       },
     });
   }

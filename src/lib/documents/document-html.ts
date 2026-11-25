@@ -34,14 +34,21 @@
  * s'écoule en blocs et se répartit en pages A4 explicites (filigrane
  * et pied numéroté sur chaque page) ; le tableau se poursuit donc
  * naturellement d'une page sur l'autre.
+ *
+ * VOLET 18 (26/11/2026) — BILINGUE FR/EN : la langue du document
+ * (d.langue, défaut "fr") choisit les LIBELLÉS du gabarit (objet
+ * LIBELLES ci-dessous), le montant en lettres et la date. Les
+ * PROPOSITIONS commerciales restent TOUJOURS en français. Ni la
+ * structure du HTML, ni le CSS, ni la pagination ne changent :
+ * seuls les TEXTES suivent la langue.
  */
 
-import { formatPaymentMethodWithLogo } from "./payment-logos";
+import { getPaymentMethodLogo } from "./payment-logos";
 import { montantEnLettres, formatDate, formatDateCourte, formatCurrency } from "./format";
 import { descriptionOuPoints, decouperHtmlRiche } from "./texte-riche";
 import { fabriquerScriptPagination } from "./pagination-flux";
 import { LABELS_DOC, type DocumentRecord } from "./types";
-import { EMETTEUR, CONDITIONS_GENERALES } from "./defaults";
+import { EMETTEUR, CONDITIONS_GENERALES, CONDITIONS_GENERALES_EN, TEXTES_DEFAUT } from "./defaults";
 
 function esc(v: string | null | undefined): string {
   if (v === null || v === undefined) return "";
@@ -57,14 +64,229 @@ function esc(v: string | null | undefined): string {
 const LIMITE_PX = Math.round((279 / 25.4) * 96);
 const DEBUT_PX = Math.round((16 / 25.4) * 96);
 
+/* ------------------------------------------------------------------
+ * VOLET 18 (26/11/2026) — INTERNATIONALISATION DU GABARIT
+ *
+ * Tous les libellés du gabarit devis/facture vivent dans LIBELLES,
+ * extraits MOT POUR MOT du code existant (les valeurs "fr" sont la
+ * référence historique). Le rendu choisit la colonne selon
+ * d.langue ?? "fr" (const L en tête de renderDocumentHtml) : ni la
+ * structure du HTML, ni le CSS, ni la pagination ne changent —
+ * seuls les TEXTES suivent la langue du document.
+ * ------------------------------------------------------------------ */
+const LIBELLES: Record<"fr" | "en", Record<string, string>> = {
+  fr: {
+    /* Titres du document */
+    titreDevis: "Devis",
+    titreFacture: "Facture",
+    /* Blocs émetteur / destinataire */
+    emetteur: "Emetteur",
+    destinataire: "Destinataire",
+    professionnel: "Professionnel :",
+    ifu: "IFU :",
+    adresse: "Adresse :",
+    pays: "Pays :",
+    entreprise: "Entreprise :",
+    nom: "Nom :",
+    ville: "Ville :",
+    telephone: "Téléphone :",
+    email: "Email :",
+    /* Introduction / remerciements */
+    merci: "Merci pour votre confiance.",
+    remerciementFacture: "Nous remercions notre client pour sa confiance.",
+    /* Tableau « Détail » */
+    detail: "Détail",
+    colType: "Type",
+    colDescription: "Description",
+    colPrixUnitaire: "Prix unitaire",
+    colQte: "Qté",
+    colTotal: "Total",
+    service: "Service",
+    /* Total sous le tableau */
+    total: "Total&nbsp;:",
+    tvaNonApplicable: "TVA non applicable",
+    /* Conditions / bon pour accord */
+    cgv: "Conditions générales de vente",
+    delaiEstime: "Délai estimé&nbsp;:",
+    bonPourAccord: "Bon pour accord",
+    dateSignature: "À _________________________ , le ____ / ____ / ______",
+    signatureEtCachet: "Signature et cachet",
+    qualiteSignataire: "Qualité de signataire",
+    /* Validité + notes */
+    validite: "Validité du document&nbsp;:",
+    jours: "jours",
+    notes: "Notes&nbsp;:",
+    /* Coordonnées bancaires */
+    coordonneesBancaires: "Coordonnées bancaires",
+    iban: "IBAN&nbsp;:",
+    bic: "BIC&nbsp;:",
+    titulaireCompte: "Titulaire du compte&nbsp;:",
+    modePaiement: "Mode de paiement&nbsp;:",
+    conditionsReglement: "Conditions de règlement&nbsp;:",
+    lienPaiement: "Lien de paiement en ligne",
+    /* Facture : bloc paiement + cachet */
+    paiement: "Paiement",
+    statutPaiement: "Statut du paiement",
+    paye: "PAYÉ",
+    enAttente: "En attente",
+    modeReglement: "Mode de règlement",
+    dateReglement: "Date de règlement",
+    devisOrigine: "Devis d'origine",
+    le: "le",
+    /* Proposition (déroulé — toujours affiché en français) */
+    deroule: "Déroulé du projet",
+    /* Pied de page */
+    piedConfidentiel: "Document confidentiel — Stevens AKPOVI",
+    page: "Page 1 sur 1",
+  },
+  en: {
+    /* Document titles */
+    titreDevis: "Quote",
+    titreFacture: "Invoice",
+    /* Issuer / recipient blocks */
+    emetteur: "Issuer",
+    destinataire: "Recipient",
+    professionnel: "Professional:",
+    ifu: "IFU:",
+    adresse: "Address:",
+    pays: "Country:",
+    entreprise: "Company:",
+    nom: "Name:",
+    ville: "City:",
+    telephone: "Phone:",
+    email: "Email:",
+    /* Introduction / thanks */
+    merci: "Thank you for your trust.",
+    remerciementFacture: "We thank our client for their trust.",
+    /* Details table */
+    detail: "Details",
+    colType: "Type",
+    colDescription: "Description",
+    colPrixUnitaire: "Unit price",
+    colQte: "Qty",
+    colTotal: "Total",
+    service: "Service",
+    /* Total below the table */
+    total: "Total:",
+    tvaNonApplicable: "VAT not applicable",
+    /* Terms / approval */
+    cgv: "Terms and conditions",
+    delaiEstime: "Estimated delivery time:",
+    bonPourAccord: "Approved by",
+    dateSignature: "At _________________________ , on ____ / ____ / ______",
+    signatureEtCachet: "Signature and stamp",
+    qualiteSignataire: "Signatory title",
+    /* Validity + notes */
+    validite: "Document validity:",
+    jours: "days",
+    notes: "Notes:",
+    /* Bank details */
+    coordonneesBancaires: "Bank details",
+    iban: "IBAN:",
+    bic: "BIC:",
+    titulaireCompte: "Account holder:",
+    modePaiement: "Payment method:",
+    conditionsReglement: "Payment terms:",
+    lienPaiement: "Online payment link",
+    /* Invoice: payment block + stamp */
+    paiement: "Payment",
+    statutPaiement: "Payment status",
+    paye: "PAID",
+    enAttente: "Pending",
+    modeReglement: "Payment method",
+    dateReglement: "Payment date",
+    devisOrigine: "Original quote",
+    le: "on",
+    /* Proposition (roadmap — propositions stay in French) */
+    deroule: "Project roadmap",
+    /* Footer */
+    piedConfidentiel: "Confidential document — Stevens AKPOVI",
+    page: "Page 1 of 1",
+  },
+};
+
+/* VOLET 18 — valeurs ENREGISTRÉES connues, traduites à l'AFFICHAGE :
+ * mode de paiement et condition de règlement par défaut. La table
+ * est BIDIRECTIONNELLE — un document français téléchargé en version
+ * anglaise affiche « Bank transfer »/« Upon receipt », un document
+ * créé en anglais puis téléchargé en français retrouve « Virement
+ * bancaire »/« À réception » ; une valeur inconnue (texte
+ * personnalisé) reste telle quelle. */
+const TRADUCTIONS_VALEURS: Record<string, string> = {
+  [TEXTES_DEFAUT.fr.modePaiement]: TEXTES_DEFAUT.en.modePaiement,
+  [TEXTES_DEFAUT.fr.conditionsReglement]: TEXTES_DEFAUT.en.conditionsReglement,
+};
+const TRADUCTIONS_INVERSEES: Record<string, string> = Object.fromEntries(
+  Object.entries(TRADUCTIONS_VALEURS).map(([fr, en]) => [en, fr]),
+);
+
+function traduireValeur(valeur: string, langue: "fr" | "en"): string {
+  if (langue === "en") return TRADUCTIONS_VALEURS[valeur] ?? valeur;
+  return TRADUCTIONS_INVERSEES[valeur] ?? valeur;
+}
+
+/* VOLET 18 — badge du mode de paiement (bloc Paiement des
+ * factures) : le LOGO vit sous les clés FRANÇAISES de
+ * payment-logos.ts — si la valeur enregistrée est déjà la
+ * traduction anglaise, on cherche la clé d'origine ; le LIBELLÉ
+ * affiché suit la langue du document. */
+function badgeModePaiement(mode: string, langue: "fr" | "en"): string {
+  const libelle = traduireValeur(mode, langue);
+  const logoUri =
+    getPaymentMethodLogo(mode) ??
+    getPaymentMethodLogo(TRADUCTIONS_INVERSEES[mode] ?? mode);
+  if (!logoUri) return esc(libelle);
+  return `<img src="${logoUri}" alt="${esc(libelle)}" style="height:16px; vertical-align:middle; margin-right:6px;" />${esc(libelle)}`;
+}
+
+/* VOLET 18 — PIED DE PAGE ANGLAIS : le moteur de pagination
+ * (pagination-flux.ts, NON modifiable) écrit « Page X sur Y » en
+ * français. Ce petit observateur — embarqué UNIQUEMENT dans les
+ * documents anglais — réécrit « Page X of Y » après chaque passe de
+ * pagination (les pages sont reconstruites quand les polices web
+ * arrivent). Aucune structure ni CSS n'est touchée : seul le TEXTE
+ * du numéro de page change. */
+const SCRIPT_PIED_PAGE_EN = `
+(function () {
+  var RE = /^Page (\\d+) sur (\\d+)$/;
+  function traduire() {
+    var elts = document.querySelectorAll('.p-num');
+    for (var i = 0; i < elts.length; i++) {
+      var m = RE.exec((elts[i].textContent || '').trim());
+      if (m) elts[i].textContent = 'Page ' + m[1] + ' of ' + m[2];
+    }
+  }
+  traduire();
+  if (window.MutationObserver) {
+    new MutationObserver(traduire).observe(document.body, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+  }
+})();
+`;
+
 export function renderDocumentHtml(
   d: DocumentRecord,
   logoSrc: string = "/assets/logo-noir.png",
 ): string {
-  const label = LABELS_DOC[d.docType];
+  /* VOLET 18 — LANGUE DU DOCUMENT : les devis et factures suivent
+   * d.langue ("fr" par défaut) ; les PROPOSITIONS commerciales
+   * restent TOUJOURS en français (template calibré — consigne de
+   * l'éditeur). Tous les libellés du gabarit passent par L. */
+  const langue: "fr" | "en" = d.docType === "proposition" ? "fr" : d.langue ?? "fr";
+  const L = LIBELLES[langue];
   const estProposition = d.docType === "proposition";
   const estFacture = d.docType === "facture";
-  const dateLabel = formatDate(d.date);
+  /* Titre du document : traduit pour devis/facture ; LABELS_DOC
+   * (français) pour la proposition commerciale. */
+  const label = estProposition
+    ? LABELS_DOC[d.docType]
+    : estFacture
+      ? L.titreFacture
+      : L.titreDevis;
+  const dateLabel = formatDate(d.date, langue);
   const datePaiementLabel = d.datePaiement ? formatDateCourte(d.datePaiement) : formatDateCourte(d.date);
 
   const total = d.items.reduce((s, it) => s + (Number(it.quantite) || 0) * (Number(it.prixUnitaire) || 0), 0);
@@ -76,73 +298,86 @@ export function renderDocumentHtml(
     (d.items.find((it) => (it.mentionLivraison ?? "").trim())?.mentionLivraison ?? "");
 
   const emetteurRows: [string, string][] = [
-    ["Professionnel :", `<strong>${esc(EMETTEUR.societe)}</strong>`],
-    ["IFU :", EMETTEUR.ifu],
-    ["Adresse :", EMETTEUR.adresse],
-    ["Pays :", EMETTEUR.pays],
+    [L.professionnel, `<strong>${esc(EMETTEUR.societe)}</strong>`],
+    [L.ifu, EMETTEUR.ifu],
+    [L.adresse, EMETTEUR.adresse],
+    [L.pays, langue === "en" ? EMETTEUR.paysEn : EMETTEUR.pays],
   ];
-  const emetteurSubText = EMETTEUR.subText;
+  /* VOLET 18 — sous-texte de l'émetteur traduit (defaults.ts). */
+  const emetteurSubText = langue === "en" ? EMETTEUR.subTextEn : EMETTEUR.subText;
 
   const c = d.client;
   const destinataireRows: [string, string][] = [
-    ...(c.entreprise ? ([["Entreprise :", esc(c.entreprise)]] as [string, string][]) : []),
-    ["Nom :", `<strong>${esc(c.nom) || "—"}</strong>`],
-    ["Ville :", esc(c.ville) || "—"],
-    ["Pays :", esc(c.pays) || "—"],
-    ["Téléphone :", esc(c.telephone) || "—"],
+    ...(c.entreprise ? ([[L.entreprise, esc(c.entreprise)]] as [string, string][]) : []),
+    [L.nom, `<strong>${esc(c.nom) || "—"}</strong>`],
+    [L.ville, esc(c.ville) || "—"],
+    [L.pays, esc(c.pays) || "—"],
+    [L.telephone, esc(c.telephone) || "—"],
     [
-      "Email :",
+      L.email,
       c.email
         ? `<a href="mailto:${esc(c.email)}" style="color:#2563eb;text-decoration:none;font-weight:500;">${esc(c.email)}</a>`
         : "—",
     ],
   ];
 
-  const remerciement =
-    estFacture
-      ? `${esc(d.intro)} Nous remercions notre client pour sa confiance.`
-      : esc(d.intro);
+  /* VOLET 18 — remerciement de facture traduit (l'intro est rédigée
+   * par l'éditeur : elle reste telle quelle). */
+  const remerciement = estFacture
+    ? `${esc(d.intro)} ${L.remerciementFacture}`
+    : esc(d.intro);
 
   /* Cachet « PAYÉ » — reproduction du style MrSteveEnglish (voir
-     l'historique) ; factures réglées uniquement. */
+     l'historique) ; factures réglées uniquement. VOLET 18 : libellé
+     et préfixe de date traduits. */
   const estPaye = d.statutPaiement === "Payé";
+  /* VOLET 18 — statut AFFICHÉ : la valeur enregistrée reste
+   * française ("Payé"/"En attente", donnée du document) ; la
+   * version anglaise affiche PAID / Pending. */
+  const statutAffiche = estPaye
+    ? L.paye
+    : langue === "en"
+      ? L.enAttente
+      : d.statutPaiement ?? "En attente";
   const cachetPaye = estFacture
     ? estPaye
       ? `
       <div class="cachet-bande">
         <div class="cachet-paye" role="img" aria-label="Cachet payé">
-          <span class="cp-texte"><span class="cp-paye">PAYÉ</span><span class="cp-date">le ${datePaiementLabel}</span></span>
+          <span class="cp-texte"><span class="cp-paye">${L.paye}</span><span class="cp-date">${L.le} ${datePaiementLabel}</span></span>
         </div>
       </div>`
       : ""
     : "";
 
-  /* Bloc Paiement (factures). */
+  /* Bloc Paiement (factures) — VOLET 18 : libellés traduits, mode
+     de paiement affiché dans la langue (badge conservé). */
   const blocPaiement = estFacture
     ? `
       <div class="invoice-payment-block">
-        <div class="ipb-title">Paiement</div>
+        <div class="ipb-title">${L.paiement}</div>
         <div class="ipb-row">
-          <span class="ipb-label">Statut du paiement</span>
-          <span class="ipb-value ${estPaye ? "paid" : ""}">${estPaye ? "PAYÉ" : esc(d.statutPaiement ?? "En attente")}</span>
+          <span class="ipb-label">${L.statutPaiement}</span>
+          <span class="ipb-value ${estPaye ? "paid" : ""}">${statutAffiche}</span>
         </div>
         <div class="ipb-row">
-          <span class="ipb-label">Mode de règlement</span>
-          <span class="ipb-value">${formatPaymentMethodWithLogo(esc(d.modePaiement))}</span>
+          <span class="ipb-label">${L.modeReglement}</span>
+          <span class="ipb-value">${badgeModePaiement(d.modePaiement, langue)}</span>
         </div>
         <div class="ipb-row">
-          <span class="ipb-label">Date de règlement</span>
-          <span class="ipb-value">${estPaye ? `le ${datePaiementLabel}` : "—"}</span>
+          <span class="ipb-label">${L.dateReglement}</span>
+          <span class="ipb-value">${estPaye ? `${L.le} ${datePaiementLabel}` : "—"}</span>
         </div>
-        ${d.devisSource ? `<div class="ipb-row"><span class="ipb-label">Devis d'origine</span><span class="ipb-value">${esc(d.devisSource)}</span></div>` : ""}
+        ${d.devisSource ? `<div class="ipb-row"><span class="ipb-label">${L.devisOrigine}</span><span class="ipb-value">${esc(d.devisSource)}</span></div>` : ""}
       </div>`
     : "";
 
-  /* Déroulé du projet (proposition commerciale ancien gabarit). */
+  /* Déroulé du projet (proposition commerciale ancien gabarit) —
+     VOLET 18 : les propositions restent en français (L = fr). */
   const blocPhases =
     estProposition && d.phases && d.phases.length
       ? `
-    <div class="section-heading" data-bloc data-heading>Déroulé du projet</div>
+    <div class="section-heading" data-bloc data-heading>${L.deroule}</div>
     <ul class="conditions-list phases-list" data-bloc>
       ${d.phases
         .map(
@@ -166,7 +401,7 @@ export function renderDocumentHtml(
       if (!fragments.length) {
         return `
   <div class="svc-part svc-debut svc-fin" data-bloc>
-    <div class="cell type-cell">${esc(it.type || "Service")}</div>
+    <div class="cell type-cell">${esc(it.type || L.service)}</div>
     <div class="cell desc-cell"><div class="service-name">${esc(it.designation)}</div></div>
     <div class="cell price-cell">${prix}</div>
     <div class="cell qty-cell">${Number(it.quantite) || 0}</div>
@@ -177,7 +412,7 @@ export function renderDocumentHtml(
         const debut = k === 0 ? " svc-debut" : "";
         const fin = k === fragments.length - 1 ? " svc-fin" : "";
         const tete = k === 0
-          ? `<div class="cell type-cell">${esc(it.type || "Service")}</div>
+          ? `<div class="cell type-cell">${esc(it.type || L.service)}</div>
     <div class="cell desc-cell"><div class="service-name">${esc(it.designation)}</div><div class="desc-riche">${fragment}</div></div>
     <div class="cell price-cell">${prix}</div>
     <div class="cell qty-cell">${Number(it.quantite) || 0}</div>
@@ -197,57 +432,63 @@ export function renderDocumentHtml(
     .join("");
 
   /* Total SOUS le tableau : chiffres + lettres + TVA non
-   * applicable (la rangée noire du pied de tableau est supprimée). */
+   * applicable (la rangée noire du pied de tableau est supprimée).
+   * VOLET 18 — libellés traduits, montant en lettres dans la
+   * LANGUE du document. */
   const blocTotal = `
   <div class="total-sous-tableau" data-bloc>
-    <p><strong>Total&nbsp;:</strong> ${formatCurrency(total, d.devise)} <span class="total-lettres">(${esc(montantEnLettres(total, d.devise))})</span> — TVA non applicable</p>
+    <p><strong>${L.total}</strong> ${formatCurrency(total, d.devise)} <span class="total-lettres">(${esc(montantEnLettres(total, d.devise, langue))})</span> — ${L.tvaNonApplicable}</p>
   </div>`;
 
   /* Conditions + Bon pour accord (devis et propositions) — le délai
    * estimé suit IMMÉDIATEMENT la liste des CGV (« sans espace de
-   * décalage ») ; l'espace de signature est agrandi. */
+   * décalage ») ; l'espace de signature est agrandi. VOLET 18 :
+   * CGV, libellés et lignes de signature traduits. */
+  const cgv = langue === "en" ? CONDITIONS_GENERALES_EN : CONDITIONS_GENERALES;
   const blocConditions = !estFacture
     ? `
     <div class="conditions-block" data-bloc>
       <div class="cb-left">
-        <div class="cb-title">Conditions générales de vente</div>
+        <div class="cb-title">${L.cgv}</div>
         <ul class="cb-conditions-list">
-          ${CONDITIONS_GENERALES.map((cond) => `<li>${esc(cond)}</li>`).join("")}
+          ${cgv.map((cond) => `<li>${esc(cond)}</li>`).join("")}
         </ul>
-        ${delaiEstime ? `<p class="delai-apres-cgv"><strong>Délai estimé&nbsp;:</strong> ${esc(delaiEstime)}</p>` : ""}
+        ${delaiEstime ? `<p class="delai-apres-cgv"><strong>${L.delaiEstime}</strong> ${esc(delaiEstime)}</p>` : ""}
       </div>
       <div class="cb-right">
-        <div class="cb-title">Bon pour accord</div>
-        <div class="cb-date-line">À _________________________ , le ____ / ____ / ______</div>
+        <div class="cb-title">${L.bonPourAccord}</div>
+        <div class="cb-date-line">${L.dateSignature}</div>
         <div class="signature-line">
-          <div class="sig-label">Signature et cachet <span class="sig-separator">|</span> <span class="sig-quality-inline">Qualité de signataire</span></div>
+          <div class="sig-label">${L.signatureEtCachet} <span class="sig-separator">|</span> <span class="sig-quality-inline">${L.qualiteSignataire}</span></div>
         </div>
       </div>
     </div>`
     : "";
 
-  /* Validité + notes. */
+  /* Validité + notes — VOLET 18 : libellés traduits. */
   const blocValiditeNotes = `
   <div class="validite-notes" data-bloc>
-    <p><span class="vn-lbl">Validité du document&nbsp;:</span> ${Number(d.validiteJours) || 5} jours</p>
-    ${d.notes ? `<p><span class="vn-lbl">Notes&nbsp;:</span> ${esc(d.notes)}</p>` : ""}
+    <p><span class="vn-lbl">${L.validite}</span> ${Number(d.validiteJours) || 5} ${L.jours}</p>
+    ${d.notes ? `<p><span class="vn-lbl">${L.notes}</span> ${esc(d.notes)}</p>` : ""}
   </div>`;
 
   /* Coordonnées bancaires — VOLET 17 : IBAN, BIC puis TITULAIRE (la
-   * ligne « Banque » est supprimée). */
+   * ligne « Banque » est supprimée). VOLET 18 : libellés traduits,
+   * valeurs système (mode de paiement, condition de règlement par
+   * défaut) affichées dans la langue. */
   const blocBanque = `
-  <div class="section-heading" data-bloc data-heading>Coordonnées bancaires</div>
+  <div class="section-heading" data-bloc data-heading>${L.coordonneesBancaires}</div>
   <div class="bank-block" data-bloc>
-    <div class="bank-row"><span class="lbl">IBAN&nbsp;:</span> <span class="val">${esc(d.banque.iban)}</span></div>
-    <div class="bank-row"><span class="lbl">BIC&nbsp;:</span> <span class="val">${esc(d.banque.bic)}</span></div>
-    <div class="bank-row"><span class="lbl">Titulaire du compte&nbsp;:</span> <span class="val">${esc(d.banque.titulaire)}</span></div>
-    <div class="bank-row"><span class="lbl">Mode de paiement&nbsp;:</span> <span class="val">${esc(d.modePaiement)}</span></div>
-    <div class="bank-row"><span class="lbl">Conditions de règlement&nbsp;:</span> <span class="val">${esc(d.conditionsReglement)}</span></div>
+    <div class="bank-row"><span class="lbl">${L.iban}</span> <span class="val">${esc(d.banque.iban)}</span></div>
+    <div class="bank-row"><span class="lbl">${L.bic}</span> <span class="val">${esc(d.banque.bic)}</span></div>
+    <div class="bank-row"><span class="lbl">${L.titulaireCompte}</span> <span class="val">${esc(d.banque.titulaire)}</span></div>
+    <div class="bank-row"><span class="lbl">${L.modePaiement}</span> <span class="val">${esc(traduireValeur(d.modePaiement, langue))}</span></div>
+    <div class="bank-row"><span class="lbl">${L.conditionsReglement}</span> <span class="val">${esc(traduireValeur(d.conditionsReglement, langue))}</span></div>
   </div>
   ${
     d.lienPaiement
       ? `<div class="payment-link-section" data-bloc>
-    <div class="section-heading" data-bloc data-heading>Lien de paiement en ligne</div>
+    <div class="section-heading" data-bloc data-heading>${L.lienPaiement}</div>
     <div class="payment-link-block" data-bloc>
       <a class="payment-link-url" href="${esc(d.lienPaiement)}" target="_blank" rel="noopener noreferrer">${esc(d.lienPaiement)}</a>
     </div>
@@ -260,12 +501,12 @@ export function renderDocumentHtml(
     ? `
     <div class="signature-steve signature-steve--facture" data-bloc>
       <div class="sig-cursive">Stevens Akpovi</div>
-      <div class="sig-caption">Stevens AKPOVI — ${esc(EMETTEUR.subText)} · ${esc(EMETTEUR.email)}</div>
+      <div class="sig-caption">Stevens AKPOVI — ${esc(emetteurSubText)} · ${esc(EMETTEUR.email)}</div>
     </div>`
     : "";
 
   const html = `<!DOCTYPE html>
-<html lang="fr">
+<html lang="${langue}">
 <head>
 <meta charset="utf-8"/>
 <title>${label} ${esc(d.numero)} — ${esc(d.client.nom)}</title>
@@ -758,7 +999,7 @@ export function renderDocumentHtml(
 
   <div class="parties" data-bloc>
     <div class="party-block">
-      <div class="party-label">Emetteur</div>
+      <div class="party-label">${L.emetteur}</div>
       ${emetteurRows
         .map((r, i) => {
           const subText = i === 0 ? `<div class="party-subtext">${esc(emetteurSubText)}</div>` : "";
@@ -767,7 +1008,7 @@ export function renderDocumentHtml(
         .join("")}
     </div>
     <div class="party-block">
-      <div class="party-label">Destinataire</div>
+      <div class="party-label">${L.destinataire}</div>
       ${destinataireRows
         .map((r) => `<div class="party-row"><span class="lbl">${r[0]}</span><span class="val">${r[1]}</span></div>`)
         .join("")}
@@ -777,18 +1018,18 @@ export function renderDocumentHtml(
   <div class="hr" data-bloc></div>
 
   <div class="thank-you" data-bloc>
-    <div class="thank-you-prefix">Merci pour votre confiance.</div>
+    <div class="thank-you-prefix">${L.merci}</div>
     <div class="thank-you-body">${remerciement}</div>
   </div>
 
-  <div class="detail-heading" data-bloc data-heading>Détail</div>
+  <div class="detail-heading" data-bloc data-heading>${L.detail}</div>
 
   <div class="svc-head" data-bloc data-heading>
-    <div class="cell">Type</div>
-    <div class="cell">Description</div>
-    <div class="cell num">Prix unitaire</div>
-    <div class="cell center">Qté</div>
-    <div class="cell num">Total</div>
+    <div class="cell">${L.colType}</div>
+    <div class="cell">${L.colDescription}</div>
+    <div class="cell num">${L.colPrixUnitaire}</div>
+    <div class="cell center">${L.colQte}</div>
+    <div class="cell num">${L.colTotal}</div>
   </div>
   ${lignesTableau}
   ${blocTotal}
@@ -809,9 +1050,9 @@ export function renderDocumentHtml(
     <div class="footer-row">
       <div class="footer-left">
         <div class="line-1">${label} ${esc(d.numero)}</div>
-        <div class="line-2">Document confidentiel — Stevens AKPOVI</div>
+        <div class="line-2">${L.piedConfidentiel}</div>
       </div>
-      <div class="p-num">Page 1 sur 1</div>
+      <div class="p-num">${L.page}</div>
     </div>
   </div>
   <div class="wm"><img src="${esc(logoSrc)}" alt="Filigrane Stevens Akpovi" /></div>
@@ -824,6 +1065,7 @@ export function renderDocumentHtml(
     enteteCompacte: false,
     formatPage: "simple",
   })}</script>
+${langue === "en" ? `<script>${SCRIPT_PIED_PAGE_EN}</script>` : ""}
 </body>
 </html>`;
 

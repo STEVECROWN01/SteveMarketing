@@ -5,8 +5,9 @@ import { PageHero, SectionHeading, CTAButton, CTAIcons, ReassuranceBar } from "@
 import { Reveal } from "@/components/motion/Reveal";
 import { BrowserMockup, PhoneMockup } from "@/components/media/Media";
 import { ProjectCard } from "@/components/marketing/ProjectCard";
-import { PROJECTS, SITE } from "@/lib/site";
-import { CTA_LABELS } from "@/content/site-content";
+/* VOLET 18 — i18n : CTA_LABELS via useContenu, PROJECTS / SITE via
+   useSite, textes inline et attributs interpolés via t()/tf(). */
+import { useContenu, useSite, useT } from "@/i18n";
 
 /**
  * PAGE DE PRÉSENTATION D'UN PROJET (#/projet/<id>)
@@ -17,6 +18,9 @@ import { CTA_LABELS } from "@/content/site-content";
  * uniquement les données réelles du projet.
  */
 export function ProjectPage({ projectId }: { projectId: string }) {
+  const { t, tf } = useT();
+  const { CTA_LABELS } = useContenu();
+  const { PROJECTS, SITE } = useSite();
   const index = PROJECTS.findIndex((p) => p.id === projectId);
   if (index === -1) return null;
   const project = PROJECTS[index];
@@ -26,7 +30,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
     <>
       {/* ---------- En-tête du projet ---------- */}
       <PageHero
-        eyebrow={`PROJETS RÉALISÉS · PROJET ${String(index + 1).padStart(2, "0")}`}
+        eyebrow={tf("PROJETS RÉALISÉS · PROJET {num}", { num: String(index + 1).padStart(2, "0") })}
         title={project.name}
         intro={project.description}
       >
@@ -36,7 +40,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
             variant="secondary"
             size="lg"
             icon={CTAIcons.works}
-            ariaLabel={`${project.cta} — ${project.name} (nouvel onglet)`}
+            ariaLabel={tf("{cta} — {name} (nouvel onglet)", { cta: project.cta, name: project.name })}
           >
             {project.cta}
           </CTAButton>
@@ -60,14 +64,13 @@ export function ProjectPage({ projectId }: { projectId: string }) {
       >
         <div className="container-site">
           <SectionHeading
-            eyebrow="LE SITE"
-            title="Le site, tel qu'il est en ligne."
+            eyebrow={t("LE SITE")}
+            title={t("Le site, tel qu'il est en ligne.")}
             tone="light"
           />
           <Reveal direction="up" delay={0.15}>
             <p className="text-body mt-6 max-w-2xl on-paper-muted">
-              {project.category}. Voici les aperçus de la version publiée —
-              l'aperçu bureau et l'aperçu mobile, côte à côte.
+              {tf("{category}. Voici les aperçus de la version publiée — l'aperçu bureau et l'aperçu mobile, côte à côte.", { category: project.category })}
             </p>
           </Reveal>
 
@@ -97,7 +100,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
               <BrowserMockup
                 src={project.desktop}
                 src2x={project.desktop2x}
-                alt={`Aperçu desktop du site ${project.name}`}
+                alt={tf("Aperçu desktop du site {name}", { name: project.name })}
                 url={project.url}
                 width={1440}
                 height={900}
@@ -118,7 +121,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
               <PhoneMockup
                 src={project.mobile}
                 src2x={project.mobile2x}
-                alt={`Aperçu mobile du site ${project.name}`}
+                alt={tf("Aperçu mobile du site {name}", { name: project.name })}
                 width={390}
                 height={844}
                 color
@@ -136,7 +139,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
                 variant="secondary"
                 size="lg"
                 icon={CTAIcons.works}
-                ariaLabel={`${project.cta} — ${project.name} (nouvel onglet)`}
+                ariaLabel={tf("{cta} — {name} (nouvel onglet)", { cta: project.cta, name: project.name })}
               >
                 {project.cta}
               </CTAButton>
@@ -152,8 +155,8 @@ export function ProjectPage({ projectId }: { projectId: string }) {
       >
         <div className="container-site">
           <SectionHeading
-            eyebrow="PROJETS RÉALISÉS"
-            title="Découvrez les autres réalisations."
+            eyebrow={t("PROJETS RÉALISÉS")}
+            title={t("Découvrez les autres réalisations.")}
             tone="light"
           />
           <div className="mt-12 grid gap-6 md:grid-cols-2">
@@ -176,11 +179,11 @@ export function ProjectPage({ projectId }: { projectId: string }) {
         />
         <div className="container-site relative text-center">
           <Reveal direction="up">
-            <p className="text-eyebrow">IL EST TEMPS DE DONNER UNE NOUVELLE DIMENSION À VOTRE ACTIVITÉ</p>
+            <p className="text-eyebrow">{t("IL EST TEMPS DE DONNER UNE NOUVELLE DIMENSION À VOTRE ACTIVITÉ")}</p>
           </Reveal>
           <Reveal direction="up" delay={0.08}>
             <h2 id="projet-cta-titre" className="text-section-title mx-auto mt-5 max-w-3xl text-white">
-              Votre projet peut être la prochaine réalisation.
+              {t("Votre projet peut être la prochaine réalisation.")}
             </h2>
           </Reveal>
           <Reveal direction="up" delay={0.16}>
@@ -190,7 +193,7 @@ export function ProjectPage({ projectId }: { projectId: string }) {
                 variant="secondary"
                 size="lg"
                 icon={CTAIcons.calendar}
-                ariaLabel={`Réserver un appel de 30 minutes sur Calendly — ${SITE.calendlyMention}`}
+                ariaLabel={tf("Réserver un appel de 30 minutes sur Calendly — {calendlyMention}", { calendlyMention: SITE.calendlyMention })}
               >
                 {CTA_LABELS.appel}
               </CTAButton>

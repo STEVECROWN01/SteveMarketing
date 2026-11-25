@@ -5,7 +5,10 @@ import { Phone } from "lucide-react";
 import { SectionHeading } from "@/components/marketing/Marketing";
 import { Reveal } from "@/components/motion/Reveal";
 import { CalendlyEmbed } from "@/components/calendly/CalendlyContext";
-import { SITE } from "@/lib/site";
+/* VOLET 18 — i18n : textes inline via t()/tf() ; la mention Calendly
+   (via useSite, traduite) est passée au gabarit tf() puis extraite du
+   résultat pour conserver son <strong> d'origine. */
+import { useSite, useT } from "@/i18n";
 
 /**
  * PAGE RÉSERVATION D'APPEL (#/reserver-un-appel) — la section
@@ -23,6 +26,16 @@ import { SITE } from "@/lib/site";
  * enfin l'id "calendly-titre" que la section référence.
  */
 export function CallBookingPage() {
+  const { t, tf } = useT();
+  const { SITE } = useSite();
+  /* Phrase de l'encart téléphonie : la mention traduite ouvre la
+     phrase (marqueur {calendlyMention}) — elle est extraite du
+     résultat pour rester dans son <strong>. */
+  const apresMention = tf(
+    "{calendlyMention} Vous recevez automatiquement le lien de visioconférence après réservation, fourni par Calendly.",
+    { calendlyMention: SITE.calendlyMention },
+  ).replace(SITE.calendlyMention, "");
+
   return (
     <section
       id="appel"
@@ -33,26 +46,23 @@ export function CallBookingPage() {
         <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
           <div>
             <SectionHeading
-              eyebrow="APPEL STRATÉGIQUE · 30 MINUTES"
-              title="Réservez votre créneau en une minute."
+              eyebrow={t("APPEL STRATÉGIQUE · 30 MINUTES")}
+              title={t("Réservez votre créneau en une minute.")}
               tone="dark"
               as="h1"
               titleId="calendly-titre"
             />
             <Reveal direction="up" delay={0.15}>
               <p className="text-body mt-6 max-w-md on-dark-muted">
-                Les créneaux affichés ci-contre sont les vraies disponibilités du
-                calendrier. Choisissez simplement l'heure qui vous convient — l'appel
-                se déroule en visioconférence, à distance.
+                {t("Les créneaux affichés ci-contre sont les vraies disponibilités du calendrier. Choisissez simplement l'heure qui vous convient — l'appel se déroule en visioconférence, à distance.")}
               </p>
             </Reveal>
             <Reveal direction="up" delay={0.2}>
               <div className="mt-7 flex items-start gap-3.5 rounded-2xl border border-[#e4e4e4]/25 bg-[#1c1c1c] px-6 py-5">
                 <Phone className="mt-1 h-5 w-5 shrink-0 text-[#e4e4e4]" aria-hidden="true" />
                 <p className="text-sm leading-relaxed text-[#d9d9d9]">
-                  <strong className="font-medium text-white">{SITE.calendlyMention}</strong>{" "}
-                  Vous recevez automatiquement le lien de visioconférence après
-                  réservation, fourni par Calendly.
+                  <strong className="font-medium text-white">{SITE.calendlyMention}</strong>
+                  {apresMention}
                 </p>
               </div>
             </Reveal>
@@ -60,15 +70,15 @@ export function CallBookingPage() {
               <ul className="mt-6 space-y-2.5 text-sm text-[#c8c8c8]">
                 <li className="flex items-center gap-2.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#e4e4e4]" aria-hidden="true" />
-                  Parler de votre activité et de vos objectifs
+                  {t("Parler de votre activité et de vos objectifs")}
                 </li>
                 <li className="flex items-center gap-2.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#e4e4e4]" aria-hidden="true" />
-                  Identifier la solution adaptée à votre besoin
+                  {t("Identifier la solution adaptée à votre besoin")}
                 </li>
                 <li className="flex items-center gap-2.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#e4e4e4]" aria-hidden="true" />
-                  Repartir avec des prochaines étapes claires
+                  {t("Repartir avec des prochaines étapes claires")}
                 </li>
               </ul>
             </Reveal>

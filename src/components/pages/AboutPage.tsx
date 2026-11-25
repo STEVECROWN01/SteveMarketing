@@ -4,8 +4,11 @@ import React from "react";
 import { PageHero, SectionHeading, CTAButton, CTAIcons, ReassuranceBar, RichText } from "@/components/marketing/Marketing";
 import { Reveal } from "@/components/motion/Reveal";
 import { MonoImage } from "@/components/media/Media";
-import { ABOUT, ABOUT_APPROACH, CTA_LABELS, METHOD, FAQ } from "@/content/site-content";
-import { ASSETS, SITE } from "@/lib/site";
+/* VOLET 18 — i18n : ABOUT / ABOUT_APPROACH / CTA_LABELS / METHOD / FAQ
+   via useContenu, SITE via useSite (mention affichée), textes inline
+   via t()/tf(). */
+import { useContenu, useSite, useT } from "@/i18n";
+import { ASSETS } from "@/lib/site";
 import {
   Accordion,
   AccordionContent,
@@ -15,19 +18,23 @@ import {
 
 /** PAGE À PROPOS — contenu du document éditorial (section 11). */
 export function AboutPage() {
+  const { t, tf } = useT();
+  const { ABOUT, ABOUT_APPROACH, CTA_LABELS, METHOD, FAQ } = useContenu();
+  const { SITE } = useSite();
+
   return (
     <>
       <PageHero
-        eyebrow="QUI SUIS-JE ? · CONCEPTEUR DE SITES WEB"
+        eyebrow={t("QUI SUIS-JE ? · CONCEPTEUR DE SITES WEB")}
         title={ABOUT.title}
-        intro="Concepteur de sites web professionnels orientés conversion. Stratégie, design et parcours de décision — au service de votre activité."
+        intro={t("Concepteur de sites web professionnels orientés conversion. Stratégie, design et parcours de décision — au service de votre activité.")}
       >
         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
             {ABOUT.cta}
           </CTAButton>
           <CTAButton action={{ kind: "page", page: "contact" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
-            Me Contacter
+            {t("Me Contacter")}
           </CTAButton>
         </div>
         <ReassuranceBar className="mt-6" />
@@ -47,7 +54,7 @@ export function AboutPage() {
               <Reveal direction="right">
                 <MonoImage
                   src={ASSETS.aboutPortrait}
-                  alt="Portrait professionnel de Stevens Akpovi, concepteur de sites web professionnels"
+                  alt={t("Portrait professionnel de Stevens Akpovi, concepteur de sites web professionnels")}
                   width={1024}
                   height={1536}
                   className="relative rounded-2xl border border-[#e4e4e4] shadow-[0_30px_60px_-30px_rgba(28,28,28,0.4)]"
@@ -56,7 +63,7 @@ export function AboutPage() {
               <Reveal direction="up" delay={0.2} className="absolute -bottom-12 -right-3 w-[72%] sm:-right-6 lg:-right-8">
                 <MonoImage
                   src={ASSETS.workspace}
-                  alt="Espace de travail de Stevens Akpovi — conception de sites web professionnels"
+                  alt={t("Espace de travail de Stevens Akpovi — conception de sites web professionnels")}
                   width={1536}
                   height={1024}
                   className="rotate-[3deg] rounded-2xl border border-[#e4e4e4] bg-white shadow-[0_25px_50px_-20px_rgba(28,28,28,0.5)]"
@@ -65,7 +72,7 @@ export function AboutPage() {
             </div>
 
             <div>
-              <SectionHeading eyebrow={ABOUT.eyebrow} title="Une conviction simple." tone="light" />
+              <SectionHeading eyebrow={ABOUT.eyebrow} title={t("Une conviction simple.")} tone="light" />
               <Reveal direction="up" delay={0.12}>
                 <RichText text={ABOUT.text} className="text-body mt-6 max-w-xl on-paper-muted" />
               </Reveal>
@@ -77,7 +84,7 @@ export function AboutPage() {
               <Reveal direction="up" delay={0.18}>
                 <div className="mt-9 rounded-2xl bg-[#1c1c1c] px-6 py-6 sm:px-8 sm:py-7">
                   <p className="font-display text-lg font-medium leading-relaxed text-white sm:text-xl">
-                    Faisons connaissance — 30 minutes suffisent pour commencer.
+                    {t("Faisons connaissance — 30 minutes suffisent pour commencer.")}
                   </p>
                   <div className="mt-5">
                     <CTAButton action={{ kind: "calendly" }} variant="primary" icon={CTAIcons.calendar}>
@@ -100,7 +107,7 @@ export function AboutPage() {
             {ABOUT_APPROACH.pillars.map((pillar, i) => (
               <Reveal key={pillar.name} direction="up" delay={i * 0.08} as="article">
                 <div className="h-full rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-7">
-                  <p className="text-eyebrow">Pilier {String(i + 1).padStart(2, "0")}</p>
+                  <p className="text-eyebrow">{tf("Pilier {num}", { num: String(i + 1).padStart(2, "0") })}</p>
                   <h3 className="mt-3 font-display text-xl font-semibold text-white">{pillar.name}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-[#c8c8c8]">{pillar.text}</p>
                 </div>
@@ -119,7 +126,7 @@ export function AboutPage() {
               <Reveal key={step.name} direction="up" delay={i * 0.05} as="li">
                 <div className="h-full rounded-2xl border border-[#e4e4e4] bg-white p-6 sm:p-7">
                   <p className="text-[11px] font-semibold tracking-widest text-[#525252] uppercase">
-                    Étape {String(i + 1).padStart(2, "0")}
+                    {tf("Étape {num}", { num: String(i + 1).padStart(2, "0") })}
                   </p>
                   <h3 className="mt-3 font-display text-lg font-semibold text-[#1c1c1c]">{step.name}</h3>
                   <p className="mt-2.5 text-sm leading-relaxed text-[#555555]">{step.text}</p>
@@ -133,7 +140,7 @@ export function AboutPage() {
       {/* FAQ (extraits pertinents) */}
       <section aria-labelledby="a-propos-faq" className="section-dark py-20 sm:py-24 lg:py-28">
         <div className="container-site">
-          <SectionHeading eyebrow="QUESTIONS FRÉQUENTES" title={FAQ.title} tone="dark" />
+          <SectionHeading eyebrow={t("QUESTIONS FRÉQUENTES")} title={FAQ.title} tone="dark" />
           <Reveal direction="up" delay={0.1}>
             <Accordion type="single" collapsible className="mt-10 flex max-w-3xl flex-col gap-3.5">
               {FAQ.items.slice(0, 4).map((item, i) => (

@@ -12,6 +12,12 @@ import {
 } from "@/lib/validation";
 import { SITE } from "@/lib/site";
 import { useRouter } from "@/components/router-context";
+/* VOLET 18 — i18n : libellés, placeholders, options de select et
+   messages via t()/tf() ; les messages d'erreur sont stockés FR
+   (validation locale ou renvois serveur) et traduits À L'AFFICHAGE —
+   les messages zod dynamiques « Minimum N caractères » sont reconnus
+   par motif (une clé par valeur de N serait impossible). */
+import { useT } from "@/i18n";
 
 /**
  * Formulaire de demande — trois variantes :
@@ -132,6 +138,15 @@ export function LeadForm({ kind }: { kind: FormKind }) {
   const mountedAt = useRef<number>(Date.now());
   const { toast } = useToast();
   const router = useRouter();
+  const { t, tf, lang } = useT();
+
+  /** Traduit un message d'erreur à l'affichage : les messages zod
+   *  dynamiques « Minimum N caractères » (aucune clé possible par N)
+   *  sont reconnus par motif ; les autres passent par t(). */
+  const traduitErreur = (message: string) => {
+    const m = message.match(/^Minimum (\d+) caractères$/);
+    return m && lang === "en" ? `Minimum ${m[1]} characters` : t(message);
+  };
 
   const set = (key: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm((f) => ({ ...f, [key]: e.target.value }));
@@ -204,11 +219,13 @@ export function LeadForm({ kind }: { kind: FormKind }) {
        questions à choix unique composent le contenu transmis (le
        formulaire de référence n'a pas de zone de texte libre). */
     const quoteMessage = [
-      `Pourquoi refaire le site maintenant : ${form.whyNow}`,
-      `Chiffre d'affaires mensuel approximatif : ${form.revenue}`,
-      form.quoteTimeline ? `Échéance envisagée : ${form.quoteTimeline}` : null,
+      tf("Pourquoi refaire le site maintenant : {whyNow}", { whyNow: form.whyNow }),
+      tf("Chiffre d'affaires mensuel approximatif : {revenue}", { revenue: form.revenue }),
+      form.quoteTimeline
+        ? tf("Échéance envisagée : {quoteTimeline}", { quoteTimeline: form.quoteTimeline })
+        : null,
       form.smsConsent
-        ? "Consentement SMS : accepté — des frais de messages et de données peuvent s'appliquer, STOP pour se désinscrire."
+        ? t("Consentement SMS : accepté — des frais de messages et de données peuvent s'appliquer, STOP pour se désinscrire.")
         : null,
     ]
       .filter(Boolean)
@@ -242,7 +259,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
 
       if (!res.ok || !data?.ok) {
         if (data?.fieldErrors) setErrors(data.fieldErrors);
-        throw new Error(data?.error ?? "Erreur inconnue");
+        throw new Error(data?.error ?? t("Erreur inconnue"));
       }
 
       setForm(EMPTY);
@@ -252,9 +269,10 @@ export function LeadForm({ kind }: { kind: FormKind }) {
         // réservation d'appel (demande de l'éditeur, 13/11/2026) —
         // les informations ont déjà été transmises par email.
         toast({
-          title: "Message envoyé",
-          description:
+          title: t("Message envoyé"),
+          description: t(
             "Merci ! Votre message est bien parti. Réservez maintenant votre créneau d'appel stratégique.",
+          ),
         });
         router.navigate("appel");
         return;
@@ -262,9 +280,10 @@ export function LeadForm({ kind }: { kind: FormKind }) {
 
       setDone(true);
       toast({
-        title: "Demande enregistrée",
-        description:
+        title: t("Demande enregistrée"),
+        description: t(
           "Votre demande a bien été envoyée. Un accusé de réception vous est adressé par email.",
+        ),
       });
       // Confirmation visible après enregistrement effectif
       document
@@ -272,13 +291,13 @@ export function LeadForm({ kind }: { kind: FormKind }) {
         ?.scrollIntoView({ behavior: "smooth", block: "center" });
     } catch (err) {
       const message =
-        err instanceof Error && err.message !== "Erreur inconnue"
+        err instanceof Error && err.message !== t("Erreur inconnue")
           ? err.message
-          : `Une erreur est survenue pendant l'envoi. Merci de réessayer ou de m'écrire directement à ${SITE.email}.`;
+          : tf("Une erreur est survenue pendant l'envoi. Merci de réessayer ou de m'écrire directement à {email}.", { email: SITE.email });
       setErrors({ form: message });
       toast({
-        title: "Envoi impossible",
-        description: message,
+        title: t("Envoi impossible"),
+        description: traduitErreur(message),
         variant: "destructive",
       });
     } finally {
@@ -341,15 +360,15 @@ export function LeadForm({ kind }: { kind: FormKind }) {
         <h3
           className={`mt-6 font-display text-2xl font-semibold ${isLight ? "text-[#1c1c1c]" : "text-white"}`}
         >
-          Votre demande a bien été enregistrée.
+          {t("Votre demande a bien été enregistrée.")}
         </h3>
         <p className={`mx-auto mt-4 max-w-md text-[15px] leading-relaxed ${isLight ? "text-[#525252]" : "text-[#c8c8c8]"}`}>
           {isQuote
-            ? "Merci pour votre confiance. Je reviens vers vous très rapidement pour préparer votre devis personnalisé."
-            : "Merci pour votre confiance. Je reviens vers vous très rapidement avec les premières observations sur votre site."}
+            ? t("Merci pour votre confiance. Je reviens vers vous très rapidement pour préparer votre devis personnalisé.")
+            : t("Merci pour votre confiance. Je reviens vers vous très rapidement avec les premières observations sur votre site.")}
         </p>
         <p className={`mt-4 text-sm ${isLight ? "text-[#525252]" : "text-[#c8c8c8]"}`}>
-          Un accusé de réception vous est adressé par email.
+          {t("Un accusé de réception vous est adressé par email.")}
         </p>
         <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
           <button
@@ -364,7 +383,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
                 : "btn-fill min-h-[44px] rounded-full border border-[#e4e4e4]/30 px-6 py-3 text-sm font-medium text-white [&::before]:bg-[#3c3c3c]"
             }
           >
-            <span className="inline-flex items-center">Envoyer Une Autre Demande</span>
+            <span className="inline-flex items-center">{t("Envoyer Une Autre Demande")}</span>
           </button>
         </div>
       </div>
@@ -379,10 +398,10 @@ export function LeadForm({ kind }: { kind: FormKind }) {
       noValidate
       aria-label={
         isContact
-          ? "Formulaire de contact — laissez un message"
+          ? t("Formulaire de contact — laissez un message")
           : isQuote
-            ? "Formulaire de demande de devis personnalisé"
-            : "Formulaire de demande d'audit gratuit"
+            ? t("Formulaire de demande de devis personnalisé")
+            : t("Formulaire de demande d'audit gratuit")
       }
       className={
         isQuote
@@ -415,7 +434,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
               <label htmlFor={`${kind}-field-firstName`} className={labelBase}>
-                Prénom <span className="text-[#2c3345]">*</span>
+                {t("Prénom")} <span className="text-[#2c3345]">*</span>
               </label>
               <input
                 id={`${kind}-field-firstName`}
@@ -427,17 +446,17 @@ export function LeadForm({ kind }: { kind: FormKind }) {
                 aria-invalid={Boolean(errors.firstName)}
                 aria-describedby={errors.firstName ? `${kind}-error-firstName` : undefined}
                 className={inputBase}
-                placeholder="Prénom"
+                placeholder={t("Prénom")}
               />
               {errors.firstName && (
                 <p id={`${kind}-error-firstName`} className={errorBase}>
-                  {errors.firstName}
+                  {traduitErreur(errors.firstName)}
                 </p>
               )}
             </div>
             <div>
               <label htmlFor={`${kind}-field-lastName`} className={labelBase}>
-                Nom <span className="text-[#2c3345]">*</span>
+                {t("Nom")} <span className="text-[#2c3345]">*</span>
               </label>
               <input
                 id={`${kind}-field-lastName`}
@@ -449,11 +468,11 @@ export function LeadForm({ kind }: { kind: FormKind }) {
                 aria-invalid={Boolean(errors.lastName)}
                 aria-describedby={errors.lastName ? `${kind}-error-lastName` : undefined}
                 className={inputBase}
-                placeholder="Nom"
+                placeholder={t("Nom")}
               />
               {errors.lastName && (
                 <p id={`${kind}-error-lastName`} className={errorBase}>
-                  {errors.lastName}
+                  {traduitErreur(errors.lastName)}
                 </p>
               )}
             </div>
@@ -462,7 +481,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
           {/* Email professionnel — icône enveloppe dans le champ (ref.) */}
           <div>
             <label htmlFor={`${kind}-field-email`} className={labelBase}>
-              Email professionnel <span className="text-[#2c3345]">*</span>
+              {t("Email professionnel")} <span className="text-[#2c3345]">*</span>
             </label>
             <div className="relative">
               <Mail
@@ -481,12 +500,12 @@ export function LeadForm({ kind }: { kind: FormKind }) {
                 aria-invalid={Boolean(errors.email)}
                 aria-describedby={errors.email ? `${kind}-error-email` : undefined}
                 className={`${inputBase} pl-[42px]`}
-                placeholder="Email"
+                placeholder={t("Email")}
               />
             </div>
             {errors.email && (
               <p id={`${kind}-error-email`} className={errorBase}>
-                {errors.email}
+                {traduitErreur(errors.email)}
               </p>
             )}
           </div>
@@ -494,7 +513,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
           {/* Téléphone */}
           <div>
             <label htmlFor={`${kind}-field-phone`} className={labelBase}>
-              Téléphone <span className="text-[#2c3345]">*</span>
+              {t("Téléphone")} <span className="text-[#2c3345]">*</span>
             </label>
             <input
               id={`${kind}-field-phone`}
@@ -508,11 +527,11 @@ export function LeadForm({ kind }: { kind: FormKind }) {
               aria-invalid={Boolean(errors.phone)}
               aria-describedby={errors.phone ? `${kind}-error-phone` : undefined}
               className={inputBase}
-              placeholder="Téléphone"
+              placeholder={t("Téléphone")}
             />
             {errors.phone && (
               <p id={`${kind}-error-phone`} className={errorBase}>
-                {errors.phone}
+                {traduitErreur(errors.phone)}
               </p>
             )}
           </div>
@@ -527,20 +546,18 @@ export function LeadForm({ kind }: { kind: FormKind }) {
                 setForm((f) => ({ ...f, smsConsent: e.target.checked }));
               }}
               className="sher-choice-input"
-              aria-label="Consentement à recevoir des messages textes de Stevens Akpovi"
+              aria-label={t("Consentement à recevoir des messages textes de Stevens Akpovi")}
             />
             <span className="sher-choice-dot sher-choice-dot--check" aria-hidden="true" />
             <span className="text-[15px] leading-snug text-[#525252]">
-              En cochant cette case, j'accepte de recevoir des messages textes de Stevens
-              Akpovi. Des frais de messages et de données peuvent s'appliquer. Répondez
-              STOP pour vous désinscrire.
+              {t("En cochant cette case, j'accepte de recevoir des messages textes de Stevens Akpovi. Des frais de messages et de données peuvent s'appliquer. Répondez STOP pour vous désinscrire.")}
             </span>
           </label>
 
           {/* Question 1 — pourquoi maintenant (choix unique) */}
           <fieldset>
             <legend className={`${labelBase} px-0`}>
-              Pourquoi voulez-vous refaire votre site web maintenant&nbsp;?{" "}
+              {t("Pourquoi voulez-vous refaire votre site web maintenant\u00A0?")}{" "}
               <span className="text-[#2c3345]">*</span>
             </legend>
             <div className="mt-1 flex flex-col">
@@ -556,13 +573,13 @@ export function LeadForm({ kind }: { kind: FormKind }) {
                     aria-invalid={Boolean(errors.whyNow)}
                   />
                   <span className="sher-choice-dot sher-choice-dot--radio" aria-hidden="true" />
-                  <span className="text-[15px] text-[#2c3345]">{option}</span>
+                  <span className="text-[15px] text-[#2c3345]">{t(option)}</span>
                 </label>
               ))}
             </div>
             {errors.whyNow && (
               <p id={`${kind}-error-whyNow`} className={errorBase} role="alert">
-                {errors.whyNow}
+                {traduitErreur(errors.whyNow)}
               </p>
             )}
           </fieldset>
@@ -570,7 +587,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
           {/* Question 2 — chiffre d'affaires mensuel (choix unique) */}
           <fieldset>
             <legend className={`${labelBase} px-0`}>
-              Quel est votre chiffre d'affaires mensuel approximatif&nbsp;?{" "}
+              {t("Quel est votre chiffre d'affaires mensuel approximatif\u00A0?")}{" "}
               <span className="text-[#2c3345]">*</span>
             </legend>
             <div className="mt-1 flex flex-col">
@@ -586,13 +603,13 @@ export function LeadForm({ kind }: { kind: FormKind }) {
                     aria-invalid={Boolean(errors.revenue)}
                   />
                   <span className="sher-choice-dot sher-choice-dot--radio" aria-hidden="true" />
-                  <span className="text-[15px] text-[#2c3345]">{option}</span>
+                  <span className="text-[15px] text-[#2c3345]">{t(option)}</span>
                 </label>
               ))}
             </div>
             {errors.revenue && (
               <p id={`${kind}-error-revenue`} className={errorBase} role="alert">
-                {errors.revenue}
+                {traduitErreur(errors.revenue)}
               </p>
             )}
           </fieldset>
@@ -600,7 +617,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
           {/* Question 3 — échéance (choix unique, facultatif) */}
           <fieldset>
             <legend className={`${labelBase} px-0`}>
-              Quand envisagez-vous de refaire votre site web&nbsp;?
+              {t("Quand envisagez-vous de refaire votre site web\u00A0?")}
             </legend>
             <div className="mt-1 flex flex-col">
               {QUOTE_TIMELINES.map((option) => (
@@ -614,7 +631,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
                     className="sher-choice-input"
                   />
                   <span className="sher-choice-dot sher-choice-dot--radio" aria-hidden="true" />
-                  <span className="text-[15px] text-[#2c3345]">{option}</span>
+                  <span className="text-[15px] text-[#2c3345]">{t(option)}</span>
                 </label>
               ))}
             </div>
@@ -627,7 +644,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
               <label htmlFor={`${kind}-field-name`} className={labelBase}>
-                Nom complet <span className="text-white">*</span>
+                {t("Nom complet")} <span className="text-white">*</span>
               </label>
               <input
                 id={`${kind}-field-name`}
@@ -639,17 +656,17 @@ export function LeadForm({ kind }: { kind: FormKind }) {
                 aria-invalid={Boolean(errors.name)}
                 aria-describedby={errors.name ? `${kind}-error-name` : undefined}
                 className={inputBase}
-                placeholder="Votre nom et prénom"
+                placeholder={t("Votre nom et prénom")}
               />
               {errors.name && (
                 <p id={`${kind}-error-name`} className={errorBase}>
-                  {errors.name}
+                  {traduitErreur(errors.name)}
                 </p>
               )}
             </div>
             <div>
               <label htmlFor={`${kind}-field-phone`} className={labelBase}>
-                Téléphone <span className="text-white">*</span>
+                {t("Téléphone")} <span className="text-white">*</span>
               </label>
               <input
                 id={`${kind}-field-phone`}
@@ -663,11 +680,11 @@ export function LeadForm({ kind }: { kind: FormKind }) {
                 aria-invalid={Boolean(errors.phone)}
                 aria-describedby={errors.phone ? `${kind}-error-phone` : undefined}
                 className={inputBase}
-                placeholder="+229 …"
+                placeholder={t("+229 …")}
               />
               {errors.phone && (
                 <p id={`${kind}-error-phone`} className={errorBase}>
-                  {errors.phone}
+                  {traduitErreur(errors.phone)}
                 </p>
               )}
             </div>
@@ -677,7 +694,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
           <div className="grid gap-5 sm:grid-cols-2">
             <div>
               <label htmlFor={`${kind}-field-email`} className={labelBase}>
-                Email professionnel <span className="text-white">*</span>
+                {t("Email professionnel")} <span className="text-white">*</span>
               </label>
               {/* Icône enveloppe au début du champ — comme le champ
                   email du formulaire de devis (demande de
@@ -700,18 +717,18 @@ export function LeadForm({ kind }: { kind: FormKind }) {
                   aria-describedby={errors.email ? `${kind}-error-email` : undefined}
                   className={inputBase}
                   style={{ paddingLeft: 42 }}
-                  placeholder="vous@exemple.com"
+                  placeholder={t("vous@exemple.com")}
                 />
               </div>
               {errors.email && (
                 <p id={`${kind}-error-email`} className={errorBase}>
-                  {errors.email}
+                  {traduitErreur(errors.email)}
                 </p>
               )}
             </div>
             <div>
               <label htmlFor={`${kind}-field-company`} className={labelBase}>
-                Entreprise <span className="text-white">*</span>
+                {t("Entreprise")} <span className="text-white">*</span>
               </label>
               <input
                 id={`${kind}-field-company`}
@@ -723,11 +740,11 @@ export function LeadForm({ kind }: { kind: FormKind }) {
                 aria-invalid={Boolean(errors.company)}
                 aria-describedby={errors.company ? `${kind}-error-company` : undefined}
                 className={inputBase}
-                placeholder="Nom de votre entreprise ou activité"
+                placeholder={t("Nom de votre entreprise ou activité")}
               />
               {errors.company && (
                 <p id={`${kind}-error-company`} className={errorBase}>
-                  {errors.company}
+                  {traduitErreur(errors.company)}
                 </p>
               )}
             </div>
@@ -736,7 +753,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
           {/* Liste déroulante — découverte */}
           <div>
             <label htmlFor={`${kind}-field-discovery`} className={labelBase}>
-              Comment m'avez-vous découvert&nbsp;?{" "}
+              {t("Comment m'avez-vous découvert\u00A0?")}{" "}
               <span className="text-white">*</span>
             </label>
             <div className="relative">
@@ -749,10 +766,10 @@ export function LeadForm({ kind }: { kind: FormKind }) {
                 aria-invalid={Boolean(errors.discovery)}
                 className={`${inputBase} appearance-none pr-[42px]`}
               >
-                <option value="">Sélectionnez…</option>
+                <option value="">{t("Sélectionnez…")}</option>
                 {DISCOVERY_SOURCES.map((s) => (
                   <option key={s} value={s}>
-                    {s}
+                    {t(s)}
                   </option>
                 ))}
               </select>
@@ -763,7 +780,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
             </div>
             {errors.discovery && (
               <p id={`${kind}-error-discovery`} className={errorBase}>
-                {errors.discovery}
+                {traduitErreur(errors.discovery)}
               </p>
             )}
           </div>
@@ -771,7 +788,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
           {/* Zone de texte — message */}
           <div>
             <label htmlFor={`${kind}-field-message`} className={labelBase}>
-              Comment puis-je vous aider&nbsp;?{" "}
+              {t("Comment puis-je vous aider\u00A0?")}{" "}
               <span className="text-white">*</span>
             </label>
             <textarea
@@ -784,11 +801,11 @@ export function LeadForm({ kind }: { kind: FormKind }) {
               aria-invalid={Boolean(errors.message)}
               aria-describedby={errors.message ? `${kind}-error-message` : undefined}
               className={`${inputBase} min-h-[150px] resize-y`}
-              placeholder="Décrivez votre demande…"
+              placeholder={t("Décrivez votre demande…")}
             />
             {errors.message && (
               <p id={`${kind}-error-message`} className={errorBase}>
-                {errors.message}
+                {traduitErreur(errors.message)}
               </p>
             )}
           </div>
@@ -798,7 +815,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
         <div className="grid gap-5 sm:grid-cols-2">
           <div>
             <label htmlFor={`${kind}-field-name`} className={labelBase}>
-              Nom complet{" "}
+              {t("Nom complet")}{" "}
               <span className="text-[#e4e4e4]">*</span>
             </label>
             <input
@@ -811,18 +828,18 @@ export function LeadForm({ kind }: { kind: FormKind }) {
               aria-invalid={Boolean(errors.name)}
               aria-describedby={errors.name ? `${kind}-error-name` : undefined}
               className={inputBase}
-              placeholder="Votre nom et prénom"
+              placeholder={t("Votre nom et prénom")}
             />
             {errors.name && (
               <p id={`${kind}-error-name`} className={errorBase}>
-                {errors.name}
+                {traduitErreur(errors.name)}
               </p>
             )}
           </div>
 
           <div>
             <label htmlFor={`${kind}-field-email`} className={labelBase}>
-              Email <span className="text-[#e4e4e4]">*</span>
+              {t("Email")} <span className="text-[#e4e4e4]">*</span>
             </label>
             <input
               id={`${kind}-field-email`}
@@ -836,18 +853,18 @@ export function LeadForm({ kind }: { kind: FormKind }) {
               aria-invalid={Boolean(errors.email)}
               aria-describedby={errors.email ? `${kind}-error-email` : undefined}
               className={inputBase}
-              placeholder="vous@exemple.com"
+              placeholder={t("vous@exemple.com")}
             />
             {errors.email && (
               <p id={`${kind}-error-email`} className={errorBase}>
-                {errors.email}
+                {traduitErreur(errors.email)}
               </p>
             )}
           </div>
 
           <div>
             <label htmlFor={`${kind}-field-phone`} className={labelBase}>
-              Téléphone <span className="text-[#c8c8c8]/60">(optionnel)</span>
+              {t("Téléphone")} <span className="text-[#c8c8c8]/60">{t("(optionnel)")}</span>
             </label>
             <input
               id={`${kind}-field-phone`}
@@ -860,18 +877,18 @@ export function LeadForm({ kind }: { kind: FormKind }) {
               aria-invalid={Boolean(errors.phone)}
               aria-describedby={errors.phone ? `${kind}-error-phone` : undefined}
               className={inputBase}
-              placeholder="+229 …"
+              placeholder={t("+229 …")}
             />
             {errors.phone && (
               <p id={`${kind}-error-phone`} className={errorBase}>
-                {errors.phone}
+                {traduitErreur(errors.phone)}
               </p>
             )}
           </div>
 
           <div>
             <label htmlFor={`${kind}-field-website`} className={labelBase}>
-              URL de votre site actuel{" "}
+              {t("URL de votre site actuel")}{" "}
               <span className="text-[#e4e4e4]">*</span>
             </label>
             <input
@@ -885,18 +902,18 @@ export function LeadForm({ kind }: { kind: FormKind }) {
               aria-invalid={Boolean(errors.website)}
               aria-describedby={errors.website ? `${kind}-error-website` : undefined}
               className={inputBase}
-              placeholder="https://votre-site.com"
+              placeholder={t("https://votre-site.com")}
             />
             {errors.website && (
               <p id={`${kind}-error-website`} className={errorBase}>
-                {errors.website}
+                {traduitErreur(errors.website)}
               </p>
             )}
           </div>
 
           <div>
             <label htmlFor={`${kind}-field-service`} className={labelBase}>
-              Service souhaité <span className="text-[#e4e4e4]">*</span>
+              {t("Service souhaité")} <span className="text-[#e4e4e4]">*</span>
             </label>
             <select
               id={`${kind}-field-service`}
@@ -907,20 +924,20 @@ export function LeadForm({ kind }: { kind: FormKind }) {
               aria-invalid={Boolean(errors.serviceType)}
               className={`${inputBase} appearance-none`}
             >
-              <option value="">— Choisir —</option>
+              <option value="">{t("— Choisir —")}</option>
               {SERVICE_TYPES.map((s) => (
                 <option key={s} value={s}>
-                  {s}
+                  {t(s)}
                 </option>
               ))}
             </select>
-            {errors.serviceType && <p className={errorBase}>{errors.serviceType}</p>}
+            {errors.serviceType && <p className={errorBase}>{traduitErreur(errors.serviceType)}</p>}
           </div>
 
           <div>
             <label htmlFor={`${kind}-field-budget`} className={labelBase}>
-              Budget envisagé{" "}
-              <span className="text-[#c8c8c8]/60">(optionnel)</span>
+              {t("Budget envisagé")}{" "}
+              <span className="text-[#c8c8c8]/60">{t("(optionnel)")}</span>
             </label>
             <select
               id={`${kind}-field-budget`}
@@ -929,10 +946,10 @@ export function LeadForm({ kind }: { kind: FormKind }) {
               onChange={set("budget")}
               className={`${inputBase} appearance-none`}
             >
-              <option value="">— Choisir —</option>
+              <option value="">{t("— Choisir —")}</option>
               {BUDGET_RANGES.map((b) => (
                 <option key={b} value={b}>
-                  {b}
+                  {t(b)}
                 </option>
               ))}
             </select>
@@ -940,8 +957,8 @@ export function LeadForm({ kind }: { kind: FormKind }) {
 
           <div>
             <label htmlFor={`${kind}-field-timeline`} className={labelBase}>
-              Échéance souhaitée{" "}
-              <span className="text-[#c8c8c8]/60">(optionnel)</span>
+              {t("Échéance souhaitée")}{" "}
+              <span className="text-[#c8c8c8]/60">{t("(optionnel)")}</span>
             </label>
             <select
               id={`${kind}-field-timeline`}
@@ -950,10 +967,10 @@ export function LeadForm({ kind }: { kind: FormKind }) {
               onChange={set("timeline")}
               className={`${inputBase} appearance-none`}
             >
-              <option value="">— Choisir —</option>
-              {TIMELINES.map((t) => (
-                <option key={t} value={t}>
-                  {t}
+              <option value="">{t("— Choisir —")}</option>
+              {TIMELINES.map((option) => (
+                <option key={option} value={option}>
+                  {t(option)}
                 </option>
               ))}
             </select>
@@ -961,7 +978,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
 
           <div className="sm:col-span-2">
             <label htmlFor={`${kind}-field-message`} className={labelBase}>
-              Votre site et vos objectifs{" "}
+              {t("Votre site et vos objectifs")}{" "}
               <span className="text-[#e4e4e4]">*</span>
             </label>
             <textarea
@@ -974,11 +991,11 @@ export function LeadForm({ kind }: { kind: FormKind }) {
               aria-invalid={Boolean(errors.message)}
               aria-describedby={errors.message ? `${kind}-error-message` : undefined}
               className={`${inputBase} min-h-[140px] resize-y py-3.5`}
-              placeholder="Indiquez l'adresse de votre site et ce qui vous préoccupe aujourd'hui…"
+              placeholder={t("Indiquez l'adresse de votre site et ce qui vous préoccupe aujourd'hui…")}
             />
             {errors.message && (
               <p id={`${kind}-error-message`} className={errorBase}>
-                {errors.message}
+                {traduitErreur(errors.message)}
               </p>
             )}
           </div>
@@ -999,7 +1016,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
           }
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-          {errors.form}
+          {traduitErreur(errors.form)}
         </p>
       )}
 
@@ -1018,10 +1035,10 @@ export function LeadForm({ kind }: { kind: FormKind }) {
             {submitting ? (
               <span className="inline-flex items-center gap-2.5">
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                Envoi en cours…
+                {t("Envoi en cours…")}
               </span>
             ) : (
-              <span className="inline-flex items-center gap-2.5">Envoyer Mon Message</span>
+              <span className="inline-flex items-center gap-2.5">{t("Envoyer Mon Message")}</span>
             )}
           </button>
         </div>
@@ -1047,18 +1064,17 @@ export function LeadForm({ kind }: { kind: FormKind }) {
             {submitting ? (
               <span className="inline-flex items-center gap-2.5">
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                Envoi en cours…
+                {t("Envoi en cours…")}
               </span>
             ) : (
-              <span className="inline-flex items-center gap-2.5">Obtenir Un Devis</span>
+              <span className="inline-flex items-center gap-2.5">{t("Obtenir Un Devis")}</span>
             )}
           </button>
         </div>
       ) : (
         <div className="mt-7 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
           <p className="text-xs leading-relaxed text-[#c8c8c8]/80">
-            Vos informations servent uniquement à traiter votre demande d'audit et ne
-            sont jamais partagées.
+            {t("Vos informations servent uniquement à traiter votre demande d'audit et ne sont jamais partagées.")}
           </p>
           <button
             type="submit"
@@ -1068,10 +1084,10 @@ export function LeadForm({ kind }: { kind: FormKind }) {
             {submitting ? (
               <span className="inline-flex items-center gap-2.5">
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                Envoi en cours…
+                {t("Envoi en cours…")}
               </span>
             ) : (
-              <span className="inline-flex items-center gap-2.5">Envoyer Ma Demande D'Audit</span>
+              <span className="inline-flex items-center gap-2.5">{t("Envoyer Ma Demande D'Audit")}</span>
             )}
           </button>
         </div>

@@ -22,6 +22,12 @@ import { formatCurrency, totalDocument, numeroDevisVersFacture } from "@/lib/doc
  * La facture reprend exactement les prestations et le total du devis
  * (règle D→F : le préfixe D est remplacé par F, les chiffres restent)
  * et porte son cachet « PAYÉ » lorsque le statut est « Payé ».
+ *
+ * VOLET 18 — BILINGUE FR/EN : la facture ENREGISTRÉE hérite de la
+ * langue du devis d'origine (base.langue) ; au moment de générer,
+ * un menu propose la VERSION DU PDF (française / anglaise) — la
+ * version choisie (`langueSortie` envoyée à /api/documents/pdf)
+ * n'écrase JAMAIS la langue enregistrée de la facture.
  */
 export function EspaceFacture({
   document: base,
@@ -45,8 +51,14 @@ export function EspaceFacture({
     base.docType === "facture" && base.datePaiement ? base.datePaiement : new Date().toISOString().slice(0, 10),
   );
   const [enCours, setEnCours] = useState(false);
+  /* VOLET 18 — menu « version du PDF » ouvert par le bouton de
+   * génération. */
+  const [choixLangue, setChoixLangue] = useState(false);
 
-  async function genererFacture() {
+  /* VOLET 18 — `langueSortie` : version du PDF téléchargé (et de sa
+   * copie email) ; l'enregistrement garde la langue de la facture
+   * (celle du devis d'origine). */
+  async function genererFacture(langueSortie: "fr" | "en") {
     if (enCours) return;
     setEnCours(true);
     try {
@@ -57,6 +69,9 @@ export function EspaceFacture({
             numero: numeroFacture,
             id: `facture-${numeroFacture}`.toLowerCase(),
             devisSource: base.numero,
+            /* VOLET 18 — la facture hérite de la langue du devis
+             * (donnée persistée, défaut "fr"). */
+            langue: base.langue ?? "fr",
             statutPaiement,
             datePaiement: statutPaiement === "Payé" ? datePaiement : undefined,
             phases: undefined,
@@ -73,7 +88,7 @@ export function EspaceFacture({
       const res = await fetch("/api/documents/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ document: facture, enregistrer: true, envoyerEmail: true }),
+        body: JSON.stringify({ document: facture, langueSortie, enregistrer: true, envoyerEmail: true }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
@@ -92,7 +107,7 @@ export function EspaceFacture({
       URL.revokeObjectURL(url);
       toast({
         title: `Facture ${numeroFacture} ${base.docType === "facture" ? "mise à jour" : "générée"}`,
-        description: `Téléchargement lancé — la facture est enregistrée${estDevis ? ` et liée au devis ${base.numero}` : ""}.`,
+        description: `Téléchargement lancé (version ${langueSortie === "en" ? "anglaise" : "française"}) — la facture est enregistrée${estDevis ? ` et liée au devis ${base.numero}` : ""}.`,
       });
       onRafraichir();
       onFerme(true);
@@ -107,9 +122,16 @@ export function EspaceFacture({
     }
   }
 
+  /* VOLET 18 — choix du menu → génération de la facture. */
+  function lancerFacture(langue: "fr" | "en") {
+    setChoixLangue(false);
+    void genererFacture(langue);
+  }
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+    <>
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-label={`${estDevis ? `Générer la facture du devis ${base.numero}` : `Modifier la facture ${base.numero}`}`}
@@ -157,7 +179,9 @@ export function EspaceFacture({
         </p>
         <div className="mt-6 flex flex-wrap justify-end gap-3">
           <BoutonAction onClick={() => onFerme()}>Annuler</BoutonAction>
-          <BoutonAction variant="principal" onClick={genererFacture} disabled={enCours}>
+          {/* VOLET 18 — le bouton ouvre le menu « version du PDF »
+              (française / anglaise) avant de générer. */}
+          <BoutonAction variant="principal" onClick={() => setChoixLangue(true)} disabled={enCours}>
             {enCours ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -172,6 +196,46 @@ export function EspaceFacture({
           </BoutonAction>
         </div>
       </div>
-    </div>
+      </div>
+
+      {/* ---------- VOLET 18 : version du PDF de la facture ---------- */}
+      {choixLangue ? (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Version du PDF de la facture"
+          onClick={(e) => e.target === e.currentTarget && setChoixLangue(false)}
+        >
+          <div className="w-full max-w-sm rounded-2xl border border-[#e4e4e4]/15 bg-[#232323] p-6">
+            <p className="text-eyebrow">Facture {numeroFacture}</p>
+            <h3 className="mt-1 font-display text-xl font-semibold text-white">Version du PDF</h3>
+            <p className="mt-1 text-sm text-[#c8c8c8]">
+              {base.client.nom} — la facture enregistrée reste en{" "}
+              {(base.langue ?? "fr") === "en" ? "anglais" : "français"} (langue du devis d'origine).
+            </p>
+            <div className="mt-5 space-y-3">
+              <BoutonAction
+                className="w-full"
+                variant={(base.langue ?? "fr") === "fr" ? "principal" : "secondaire"}
+                onClick={() => lancerFacture("fr")}
+              >
+                Version française
+              </BoutonAction>
+              <BoutonAction
+                className="w-full"
+                variant={(base.langue ?? "fr") === "en" ? "principal" : "secondaire"}
+                onClick={() => lancerFacture("en")}
+              >
+                Version anglaise
+              </BoutonAction>
+            </div>
+            <div className="mt-5 flex justify-end">
+              <BoutonAction onClick={() => setChoixLangue(false)}>Annuler</BoutonAction>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }

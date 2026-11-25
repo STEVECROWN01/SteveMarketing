@@ -5,6 +5,10 @@ import { ArrowRight } from "lucide-react";
 import { useRouter } from "@/components/router-context";
 import { Reveal } from "@/components/motion/Reveal";
 import { MonoImage, DirectionalIcon } from "@/components/media/Media";
+/* VOLET 18 — i18n : libellés du bouton et attributs alt/aria-label
+   interpolés via t()/tf() — les données du projet viennent du parent
+   (déjà traduites quand il utilise useSite()). */
+import { useT } from "@/i18n";
 
 /**
  * Carte de réalisation — présentation calquée sur la section
@@ -29,6 +33,7 @@ export interface Project {
 
 export function ProjectCard({ project, index }: { project: Project; index: number }) {
   const router = useRouter();
+  const { t, tf } = useT();
 
   const goProject = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -40,7 +45,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
       <a
         href={`#/projet/${project.id}`}
         onClick={goProject}
-        aria-label={`Voir Le Projet — ${project.name}`}
+        aria-label={tf("Voir Le Projet — {name}", { name: project.name })}
         className="group media-group flex h-full flex-col overflow-hidden rounded-2xl border border-[#e4e4e4] bg-white transition-all duration-300 hover:border-[#1c1c1c]/25 hover:shadow-[0_30px_60px_-35px_rgba(28,28,28,0.35)]"
       >
         {/* Capture du site — COUVRE LA CARTE de gauche à droite et
@@ -52,7 +57,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
         <MonoImage
           src={project.desktop}
           src2x={project.desktop2x}
-          alt={`Aperçu du site ${project.name}`}
+          alt={tf("Aperçu du site {name}", { name: project.name })}
           width={1440}
           height={900}
           sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 400px"
@@ -65,7 +70,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
         <div className="flex flex-1 flex-col p-4 sm:p-5">
           <div className="flex items-end justify-between gap-4">
             <div className="min-w-0">
-              <p className="text-eyebrow">Projet {String(index + 1).padStart(2, "0")}</p>
+              <p className="text-eyebrow">{tf("Projet {num}", { num: String(index + 1).padStart(2, "0") })}</p>
               <h3 className="text-card-title mt-2 text-[#1c1c1c]">{project.name}</h3>
               <p className="mt-1 text-sm text-[#525252]">{project.category}</p>
             </div>
@@ -79,7 +84,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
               aria-hidden="true"
               className="group/btn btn-fill inline-flex min-h-[48px] items-center justify-center gap-2.5 rounded-full border border-[#e4e4e4] bg-white px-6 py-3.5 text-sm font-medium tracking-[0.01em] text-[#1c1c1c] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-[#c9baac] [&::before]:bg-[#e4e4e4]"
             >
-              Voir Le Projet
+              {t("Voir Le Projet")}
               <ArrowRight
                 className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1"
               />

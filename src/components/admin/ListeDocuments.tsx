@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from "react";
 import { Download, Eye, FileText, Loader2, Pencil, Receipt, Trash2, X } from "lucide-react";
 import { ApercuDocument } from "./ApercuDocument";
-import { Carte, Pastille } from "./elements";
+import { BoutonAction, Carte, Pastille } from "./elements";
 import type { DocumentRecord, DocType } from "@/lib/documents/types";
 import { LABELS_DOC } from "@/lib/documents/types";
 import { estPropositionV2 } from "@/lib/documents/proposition";
@@ -23,6 +23,14 @@ import { formatDate, formatCurrency, totalDocument, fmtMontantSimple } from "@/l
  *    espace de facturation pour facture) ;
  *  - reçue (devis) : génération de la facture correspondante ;
  *  - corbeille : suppression du stockage.
+ *
+ * VOLET 18 — TÉLÉCHARGEMENT BILINGUE : le bouton de téléchargement
+ * d'un DEVIS ou d'une FACTURE ouvre d'abord un menu « Version du
+ * document » (française / anglaise) — la version choisie est une
+ * VERSION DE SORTIE ({ ...record, langue }) : rien n'est
+ * enregistré, la langue du document stocké n'est jamais écrasée.
+ * Les PROPOSITIONS se téléchargent directement (français seul,
+ * comportement inchangé).
  */
 
 export function ListeDocuments({
@@ -46,6 +54,9 @@ export function ListeDocuments({
 }) {
   const [apercu, setApercu] = useState<ToutDocument | null>(null);
   const [enCours, setEnCours] = useState<string | null>(null);
+  /* VOLET 18 — document (devis/facture) dont l'utilisateur choisit
+   * la version du PDF à télécharger. */
+  const [choixLangue, setChoixLangue] = useState<DocumentRecord | null>(null);
 
   /* ORDRE DE CRÉATION : du premier au dernier document créé. */
   const visibles = useMemo(
@@ -93,13 +104,31 @@ export function ListeDocuments({
     }
   }
 
-  async function telechargerExistant(record: ToutDocument) {
+  async function telechargerExistant(record: ToutDocument, langue?: "fr" | "en") {
     try {
-      await telecharger(record, false);
-      toast({ title: `${record.numero} téléchargé` });
+      /* VOLET 18 — version de sortie : le record envoyé porte la
+       * langue CHOISIE (rien n'est enregistré ici — la langue du
+       * document stocké n'est jamais écrasée) ; sans choix
+       * (propositions), le document part tel quel. */
+      await telecharger(langue ? ({ ...record, langue } as ToutDocument) : record, false);
+      toast({
+        title: `${record.numero} téléchargé`,
+        ...(langue
+          ? { description: langue === "en" ? "Version anglaise du PDF." : "Version française du PDF." }
+          : {}),
+      });
     } catch (e) {
       toast({ title: "Téléchargement impossible", description: e instanceof Error ? e.message : undefined, variant: "destructive" });
     }
+  }
+
+  /* VOLET 18 — choix du menu → téléchargement dans la version
+   * choisie (le menu se ferme immédiatement, le bouton de ligne
+   * porte son propre état de chargement). */
+  function lancerTelechargement(langue: "fr" | "en") {
+    const record = choixLangue;
+    setChoixLangue(null);
+    if (record) void telechargerExistant(record, langue);
   }
 
   async function supprimer(record: ToutDocument) {
@@ -222,7 +251,14 @@ export function ListeDocuments({
                         </button>
                         <button
                           type="button"
-                          onClick={() => telechargerExistant(d)}
+                          onClick={() =>
+                            /* VOLET 18 — devis/facture : menu « version du
+                             * document » (FR/EN) ; proposition : français
+                             * seul, téléchargement direct. */
+                            d.docType === "proposition"
+                              ? telechargerExistant(d)
+                              : setChoixLangue(d as DocumentRecord)
+                          }
                           disabled={enCours === `${d.numero}-pdf`}
                           className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-[#e4e4e4] disabled:opacity-50"
                           aria-label={`Télécharger ${d.numero}`}
@@ -277,6 +313,45 @@ export function ListeDocuments({
           </table>
         </Carte>
       )}
+
+      {/* ---------- VOLET 18 : version du PDF (devis/factures) ---------- */}
+      {choixLangue ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Version du PDF — ${choixLangue.numero}`}
+          onClick={(e) => e.target === e.currentTarget && setChoixLangue(null)}
+        >
+          <div className="w-full max-w-sm rounded-2xl border border-[#e4e4e4]/15 bg-[#232323] p-6">
+            <p className="text-eyebrow">Téléchargement du PDF</p>
+            <h3 className="mt-1 font-display text-xl font-semibold text-white">Version du document</h3>
+            <p className="mt-1 text-sm text-[#c8c8c8]">
+              {choixLangue.numero} — {choixLangue.client.nom} · la langue enregistrée reste le{" "}
+              {(choixLangue.langue ?? "fr") === "en" ? "anglais" : "français"}.
+            </p>
+            <div className="mt-5 space-y-3">
+              <BoutonAction
+                className="w-full"
+                variant={(choixLangue.langue ?? "fr") === "fr" ? "principal" : "secondaire"}
+                onClick={() => lancerTelechargement("fr")}
+              >
+                Version française
+              </BoutonAction>
+              <BoutonAction
+                className="w-full"
+                variant={(choixLangue.langue ?? "fr") === "en" ? "principal" : "secondaire"}
+                onClick={() => lancerTelechargement("en")}
+              >
+                Version anglaise
+              </BoutonAction>
+            </div>
+            <div className="mt-5 flex justify-end">
+              <BoutonAction onClick={() => setChoixLangue(null)}>Annuler</BoutonAction>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {/* ---------- Aperçu plein écran ---------- */}
       {apercu ? (

@@ -10,6 +10,7 @@ import React, {
   useSyncExternalStore,
 } from "react";
 import { PAGES, PROJECTS, type PageKey } from "@/lib/site";
+import { traduit, traduitModele, useLang } from "@/i18n";
 
 /**
  * Routeur applicatif du site (pages virtuelles dans la route `/`).
@@ -181,6 +182,11 @@ export function RouterProvider({ children }: { children: React.ReactNode }) {
   // Le hash est un système externe → useSyncExternalStore (SSR-safe)
   const hash = useSyncExternalStore(subscribe, getHash, getServerHash);
   const state = useMemo(() => parseHash(hash), [hash]);
+  /* VOLET 18 — les TITRES et méta descriptions de pages suivent la
+     LANGUE courante (PAGES est traduit via traduit()) : le changement
+     de langue ré-applique les méta de la page visualisée — la garde
+     anti-écrasement ré-écrit désormais les valeurs traduites. */
+  const { lang } = useLang();
 
   // Titre + méta description dynamiques, puis défilement après changement
   // de page.
@@ -217,9 +223,9 @@ export function RouterProvider({ children }: { children: React.ReactNode }) {
       if (typeof document !== "undefined") {
         applyMeta(
           project
-            ? `${project.name} — Projet web | Stevens Akpovi`
-            : "Réalisations — Projets web | Stevens Akpovi",
-          project?.description ?? PAGES.realisations.description
+            ? traduitModele("{name} — Projet web | Stevens Akpovi", { name: project.name }, lang)
+            : traduit("Réalisations — Projets web | Stevens Akpovi", lang),
+          project ? traduit(project.description, lang) : traduit(PAGES.realisations.description, lang)
         );
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -230,7 +236,7 @@ export function RouterProvider({ children }: { children: React.ReactNode }) {
         ? PAGES[PAGE_KEYS[state.page] as keyof typeof PAGES]
         : null;
     if (meta && typeof document !== "undefined") {
-      applyMeta(meta.title, meta.description);
+      applyMeta(traduit(meta.title, lang), traduit(meta.description, lang));
     }
     // Laisse le nouveau contenu monter avant l'ancrage : la transition
     // de page (AnimatePresence mode="wait") retarde le montage du
@@ -254,7 +260,7 @@ export function RouterProvider({ children }: { children: React.ReactNode }) {
     };
     rafId = requestAnimationFrame(attempt);
     return () => cancelAnimationFrame(rafId);
-  }, [state.page, state.section]);
+  }, [state.page, state.section, lang]);
 
   const navigate = useCallback((page: AppPage, section: string | null = null) => {
     const fragment = PAGE_TO_HASH[page] ?? "accueil";

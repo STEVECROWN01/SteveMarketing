@@ -6,6 +6,8 @@ import { useRouter } from "@/components/router-context";
 import { ASSETS, NAV_ITEMS, SITE } from "@/lib/site";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { StartProjectButton } from "@/components/marketing/StartProjectButton";
+import { useT } from "@/i18n";
+import { BoutonLangue } from "@/i18n/BoutonLangue";
 import {
   EmailBrandIcon,
   LinkedInBrandIcon,
@@ -40,7 +42,8 @@ const HEADER_NAV_ITEMS = NAV_ITEMS.filter(
  *  Publicité Meta Ads, puis Mes Réalisations. L'entrée
  *  « Référencement International SEO » (ancre de section sur la page
  *  Référencement) a été retirée à la demande de l'éditeur
- *  (16/11/2026). */
+ *  (16/11/2026). VOLET 18 : libellés traduits via t() — le site
+ *  devient bilingue. */
 const MENU_MAIN_ITEMS: { key: string; label: string; section?: string }[] = [
   { key: "processus", label: "Méthode" },
   { key: "referencement", label: "Référencement SEO" },
@@ -50,7 +53,12 @@ const MENU_MAIN_ITEMS: { key: string; label: string; section?: string }[] = [
 
 /** DEUXIÈME colonne du menu plein écran, nommée « Autre Liens »
  *  (demande de l'éditeur, 15/11/2026, renommée de « Autre » le
- *  16/11/2026) : À propos, Contact et Mentions légales. */
+ *  16/11/2026) : À propos, Contact et Mentions légales. VOLET 18
+ *  (25/11/2026) : les trois icônes réseaux sociaux s'y ajoutent À
+ *  LA SUITE des liens — sans décalage au-dessus et SANS trait de
+ *  séparation (demande de l'éditeur : le séparateur du panneau
+ *  disparaît, les pastilles sociales suivent les éléments
+ *  « autres liens »). */
 const MENU_OTHER_ITEMS: { key: string; label: string }[] = [
   { key: "aPropos", label: "À propos" },
   { key: "contact", label: "Contact" },
@@ -78,6 +86,7 @@ const MENU_OTHER_ITEMS: { key: string; label: string }[] = [
  */
 export function Header() {
   const router = useRouter();
+  const { t, tf } = useT();
   const [menuOpen, setMenuOpen] = useState(false);
   const reduce = useReducedMotion();
   // Bouton hamburger — référence pour la RESTAURATION DU FOCUS à la
@@ -217,7 +226,7 @@ export function Header() {
         aria-hidden={menuOpen}
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-full focus:bg-[#e4e4e4] focus:px-5 focus:py-2.5 focus:text-sm focus:font-medium focus:text-[#1c1c1c]"
       >
-        Aller au contenu principal
+        {t("Aller au contenu principal")}
       </a>
 
       <div className="mx-auto flex w-full max-w-[1400px] items-start justify-between px-5 sm:px-8 lg:px-10">
@@ -228,7 +237,7 @@ export function Header() {
         <a
           href="#/accueil"
           onClick={(e) => goPage(e, "accueil")}
-          aria-label="Stevens Akpovi — retour à l'accueil"
+          aria-label={t("Stevens Akpovi — retour à l'accueil")}
           className="flex h-16 w-16 items-center justify-center rounded-b-lg bg-[#1c1c1c] transition-colors duration-300 hover:bg-[#232323] lg:h-[104px] lg:w-[100px] lg:rounded-b-[9px]"
         >
           {/* Logo officiel (version blanche, pour fond sombre) —
@@ -250,7 +259,7 @@ export function Header() {
             « Démarrer un projet », élargi puis jugé trop grand, est
             légèrement réduit (40 → 30px). */}
         <nav
-          aria-label="Navigation principale"
+          aria-label={t("Navigation principale")}
           className="mt-[13px] hidden h-[85px] items-center justify-between rounded-[9px] bg-[#1c1c1c] pl-[30px] pr-[30px] lg:flex"
         >
           <ul className="flex items-center">
@@ -271,12 +280,18 @@ export function Header() {
                       : "after:left-1/2 after:w-0 hover:after:left-0 hover:after:w-full"
                   }`}
                 >
-                  {item.label}
+                  {t(item.label)}
                 </a>
               </li>
             ))}
           </ul>
-          <StartProjectButton className="ml-6" onClick={startProject} />
+          <div className="flex items-center gap-3">
+            <StartProjectButton onClick={startProject} />
+            {/* VOLET 18 — bouton de switch bilingue : À DROITE du
+                bouton « Démarrer un projet », dans la bande de menus
+                (demande de l'éditeur). */}
+            <BoutonLangue taille="header" />
+          </div>
         </nav>
 
         {/* ---------- 3. Pastille hamburger — collée en haut ---------- */}
@@ -289,7 +304,7 @@ export function Header() {
           onClick={() => setMenuOpen((v) => !v)}
           aria-expanded={menuOpen}
           aria-controls="menu-plein-ecran"
-          aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          aria-label={menuOpen ? t("Fermer le menu") : t("Ouvrir le menu")}
           className="flex h-16 w-16 items-center justify-center rounded-b-lg bg-[#1c1c1c] transition-colors duration-300 hover:bg-[#232323] lg:h-[104px] lg:w-[100px] lg:rounded-b-[9px]"
         >
           {BurgerIcon}
@@ -306,7 +321,7 @@ export function Header() {
             id="menu-plein-ecran"
             role="dialog"
             aria-modal="true"
-            aria-label="Menu de navigation"
+            aria-label={t("Menu de navigation")}
             initial={reduce ? { opacity: 0 } : { opacity: 0, y: -18, scale: 0.995 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduce ? { opacity: 0 } : { opacity: 0, y: -14, scale: 0.997 }}
@@ -314,23 +329,29 @@ export function Header() {
             className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-[#1c1c1c]"
           >
             <div className="container-site relative flex min-h-0 flex-1 flex-col pb-[28px] pt-[68px] sm:pb-[32px] sm:pt-[80px] lg:pb-[44px] lg:pt-[120px]">
-              {/* Croix de fermeture dédiée — sous la pastille hamburger.
-                  Au survol, TOUT le bouton prend la couleur de survol du
-                  bouton du header (remplissage #e4e4e4, croix sombre). */}
-              <button
-                type="button"
-                onClick={closeMenu}
-                aria-label="Fermer le menu"
-                className="absolute right-4 top-4 flex h-12 w-12 items-center justify-center rounded-full border border-[#e4e4e4]/25 bg-[#232323] text-white transition-colors duration-300 hover:border-[#c9baac] hover:bg-[#e4e4e4] hover:text-[#1c1c1c] focus-visible:outline-2 focus-visible:outline-offset-4 sm:h-14 sm:w-14"
-              >
-                <X className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
-              </button>
+              {/* VOLET 18 — bouton de switch bilingue À GAUCHE du
+                  bouton de fermeture (demande de l'éditeur), dans le
+                  même groupe d'angle supérieur droit. Croix dédiée
+                  sous la pastille hamburger : au survol, TOUT le
+                  bouton prend la couleur de survol du bouton du
+                  header (remplissage #e4e4e4, croix sombre). */}
+              <div className="absolute right-4 top-4 flex items-center gap-2.5 sm:right-6 sm:top-6 sm:gap-3">
+                <BoutonLangue taille="panneau" />
+                <button
+                  type="button"
+                  onClick={closeMenu}
+                  aria-label={t("Fermer le menu")}
+                  className="flex h-12 w-12 items-center justify-center rounded-full border border-[#e4e4e4]/25 bg-[#232323] text-white transition-colors duration-300 hover:border-[#c9baac] hover:bg-[#e4e4e4] hover:text-[#1c1c1c] focus-visible:outline-2 focus-visible:outline-offset-4 sm:h-14 sm:w-14"
+                >
+                  <X className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
+                </button>
+              </div>
 
               {/* Menus — deux colonnes (demande de l'éditeur,
                   15/11/2026) : pages majeures à gauche, « Autre » à
                   droite ; empilées sur très petits écrans. */}
               <div className="flex min-h-0 flex-1 flex-col justify-center gap-9 py-4 min-[560px]:flex-row min-[560px]:items-start min-[560px]:gap-14 lg:gap-24">
-                <nav aria-label="Navigation plein écran — pages" className="min-w-0 flex-1">
+                <nav aria-label={t("Navigation plein écran — pages")} className="min-w-0 flex-1">
                   <ul className="flex flex-col">
                     {MENU_MAIN_ITEMS.map((item, i) => (
                       <motion.li
@@ -349,7 +370,7 @@ export function Header() {
                               : "after:left-1/2 after:w-0 hover:after:left-0 hover:after:w-full"
                           }`}
                         >
-                          {item.label}
+                          {t(item.label)}
                         </a>
                       </motion.li>
                     ))}
@@ -360,9 +381,15 @@ export function Header() {
                     mentions légales (nom demandé par l'éditeur).
                     Taille de police des liens : 16 px, EXACTEMENT
                     comme les liens des menus du header (demande de
-                    l'éditeur, 15/11/2026). */}
-                <nav aria-label="Navigation plein écran — autres liens" className="min-w-0 shrink-0">
-                  <p className="text-eyebrow mb-4 sm:mb-5">Autres Liens</p>
+                    l'éditeur, 15/11/2026).
+                    VOLET 18 (25/11/2026) : les trois pastilles
+                    réseaux sociaux suivent À LA SUITE des liens, à
+                    la suite sans décalage marqué et SANS trait de
+                    séparation (demande de l'éditeur — l'ancien bloc
+                    du bas avec sa barre de séparation est
+                    supprimé). */}
+                <nav aria-label={t("Navigation plein écran — autres liens")} className="min-w-0 shrink-0">
+                  <p className="text-eyebrow mb-4 sm:mb-5">{t("Autres Liens")}</p>
                   <ul className="flex flex-col">
                     {MENU_OTHER_ITEMS.map((item, i) => (
                       <motion.li
@@ -381,60 +408,55 @@ export function Header() {
                               : "after:left-1/2 after:w-0 hover:after:left-0 hover:after:w-full"
                           }`}
                         >
-                          {item.label}
+                          {t(item.label)}
                         </a>
                       </motion.li>
                     ))}
                   </ul>
+
+                  {/* Trois VRAIES icônes de contact (email, LinkedIn,
+                      WhatsApp) — glyphes officiels, mêmes pastilles
+                      blanches que le pied de page, À LA SUITE des
+                      liens ci-dessus. Au survol, chaque pastille
+                      prend la couleur officielle de son réseau et le
+                      glyphe passe en blanc (demande de l'éditeur,
+                      16/11/2026) : LinkedIn #0A66C2, WhatsApp
+                      #25D366 ; l'email n'ayant pas de couleur
+                      officielle, il prend le noir #1c1c1c du site. */}
+                  <motion.div
+                    initial={reduce ? undefined : { opacity: 0, x: -14 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.31, duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    className="mt-5 flex items-center gap-2.5 sm:mt-6"
+                  >
+                    <a
+                      href={`mailto:${SITE.email}`}
+                      aria-label={tf("Écrire un email à Stevens Akpovi — {email}", { email: SITE.email })}
+                      className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#1c1c1c] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
+                    >
+                      <EmailBrandIcon className="h-4 w-4" />
+                    </a>
+                    <a
+                      href={SITE.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={t("LinkedIn — Stevens Akpovi")}
+                      className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#0A66C2] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
+                    >
+                      <LinkedInBrandIcon className="h-4 w-4" />
+                    </a>
+                    <a
+                      href={SITE.whatsapp}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={t("WhatsApp — Stevens Akpovi")}
+                      className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#25D366] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
+                    >
+                      <WhatsAppBrandIcon className="h-4 w-4" />
+                    </a>
+                  </motion.div>
                 </nav>
               </div>
-
-              {/* Barre de séparation à extrémités fondues — comme
-                  toutes les barres de séparation du site (fade-in à
-                  gauche, fade-out à droite). */}
-              <motion.div
-                initial={reduce ? undefined : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.4 }}
-              >
-                <div aria-hidden="true" className="separator-fade" />
-
-                {/* Trois VRAIES icônes de contact (email, LinkedIn,
-                    WhatsApp) — glyphes officiels, mêmes pastilles
-                    blanches que le pied de page. Au survol, chaque
-                    pastille prend la couleur officielle de son réseau
-                    et le glyphe passe en blanc (demande de
-                    l'éditeur, 16/11/2026) : LinkedIn #0A66C2,
-                    WhatsApp #25D366 ; l'email n'ayant pas de couleur
-                    officielle, il prend le noir #1c1c1c du site. */}
-                <div className="mt-5 flex items-center gap-2.5 sm:mt-6">
-                  <a
-                    href={`mailto:${SITE.email}`}
-                    aria-label={`Écrire un email à Stevens Akpovi — ${SITE.email}`}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#1c1c1c] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
-                  >
-                    <EmailBrandIcon className="h-4 w-4" />
-                  </a>
-                  <a
-                    href={SITE.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="LinkedIn — Stevens Akpovi"
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#0A66C2] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
-                  >
-                    <LinkedInBrandIcon className="h-4 w-4" />
-                  </a>
-                  <a
-                    href={SITE.whatsapp}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="WhatsApp — Stevens Akpovi"
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1c1c1c] transition-colors duration-300 hover:bg-[#25D366] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4"
-                  >
-                    <WhatsAppBrandIcon className="h-4 w-4" />
-                  </a>
-                </div>
-              </motion.div>
             </div>
           </motion.div>
         )}

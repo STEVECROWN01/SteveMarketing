@@ -6,8 +6,9 @@ import { PageHero, CTAButton, CTAIcons, ReassuranceBar } from "@/components/mark
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { MonoImage } from "@/components/media/Media";
 import { useRouter } from "@/components/router-context";
-import { CTA_LABELS, WORKS } from "@/content/site-content";
-import { PROJECTS } from "@/lib/site";
+/* VOLET 18 — i18n : CTA_LABELS / WORKS via useContenu, PROJECTS via
+   useSite, textes inline et attributs interpolés via t()/tf(). */
+import { useContenu, useSite, useT } from "@/i18n";
 
 /**
  * PAGE RÉALISATIONS — les trois réalisations réelles uniquement.
@@ -27,6 +28,9 @@ import { PROJECTS } from "@/lib/site";
  */
 export function PortfolioPage() {
   const router = useRouter();
+  const { t, tf } = useT();
+  const { CTA_LABELS, WORKS } = useContenu();
+  const { PROJECTS } = useSite();
 
   const goProject = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
@@ -36,12 +40,12 @@ export function PortfolioPage() {
   return (
     <>
       <PageHero
-        eyebrow="PROJETS RÉALISÉS · EXPÉRIENCES DIGITALES"
+        eyebrow={t("PROJETS RÉALISÉS · EXPÉRIENCES DIGITALES")}
         title={WORKS.title}
         intro={WORKS.intro}
       >
         <CTAButton action={{ kind: "page", page: "devis" }} variant="secondary" size="lg" icon={CTAIcons.quote}>
-          Discuter De Mon Projet
+          {t("Discuter De Mon Projet")}
         </CTAButton>
       </PageHero>
 
@@ -52,7 +56,7 @@ export function PortfolioPage() {
           séparés par des traits de séparation horizontaux à
           extrémités fondues (le style du site). */}
       <section
-        aria-label="Réalisations de Stevens Akpovi"
+        aria-label={t("Réalisations de Stevens Akpovi")}
         className="section-deep scroll-mt-20 py-20 sm:py-24 lg:py-28"
       >
         <div className="container-site">
@@ -108,10 +112,10 @@ export function PortfolioPage() {
                       <a
                         href={`#/projet/${project.id}`}
                         onClick={(e) => goProject(e, project.id)}
-                        aria-label={`Voir Le Projet — ${project.name}`}
+                        aria-label={tf("Voir Le Projet — {name}", { name: project.name })}
                         className="group/btn btn-fill inline-flex min-h-[48px] items-center justify-center gap-2.5 rounded-full border border-[#e4e4e4] bg-white px-6 py-3.5 text-sm font-medium tracking-[0.01em] text-[#1c1c1c] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-[#c9baac] focus-visible:outline-2 focus-visible:outline-offset-4 [&::before]:bg-[#e4e4e4]"
                       >
-                        Voir Le Projet
+                        {t("Voir Le Projet")}
                         <ArrowRight
                           className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1"
                           aria-hidden="true"
@@ -130,13 +134,13 @@ export function PortfolioPage() {
                   <a
                     href={`#/projet/${project.id}`}
                     onClick={(e) => goProject(e, project.id)}
-                    aria-label={`Aperçu du site ${project.name} — Voir Le Projet`}
+                    aria-label={tf("Aperçu du site {name} — Voir Le Projet", { name: project.name })}
                     className="group media-group block overflow-hidden rounded-2xl border border-[#e4e4e4]/12"
                   >
                     <MonoImage
                       src={project.desktop}
                       src2x={project.desktop2x}
-                      alt={`Aperçu du site ${project.name}`}
+                      alt={tf("Aperçu du site {name}", { name: project.name })}
                       width={1440}
                       height={900}
                       eager={i === 0}

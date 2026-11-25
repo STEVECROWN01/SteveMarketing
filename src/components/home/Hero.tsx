@@ -5,8 +5,9 @@ import { Star } from "lucide-react";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
 import { BrowserMockup, PhoneMockup } from "@/components/media/Media";
-import { HERO } from "@/content/site-content";
-import { ASSETS, PROJECTS } from "@/lib/site";
+/* VOLET 18 — i18n : HERO traduit via useContenu, PROJECTS via useSite. */
+import { useContenu, useSite, useT } from "@/i18n";
+import { ASSETS } from "@/lib/site";
 
 /**
  * SECTION 01 — HERO
@@ -105,6 +106,10 @@ import { ASSETS, PROJECTS } from "@/lib/site";
  * inchangé sur tout le reste du site).
  */
 export function Hero() {
+  const { t, tf } = useT();
+  const { HERO } = useContenu();
+  const { PROJECTS } = useSite();
+
   /* Équilibrage vertical de la description (bureau uniquement) :
      même espace au-dessus et au-dessous de la description — la
      description seule est déplacée verticalement, le titre et les
@@ -177,7 +182,7 @@ export function Hero() {
   return (
     <section
       id="hero"
-      aria-label="Introduction — Stevens Akpovi, conception de sites web orientés conversion"
+      aria-label={t("Introduction — Stevens Akpovi, conception de sites web orientés conversion")}
       className="section-deep relative flex min-h-svh flex-col overflow-hidden"
     >
       {/* Préchargement des images du hero (performance) : chaque
@@ -234,7 +239,7 @@ export function Hero() {
             <Reveal direction="up" aboveFold>
               <p
                 className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] font-medium tracking-[0.02em] text-[#c8c8c8] sm:text-sm"
-                aria-label="Note moyenne de 4,9 sur 5"
+                aria-label={t("Note moyenne de 4,9 sur 5")}
               >
                 <span className="flex items-center gap-1" aria-hidden="true">
                   {[0, 1, 2, 3].map((i) => (
@@ -248,7 +253,7 @@ export function Hero() {
                     </span>
                   </span>
                 </span>
-                <span>4,9/5</span>
+                <span>{t("4,9/5")}</span>
               </p>
             </Reveal>
 
@@ -406,7 +411,7 @@ export function Hero() {
                     className="h-1 w-1 shrink-0 rounded-full bg-[#22c55e] shadow-[0_0_8px_rgba(34,197,94,0.95)]"
                     aria-hidden="true"
                   />
-                  <span>Stevens Akpovi</span>
+                  <span>{t("Stevens Akpovi")}</span>
                 </span>
               </span>
 
@@ -448,11 +453,12 @@ export function Hero() {
                     src2x={PROJECTS[2].desktop2x}
                     srcSmall={PROJECTS[2].desktopSmall}
                     srcSmallWidth={640}
-                    alt={`Aperçu du site ${PROJECTS[2].name} — plateforme immobilière`}
+                    alt={tf("Aperçu du site {name} — plateforme immobilière", { name: PROJECTS[2].name })}
                     url={PROJECTS[2].url}
                     width={640}
                     height={400}
                     color
+                    zoom
                     priority
                     sizes="(max-width: 640px) 130px, (max-width: 1023px) 290px, 230px"
                   />
@@ -486,10 +492,11 @@ export function Hero() {
                     src2x={PROJECTS[2].mobile2x}
                     srcSmall={PROJECTS[2].mobileSmall}
                     srcSmallWidth={290}
-                    alt={`Aperçu mobile du site ${PROJECTS[2].name}`}
+                    alt={tf("Aperçu mobile du site {name}", { name: PROJECTS[2].name })}
                     width={290}
                     height={628}
                     color
+                    zoom
                     priority
                     sizes="(max-width: 640px) 68px, (max-width: 1023px) 145px, 104px"
                   />
@@ -567,7 +574,7 @@ export function Hero() {
                   variant="secondary"
                   size="lg"
                   hideArrowBelowSm
-                  ariaLabel="Réserver Un Appel — 30 minutes, gratuit et sans engagement"
+                  ariaLabel={t("Réserver Un Appel — 30 minutes, gratuit et sans engagement")}
                   className="px-2 text-[length:clamp(10px,3vw,12px)] sm:px-7 sm:text-[15px]"
                 >
                   {HERO.ctaPrimary}

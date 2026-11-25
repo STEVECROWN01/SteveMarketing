@@ -20,7 +20,10 @@ import {
   ReassuranceBar,
 } from "@/components/marketing/Marketing";
 import { Reveal } from "@/components/motion/Reveal";
-import { CTA_LABELS } from "@/content/site-content";
+/* VOLET 18 — i18n : CTA_LABELS via useContenu ; textes inline (y compris
+   les libellés des tableaux module-level, enveloppés AU RENDU pour
+   rester réactifs à la langue) via t()/tf(). */
+import { useContenu, useT } from "@/i18n";
 
 /**
  * PAGE PUBLICITÉ META ADS (demande de l'éditeur, 15/11/2026) — page
@@ -77,14 +80,16 @@ const ADS_STEPS = [
 
 export function MetaAdsPage() {
   const router = useRouter();
+  const { t, tf } = useT();
+  const { CTA_LABELS } = useContenu();
 
   return (
     <>
       {/* ---------- En-tête de page ---------- */}
       <PageHero
-        eyebrow="PUBLICITÉ · META ADS"
-        title="Meta Ads : faites connaître votre activité sur Facebook et Instagram."
-        intro="Développez votre présence sur Facebook et Instagram grâce à des campagnes publicitaires ciblées et structurées autour de vos objectifs — le complément naturel d'un site web pensé pour convertir."
+        eyebrow={t("PUBLICITÉ · META ADS")}
+        title={t("Meta Ads : faites connaître votre activité sur Facebook et Instagram.")}
+        intro={t("Développez votre présence sur Facebook et Instagram grâce à des campagnes publicitaires ciblées et structurées autour de vos objectifs — le complément naturel d'un site web pensé pour convertir.")}
       >
         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
           <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
@@ -98,11 +103,11 @@ export function MetaAdsPage() {
       </PageHero>
 
       {/* ---------- Ce que comprennent les campagnes ---------- */}
-      <section aria-label="Ce que comprennent vos campagnes publicitaires" className="section-light bg-grid-light py-20 sm:py-24 lg:py-28">
+      <section aria-label={t("Ce que comprennent vos campagnes publicitaires")} className="section-light bg-grid-light py-20 sm:py-24 lg:py-28">
         <div className="container-site">
           <SectionHeading
-            eyebrow="CAMPAGNES CIBLÉES ET STRUCTURÉES"
-            title="Ce que comprennent vos campagnes."
+            eyebrow={t("CAMPAGNES CIBLÉES ET STRUCTURÉES")}
+            title={t("Ce que comprennent vos campagnes.")}
             tone="light"
           />
           <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -117,8 +122,8 @@ export function MetaAdsPage() {
                       {String(i + 1).padStart(2, "0")}
                     </span>
                   </div>
-                  <h3 className="mt-5 font-display text-lg font-semibold text-[#1c1c1c]">{item.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-[#555555]">{item.text}</p>
+                  <h3 className="mt-5 font-display text-lg font-semibold text-[#1c1c1c]">{t(item.title)}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-[#555555]">{t(item.text)}</p>
                 </div>
               </Reveal>
             ))}
@@ -127,14 +132,14 @@ export function MetaAdsPage() {
           {/* Plateformes couvertes — Facebook et Instagram */}
           <Reveal direction="up" delay={0.15}>
             <div className="mt-10 flex flex-wrap items-center gap-3">
-              <span className="text-sm font-medium text-[#525252]">Plateformes couvertes :</span>
+              <span className="text-sm font-medium text-[#525252]">{t("Plateformes couvertes :")}</span>
               <span className="inline-flex min-h-[40px] items-center gap-2 rounded-full border border-[#e4e4e4] bg-white px-4 py-2 text-[13px] text-[#1c1c1c]">
                 <Facebook className="h-4 w-4" aria-hidden="true" />
-                Facebook
+                {t("Facebook")}
               </span>
               <span className="inline-flex min-h-[40px] items-center gap-2 rounded-full border border-[#e4e4e4] bg-white px-4 py-2 text-[13px] text-[#1c1c1c]">
                 <Instagram className="h-4 w-4" aria-hidden="true" />
-                Instagram
+                {t("Instagram")}
               </span>
             </div>
           </Reveal>
@@ -142,12 +147,12 @@ export function MetaAdsPage() {
       </section>
 
       {/* ---------- SEO ou Meta Ads ? ---------- */}
-      <section aria-label="SEO ou Meta Ads : deux leviers de visibilité" className="section-dark relative py-20 sm:py-24 lg:py-28">
+      <section aria-label={t("SEO ou Meta Ads : deux leviers de visibilité")} className="section-dark relative py-20 sm:py-24 lg:py-28">
         <div aria-hidden="true" className="separator-fade absolute inset-x-0 top-0" />
         <div className="container-site">
           <SectionHeading
-            eyebrow="VOTRE SITE EST PRÊT. MAINTENANT, FAISONS-LE CONNAÎTRE."
-            title="Deux leviers de visibilité, au service du même objectif."
+            eyebrow={t("VOTRE SITE EST PRÊT. MAINTENANT, FAISONS-LE CONNAÎTRE.")}
+            title={t("Deux leviers de visibilité, au service du même objectif.")}
             tone="dark"
             align="center"
             className="mx-auto"
@@ -163,15 +168,13 @@ export function MetaAdsPage() {
                   <Search className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <h3 className="mt-6 font-display text-xl font-semibold text-white">
-                  Référencement SEO
+                  {t("Référencement SEO")}
                 </h3>
                 <p className="mt-4 text-[15px] leading-relaxed text-[#c8c8c8]">
-                  Une visibilité qui ne dépend pas de la publicité : votre site gagne en
-                  positionnement sur les recherches de vos futurs clients et continue de
-                  travailler pour vous sur la durée.
+                  {t("Une visibilité qui ne dépend pas de la publicité : votre site gagne en positionnement sur les recherches de vos futurs clients et continue de travailler pour vous sur la durée.")}
                 </p>
                 <span className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-white">
-                  Découvrir le Référencement SEO
+                  {t("Découvrir le Référencement SEO")}
                   <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden="true" />
                 </span>
               </button>
@@ -182,15 +185,13 @@ export function MetaAdsPage() {
                   <Megaphone className="h-5 w-5" aria-hidden="true" />
                 </span>
                 <h3 className="mt-6 font-display text-xl font-semibold text-white">
-                  Publicité Meta Ads
+                  {t("Publicité Meta Ads")}
                 </h3>
                 <p className="mt-4 text-[15px] leading-relaxed text-[#c8c8c8]">
-                  Une visibilité ciblée sur Facebook et Instagram : vos campagnes présentent
-                  votre activité aux personnes les plus susceptibles d'être intéressées, avec
-                  un suivi des résultats.
+                  {t("Une visibilité ciblée sur Facebook et Instagram : vos campagnes présentent votre activité aux personnes les plus susceptibles d'être intéressées, avec un suivi des résultats.")}
                 </p>
                 <span className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[#e4e4e4]">
-                  Vous êtes sur la bonne page
+                  {t("Vous êtes sur la bonne page")}
                   <ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </span>
               </div>
@@ -200,11 +201,11 @@ export function MetaAdsPage() {
       </section>
 
       {/* ---------- Comment je travaille ---------- */}
-      <section aria-label="Comment je travaille vos campagnes publicitaires" className="section-bright py-20 sm:py-24 lg:py-28">
+      <section aria-label={t("Comment je travaille vos campagnes publicitaires")} className="section-bright py-20 sm:py-24 lg:py-28">
         <div className="container-site">
           <SectionHeading
-            eyebrow="MA MÉTHODE"
-            title="Comment je travaille vos campagnes."
+            eyebrow={t("MA MÉTHODE")}
+            title={t("Comment je travaille vos campagnes.")}
             tone="light"
           />
           <ol className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -212,10 +213,10 @@ export function MetaAdsPage() {
               <Reveal key={step.name} direction="up" delay={i * 0.05} as="li">
                 <div className="h-full rounded-2xl border border-[#e4e4e4] bg-white p-6">
                   <p className="text-[11px] font-semibold tracking-widest text-[#525252] uppercase">
-                    Étape {String(i + 1).padStart(2, "0")}
+                    {tf("Étape {num}", { num: String(i + 1).padStart(2, "0") })}
                   </p>
-                  <h3 className="mt-3 font-display text-lg font-semibold text-[#1c1c1c]">{step.name}</h3>
-                  <p className="mt-2.5 text-sm leading-relaxed text-[#555555]">{step.text}</p>
+                  <h3 className="mt-3 font-display text-lg font-semibold text-[#1c1c1c]">{t(step.name)}</h3>
+                  <p className="mt-2.5 text-sm leading-relaxed text-[#555555]">{t(step.text)}</p>
                 </div>
               </Reveal>
             ))}
@@ -224,13 +225,13 @@ export function MetaAdsPage() {
       </section>
 
       {/* ---------- Appel à l'action final ---------- */}
-      <section aria-label="Parlons de votre publicité" className="section-deep relative overflow-hidden py-20 sm:py-24 lg:py-28">
+      <section aria-label={t("Parlons de votre publicité")} className="section-deep relative overflow-hidden py-20 sm:py-24 lg:py-28">
         <div className="bg-grid-dark absolute inset-0" aria-hidden="true" />
         <div className="container-site relative text-center">
           <Reveal direction="up">
-            <p className="text-eyebrow">PARLONS DE VOTRE PUBLICITÉ</p>
+            <p className="text-eyebrow">{t("PARLONS DE VOTRE PUBLICITÉ")}</p>
             <h2 className="text-section-title mx-auto mt-4 max-w-2xl text-white">
-              Votre activité mérite d'être connue.
+              {t("Votre activité mérite d'être connue.")}
             </h2>
           </Reveal>
           <Reveal direction="up" delay={0.12}>

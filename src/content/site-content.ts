@@ -71,7 +71,7 @@ export const HERO = {
    *  10, supprimés) : la cible commerciale se lit dans le texte et
    *  l'image reste entièrement dégagée. Casse exacte de l'éditeur
    *  respectée (« PMEs » garde son s bas-de-casse). */
-  targetItalic: "— PMEs / PROFESSIONNELS",
+  targetItalic: "— PMEs / Professionnels",
   ctaPrimary: CTA_LABELS.appel,
   /** « Voir Mes Réalisations » — libellé unifié (18/11/2026) :
    *  « Voir Mes Travaux » désignait la même page sous un autre

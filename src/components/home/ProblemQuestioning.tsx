@@ -5,7 +5,8 @@ import { XCircle, HelpCircle } from "lucide-react";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { SectionHeading, CTAButton, CTAIcons, RichText } from "@/components/marketing/Marketing";
 import { MonoImage } from "@/components/media/Media";
-import { PROBLEM, QUESTIONING } from "@/content/site-content";
+/* VOLET 18 — i18n : PROBLEM / QUESTIONING traduits via useContenu. */
+import { useContenu, useT } from "@/i18n";
 import { ASSETS } from "@/lib/site";
 
 /**
@@ -13,6 +14,9 @@ import { ASSETS } from "@/lib/site";
  * SECTION 03 — REMISE EN QUESTION (fond clair)
  */
 export function ProblemSection() {
+  const { PROBLEM } = useContenu();
+  const { t } = useT();
+
   return (
     <section id="probleme" aria-labelledby="probleme-titre" className="section-dark scroll-mt-20 py-20 sm:py-24 lg:py-32">
       <div className="container-site">
@@ -61,7 +65,7 @@ export function ProblemSection() {
             <Reveal direction="left" delay={0.1}>
               <MonoImage
                 src={ASSETS.problemNoWebsite}
-                alt="Illustration : professionnel sans site web, dépendant des réseaux sociaux"
+                alt={t("Illustration : professionnel sans site web, dépendant des réseaux sociaux")}
                 width={900}
                 height={1350}
                 className="rounded-2xl border border-[#e4e4e4]/12 shadow-[0_30px_70px_-30px_rgba(0,0,0,0.7)]"
@@ -70,7 +74,7 @@ export function ProblemSection() {
             <Reveal direction="right" delay={0.25} className="absolute -bottom-12 -right-3 w-[74%] sm:-right-6 lg:-right-8">
               <MonoImage
                 src={ASSETS.problemIneffective}
-                alt="Illustration : site web inefficace qui n'apporte pas de résultats"
+                alt={t("Illustration : site web inefficace qui n'apporte pas de résultats")}
                 width={1280}
                 height={853}
                 forceMono
@@ -110,10 +114,13 @@ export function ProblemSection() {
  *  deux colonnes × trois rangées à droite, puis le bloc conclusion
  *  + CTA. */
 export function QuestioningSection() {
+  const { QUESTIONING } = useContenu();
+  const { t } = useT();
+
   return (
     <section
       id="remise-en-question"
-      aria-label="Questions à vous poser sur votre site web"
+      aria-label={t("Questions à vous poser sur votre site web")}
       className="section-light bg-grid-light scroll-mt-20 py-20 sm:py-24 lg:py-32"
     >
       <div className="container-site">

@@ -9,7 +9,9 @@ import {
 } from "@/components/ui/accordion";
 import { Reveal } from "@/components/motion/Reveal";
 import { SectionHeading, CTAButton, CTAIcons, ReassuranceBar, RichText } from "@/components/marketing/Marketing";
-import { CTA_LABELS, FAQ, FINAL_CTA } from "@/content/site-content";
+/* VOLET 18 — i18n : CTA_LABELS / FAQ / FINAL_CTA traduits via useContenu ;
+   textes en dur (note de la carte, mention, aria-label) via t(). */
+import { useContenu, useT } from "@/i18n";
 
 /**
  * SECTION 12 — FAQ (fond sombre)
@@ -20,6 +22,9 @@ import { CTA_LABELS, FAQ, FINAL_CTA } from "@/content/site-content";
  * (le voile lui-même vit dans le composant Footer).
  */
 export function FaqSection() {
+  const { t } = useT();
+  const { CTA_LABELS, FAQ } = useContenu();
+
   return (
     <section
       id="faq"
@@ -33,7 +38,7 @@ export function FaqSection() {
             <Reveal direction="up" delay={0.18}>
               <div className="mt-9 rounded-2xl bg-[#e4e4e4] p-6 sm:p-7">
                 <p className="font-display text-base font-semibold leading-snug text-[#1c1c1c]">
-                  Une question spécifique&nbsp;? Prenons 30 minutes pour en discuter.
+                  {t("Une question spécifique\u00A0? Prenons 30 minutes pour en discuter.")}
                 </p>
                 <CTAButton
                   action={{ kind: "calendly" }}
@@ -44,7 +49,7 @@ export function FaqSection() {
                   {CTA_LABELS.appel}
                 </CTAButton>
                 <p className="mt-4 text-xs font-medium text-[#1c1c1c]/70">
-                  30 minutes · Gratuit · Sans engagement.
+                  {t("30 minutes · Gratuit · Sans engagement.")}
                 </p>
               </div>
             </Reveal>
@@ -75,6 +80,9 @@ export function FaqSection() {
 }
 
 export function FinalCtaSection() {
+  const { t } = useT();
+  const { FINAL_CTA } = useContenu();
+
   return (
     <section
       id="contact-final"
@@ -116,7 +124,7 @@ export function FinalCtaSection() {
               variant="primary"
               size="lg"
               icon={CTAIcons.calendar}
-              ariaLabel="Réserver Un Appel — 30 minutes, gratuit et sans engagement"
+              ariaLabel={t("Réserver Un Appel — 30 minutes, gratuit et sans engagement")}
             >
               {FINAL_CTA.cta1}
             </CTAButton>

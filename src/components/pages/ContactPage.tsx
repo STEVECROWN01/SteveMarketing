@@ -12,8 +12,13 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useRouter } from "@/components/router-context";
-import { SITE } from "@/lib/site";
-import { CTA_LABELS } from "@/content/site-content";
+/* VOLET 18 — i18n : CTA_LABELS via useContenu, SITE via useSite ; textes
+   inline via t()/tf(). Les phrases RECONSTITUÉES coupées autour des
+   LIENS et BOUTONS fonctionnels (email, LinkedIn, WhatsApp, devis,
+   appel) sont traduites ENTIÈRES (clé complète), puis DÉCOUPÉES sur le
+   libellé de l'élément interactif pour reconstruire le JSX d'origine
+   — cf. convention « RECONSTITUTION » de trad-ui-en.ts. */
+import { useContenu, useSite, useT } from "@/i18n";
 
 /**
  * PAGE CONTACT — présentation calquée sur « /contact-us » de
@@ -31,6 +36,47 @@ import { CTA_LABELS } from "@/content/site-content";
  */
 export function ContactPage() {
   const router = useRouter();
+  const { t, tf } = useT();
+  const { CTA_LABELS } = useContenu();
+  const { SITE } = useSite();
+
+  /* Découpe défensive d'une phrase traduite autour d'un libellé
+     interactif : libellé introuvable ⇒ phrase entière avant, rien
+     après (aucun crash, le texte reste affiché). */
+  const couper = (phrase: string, libelle: string): [string, string] => {
+    const i = phrase.indexOf(libelle);
+    return i === -1 ? [phrase, ""] : [phrase.slice(0, i), phrase.slice(i + libelle.length)];
+  };
+
+  /* Accordéon « Clients existants » — paragraphe email. */
+  const [avantCourriel, apresCourriel] = couper(
+    tf(
+      "Pour toute question, suivi ou précision sur un projet en cours, écrivez-moi directement à {email} — je réponds personnellement à chaque message.",
+      { email: SITE.email },
+    ),
+    SITE.email,
+  );
+
+  /* Accordéon « Clients existants » — paragraphe LinkedIn / WhatsApp. */
+  const libelleLinkedIn = t("LinkedIn");
+  const libelleWhatsApp = t("WhatsApp");
+  const [avantLinkedIn, resteLinkedIn] = couper(
+    t("Vous pouvez aussi m'écrire sur LinkedIn ou WhatsApp."),
+    libelleLinkedIn,
+  );
+  const [entreReseaux, apresWhatsApp] = couper(resteLinkedIn, libelleWhatsApp);
+
+  /* Accordéon « Nouveaux clients » — les deux boutons inline. */
+  const libelleDevis = t("demander un devis personnalisé");
+  const libelleAppel = t("réserver un appel stratégique de 30 minutes");
+  const [avantDevis, resteDevis] = couper(
+    tf(
+      "La première étape est de parler de votre projet. Vous pouvez demander un devis personnalisé, ou réserver un appel stratégique de 30 minutes — {calendlyMention}",
+      { calendlyMention: SITE.calendlyMention.toLowerCase() },
+    ),
+    libelleDevis,
+  );
+  const [entreBoutons, apresAppel] = couper(resteDevis, libelleAppel);
 
   const goDevis = (e?: React.MouseEvent) => {
     e?.preventDefault();
@@ -39,38 +85,59 @@ export function ContactPage() {
 
   return (
     <section
-      aria-label="Page contact"
-      className="section-dark relative overflow-hidden pb-24 pt-[128px] sm:pb-28 sm:pt-[150px] lg:pb-32 lg:pt-[170px]"
+      aria-label={t("Page contact")}
+      /* VOLET 18 — PLUS DE overflow-hidden DIRECTEMENT sur la section :
+         un ancêtre avec overflow ≠ visible NEUTRALISE le
+         position: sticky de la colonne gauche (le collage à l’écran
+         demandé par l’éditeur ne jouait pas — mesuré top=-542 px au
+         lieu de rester calé). Le rognage des orbes passe à un
+         conteneur dédié ci-dessous : rendu identique, sticky
+         opérationnel. */
+      className="section-dark relative pb-24 pt-[128px] sm:pb-28 sm:pt-[150px] lg:pb-32 lg:pt-[170px]"
     >
-      {/* Orbes lumineux discrets (style sheragency) */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -left-44 -top-44 h-[560px] w-[560px] rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(228,228,228,0.13), transparent 65%)" }}
-      />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-56 -right-48 h-[640px] w-[640px] rounded-full"
-        style={{ background: "radial-gradient(circle, rgba(228,228,228,0.09), transparent 65%)" }}
-      />
+      {/* Orbes lumineux discrets (style sheragency) — conteneur
+          CLIPPÉ (inset-0 + overflow-hidden) : les orbes débordent
+          toujours visuellement de leurs coins mais ne peignent plus
+          hors de la section. */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div
+          className="absolute -left-44 -top-44 h-[560px] w-[560px] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(228,228,228,0.13), transparent 65%)" }}
+        />
+        <div
+          className="absolute -bottom-56 -right-48 h-[640px] w-[640px] rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(228,228,228,0.09), transparent 65%)" }}
+        />
+      </div>
 
       <div className="container-site relative">
         <div className="grid gap-14 lg:grid-cols-[0.42fr_0.58fr] lg:gap-16 xl:gap-24">
           {/* ---------- Colonne gauche : titre + bouton devis ---------- */}
-          <div className="lg:pt-3">
+          {/* VOLET 18 (25/11/2026) — COLONNE GAUCHE COLLÉE À L'ÉCRAN
+              (demande de l'éditeur) : au défilement sur bureau, le
+              bloc texte (description, bouton, cinq étoiles) se CALA
+              à l'écran (position sticky, self-start) — c'est la
+              colonne DROITE, la plus longue (accordéons +
+              formulaire), qui défile jusqu'à son bout AVANT que le
+              pied de page n'apparaisse — même comportement que la
+              page de création de documents de l'espace client
+              (aperçu fixe, formulaire qui défile). Le top (~128px)
+              dégage la pilule de navigation fixe du header. Sur
+              mobile/tablette : comportement inchangé (colonnes
+              empilées). */}
+          <div className="lg:sticky lg:top-[128px] lg:self-start lg:pt-3">
             <Reveal direction="up">
-              <p className="text-eyebrow">CONTACT</p>
+              <p className="text-eyebrow">{t("CONTACT")}</p>
             </Reveal>
             <RevealText
               as="h1"
-              text="Contact"
+              text={t("Contact")}
               delay={0.06}
               className="font-display mt-5 text-[clamp(2.6rem,6vw,4.2rem)] font-semibold leading-[1.05] tracking-[-0.02em] text-white"
             />
             <Reveal direction="up" delay={0.14}>
               <p className="text-body mt-6 max-w-md on-dark-muted">
-                Une question, un projet, une idée&nbsp;? Laissez-moi un message — je
-                réponds personnellement à chaque demande.
+                {t("Une question, un projet, une idée\u00A0? Laissez-moi un message — je réponds personnellement à chaque demande.")}
               </p>
             </Reveal>
             <Reveal direction="up" delay={0.2}>
@@ -86,7 +153,7 @@ export function ContactPage() {
               </div>
             </Reveal>
             <Reveal direction="up" delay={0.26}>
-              <p className="mt-8 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] font-medium tracking-[0.02em] text-[#c8c8c8]" aria-label="Note moyenne de 4,9 sur 5">
+              <p className="mt-8 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] font-medium tracking-[0.02em] text-[#c8c8c8]" aria-label={t("Note moyenne de 4,9 sur 5")}>
                 <span className="flex items-center gap-1" aria-hidden="true">
                   {[0, 1, 2, 3].map((i) => (
                     <Star key={i} fill="#e4e4e4" strokeWidth={0} className="h-4 w-4" />
@@ -98,7 +165,7 @@ export function ContactPage() {
                     </span>
                   </span>
                 </span>
-                <span>4,9/5</span>
+                <span>{t("4,9/5")}</span>
               </p>
             </Reveal>
           </div>
@@ -115,40 +182,39 @@ export function ContactPage() {
                     headingLevel="h2"
                     className="py-6 text-left font-display text-xl font-medium text-white hover:text-[#e4e4e4] hover:no-underline sm:text-2xl"
                   >
-                    Clients existants
+                    {t("Clients existants")}
                   </AccordionTrigger>
                   <AccordionContent className="pb-7 text-[15px] leading-relaxed text-[#c8c8c8]">
                     <p>
-                      Pour toute question, suivi ou précision sur un projet en cours,
-                      écrivez-moi directement à{" "}
+                      {avantCourriel}
                       <a
                         href={`mailto:${SITE.email}`}
                         className="font-medium text-[#e4e4e4] underline underline-offset-4"
                       >
                         {SITE.email}
-                      </a>{" "}
-                      — je réponds personnellement à chaque message.
+                      </a>
+                      {apresCourriel}
                     </p>
                     <p className="mt-3">
-                      Vous pouvez aussi m'écrire sur{" "}
+                      {avantLinkedIn}
                       <a
                         href={SITE.linkedin}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="font-medium text-[#e4e4e4] underline underline-offset-4"
                       >
-                        LinkedIn
-                      </a>{" "}
-                      ou{" "}
+                        {libelleLinkedIn}
+                      </a>
+                      {entreReseaux}
                       <a
                         href={SITE.whatsapp}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="font-medium text-[#e4e4e4] underline underline-offset-4"
                       >
-                        WhatsApp
+                        {libelleWhatsApp}
                       </a>
-                      .
+                      {apresWhatsApp}
                     </p>
                   </AccordionContent>
                 </AccordionItem>
@@ -161,27 +227,27 @@ export function ContactPage() {
                     headingLevel="h2"
                     className="py-6 text-left font-display text-xl font-medium text-white hover:text-[#e4e4e4] hover:no-underline sm:text-2xl"
                   >
-                    Nouveaux clients
+                    {t("Nouveaux clients")}
                   </AccordionTrigger>
                   <AccordionContent className="pb-7 text-[15px] leading-relaxed text-[#c8c8c8]">
                     <p>
-                      La première étape est de parler de votre projet. Vous pouvez{" "}
+                      {avantDevis}
                       <button
                         type="button"
                         onClick={goDevis}
                         className="font-medium text-[#e4e4e4] underline underline-offset-4"
                       >
-                        demander un devis personnalisé
+                        {libelleDevis}
                       </button>
-                      , ou{" "}
+                      {entreBoutons}
                       <button
                         type="button"
                         onClick={() => router.navigate("appel")}
                         className="font-medium text-[#e4e4e4] underline underline-offset-4"
                       >
-                        réserver un appel stratégique de 30 minutes
-                      </button>{" "}
-                      — {SITE.calendlyMention.toLowerCase()}
+                        {libelleAppel}
+                      </button>
+                      {apresAppel}
                     </p>
                   </AccordionContent>
                 </AccordionItem>
@@ -194,14 +260,11 @@ export function ContactPage() {
                     headingLevel="h2"
                     className="py-6 text-left font-display text-xl font-medium text-white hover:text-[#e4e4e4] hover:no-underline sm:text-2xl"
                   >
-                    Vous avez déjà un site&nbsp;?
+                    {t("Vous avez déjà un site\u00A0?")}
                   </AccordionTrigger>
                   <AccordionContent className="pb-7 text-[15px] leading-relaxed text-[#c8c8c8]">
                     <p>
-                      Décrivez-moi votre site actuel et vos objectifs dans le
-                      formulaire ci-dessous&nbsp;: je vous ferai part de mes premières
-                      observations concrètes — image, clarté des services, parcours de
-                      contact et référencement de base.
+                      {t("Décrivez-moi votre site actuel et vos objectifs dans le formulaire ci-dessous\u00A0: je vous ferai part de mes premières observations concrètes — image, clarté des services, parcours de contact et référencement de base.")}
                     </p>
                   </AccordionContent>
                 </AccordionItem>
@@ -210,14 +273,14 @@ export function ContactPage() {
 
             <RevealText
               as="h2"
-              text="Laissez-moi un message"
+              text={t("Laissez-moi un message")}
               delay={0.05}
               className="text-section-title mt-14 text-white"
             />
 
             <Reveal direction="up" delay={0.12}>
               <p className="text-body mt-6 max-w-xl on-dark-muted">
-                Décrivez votre besoin en quelques lignes.
+                {t("Décrivez votre besoin en quelques lignes.")}
               </p>
             </Reveal>
 

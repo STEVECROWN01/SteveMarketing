@@ -4,8 +4,8 @@ import React from "react";
 import { Reveal } from "@/components/motion/Reveal";
 import { SectionHeading, CTAButton, CTAIcons } from "@/components/marketing/Marketing";
 import { ProjectCard } from "@/components/marketing/ProjectCard";
-import { CTA_LABELS, WORKS } from "@/content/site-content";
-import { PROJECTS } from "@/lib/site";
+/* VOLET 18 — i18n : CTA_LABELS / WORKS traduits via useContenu, PROJECTS via useSite. */
+import { useContenu, useSite } from "@/i18n";
 
 /**
  * SECTION 09 — RÉALISATIONS (fond blanc)
@@ -19,6 +19,9 @@ import { PROJECTS } from "@/lib/site";
  * pages de case study. Captures en COULEUR (16/11/2026).
  */
 export function WorksSection() {
+  const { CTA_LABELS, WORKS } = useContenu();
+  const { PROJECTS } = useSite();
+
   return (
     /* Padding inférieur réduit d'un cran (demande de l'éditeur,
        16/11/2026) : l'espace clair entre les dernières cartes et la

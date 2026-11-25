@@ -7,7 +7,8 @@ import { SectionHeading, CTAButton, CTAIcons, RichText } from "@/components/mark
 import { StartProjectButton } from "@/components/marketing/StartProjectButton";
 import { useRouter } from "@/components/router-context";
 import { MonoImage } from "@/components/media/Media";
-import { TRANSFORMATION, SOLUTION } from "@/content/site-content";
+/* VOLET 18 — i18n : TRANSFORMATION / SOLUTION traduits via useContenu. */
+import { useContenu, useT } from "@/i18n";
 import { ASSETS } from "@/lib/site";
 
 const BENEFIT_ICONS = [Clock, TrendingUp, Users, Home, RefreshCw];
@@ -17,6 +18,9 @@ const BENEFIT_ICONS = [Clock, TrendingUp, Users, Home, RefreshCw];
  * SECTION 05 — MA SOLUTION (fond sombre, trois piliers)
  */
 export function TransformationSection() {
+  const { TRANSFORMATION } = useContenu();
+  const { t } = useT();
+
   return (
     <section
       id="transformation"
@@ -34,7 +38,7 @@ export function TransformationSection() {
             <Reveal direction="right">
               <MonoImage
                 src={ASSETS.benefitGrowth}
-                alt="Illustration : croissance de l'activité grâce à une présence professionnelle en ligne"
+                alt={t("Illustration : croissance de l'activité grâce à une présence professionnelle en ligne")}
                 width={1280}
                 height={853}
                 className="relative rounded-2xl border border-[#e4e4e4]/12 shadow-[0_30px_70px_-30px_rgba(0,0,0,0.7)]"
@@ -99,6 +103,8 @@ export function TransformationSection() {
  *  simplement séparées par la gouttière standard de la grille. */
 export function SolutionSection() {
   const router = useRouter();
+  const { SOLUTION } = useContenu();
+  const { t } = useT();
   // Une seule étape ouverte à la fois — la première par défaut,
   // comme le déroulé de lecture de la référence.
   const [open, setOpen] = useState<number | null>(0);
@@ -108,7 +114,7 @@ export function SolutionSection() {
   return (
     <section
       id="solution"
-      aria-label="Comment je travaille — processus de collaboration"
+      aria-label={t("Comment je travaille — processus de collaboration")}
       className="section-dark relative scroll-mt-20 py-20 sm:py-24 lg:py-32"
     >
       {/* Barre de séparation à extrémités fondues — fade-in à gauche,

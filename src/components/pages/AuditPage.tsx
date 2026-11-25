@@ -4,6 +4,11 @@ import React from "react";
 import { Star } from "lucide-react";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { LeadForm } from "@/components/forms/LeadForm";
+/* VOLET 18 — i18n : textes inline via t() ; la phrase croisée
+   « Vous préférez en parler de vive voix ?… » est traduite ENTIÈRE
+   (clé complète) puis découpée sur le libellé du lien pour
+   reconstruire le JSX (convention RECONSTITUTION de trad-ui-en.ts). */
+import { useT } from "@/i18n";
 
 /** Icône « coche pleine » — la même que la liste de bénéfices de la
  *  page Devis (cercle #e4e4e4, coche sombre) : les deux pages de
@@ -48,10 +53,18 @@ const BENEFITS = [
 ];
 
 export function AuditPage() {
+  const { t } = useT();
+  const libelleAppel = t("Réservez un appel de 30 minutes");
+  const [avantAppel, apresAppel] = (() => {
+    const phrase = t("Vous préférez en parler de vive voix\u00A0? Réservez un appel de 30 minutes — gratuit et sans engagement.");
+    const i = phrase.indexOf(libelleAppel);
+    return i === -1 ? [phrase, ""] : [phrase.slice(0, i), phrase.slice(i + libelleAppel.length)];
+  })();
+
   return (
     <>
       <section
-        aria-label="Demande d'audit gratuit de votre site web"
+        aria-label={t("Demande d'audit gratuit de votre site web")}
         className="section-deep bg-grid-dark relative overflow-hidden pb-20 pt-[128px] sm:pb-24 sm:pt-[150px] lg:pt-[160px]"
       >
         <div
@@ -61,22 +74,20 @@ export function AuditPage() {
         <div className="container-site relative">
           <div className="mx-auto max-w-3xl text-center">
             <Reveal direction="up">
-              <p className="text-eyebrow">DEMANDE D'AUDIT GRATUIT</p>
+              <p className="text-eyebrow">{t("DEMANDE D'AUDIT GRATUIT")}</p>
             </Reveal>
 
             <RevealText
               as="h1"
-              text="Découvrez Pourquoi Votre Site Ne Vous Apporte Pas Assez De Clients."
-              boldText="Pas Assez De Clients."
+              text={t("Découvrez Pourquoi Votre Site Ne Vous Apporte Pas Assez De Clients.")}
+              boldText={t("Pas Assez De Clients.")}
               delay={0.06}
               className="text-hero-title mt-5 text-white"
             />
 
             <Reveal direction="up" delay={0.14}>
               <p className="text-body mx-auto mt-6 max-w-2xl on-dark-muted">
-                J'examine personnellement votre site actuel et je vous renvoie des
-                observations claires : ce qui fonctionne déjà, ce qui freine vos
-                visiteurs, et ce qu'il faut améliorer en priorité.
+                {t("J'examine personnellement votre site actuel et je vous renvoie des observations claires : ce qui fonctionne déjà, ce qui freine vos visiteurs, et ce qu'il faut améliorer en priorité.")}
               </p>
             </Reveal>
 
@@ -90,7 +101,7 @@ export function AuditPage() {
                     className="flex items-center gap-3 text-left text-[16px] font-medium text-white"
                   >
                     <CheckOne className="h-[26px] w-[27px] shrink-0" />
-                    {benefit}
+                    {t(benefit)}
                   </li>
                 ))}
               </ul>
@@ -101,7 +112,7 @@ export function AuditPage() {
             <Reveal direction="up" delay={0.22}>
               <p
                 className="mt-8 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 text-[13px] font-medium tracking-[0.02em] text-[#c8c8c8]"
-                aria-label="Note moyenne de 4,9 sur 5"
+                aria-label={t("Note moyenne de 4,9 sur 5")}
               >
                 <span className="flex items-center gap-1" aria-hidden="true">
                   {[0, 1, 2, 3].map((i) => (
@@ -114,7 +125,7 @@ export function AuditPage() {
                     </span>
                   </span>
                 </span>
-                <span>4,9/5</span>
+                <span>{t("4,9/5")}</span>
               </p>
             </Reveal>
           </div>
@@ -124,7 +135,7 @@ export function AuditPage() {
       {/* Formulaire d'audit — carte sombre #232323 posée sur le fond
           #1c1c1c (variante « audit » du LeadForm : l'URL du site
           actuel y est obligatoire). */}
-      <section aria-label="Formulaire de demande d'audit" className="section-dark pb-24 pt-4 sm:pb-28">
+      <section aria-label={t("Formulaire de demande d'audit")} className="section-dark pb-24 pt-4 sm:pb-28">
         <div className="container-site">
           <Reveal direction="up" delay={0.26}>
             <div className="mx-auto max-w-[680px]">
@@ -137,14 +148,14 @@ export function AuditPage() {
               seuil. */}
           <Reveal direction="up" delay={0.3}>
             <p className="mx-auto mt-8 max-w-xl text-center text-sm on-dark-muted">
-              Vous préférez en parler de vive voix&nbsp;?{" "}
+              {avantAppel}
               <a
                 href="#/reserver-un-appel"
                 className="font-medium text-white underline decoration-[#e4e4e4]/50 decoration-2 underline-offset-[6px] transition-colors hover:decoration-[#e4e4e4]"
               >
-                Réservez un appel de 30 minutes
-              </a>{" "}
-              — gratuit et sans engagement.
+                {libelleAppel}
+              </a>
+              {apresAppel}
             </p>
           </Reveal>
         </div>

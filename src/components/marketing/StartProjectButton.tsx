@@ -2,6 +2,8 @@
 
 import React from "react";
 import { ArrowUpRight } from "lucide-react";
+/* VOLET 18 — i18n : libellé par défaut et aria-label via t()/tf(). */
+import { useT } from "@/i18n";
 
 /**
  * Bouton blanc « style header » (pastille flèche ↗, style sheragency) :
@@ -21,14 +23,15 @@ export function StartProjectButton({
   onClick: (e?: React.MouseEvent) => void;
   ariaLabel?: string;
 }) {
+  const { t, tf } = useT();
   return (
     <button
       type="button"
       onClick={onClick}
-      aria-label={ariaLabel ?? `${label} — page de demande de devis`}
+      aria-label={ariaLabel ?? tf("{label} — page de demande de devis", { label: t(label) })}
       className={`group/cta btn-fill inline-flex min-h-[52px] items-center gap-3 rounded-full border border-[#e4e4e4] bg-white py-2 pl-6 pr-2.5 font-medium tracking-[0.01em] text-[#1c1c1c] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-[#c9baac] focus-visible:outline-2 focus-visible:outline-offset-4 [&::before]:bg-[#e4e4e4] ${className}`}
     >
-      <span className="text-[15px]">{label}</span>
+      <span className="text-[15px]">{t(label)}</span>
       <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#e4e4e4] transition-colors duration-300 group-hover/cta:bg-[#1c1c1c]">
         <ArrowUpRight
           className="h-3.5 w-3.5 text-[#1c1c1c] transition-colors duration-300 group-hover/cta:text-white"

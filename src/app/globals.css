@@ -201,6 +201,13 @@ html.lenis body {
   font-size: clamp(0.95rem, 1.4vw, 1.075rem);
   line-height: 1.75;
 }
+/* VOLET 18 (25/11/2026) — description du hero LÉGÈREMENT réduite
+   (demande de l'éditeur) : un cran sous .text-body, mêmes paliers
+   relatifs (min 0,95→0,9 rem, max 1,075→1 rem). La sélecteur par
+   identifiant l'emporte sur l'utilitaire .text-body du hero. */
+#hero .hero-desc {
+  font-size: clamp(0.9rem, 1.3vw, 1rem);
+}
 
 /* ---------- Sections ---------- */
 .section-dark {

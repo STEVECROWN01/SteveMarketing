@@ -14,15 +14,20 @@ import type { CoordonneesBancaires, DemandeDocument, LigneDocument } from "./typ
 
 /** Émetteur — identité affichée en haut de chaque document.
  *  VOLET 17 : « Professionnel : Stevens AKPOVI » (majuscules,
- *    demande de l'éditeur). */
+ *    demande de l'éditeur).
+ *  VOLET 18 — sous-texte et pays possèdent leur équivalent ANGLAIS
+ *    (subTextEn / paysEn) : le gabarit les choisit selon la langue
+ *    du document ; les valeurs françaises restent la référence. */
 export const EMETTEUR = {
   societe: "Stevens AKPOVI",
   subText: "Concepteur de sites web professionnels",
+  subTextEn: "Professional website designer",
   ifu: "0202212825543",
   rccm: "RB/PKO/23 A 18020",
   contact: "Stevens AKPOVI",
   adresse: "Parakou, Borgou, Bénin",
   pays: "Bénin",
+  paysEn: "Benin",
   siteWeb: "stevensakpovi.vercel.app",
   email: "stevensakpovi@gmail.com",
 } as const;
@@ -45,11 +50,82 @@ export const CONDITIONS_GENERALES: string[] = [
   "Les informations transmises par le client restent strictement confidentielles.",
 ];
 
+/** VOLET 18 — CGV ANGLAISES : traduction fidèle ligne à ligne de
+ *  CONDITIONS_GENERALES, imprimées par le gabarit des documents en
+ *  langue "en" (devis/factures). */
+export const CONDITIONS_GENERALES_EN: string[] = [
+  "The assignment is carried out remotely.",
+  "Deliverables are provided in digital format.",
+  "Work starts once payment has been received.",
+  "One round of minor adjustments is included after delivery.",
+  "Any information provided by the client remains strictly confidential.",
+];
+
 /** Validité par défaut des devis (jours) — 15 jours (volet 15). */
 export const VALIDITE_JOURS = 15;
 
 export const NOTE_DEFAUT =
   "Je reste à votre disposition pour toute question complémentaire et vous remercie pour votre confiance.";
+
+/* ------------------------------------------------------------------
+ * VOLET 18 — TEXTES PAR DÉFAUT PAR LANGUE
+ *
+ * Référence unique des textes pré-remplis d'un NOUVEAU devis : le
+ * formulaire s'en sert (1) pour pré-remplir selon la langue choisie,
+ * (2) pour DÉTECTER les champs encore « par défaut » au moment du
+ * switch FR/EN — seul un texte NON personnalisé est traduit, jamais
+ * un texte rédigé. Les valeurs FR sont les textes historiques,
+ * MOT POUR MOT (le comportement français reste identique).
+ * ------------------------------------------------------------------ */
+
+/** Clés des textes par défaut testables (champs texte du devis). */
+export type CleTexteDefaut =
+  | "intro"
+  | "conditionsReglement"
+  | "modePaiement"
+  | "notes"
+  | "delaiEstime"
+  | "designationLigne"
+  | "descriptionLigne";
+
+/** Textes par défaut FR/EN — ex. TEXTES_DEFAUT.en.intro. */
+export const TEXTES_DEFAUT: Record<"fr" | "en", Record<CleTexteDefaut, string>> = {
+  fr: {
+    intro:
+      "Le présent devis concerne la création d'un site web professionnel conçu pour valoriser votre activité, attirer les bons visiteurs et transformer leur intérêt en demandes concrètes.",
+    conditionsReglement: "À réception",
+    modePaiement: "Virement bancaire",
+    notes: NOTE_DEFAUT,
+    delaiEstime: "02 à 03 semaines",
+    designationLigne: "Site Web Professionnel — Conception complète",
+    descriptionLigne: [
+      "Écoute stratégique et compréhension de votre activité.",
+      "Conception sur mesure au code pur, sans template générique.",
+      "Rédaction professionnelle des textes (copywriting inclus).",
+      "Référencement de base (SEO) dès la conception.",
+      "Adaptation mobile, tablette et ordinateur.",
+      "Mise en ligne et livraison dans un délai très court.",
+    ].join("\n"),
+  },
+  en: {
+    intro:
+      "This quote concerns the creation of a professional website designed to showcase your business, attract the right visitors and turn their interest into concrete enquiries.",
+    conditionsReglement: "Upon receipt",
+    modePaiement: "Bank transfer",
+    notes:
+      "I remain at your disposal for any further questions and thank you for your trust.",
+    delaiEstime: "02 to 03 weeks",
+    designationLigne: "Professional Website — Complete design",
+    descriptionLigne: [
+      "Strategic listening and understanding of your business.",
+      "Tailor-made design in pure code, with no generic template.",
+      "Professional copywriting (text writing included).",
+      "Basic search engine optimisation (SEO) built in from the design stage.",
+      "Mobile, tablet and desktop responsiveness.",
+      "Go-live and delivery within a very short timeframe.",
+    ].join("\n"),
+  },
+};
 
 function nouvelleLigne(partial: Partial<LigneDocument> & { designation: string; prixUnitaire: number }): LigneDocument {
   return {
@@ -64,33 +140,32 @@ function nouvelleLigne(partial: Partial<LigneDocument> & { designation: string; 
 /** Pré-remplissage par défaut d'un NOUVEAU DEVIS : prestation type
  *  de l'offre de Stevens (site web professionnel), client à
  *  compléter. VOLET 17 : description RÉDIGÉE (texte riche) au lieu
- *  des puces, délai estimé porté par le document. */
-export function devisParDefaut(): Omit<DemandeDocument, "docType" | "numeroClient" | "date"> {
+ *  des puces, délai estimé porté par le document.
+ *  VOLET 18 — paramètre `langue` ("fr" par défaut) : les textes par
+ *  défaut et la langue du document suivent la langue choisie ; les
+ *  valeurs FR restent identiques mot pour mot. */
+export function devisParDefaut(
+  langue: "fr" | "en" = "fr",
+): Omit<DemandeDocument, "docType" | "numeroClient" | "date"> {
+  const t = TEXTES_DEFAUT[langue];
   return {
+    langue,
     client: { nom: "", entreprise: "", ville: "", pays: "Bénin", telephone: "", email: "" },
     objet: "Création d'un site web professionnel",
-    intro:
-      "Le présent devis concerne la création d'un site web professionnel conçu pour valoriser votre activité, attirer les bons visiteurs et transformer leur intérêt en demandes concrètes.",
+    intro: t.intro,
     items: [
       nouvelleLigne({
-        designation: "Site Web Professionnel — Conception complète",
-        description: [
-          "Écoute stratégique et compréhension de votre activité.",
-          "Conception sur mesure au code pur, sans template générique.",
-          "Rédaction professionnelle des textes (copywriting inclus).",
-          "Référencement de base (SEO) dès la conception.",
-          "Adaptation mobile, tablette et ordinateur.",
-          "Mise en ligne et livraison dans un délai très court.",
-        ].join("\n"),
+        designation: t.designationLigne,
+        description: t.descriptionLigne,
         prixUnitaire: 350000,
       }),
     ],
     devise: "EUR",
-    delaiEstime: "02 à 03 semaines",
-    conditionsReglement: "À réception",
-    modePaiement: "Virement bancaire",
+    delaiEstime: t.delaiEstime,
+    conditionsReglement: t.conditionsReglement,
+    modePaiement: t.modePaiement,
     validiteJours: VALIDITE_JOURS,
-    notes: NOTE_DEFAUT,
+    notes: t.notes,
     banque: { ...BANQUE_DEFAUT },
   };
 }
