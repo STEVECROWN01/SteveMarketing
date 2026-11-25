@@ -18,13 +18,17 @@ const MDP = "MotDePasseTest-Volet17";
 (async () => {
   const browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  /* VOLET 17 (reprise) : « networkidle » bloquait (requêtes externes
+     pendantes) — « load » comme la sonde 16, délais bornés. */
+  page.setDefaultTimeout(15000);
   const resultats = [];
   const ok = (nom, cond) => {
     resultats.push([cond ? "OK" : "ÉCHEC", nom]);
     console.log(`${cond ? "✓" : "✗"} ${nom}`);
   };
 
-  await page.goto(`${BASE}/#admin`, { waitUntil: "networkidle", timeout: 60000 });
+  await page.goto(`${BASE}/#admin`, { waitUntil: "load", timeout: 45000 });
+  await page.waitForTimeout(1500);
 
   /* 1 — Connexion */
   ok("C1 login : titre « Bienvenue, Stevens ! »", await page.locator("h1:has-text('Bienvenue, Stevens !')").count() === 1);
