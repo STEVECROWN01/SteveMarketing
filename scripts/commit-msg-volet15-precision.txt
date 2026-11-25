@@ -1,0 +1,18 @@
+VOLET 15 — PRÉCISION : « K.QUOTES » DISPARAÎT DU PAQUET CLIENT
+
+La sonde de production (sonde-prod-volet15-2026-11-25.js, 22/23)
+repérait une trace résiduelle de « K.Quotes » dans les chunks
+téléchargés par le navigateur : un commentaire placé DANS le
+gabarit CSS (chaîne de caractères, donc insensible à la
+minification) de document-html.ts.
+
+- « Bloc Paiement (factures) — structure K.Quotes. » reformulé ;
+- le second commentaire du gabarit CSS, de même ;
+- les commentaires de code (types.ts, format.ts, defaults.ts) sont
+  retirés du paquet client par la minification — ils restent dans
+  le source comme documentation interne (fichiers partagés avec le
+  serveur, jamais exposés au navigateur) ;
+- les composants admin eux-mêmes ne mentionnent plus K.Quotes
+  (déjà le cas au commit précédent).
+
+Cible : 23/23 verts à la re-sonde de production.

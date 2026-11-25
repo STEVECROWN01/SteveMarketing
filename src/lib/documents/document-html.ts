@@ -106,7 +106,8 @@ export function renderDocumentHtml(
       : ""
     : "";
 
-  /* Bloc Paiement (factures) — structure K.Quotes. */
+  /* Bloc Paiement (factures) — statut, date de règlement et volet
+     bancaire restitués au format attendu par le gabarit imprimable. */
   const blocPaiement = estFacture
     ? `
       <div class="invoice-payment-block">
@@ -483,7 +484,7 @@ export function renderDocumentHtml(
   .signature-line .sig-separator { color: #6b7280; margin: 0 4px; font-weight: 400; }
   .signature-line .sig-quality-inline { color: #6b7280; font-weight: 400; font-style: italic; }
 
-  /* ---- Bloc Paiement (factures) — structure K.Quotes ---- */
+  /* ---- Bloc Paiement (factures) : habillage du volet règlement ---- */
   .invoice-payment-block {
     background: rgba(75, 138, 107, 0.08);
     border: 1px solid rgba(75, 138, 107, 0.3);
