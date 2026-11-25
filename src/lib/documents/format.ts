@@ -86,3 +86,15 @@ export function buildNomFichier(
 export function totalDocument(items: { quantite: number; prixUnitaire: number }[]): number {
   return items.reduce((somme, it) => somme + (Number(it.quantite) || 0) * (Number(it.prixUnitaire) || 0), 0);
 }
+
+/** Montant façon « proposition commerciale » (VOLET 16) : « 2 000 € »
+ *  sans décimales quand le montant est entier (template de l'éditeur). */
+export function fmtMontantSimple(montant: number, devise: string = "EUR"): string {
+  const n = Number.isFinite(montant) ? montant : 0;
+  const nb = n.toLocaleString("fr-FR", {
+    minimumFractionDigits: Number.isInteger(n) ? 0 : 2,
+    maximumFractionDigits: 2,
+  });
+  const m = MONNAIES[devise] ?? MONNAIES.EUR;
+  return m.avant ? `${m.symbole}${nb}` : `${nb} ${m.symbole}`;
+}

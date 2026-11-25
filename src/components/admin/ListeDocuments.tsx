@@ -6,7 +6,9 @@ import { ApercuDocument } from "./ApercuDocument";
 import { Carte, Pastille } from "./elements";
 import type { DocumentRecord, DocType } from "@/lib/documents/types";
 import { LABELS_DOC } from "@/lib/documents/types";
-import { formatDate, formatCurrency, totalDocument } from "@/lib/documents/format";
+import { estPropositionV2 } from "@/lib/documents/proposition";
+import type { ToutDocument } from "@/lib/documents/github";
+import { formatDate, formatCurrency, totalDocument, fmtMontantSimple } from "@/lib/documents/format";
 
 /**
  * LISTE DES DOCUMENTS D'UN TYPE (VOLET 15) — chaque rubrique du
@@ -34,15 +36,15 @@ export function ListeDocuments({
   onFacturer,
 }: {
   docType: DocType;
-  documents: DocumentRecord[];
+  documents: ToutDocument[];
   chargement: boolean;
   stockageConfigure: boolean;
   onRafraichir: () => void;
   toast: (t: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
-  onModifier: (d: DocumentRecord) => void;
+  onModifier: (d: ToutDocument) => void;
   onFacturer?: (d: DocumentRecord) => void;
 }) {
-  const [apercu, setApercu] = useState<DocumentRecord | null>(null);
+  const [apercu, setApercu] = useState<ToutDocument | null>(null);
   const [enCours, setEnCours] = useState<string | null>(null);
 
   /* ORDRE DE CRÉATION : du premier au dernier document créé. */
@@ -57,7 +59,7 @@ export function ListeDocuments({
   const factureExistante = (numeroDevis: string) =>
     documents.find((f) => f.docType === "facture" && f.devisSource === numeroDevis);
 
-  async function telecharger(record: DocumentRecord, avecEnregistrement = false) {
+  async function telecharger(record: ToutDocument, avecEnregistrement = false) {
     const cle = `${record.numero}-pdf`;
     setEnCours(cle);
     try {
@@ -91,7 +93,7 @@ export function ListeDocuments({
     }
   }
 
-  async function telechargerExistant(record: DocumentRecord) {
+  async function telechargerExistant(record: ToutDocument) {
     try {
       await telecharger(record, false);
       toast({ title: `${record.numero} téléchargé` });
@@ -100,8 +102,11 @@ export function ListeDocuments({
     }
   }
 
-  async function supprimer(record: DocumentRecord) {
-    if (!window.confirm(`Supprimer définitivement ${record.numero} (${record.client.nom}) du stockage ?`)) return;
+  async function supprimer(record: ToutDocument) {
+    const intitule = estPropositionV2(record)
+      ? `${record.numero} (${record.projet})`
+      : `${record.numero} (${record.client.nom})`;
+    if (!window.confirm(`Supprimer définitivement ${intitule} du stockage ?`)) return;
     setEnCours(`${record.numero}-suppr`);
     try {
       const res = await fetch(`/api/documents/${encodeURIComponent(record.id)}`, { method: "DELETE" });
@@ -156,7 +161,7 @@ export function ListeDocuments({
             <thead>
               <tr className="border-b border-[#e4e4e4]/10 text-[11px] tracking-widest text-[#c8c8c8] uppercase">
                 <th className="px-5 py-4">Numéro</th>
-                <th className="px-5 py-4">Client</th>
+                <th className="px-5 py-4">{docType === "proposition" ? "Projet" : "Client"}</th>
                 <th className="px-5 py-4">Date</th>
                 <th className="px-5 py-4">Total</th>
                 <th className="px-5 py-4">Statut</th>
@@ -166,16 +171,28 @@ export function ListeDocuments({
             <tbody>
               {visibles.map((d) => {
                 const facture = d.docType === "devis" ? factureExistante(d.numero) : undefined;
+                const prop = estPropositionV2(d);
                 return (
                   <tr key={d.id} className="border-b border-[#e4e4e4]/8 transition-colors hover:bg-[#2f2f2f]/40">
                     <td className="whitespace-nowrap px-5 py-4 font-medium text-white">{d.numero}</td>
-                    <td className="max-w-[220px] px-5 py-4">
-                      <p className="truncate font-medium text-white">{d.client.nom}</p>
-                      {d.client.entreprise ? <p className="truncate text-xs text-[#c8c8c8]">{d.client.entreprise}</p> : null}
+                    <td className="max-w-[260px] px-5 py-4">
+                      {prop ? (
+                        <>
+                          <p className="truncate font-medium text-white">{d.projet}</p>
+                          <p className="truncate text-xs text-[#c8c8c8]">{d.titre}</p>
+                        </>
+                      ) : (
+                        <>
+                          <p className="truncate font-medium text-white">{d.client.nom}</p>
+                          {d.client.entreprise ? <p className="truncate text-xs text-[#c8c8c8]">{d.client.entreprise}</p> : null}
+                        </>
+                      )}
                     </td>
                     <td className="whitespace-nowrap px-5 py-4 text-[#c8c8c8]">{formatDate(d.date)}</td>
                     <td className="whitespace-nowrap px-5 py-4 font-medium text-white">
-                      {formatCurrency(totalDocument(d.items), d.devise)}
+                      {prop
+                        ? fmtMontantSimple(d.montant, d.devise)
+                        : formatCurrency(totalDocument((d as DocumentRecord).items), d.devise)}
                     </td>
                     <td className="px-5 py-4">
                       {d.docType === "facture" ? (
@@ -229,7 +246,7 @@ export function ListeDocuments({
                         {d.docType === "devis" && onFacturer ? (
                           <button
                             type="button"
-                            onClick={() => onFacturer(d)}
+                            onClick={() => onFacturer(d as DocumentRecord)}
                             className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-[#e4e4e4]"
                             aria-label={`Générer la facture du devis ${d.numero}`}
                             title="Générer la facture"
@@ -273,7 +290,9 @@ export function ListeDocuments({
           <div className="flex h-full max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border border-[#e4e4e4]/15 bg-[#141414]">
             <div className="flex items-center justify-between border-b border-[#e4e4e4]/10 px-5 py-3">
               <p className="font-display text-sm font-semibold text-white">
-                {LABELS_DOC[apercu.docType]} {apercu.numero} — {apercu.client.nom}
+                {apercu.docType === "proposition" && estPropositionV2(apercu)
+                  ? `Proposition commerciale ${apercu.numero} — ${apercu.projet}`
+                  : `${LABELS_DOC[apercu.docType]} ${apercu.numero} — ${(apercu as DocumentRecord).client.nom}`}
               </p>
               <button
                 type="button"

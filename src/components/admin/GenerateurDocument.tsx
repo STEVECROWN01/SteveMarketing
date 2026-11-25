@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Download, Loader2, Pencil, Plus, Save, Sparkles, Trash2 } from "lucide-react";
+import { Download, Inbox, Loader2, Pencil, Plus, Save, Sparkles, Trash2 } from "lucide-react";
 import { ApercuDocument } from "./ApercuDocument";
 import { BoutonAction, Carte, Champ, Pastille, TitreSection, styleInput } from "./elements";
 import {
-  CONDITIONS_REGLEMENT,
   DEVISES,
   MODES_PAIEMENT,
   type DocType,
@@ -40,6 +39,28 @@ import {
 
 type Formulaire = Omit<DocumentRecord, "id" | "numero" | "createdAt" | "updatedAt" | "docType">;
 
+/** Pré-remplissage depuis une DEMANDE reçue (VOLET 16) : contact
+ *  du demandeur + récapitulatif de sa demande (affiché au-dessus du
+ *  formulaire, jamais imprimé sur le document). */
+export type PreRemplissage = {
+  client?: Partial<{
+    nom: string;
+    entreprise: string;
+    ville: string;
+    pays: string;
+    telephone: string;
+    email: string;
+  }>;
+  origine?: {
+    nom: string;
+    email?: string;
+    telephone?: string | null;
+    entreprise?: string | null;
+    date: string;
+    message: string;
+  };
+};
+
 function nouvelleLigneVide(): LigneDocument {
   return {
     id: Math.random().toString(36).slice(2, 10),
@@ -56,6 +77,7 @@ function etatInitial(
   docType: DocType,
   prochainNumero: number,
   initial: DocumentRecord | null,
+  preRemplissage: PreRemplissage | null,
 ): Formulaire {
   if (initial) {
     /* ÉDITION : on reprend le document tel quel ; le numéro et
@@ -68,6 +90,9 @@ function etatInitial(
     docType === "proposition" ? propositionParDefaut() : devisParDefaut();
   return {
     ...(base as unknown as Formulaire),
+    ...(preRemplissage?.client
+      ? { client: { ...(base as unknown as Formulaire).client, ...preRemplissage.client } }
+      : {}),
     numeroClient: prochainNumero,
     date: new Date().toISOString().slice(0, 10),
   };
@@ -80,6 +105,7 @@ export function GenerateurDocument({
   onEnregistre,
   toast,
   initial = null,
+  preRemplissage = null,
 }: {
   docType: "devis" | "proposition";
   prochainNumero: number;
@@ -88,8 +114,12 @@ export function GenerateurDocument({
   toast: (t: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
   /** VOLET 15 : document existant à MODIFIER (null = création). */
   initial?: DocumentRecord | null;
+  /** VOLET 16 : pré-remplissage depuis une demande reçue. */
+  preRemplissage?: PreRemplissage | null;
 }) {
-  const [form, setForm] = useState<Formulaire>(() => etatInitial(docType, prochainNumero, initial));
+  const [form, setForm] = useState<Formulaire>(() =>
+    etatInitial(docType, prochainNumero, initial, preRemplissage),
+  );
   const [generation, setGeneration] = useState(false);
   const [enregistrement, setEnregistrement] = useState(false);
 
@@ -127,6 +157,17 @@ export function GenerateurDocument({
       phases: (f.phases ?? []).map((p, i) => (i === index ? { ...p, ...patch } : p)),
     }));
 
+  /* VOLET 16 : la condition de règlement est TOUJOURS « À réception »
+     (demande de l'éditeur) — plus de champ dans le formulaire, la
+     valeur est posée automatiquement à chaque enregistrement. */
+  const corpsDocument = () => ({
+    ...form,
+    conditionsReglement: "À réception",
+    docType,
+    numero,
+    ...(initial ? { id: initial.id, createdAt: initial.createdAt } : {}),
+  });
+
   async function genererPdf() {
     if (generation) return;
     if (!form.client.nom.trim()) {
@@ -139,7 +180,7 @@ export function GenerateurDocument({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          document: { ...form, docType, numero, ...(initial ? { id: initial.id, createdAt: initial.createdAt } : {}) },
+          document: corpsDocument(),
           enregistrer: true,
           envoyerEmail: true,
         }),
@@ -189,7 +230,7 @@ export function GenerateurDocument({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          document: { ...form, docType, numero, ...(initial ? { id: initial.id, createdAt: initial.createdAt } : {}) },
+          document: corpsDocument(),
         }),
       });
       const data = await res.json().catch(() => null);
@@ -233,6 +274,30 @@ export function GenerateurDocument({
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_470px]">
       {/* ---------------- Formulaire ---------------- */}
       <div className="space-y-6">
+        {/* Demande à l'origine (VOLET 16 — jamais imprimée) */}
+        {preRemplissage?.origine ? (
+          <Carte className="border-[#e4e4e4]/25 bg-[#1c1c1c] p-5">
+            <div className="mb-3 flex items-center gap-2.5">
+              <Inbox className="h-4 w-4 text-[#e4e4e4]" aria-hidden="true" />
+              <h3 className="font-display text-base font-semibold text-white">
+                Demande à l&apos;origine de ce devis
+              </h3>
+            </div>
+            <p className="text-xs text-[#c8c8c8]">
+              {preRemplissage.origine.nom}
+              {preRemplissage.origine.email ? ` — ${preRemplissage.origine.email}` : ""}
+              {preRemplissage.origine.entreprise ? ` — ${preRemplissage.origine.entreprise}` : ""}
+              {` · reçue le ${preRemplissage.origine.date}`}
+            </p>
+            <p className="mt-2 max-h-32 overflow-y-auto whitespace-pre-line text-sm leading-relaxed text-[#d9d9d9]">
+              {preRemplissage.origine.message}
+            </p>
+            <p className="mt-3 text-[11px] text-[#c8c8c8]/70">
+              Les coordonnées du demandeur sont déjà reportées ci-dessous dans la fiche client.
+            </p>
+          </Carte>
+        ) : null}
+
         {/* Client */}
         <Carte className="p-5 sm:p-6">
           <TitreSection note={`Numéro : ${numero}`}>Client & document</TitreSection>
@@ -384,9 +449,10 @@ export function GenerateurDocument({
           </Carte>
         )}
 
-        {/* Règlement & banque */}
+        {/* Règlement & banque — VOLET 16 : plus de champ « Conditions
+            de règlement », toujours « À réception » automatiquement. */}
         <Carte className="p-5 sm:p-6">
-          <TitreSection>Règlement & coordonnées bancaires</TitreSection>
+          <TitreSection note="règlement toujours à réception">Règlement & coordonnées bancaires</TitreSection>
           <div className="grid gap-4 sm:grid-cols-2">
             <Champ label="Devise">
               <select className={styleInput} value={form.devise} onChange={(e) => maj("devise", e.target.value)}>
@@ -394,13 +460,6 @@ export function GenerateurDocument({
                   <option key={dv.code} value={dv.code} className="bg-[#232323]">
                     {dv.label}
                   </option>
-                ))}
-              </select>
-            </Champ>
-            <Champ label="Conditions de règlement">
-              <select className={styleInput} value={form.conditionsReglement} onChange={(e) => maj("conditionsReglement", e.target.value)}>
-                {CONDITIONS_REGLEMENT.map((c) => (
-                  <option key={c} value={c} className="bg-[#232323]">{c}</option>
                 ))}
               </select>
             </Champ>
@@ -467,7 +526,7 @@ export function GenerateurDocument({
       </div>
 
       {/* ---------------- Aperçu ---------------- */}
-      <div className="xl:sticky xl:top-6 xl:h-[calc(100vh-6rem)]">
+      <div className="xl:sticky xl:top-6 xl:h-[calc(100vh-3rem)]">
         <ApercuDocument document={pourApercu} />
       </div>
     </div>

@@ -5,8 +5,8 @@ import {
   saveDocument,
   completerDocument,
   isStorageConfigured,
+  type ToutDocument,
 } from "@/lib/documents/github";
-import type { DocumentRecord } from "@/lib/documents/types";
 import { isEmailServiceConfigured } from "@/lib/email";
 
 export const runtime = "nodejs";
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
   if (!isStorageConfigured()) {
     return NextResponse.json({
       ok: true,
-      documents: [] as DocumentRecord[],
+      documents: [] as ToutDocument[],
       stockageConfigure: false,
       emailConfigure: isEmailServiceConfigured(),
     });
@@ -62,13 +62,17 @@ export async function POST(req: NextRequest) {
   if (!d || !["proposition", "devis", "facture"].includes(d?.docType)) {
     return NextResponse.json({ ok: false, error: "Document invalide." }, { status: 422 });
   }
-  if (!Number.isFinite(Number(d?.numeroClient)) || !Array.isArray(d?.items)) {
+  /* Proposition commerciale v2 (VOLET 16) : structure en sections,
+     sans tableau d'items. */
+  const estPropV2 = d.docType === "proposition" && d.sections && typeof d.titre === "string";
+  if (!Number.isFinite(Number(d?.numeroClient))) {
+    return NextResponse.json({ ok: false, error: "Document invalide." }, { status: 422 });
+  }
+  if (!estPropV2 && !Array.isArray(d?.items)) {
     return NextResponse.json({ ok: false, error: "Document invalide." }, { status: 422 });
   }
   try {
-    const document = completerDocument(
-      d as Partial<DocumentRecord> & Pick<DocumentRecord, "docType" | "numeroClient">,
-    );
+    const document = completerDocument(d as Parameters<typeof completerDocument>[0]) as ToutDocument;
     await saveDocument(document);
     return NextResponse.json({ ok: true, document });
   } catch (e) {

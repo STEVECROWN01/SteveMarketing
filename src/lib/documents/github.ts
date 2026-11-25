@@ -24,7 +24,12 @@
  */
 
 import type { DocumentRecord } from "./types";
+import type { PropositionRecord } from "./proposition";
 import { buildIdDocument, buildNumero } from "./format";
+
+/** Tout document commercial (gabarit historique OU proposition
+ *  commerciale v2 — VOLET 16). */
+export type ToutDocument = DocumentRecord | PropositionRecord;
 
 const API = "https://api.github.com";
 const DOSSIER = "documents";
@@ -66,7 +71,7 @@ async function gh(chemin: string, init: RequestInit = {}): Promise<Response> {
 }
 
 /** Liste tous les documents enregistrés (plus récents d'abord). */
-export async function listDocuments(): Promise<DocumentRecord[]> {
+export async function listDocuments(): Promise<ToutDocument[]> {
   if (!isStorageConfigured()) throw new Error(messageStockageNonConfigure());
   const { repo, branch } = getConfig();
 
@@ -88,19 +93,19 @@ export async function listDocuments(): Promise<DocumentRecord[]> {
       if (!data.content) return null;
       const json = Buffer.from(data.content, data.encoding === "base64" ? "base64" : "utf8").toString("utf8");
       try {
-        return JSON.parse(json) as DocumentRecord;
+        return JSON.parse(json) as ToutDocument;
       } catch {
         return null;
       }
     }),
   );
   return documents
-    .filter((d): d is DocumentRecord => Boolean(d))
+    .filter((d): d is ToutDocument => Boolean(d))
     .sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""));
 }
 
 /** Enregistre (crée ou met à jour) un document. */
-export async function saveDocument(document: DocumentRecord): Promise<void> {
+export async function saveDocument(document: ToutDocument): Promise<void> {
   if (!isStorageConfigured()) throw new Error(messageStockageNonConfigure());
   const { repo, branch } = getConfig();
   const chemin = `/repos/${repo}/contents/${DOSSIER}/${document.id}.json`;
@@ -126,7 +131,7 @@ export async function saveDocument(document: DocumentRecord): Promise<void> {
 }
 
 /** Récupère un document par son identifiant de fichier. */
-export async function getDocument(id: string): Promise<DocumentRecord | null> {
+export async function getDocument(id: string): Promise<ToutDocument | null> {
   if (!isStorageConfigured()) throw new Error(messageStockageNonConfigure());
   const { repo, branch } = getConfig();
   const nomFichier = id.endsWith(".json") ? id : `${id}.json`;
@@ -165,14 +170,21 @@ export async function deleteDocument(id: string): Promise<void> {
 }
 
 /** Complète un document partiel en enregistrement complet
- *  (identifiant, numéro, horodatages). */
-export function completerDocument(
-  d: Partial<DocumentRecord> & Pick<DocumentRecord, "docType" | "numeroClient">,
-): DocumentRecord {
+ *  (identifiant, numéro, horodatages) — gabarit historique comme
+ *  proposition commerciale v2. */
+export function completerDocument<
+  T extends {
+    docType: "proposition" | "devis" | "facture";
+    numeroClient: number;
+    numero?: string;
+    id?: string;
+    createdAt?: string;
+  },
+>(d: T): T & { numero: string; id: string; createdAt: string; updatedAt: string } {
   const maintenant = new Date().toISOString();
   const numero = d.numero || buildNumero(Number(d.numeroClient) || 1, d.docType);
   return {
-    ...(d as DocumentRecord),
+    ...d,
     numero,
     id: d.id || buildIdDocument(d.docType, numero),
     createdAt: d.createdAt || maintenant,

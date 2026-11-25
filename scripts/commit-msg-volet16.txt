@@ -1,0 +1,84 @@
+VOLET 16 — CONNEXION RÉHABILLÉE, PROPOSITION COMMERCIALE SUR LE
+GABARIT PERSONNEL DE L'ÉDITEUR, DEMANDES → DEVIS PRÉ-REmpli,
+APERÇU PLEINE HAUTEUR (25/11/2026)
+
+Demandes de l'éditeur, 60/60 contrôles verts (scripts/
+sonde-volet16-2026-11-25.js — la sonde intercepte /api/documents*
+et /api/admin/leads* avec de faux documents : aucun test n'écrit
+dans le stockage réel ; la connexion passe par la VRAIE API).
+
+CONNEXION
+- Le LOGO du site remplace l'icône cadenas, centré horizontalement
+  dans la carte ; le message de bienvenue est centré lui aussi ;
+  le titre devient « Backoffice » (l'œil noir du volet 15 et le
+  message « Bienvenue, Stevens. » sont conservés).
+
+BARRE SUPÉRIEURE
+- Logo agrandi : sa hauteur s'aligne désormais sur celle des
+  boutons à droite (44 px) ;
+- « BACK-OFFICE », plus grand (13 px), est aligné sur le BAS du
+  logo (plus de centrage vertical).
+
+DEMANDES REÇUES
+- « Gagnée / Perdue » devient « Signée / Non retenue » (l'éditeur
+  ne veut pas d'un vocabulaire de jeu) ;
+- Filtres de type : Devis, Audits, Messages — l'option combinée
+  « Devis + Audits + Messages » passe en DERNIÈRE position ;
+- Chaque demande de DEVIS porte un bouton « Créer un devis » :
+  l'espace de création s'ouvre avec les coordonnées du demandeur
+  PRÉ-REmplis (nom, email, téléphone, entreprise) et une carte
+  « Demande à l'origine » récapitulant son message (jamais
+  imprimée sur le document).
+
+FACTURES SANS DEVIS
+- « Créer une nouvelle facture » sans aucun devis : le message
+  « Aucun devis n'est créé pour le moment… » est suivi d'un bouton
+  « Créer un devis » qui ouvre directement l'espace de création.
+
+FORMULAIRE DES DEVIS
+- Champ « Conditions de règlement » SUPPRIMÉ : la valeur est
+  toujours « À réception », posée automatiquement à chaque
+  enregistrement.
+
+APERÇU DES DOCUMENTS (pleine hauteur)
+- L'aperçu, calé pendant le défilement du formulaire, remplit
+  désormais TOUT la hauteur de l'espace dédié : l'échelle se
+  calcule sur la taille RÉELLE du panneau (mesure continue
+  ResizeObserver), s'adapte à tous les écrans, et l'espace
+  laissé sous l'aperçu est identique à celui au-dessus ;
+- Une page A4 à la fois, avec navigation ‹ page N / total ›.
+
+PROPOSITION COMMERCIALE — NOUVEAU GABARIT (PDF fourni en exemple)
+- La proposition quitte le gabarit « devis » et suit EXACTEMENT le
+  template de l'éditeur : Poppins, palette monochrome (#F8F8F8,
+  #141414, filets #DCDAD6), marges 22 mm, en-tête « PROPOSITION
+  COMMERCIALE » + titre + logo, bloc VOTRE PROJET / PRESTATAIRE /
+  MONTANT TOTAL / DÉLAI ESTIMÉ, huit sections numérotées (01→08 :
+  présentation, objectifs, périmètre lettré A/B/C…, investissement
+  sur bandeau noir, calendrier avec étapes numérotées, modalités
+  de paiement en blocs 2/3/4, validation, conclusion + signature),
+  filigrane logo pleine page, en-tête compact répété, pied «
+  prestataire · Proposition commerciale · site — NN / NN » ;
+- PAGINATION AUTOMATIQUE : le contenu est mesuré par un script
+  INSÉRÉ dans le document et réparti en pages A4 explicites —
+  six pages avec les valeurs par défaut, comme l'exemple ;
+- Le formulaire de création suit la structure du document, champ
+  par champ (un champ ou une liste par niveau, échéances avec
+  pourcentages et montants calculés) ; les valeurs PAR DÉFAUT
+  reprennent le CONTENU de l'exemple — les informations
+  personnelles du client de l'exemple (nom, ville, situation) ne
+  sont PAS reproduites ;
+- Aperçu en direct paginé (postMessage), PDF via Puppeteer
+  (attente de pagination stable), enregistrement et copie email
+  adaptés (projet/titre au lieu du nom de client) ;
+- Les propositions créées avec l'ANCIEN gabarit restent
+  consultables et modifiables (composant historique conservé) ;
+- Liste : colonne « Projet », montant sans décimales (« 2 000 € »).
+
+NOTES TECHNIQUES
+- proposition.ts / proposition-html.ts / GenerateurProposition.tsx
+  (nouveaux) ; types élargis côté API (ToutDocument) ;
+- pagination : la marge supérieure des blocs est convertie en mm
+  (bug mesuré : marge comptée en pixels comme des millimètres) ;
+  re-paginage automatique quand les polices arrivent ;
+- le PDF attend une pagination STABLE (900 ms sans nouvelle passe).

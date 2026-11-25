@@ -7,12 +7,12 @@ import {
   Download,
   Eye,
   EyeOff,
+  FilePlus2,
   FileText,
   Handshake,
   Inbox,
   LayoutDashboard,
   Loader2,
-  Lock,
   LogOut,
   Plus,
   Receipt,
@@ -22,11 +22,14 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { LEAD_STATUSES } from "@/lib/validation";
 import { ASSETS } from "@/lib/site";
-import { GenerateurDocument } from "@/components/admin/GenerateurDocument";
+import { GenerateurDocument, type PreRemplissage } from "@/components/admin/GenerateurDocument";
+import { GenerateurProposition } from "@/components/admin/GenerateurProposition";
 import { ListeDocuments } from "@/components/admin/ListeDocuments";
 import { EspaceFacture } from "@/components/admin/EspaceFacture";
 import { BoutonAction, Carte, Pastille } from "@/components/admin/elements";
 import type { DocumentRecord } from "@/lib/documents/types";
+import { estPropositionV2, type PropositionRecord } from "@/lib/documents/proposition";
+import type { ToutDocument } from "@/lib/documents/github";
 import { formatCurrency, totalDocument, formatDate } from "@/lib/documents/format";
 
 /**
@@ -89,8 +92,10 @@ const STATUS_LABELS: Record<string, string> = {
   new: "Nouvelle",
   contacted: "Contacté",
   qualified: "Qualifiée",
-  won: "Gagnée",
-  lost: "Perdue",
+  /* VOLET 16 : « Gagnée / Perdue » laissaient croire à un jeu —
+     termes commerciaux appropriés (demande de l'éditeur). */
+  won: "Signée",
+  lost: "Non retenue",
 };
 
 const STATUS_STYLES: Record<string, string> = {
@@ -146,14 +151,22 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
 
   return (
     <div className="container-site flex min-h-screen items-center justify-center py-32">
-      <div className="w-full max-w-md rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-8 sm:p-10">
-        <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#e4e4e4] text-[#1c1c1c]">
-          <Lock className="h-5.5 w-5.5" aria-hidden="true" />
+      <div className="w-full max-w-md rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-8 text-center sm:p-10">
+        {/* VOLET 16 : le logo du site remplace l'icône cadenas —
+            centré horizontalement dans la carte. */}
+        <span className="flex justify-center">
+          <img
+            src={ASSETS.logoLight}
+            alt="Stevens Akpovi"
+            width={300}
+            height={240}
+            className="h-16 w-auto"
+          />
         </span>
         <h1 className="mt-6 font-display text-2xl font-semibold text-white">
-          Espace administrateur
+          Backoffice
         </h1>
-        <p className="mt-2 text-sm leading-relaxed text-[#c8c8c8]">
+        <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-[#c8c8c8]">
           <span className="font-medium text-white">Bienvenue, Stevens.</span>{" "}
           Votre back-office vous attend : retrouvez les demandes de vos
           clients, générez vos propositions, devis et factures en quelques
@@ -166,10 +179,10 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
             <label htmlFor="admin-password" className="mb-1.5 block text-sm font-medium text-white">
               Mot de passe
             </label>
-            {/* Icône œil à l'intérieur du champ (volet 14). VOLET 15 :
-                pastille CLAIRE + icône NOIRE — le contraste reste
-                entier au repos comme au survol (hover : la pastille
-                s'éclaircit, l'icône demeure noire). */}
+          {/* Icône œil à l'intérieur du champ (volet 14). VOLET 15 :
+              pastille CLAIRE + icône NOIRE — le contraste reste
+              entier au repos comme au survol (hover : la pastille
+              s'éclaircit, l'icône demeure noire). */}
             <div className="relative">
               <input
                 id="admin-password"
@@ -226,11 +239,14 @@ function PanneauDemandes({
   loading,
   onActualiser,
   onMajStatut,
+  onCreerDevis,
 }: {
   leads: Lead[];
   loading: boolean;
   onActualiser: () => void;
   onMajStatut: (id: string, status: string) => void;
+  /** VOLET 16 : création d'un devis directement depuis une demande. */
+  onCreerDevis: (lead: Lead) => void;
 }) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("all");
@@ -314,11 +330,14 @@ function PanneauDemandes({
           </button>
         ))}
         <span className="mx-2 hidden h-4 w-px bg-[#e4e4e4]/20 sm:block" aria-hidden="true" />
+        {/* VOLET 16 : les filtres spécifiques d'abord, l'option
+            combinée « Devis + Audits + Messages » en DERNIÈRE
+            position (demande de l'éditeur). */}
         {[
-          { key: "all", label: "Devis + Audits + Messages" },
           { key: "quote", label: "Devis" },
           { key: "audit", label: "Audits" },
           { key: "contact", label: "Messages" },
+          { key: "all", label: "Devis + Audits + Messages" },
         ].map((f) => (
           <button
             key={f.key}
@@ -392,18 +411,36 @@ function PanneauDemandes({
                       {formatDateHeure(lead.createdAt)}
                     </td>
                     <td className="px-5 py-4">
-                      <button
-                        type="button"
-                        onClick={() => setExpanded(expanded === lead.id ? null : lead.id)}
-                        aria-expanded={expanded === lead.id}
-                        aria-label={`Détails de la demande de ${lead.name}`}
-                        className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-[#e4e4e4]"
-                      >
-                        <ChevronRight
-                          className={`h-4 w-4 transition-transform ${expanded === lead.id ? "rotate-90" : ""}`}
-                          aria-hidden="true"
-                        />
-                      </button>
+                      <div className="flex items-center justify-end gap-2">
+                        {/* VOLET 16 : créer un devis directement depuis
+                            une demande de devis reçue (formulaire
+                            pré-rempli avec les coordonnées du
+                            demandeur). */}
+                        {lead.type === "quote" ? (
+                          <button
+                            type="button"
+                            onClick={() => onCreerDevis(lead)}
+                            className="flex min-h-[36px] items-center gap-1.5 rounded-full border border-[#e4e4e4]/25 px-3.5 text-xs font-medium text-white transition-colors hover:border-[#e4e4e4]"
+                            aria-label={`Créer un devis pour la demande de ${lead.name}`}
+                            title="Créer un devis (formulaire pré-rempli)"
+                          >
+                            <FilePlus2 className="h-3.5 w-3.5" aria-hidden="true" />
+                            Créer un devis
+                          </button>
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={() => setExpanded(expanded === lead.id ? null : lead.id)}
+                          aria-expanded={expanded === lead.id}
+                          aria-label={`Détails de la demande de ${lead.name}`}
+                          className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-[#e4e4e4]"
+                        >
+                          <ChevronRight
+                            className={`h-4 w-4 transition-transform ${expanded === lead.id ? "rotate-90" : ""}`}
+                            aria-hidden="true"
+                          />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   {expanded === lead.id && (
@@ -454,14 +491,18 @@ function PanneauDemandes({
 function SelectionDevis({
   documents,
   onChoisir,
+  onCreerDevis,
 }: {
-  documents: DocumentRecord[];
+  documents: ToutDocument[];
   onChoisir: (devis: DocumentRecord) => void;
+  /** VOLET 16 : depuis l'état « aucun devis », un bouton « Créer un
+      devis » ouvre directement l'espace de création de devis. */
+  onCreerDevis: () => void;
 }) {
   const devis = useMemo(
     () =>
       documents
-        .filter((d) => d.docType === "devis")
+        .filter((d): d is DocumentRecord => d.docType === "devis")
         .sort((a, b) => (a.createdAt || "").localeCompare(b.createdAt || "")),
     [documents],
   );
@@ -469,12 +510,17 @@ function SelectionDevis({
 
   if (devis.length === 0) {
     return (
-      <Carte className="flex flex-col items-center gap-3 px-6 py-16 text-center">
+      <Carte className="flex flex-col items-center gap-4 px-6 py-16 text-center">
         <FileText className="h-8 w-8 text-[#e4e4e4]" aria-hidden="true" />
         <p className="max-w-md text-sm leading-relaxed text-[#c8c8c8]">
-          Aucun devis enregistré pour l&apos;instant. Créez d&apos;abord un devis : la facture
+          Aucun devis n&apos;est créé pour le moment. Pour pouvoir facturer et
+          créer une facture, commencez par créer un devis — la facture
           reprend toujours les prestations et le total d&apos;un devis.
         </p>
+        <BoutonAction variant="principal" onClick={onCreerDevis}>
+          <FilePlus2 className="h-4 w-4" aria-hidden="true" />
+          Créer un devis
+        </BoutonAction>
       </Carte>
     );
   }
@@ -566,7 +612,7 @@ export function AdminPage() {
   const [section, setSection] = useState<Section>("tableau");
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(false);
-  const [documents, setDocuments] = useState<DocumentRecord[]>([]);
+  const [documents, setDocuments] = useState<ToutDocument[]>([]);
   const [docsChargement, setDocsChargement] = useState(false);
   const [stockageConfigure, setStockageConfigure] = useState(false);
   const [emailConfigure, setEmailConfigure] = useState(false);
@@ -574,9 +620,11 @@ export function AdminPage() {
 
   /* VOLET 15 — vues des rubriques documents. */
   const [vueDocs, setVueDocs] = useState<VueDocs>("liste");
-  const [docEnEdition, setDocEnEdition] = useState<DocumentRecord | null>(null);
+  const [docEnEdition, setDocEnEdition] = useState<ToutDocument | null>(null);
   const [vueFactures, setVueFactures] = useState<VueFactures>("liste");
   const [factureCible, setFactureCible] = useState<DocumentRecord | null>(null);
+  /* VOLET 16 — pré-remplissage d'un nouveau devis depuis une demande. */
+  const [preRemplissage, setPreRemplissage] = useState<PreRemplissage | null>(null);
 
   const chargerDocuments = useCallback(async () => {
     setDocsChargement(true);
@@ -585,7 +633,7 @@ export function AdminPage() {
       if (res.status === 401) return;
       const data = await res.json();
       if (data?.ok) {
-        setDocuments(data.documents ?? []);
+        setDocuments((data.documents ?? []) as ToutDocument[]);
         setStockageConfigure(Boolean(data.stockageConfigure));
         setEmailConfigure(Boolean(data.emailConfigure));
       }
@@ -656,6 +704,7 @@ export function AdminPage() {
     setDocEnEdition(null);
     setVueFactures("liste");
     setFactureCible(null);
+    setPreRemplissage(null);
     toast({ title: "Espace fermé" });
   }
 
@@ -673,6 +722,33 @@ export function AdminPage() {
     setVueDocs("creation");
     setDocEnEdition(null);
     setVueFactures("liste");
+    if (s === "devis") setPreRemplissage(null);
+  }
+
+  /** VOLET 16 — créer un devis DEPUIS UNE DEMANDE reçue : l'espace
+      de création s'ouvre avec les coordonnées du demandeur
+      pré-remplies et un récapitulatif de sa demande. */
+  function creerDevisDepuisDemande(lead: Lead) {
+    setSection("devis");
+    setVueDocs("creation");
+    setDocEnEdition(null);
+    setVueFactures("liste");
+    setPreRemplissage({
+      client: {
+        nom: lead.name || "",
+        email: lead.email || "",
+        telephone: lead.phone || "",
+        entreprise: lead.company || "",
+      },
+      origine: {
+        nom: lead.name,
+        email: lead.email,
+        telephone: lead.phone,
+        entreprise: lead.company,
+        date: formatDateHeure(lead.createdAt),
+        message: lead.message,
+      },
+    });
   }
 
   /** Raccourci « Nouvelle facture » : ouvre la sélection du devis. */
@@ -684,7 +760,7 @@ export function AdminPage() {
   }
 
   /** Icône « modifier » d'un document de la liste. */
-  function modifierDocument(d: DocumentRecord) {
+  function modifierDocument(d: ToutDocument) {
     setDocEnEdition(d);
     setVueDocs("edition");
   }
@@ -705,7 +781,7 @@ export function AdminPage() {
   const totalFacture = useMemo(
     () =>
       documents
-        .filter((d) => d.docType === "facture")
+        .filter((d): d is DocumentRecord => d.docType === "facture")
         .reduce((somme, d) => somme + totalDocument(d.items), 0),
     [documents],
   );
@@ -794,19 +870,22 @@ export function AdminPage() {
 
   return (
     <div className="section-deep min-h-screen">
-      {/* Barre supérieure — VOLET 15 : logo du site + « BACK-OFFICE »
-          à droite du logo (remplace le titre et l'ancien sur-titre). */}
+      {/* Barre supérieure — VOLET 16 : logo agrandi (hauteur
+          alignée sur celle des boutons à droite) et mention
+          « BACK-OFFICE » plus grande, alignée sur le BAS du logo. */}
       <div className="border-b border-[#e4e4e4]/10 bg-[#070707]">
         <div className="container-site flex flex-wrap items-center justify-between gap-4 py-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-stretch gap-4">
             <img
               src={ASSETS.logoLight}
               alt="Stevens Akpovi"
-              width={50}
-              height={40}
-              className="h-10 w-auto"
+              width={55}
+              height={44}
+              className="h-11 w-auto self-center"
             />
-            <h1 className="text-eyebrow text-[#c8c8c8]">Back-office</h1>
+            <h1 className="self-end pb-1 text-[13px] font-semibold tracking-[0.24em] text-[#c8c8c8] uppercase">
+              Back-office
+            </h1>
           </div>
           <div className="flex items-center gap-3">
             <BoutonAction
@@ -937,21 +1016,28 @@ export function AdminPage() {
 
         {/* ---------------- DEMANDES ---------------- */}
         {section === "demandes" && (
-          <PanneauDemandes leads={leads} loading={loading} onActualiser={chargerDemandes} onMajStatut={majStatut} />
+          <PanneauDemandes
+            leads={leads}
+            loading={loading}
+            onActualiser={chargerDemandes}
+            onMajStatut={majStatut}
+            onCreerDevis={creerDevisDepuisDemande}
+          />
         )}
 
-        {/* ---------------- PROPOSITIONS COMMERCIALES ---------------- */}
+        {/* ---------------- PROPOSITIONS COMMERCIALES ----------------
+            VOLET 16 : gabarit personnel de l'éditeur (PDF fourni en
+            exemple) — formulaire structuré par sections. */}
         {section === "propositions" && vueDocs === "creation" && (
           <>
             <EnteteDocument
               titre="Nouvelle proposition commerciale"
-              description="Présentez votre offre en détail : prestations, déroulé du projet et conditions."
+              description="Rédigez chaque section de votre proposition : le document suit exactement votre gabarit, paginé automatiquement."
               onRetour={() => allerA("propositions")}
               libelleRetour="Retour aux propositions"
             />
-            <GenerateurDocument
+            <GenerateurProposition
               key={`proposition-${prochainNumero}`}
-              docType="proposition"
               prochainNumero={prochainNumero}
               stockageConfigure={stockageConfigure}
               onEnregistre={chargerDocuments}
@@ -959,11 +1045,29 @@ export function AdminPage() {
             />
           </>
         )}
-        {section === "propositions" && vueDocs === "edition" && docEnEdition && (
+        {section === "propositions" && vueDocs === "edition" && docEnEdition && estPropositionV2(docEnEdition) && (
           <>
             <EnteteDocument
               titre={`Modifier la proposition ${docEnEdition.numero}`}
               description="Ajustez la proposition, puis régénérez le PDF mis à jour."
+              onRetour={() => allerA("propositions")}
+              libelleRetour="Retour aux propositions"
+            />
+            <GenerateurProposition
+              key={`edition-${docEnEdition.id}`}
+              prochainNumero={prochainNumero}
+              stockageConfigure={stockageConfigure}
+              onEnregistre={chargerDocuments}
+              toast={toast}
+              initial={docEnEdition}
+            />
+          </>
+        )}
+        {section === "propositions" && vueDocs === "edition" && docEnEdition && !estPropositionV2(docEnEdition) && (
+          <>
+            <EnteteDocument
+              titre={`Modifier la proposition ${docEnEdition.numero}`}
+              description="Proposition créée avec l'ancien gabarit — elle reste modifiable ici."
               onRetour={() => allerA("propositions")}
               libelleRetour="Retour aux propositions"
             />
@@ -1008,12 +1112,13 @@ export function AdminPage() {
               libelleRetour="Retour aux devis"
             />
             <GenerateurDocument
-              key={`devis-${prochainNumero}`}
+              key={`devis-${prochainNumero}${preRemplissage?.origine?.nom ?? ""}`}
               docType="devis"
               prochainNumero={prochainNumero}
               stockageConfigure={stockageConfigure}
               onEnregistre={chargerDocuments}
               toast={toast}
+              preRemplissage={preRemplissage}
             />
           </>
         )}
@@ -1028,7 +1133,7 @@ export function AdminPage() {
             <GenerateurDocument
               key={`edition-${docEnEdition.id}`}
               docType="devis"
-              initial={docEnEdition}
+              initial={docEnEdition as DocumentRecord}
               prochainNumero={prochainNumero}
               stockageConfigure={stockageConfigure}
               onEnregistre={chargerDocuments}
@@ -1052,7 +1157,7 @@ export function AdminPage() {
               onRafraichir={chargerDocuments}
               toast={toast}
               onModifier={modifierDocument}
-              onFacturer={(d) => setFactureCible(d)}
+              onFacturer={(d) => setFactureCible(d as DocumentRecord)}
             />
           </>
         )}
@@ -1066,7 +1171,11 @@ export function AdminPage() {
               onRetour={() => setVueFactures("liste")}
               libelleRetour="Retour aux factures"
             />
-            <SelectionDevis documents={documents} onChoisir={(d) => setFactureCible(d)} />
+            <SelectionDevis
+              documents={documents}
+              onChoisir={(d) => setFactureCible(d)}
+              onCreerDevis={() => ouvrirCreation("devis")}
+            />
           </>
         )}
         {section === "factures" && vueFactures === "liste" && (
@@ -1084,7 +1193,7 @@ export function AdminPage() {
               stockageConfigure={stockageConfigure}
               onRafraichir={chargerDocuments}
               toast={toast}
-              onModifier={(f) => setFactureCible(f)}
+              onModifier={(f) => setFactureCible(f as DocumentRecord)}
             />
           </>
         )}

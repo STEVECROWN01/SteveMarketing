@@ -17,6 +17,8 @@ import path from "path";
 import os from "os";
 import type { DocumentRecord } from "./types";
 import { renderDocumentHtml } from "./document-html";
+import { estPropositionV2, type PropositionRecord } from "./proposition";
+import { renderPropositionHtml } from "./proposition-html";
 
 let browserInstance: Browser | null = null;
 
@@ -85,27 +87,38 @@ async function getBrowser(): Promise<Browser> {
   return browserInstance;
 }
 
-/** Génère le PDF A4 du document (2 pages devis/proposition, 1 page
- *  facture — piloté par le CSS du template). `logoSrc` est un data
- *  URI base64 : setContent n'a pas d'URL de base pour résoudre
- *  /assets/logo-noir.png. */
+/** Génère le PDF A4 du document (2 pages devis, 1 page facture —
+ *  piloté par le CSS du template ; PROPOSITION COMMERCIALE v2 :
+ *  pagination automatique par le script du document). `logoSrc`
+ *  est un data URI base64 : setContent n'a pas d'URL de base pour
+ *  résoudre /assets/logo-noir.png. */
 export async function generatePdf(
-  document: DocumentRecord,
+  document: DocumentRecord | PropositionRecord,
   logoSrc?: string,
 ): Promise<Buffer> {
   const browser = await getBrowser();
   const page = await browser.newPage();
 
-  const html = renderDocumentHtml(document, logoSrc);
+  const estProposition = estPropositionV2(document);
+  const html = estProposition
+    ? renderPropositionHtml(document, logoSrc)
+    : renderDocumentHtml(document as DocumentRecord, logoSrc);
   /* networkidle0 : le HTML référence les polices par <link>
      (Google Fonts) — domcontentloaded n'attend pas leur
      téléchargement et document.fonts.ready résout alors trop tôt
      (signature cursive rendue en police de repli — mesuré au
      contrôle visuel du volet 14). networkidle0 attend que le
      réseau soit calme, polices incluses ; le catch tolère un lien
-     lent (la course fonts.ready ci-dessous borne le reste). */
+     lent (la course fonts.ready ci-dessous borne le reste).
+     NOTE de typage : les types Puppeteer 25 retirent networkidle0
+     de SetContentWaitForOptions (déprécié) mais l'événement reste
+     géré à l'exécution — cast pour conserver le comportement. */
+  const optionsContenu = { waitUntil: "networkidle0", timeout: 45000 } as unknown as {
+    waitUntil: "load";
+    timeout: number;
+  };
   await page
-    .setContent(html, { waitUntil: "networkidle0", timeout: 45000 })
+    .setContent(html, optionsContenu)
     .catch(() => undefined);
   // Attendre les polices web (Inter, Great Vibes) — 5 s maximum.
   /* NOTE : la fonction d'évaluation est passée en CHAÎNE (et non en
@@ -115,6 +128,22 @@ export async function generatePdf(
   await page.evaluate(
     `(() => Promise.race([(document.fonts && document.fonts.ready) || Promise.resolve(), new Promise((r) => setTimeout(r, 5000))]))()`,
   );
+
+  /* PROPOSITION COMMERCIALE (VOLET 16) : attendre la pagination
+     automatique STABLE — le script du document répartit les blocs
+     en pages A4 explicites puis pose window.__paginePc ; les polices
+     Poppins (Google Fonts) peuvent arriver après coup et déclencher
+     un re-paginage : on attend qu'aucune passe n'ait eu lieu depuis
+     900 ms. 20 s maximum, toléré : en cas d'échec le flux continu
+     s'imprime (repli dégradé). */
+  if (estProposition) {
+    await page
+      .waitForFunction(
+        "window.__paginePc === true && (Date.now() - (window.__paginePcAt || 0)) > 900",
+        { timeout: 20000, polling: 400 },
+      )
+      .catch(() => undefined);
+  }
 
   const pdfBuffer = await page.pdf({
     format: "A4",
