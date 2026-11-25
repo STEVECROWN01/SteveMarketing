@@ -87,10 +87,24 @@ export function htmlRicheOuTexteBrut(html: string | null | undefined): string {
     .join("");
 }
 
-/** Découpe une description riche en FRAGMENTS de bloc (un paragraphe
- *  ou une liste) — chaque fragment devient une ligne-bloc paginable
- *  du tableau : une description plus longue qu'une page se poursuit
- *  sur la page suivante, le tableau continue (VOLET 17). */
+/** Découpe une description riche en FRAGMENTS de bloc (un
+ *  paragraphe, un élément de liste) — chaque fragment devient une
+ *  ligne-bloc paginable du tableau : une description plus longue
+ *  qu'une page se poursuit sur la page suivante, le tableau
+ *  continue (VOLET 17).
+ *
+ *  VOLET 19 (26/11/2026) — GRANULARITÉ FINE : les listes
+ *  (<ul>/<ol>) sont ÉCLATÉES élément par élément. Avant, une liste
+ *  entière formait UN SEUL bloc : une description dense était
+ *  repoussée EN BLOC sur la page suivante en laissant un grand vide
+ *  en bas de la première page (bug signalé par l'éditeur : « le
+ *  tableau ne finit pas la première page mais continue sur la page
+ *  suivante, il y a suffisamment d'espace en bas… voire même
+ *  disparaît de la première page »). Désormais CHAQUE <li> est son
+ *  propre bloc paginable : le tableau remplit la page jusqu'en bas
+ *  et se poursuit naturellement. Les fragments d'une même liste
+ *  portent « li-suite » (+ --debut / --fin) : marges calquées sur
+ *  celles d'une liste unique — visuellement RIEN ne change. */
 export function decouperHtmlRiche(html: string | null | undefined): string[] {
   const riche = htmlRicheOuTexteBrut(html);
   if (!riche) return [];
@@ -101,8 +115,41 @@ export function decouperHtmlRiche(html: string | null | undefined): string[] {
       .map((l) => l.trim())
       .filter(Boolean);
   }
-  return riche
+  const bruts = riche
     .split(/(?=<p\b|<ul\b|<ol\b|<div\b|<font\b)/i)
     .map((m) => m.trim())
     .filter(Boolean);
+
+  const fragments: string[] = [];
+  for (const brut of bruts) {
+    /* Fragment = UNE liste pure (sans liste imbriquée) → éclater. */
+    const m = brut.match(/^<(ul|ol)\b[^>]*>([\s\S]*)<\/\1\s*>$/i);
+    if (m) {
+      const balise = m[1].toLowerCase();
+      const nbListes = (m[2].match(/<(ul|ol)\b/gi) || []).length;
+      if (nbListes === 0) {
+        const items = m[2]
+          .split(/(?=<li\b)/i)
+          .map((s) => s.trim())
+          .filter((s) => /^<li\b/i.test(s));
+        if (items.length > 0) {
+          items.forEach((item, i) => {
+            const classes =
+              "li-suite" +
+              (i === 0 ? " li-suite--debut" : "") +
+              (i === items.length - 1 ? " li-suite--fin" : "");
+            fragments.push(
+              balise === "ol"
+                ? `<ol class="${classes}" start="${i + 1}">${item}</ol>`
+                : `<ul class="${classes}">${item}</ul>`,
+            );
+          });
+          continue;
+        }
+      }
+    }
+    /* paragraphe, div, liste imbriquée : bloc entier */
+    fragments.push(brut);
+  }
+  return fragments;
 }

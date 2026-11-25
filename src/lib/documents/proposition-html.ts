@@ -74,7 +74,12 @@ const DEBUT_N_PX = Math.round(88 * 4 / 3);
 /** Rendu complet (HTML autonome) de la proposition commerciale. */
 export function renderPropositionHtml(
   p: PropositionRecord,
-  logoSrc: string = "/assets/logo-noir.png",
+  /* VOLET 19 — logo recadré SERRÉ sur le glyphe (celui du PDF
+   * d'exemple) : l'ancien logo-noir.png portait ~25 % de marges
+   * transparentes et la marque apparaissait trop petite à hauteur
+   * fixe. Le PDF (serverless) passe un data URI ; l'aperçu
+   * navigateur sert l'asset public. */
+  logoSrc: string = "/assets/logo-noir-doc.png",
 ): string {
   const s = p.sections;
   const siteUrl = p.signature.site
@@ -235,6 +240,15 @@ ${suite}`;
   .wm img { height: 353.4pt; width: auto; display: block; }
 
   /* ---- En-tête page 1 ---- */
+  /* VOLET 19 (26/11/2026) — LOGO À DROITE : sa HAUTEUR s'aligne sur
+   * la hauteur qu'occupe le TITRE à gauche (demande de l'éditeur :
+   * « sa taille est augmentée afin que sa hauteur s'aligne avec la
+   * hauteur qu'occupe le titre du document qui est sur la même
+   * horizontale que lui à gauche »). Le petit script ALIGNEMENT
+   * LOGO TITRE (fin de gabarit) mesure le titre et cale la hauteur
+   * du logo — 78,8 pt au minimum (la valeur de l'exemple, pour un
+   * titre de 3 lignes) : un titre plus court garde le logo de
+   * l'exemple, un titre plus long l'agrandit. */
   .entete1 { position: relative; min-height: 78.8pt; }
   .e1-surtitre {
     margin: 0;
@@ -517,6 +531,29 @@ ${blocsPaiements}`, " t06")}
     debutNPx: DEBUT_N_PX,
     enteteCompacte: true,
   })}</script>
+<script>
+/* VOLET 19 — ALIGNEMENT LOGO ↔ TITRE (page 1) : la hauteur du logo
+   suit la hauteur du TITRE (min. 78,8 pt = valeur de l'exemple).
+   Rejoué quand les polices web arrivent (le titre peut se
+   re-calculer) ; l'élément étant positionné en absolu, ce
+   recaliblage n'a AUCUN effet sur la pagination. */
+(function () {
+  function alignerLogoTitre() {
+    var t = document.querySelector('.e1-titre');
+    var img = document.querySelector('.e1-logo img');
+    if (!t || !img) return;
+    var hTitre = t.getBoundingClientRect().height;
+    var cible = Math.max(hTitre - 2.2 * 4 / 3, 78.8 * 4 / 3);
+    img.style.height = cible + 'px';
+    img.style.width = 'auto';
+  }
+  alignerLogoTitre();
+  window.addEventListener('load', alignerLogoTitre);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(alignerLogoTitre).catch(function () {});
+  }
+})();
+</script>
 </body>
 </html>`;
 

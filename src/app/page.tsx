@@ -11,7 +11,6 @@ import { HomePage } from "@/components/home/HomePage";
 import { InteractionCouleurs } from "@/components/media/InteractionCouleurs";
 import { Toaster } from "@/components/ui/toaster";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
-import { PROJECTS } from "@/lib/site";
 
 /**
  * Coquille applicative : routeur de pages (URLs propres par
@@ -102,8 +101,12 @@ function PageSwitch() {
       case "realisations":
         return <PortfolioPage />;
       case "projet": {
-        const known = PROJECTS.some((p) => p.id === section);
-        return known && section ? <ProjectPage projectId={section} /> : <PortfolioPage />;
+        /* VOLET 19 — les pages projet couvrent AUSSI les projets
+           publiés depuis l'espace admin (chargés côté client) : la
+           page elle-même attend brièvement les identifiants non
+           statiques puis replie sur la liste des réalisations si
+           l'identifiant est définitivement inconnu. */
+        return section ? <ProjectPage projectId={section} /> : <PortfolioPage />;
       }
       case "aPropos":
         return <AboutPage />;

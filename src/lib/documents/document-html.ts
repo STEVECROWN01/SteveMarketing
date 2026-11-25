@@ -59,10 +59,15 @@ function esc(v: string | null | undefined): string {
     .replace(/"/g, "&quot;");
 }
 
-/* Pagination du devis : marges 16 mm, contenu jusqu'à 279 mm
- * (le pied de page occupe le bas). */
+/* Pagination du devis : marges latérales 16 mm, contenu jusqu'à
+ * 279 mm (le pied de page occupe le bas). VOLET 19 : les pages de
+ * SUITE démarrent à 88 pt du haut — la place de l'EN-TÊTE COMPACT
+ * cloné sur chaque page 2+ (comme la proposition commerciale,
+ * demande de l'éditeur : « tu devrais faire d'entête comme on a
+ * fait d'entête pour la proposition »). */
 const LIMITE_PX = Math.round((279 / 25.4) * 96);
 const DEBUT_PX = Math.round((16 / 25.4) * 96);
+const DEBUT_N_PX = Math.round(88 * 4 / 3);
 
 /* ------------------------------------------------------------------
  * VOLET 18 (26/11/2026) — INTERNATIONALISATION DU GABARIT
@@ -102,9 +107,10 @@ const LIBELLES: Record<"fr" | "en", Record<string, string>> = {
     colQte: "Qté",
     colTotal: "Total",
     service: "Service",
-    /* Total sous le tableau */
-    total: "Total&nbsp;:",
-    tvaNonApplicable: "TVA non applicable",
+    /* Total sous le tableau — VOLET 19 : lignes à pointillés */
+    totalCourt: "Total",
+    tvaCourt: "TVA",
+    tvaNonApplicable: "Non applicable",
     /* Conditions / bon pour accord */
     cgv: "Conditions générales de vente",
     delaiEstime: "Délai estimé&nbsp;:",
@@ -166,9 +172,10 @@ const LIBELLES: Record<"fr" | "en", Record<string, string>> = {
     colQte: "Qty",
     colTotal: "Total",
     service: "Service",
-    /* Total below the table */
-    total: "Total:",
-    tvaNonApplicable: "VAT not applicable",
+    /* Total below the table — VOLET 19: dotted leader lines */
+    totalCourt: "Total",
+    tvaCourt: "VAT",
+    tvaNonApplicable: "Not applicable",
     /* Terms / approval */
     cgv: "Terms and conditions",
     delaiEstime: "Estimated delivery time:",
@@ -269,7 +276,9 @@ const SCRIPT_PIED_PAGE_EN = `
 
 export function renderDocumentHtml(
   d: DocumentRecord,
-  logoSrc: string = "/assets/logo-noir.png",
+  /* VOLET 19 — logo recadré SERRÉ (celui du PDF d'exemple) : voir
+   * logo-base64.ts / public/assets/logo-noir-doc.png. */
+  logoSrc: string = "/assets/logo-noir-doc.png",
 ): string {
   /* VOLET 18 — LANGUE DU DOCUMENT : les devis et factures suivent
    * d.langue ("fr" par défaut) ; les PROPOSITIONS commerciales
@@ -431,13 +440,25 @@ export function renderDocumentHtml(
     })
     .join("");
 
-  /* Total SOUS le tableau : chiffres + lettres + TVA non
-   * applicable (la rangée noire du pied de tableau est supprimée).
-   * VOLET 18 — libellés traduits, montant en lettres dans la
-   * LANGUE du document. */
+  /* Total SOUS le tableau — VOLET 19 (26/11/2026), demande de
+   * l'éditeur : « Total » EN GRAS ET GROS à gauche, pointillés
+   * jusqu'au PRIX totalement à droite ; LIGNE SUIVANTE : « TVA »
+   * aussi en gras et gros, pointillés jusqu'à « Non applicable » à
+   * droite. Le montant en lettres (VOLET 17) reste en note discrète
+   * sous les deux lignes. Libellés traduits (langue du document). */
   const blocTotal = `
   <div class="total-sous-tableau" data-bloc>
-    <p><strong>${L.total}</strong> ${formatCurrency(total, d.devise)} <span class="total-lettres">(${esc(montantEnLettres(total, d.devise, langue))})</span> — ${L.tvaNonApplicable}</p>
+    <div class="total-ligne">
+      <span class="total-libelle">${L.totalCourt}</span>
+      <span class="total-pointilles" aria-hidden="true"></span>
+      <span class="total-valeur">${formatCurrency(total, d.devise)}</span>
+    </div>
+    <div class="total-ligne total-ligne--tva">
+      <span class="total-libelle">${L.tvaCourt}</span>
+      <span class="total-pointilles" aria-hidden="true"></span>
+      <span class="total-valeur">${L.tvaNonApplicable}</span>
+    </div>
+    <p class="total-lettres">(${esc(montantEnLettres(total, d.devise, langue))})</p>
   </div>`;
 
   /* Conditions + Bon pour accord (devis et propositions) — le délai
@@ -539,23 +560,49 @@ export function renderDocumentHtml(
     page-break-after: always;
   }
   .ppage.ppage-fin { break-after: auto; page-break-after: auto; }
+  /* VOLET 19 — pages de SUITE : contenu à 88 pt du haut, SOUS
+     l'en-tête compact (comme la proposition commerciale). */
+  .ppage-n { padding-top: 88pt; }
   @media print {
     body { background: #ffffff; }
     .ppage { margin: 0; box-shadow: none; }
   }
   .corps { position: relative; z-index: 1; }
 
-  /* ---- Filigrane ---- */
+  /* ---- En-tête compact des pages de suite — VOLET 19 ----
+     Calqué sur celui de la proposition commerciale (mêmes mesures
+     que l'exemple : logo à droite, 32,6 pt de haut, POSÉ à 31,2 pt
+     du haut de page — taille et position verticale réelle de
+     l'exemple ; sur-titre + numéro/client à gauche, filet clair). */
+  .entete-n { position: absolute; top: 0; left: 16mm; right: 16mm; z-index: 1; }
+  .en-textes { position: relative; padding-right: 56pt; }
+  .en-surtitre {
+    margin: 36.4pt 0 0 0;
+    font-size: 7pt; font-weight: 600;
+    letter-spacing: 0.05em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: #374151;
+  }
+  .en-sous { margin: 0; font-size: 7pt; font-weight: 400; line-height: 1.4; color: #6b7280; }
+  .en-filet { margin-top: 11pt; border-top: 0.5pt solid #d1d5db; }
+  .en-logo { position: absolute; right: 0; top: 31.2pt; }
+  .en-logo img { height: 32.6pt; width: auto; display: block; }
+
+  /* ---- Filigrane — VOLET 19 : DIMENSIONS DE L'EXEMPLE de la
+     proposition commerciale (demande de l'éditeur : le filigrane
+     des devis et factures doit correspondre à celui du document de
+     référence) : hauteur 353,4 pt, haut à 258,4 pt, centré
+     horizontalement, opacité 6 %. ---- */
   .wm {
-    position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60%;
-    max-width: 150mm;
-    opacity: 0.08;
+    position: absolute; top: 258.4pt; left: 50%;
+    transform: translateX(-50%);
+    height: 353.4pt;
+    opacity: 0.06;
     pointer-events: none;
     z-index: 0;
   }
-  .wm img { width: 100%; height: auto; display: block; }
+  .wm img { height: 353.4pt; width: auto; display: block; }
 
   /* ---- Entête ---- */
   .doc-header {
@@ -723,16 +770,51 @@ export function renderDocumentHtml(
   .desc-riche li { font-size: 9pt; line-height: 1.5; color: #374151; margin-bottom: 1px; }
   .desc-riche ul li { list-style-type: disc; }
   .desc-riche ol li { list-style-type: decimal; }
+  /* VOLET 19 — fragments de liste éclatés (pagination fine, voir
+     texte-riche.ts) : une suite de <ul class="li-suite"> d'un seul
+     <li> ressemble à UNE liste unique — marges annulées sauf aux
+     extrémités (--debut / --fin reprennent les 2 px / 4 px d'origine). */
+  .desc-riche ul.li-suite, .desc-riche ol.li-suite { margin: 0; }
+  .desc-riche ul.li-suite--debut, .desc-riche ol.li-suite--debut { margin-top: 2px; }
+  .desc-riche ul.li-suite--fin, .desc-riche ol.li-suite--fin { margin-bottom: 4px; }
 
-  /* ---- Total SOUS le tableau (plus de rangée noire) ---- */
-  .total-sous-tableau { margin-top: 4mm; }
-  .total-sous-tableau p {
-    margin: 0;
-    font-size: 11pt;
+  /* ---- Total SOUS le tableau — VOLET 19 : lignes à POINTILLÉS.
+     « Total » et « TVA » en GRAS ET GROS à gauche, la valeur
+     totalement à droite, pointillés entre les deux (demande de
+     l'éditeur). Le montant en lettres reste en note italique. ---- */
+  .total-sous-tableau { margin-top: 5mm; }
+  .total-ligne { display: flex; align-items: baseline; margin: 0; }
+  .total-ligne + .total-ligne { margin-top: 2.5mm; }
+  .total-libelle {
+    font-size: 15pt;
+    font-weight: 800;
     color: #000000;
+    letter-spacing: -0.2px;
+    line-height: 1.25;
+  }
+  .total-valeur {
+    font-size: 15pt;
+    font-weight: 700;
+    color: #000000;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    line-height: 1.25;
+  }
+  .total-ligne--tva .total-libelle { font-size: 13pt; }
+  .total-ligne--tva .total-valeur { font-size: 13pt; font-weight: 600; }
+  .total-pointilles {
+    flex: 1 1 auto;
+    min-width: 24px;
+    border-bottom: 1.1mm dotted #000000;
+    margin: 0 8px 2.5px;
+  }
+  .total-lettres {
+    margin: 2mm 0 0 0;
+    font-size: 10pt;
+    color: #374151;
+    font-style: italic;
     line-height: 1.5;
   }
-  .total-sous-tableau .total-lettres { color: #374151; font-style: italic; }
 
   /* ---- Conditions / Bon pour accord ---- */
   .conditions-block {
@@ -1045,6 +1127,17 @@ export function renderDocumentHtml(
 
 <!-- Gabarits clonés par le script de pagination -->
 <div id="pc-gabarits" aria-hidden="true">
+  <!-- VOLET 19 — EN-TÊTE COMPACT des pages de suite (comme la
+       proposition commerciale) : type + numéro/client à gauche,
+       logo 32,6 pt à droite, filet clair. -->
+  <div class="entete-n">
+    <div class="en-textes">
+      <p class="en-surtitre">${label}</p>
+      <p class="en-sous">${esc(d.numero)} · ${esc(d.client.nom)}${d.client.entreprise ? " · " + esc(d.client.entreprise) : ""}</p>
+    </div>
+    <div class="en-filet"></div>
+    <div class="en-logo"><img src="${esc(logoSrc)}" alt="Stevens Akpovi"></div>
+  </div>
   <div class="pied">
     <hr class="footer-hr" />
     <div class="footer-row">
@@ -1061,8 +1154,8 @@ export function renderDocumentHtml(
 <script>${fabriquerScriptPagination({
     limitePx: LIMITE_PX,
     debutP1Px: DEBUT_PX,
-    debutNPx: DEBUT_PX,
-    enteteCompacte: false,
+    debutNPx: DEBUT_N_PX,
+    enteteCompacte: true,
     formatPage: "simple",
   })}</script>
 ${langue === "en" ? `<script>${SCRIPT_PIED_PAGE_EN}</script>` : ""}

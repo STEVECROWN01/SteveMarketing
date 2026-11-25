@@ -257,10 +257,17 @@ export function Header() {
         {/* Espaces à la demande de l'éditeur (15/11/2026) : air à
             gauche du premier lien ; l'espace à droite du bouton
             « Démarrer un projet », élargi puis jugé trop grand, est
-            légèrement réduit (40 → 30px). */}
+            légèrement réduit (40 → 30px).
+            VOLET 19 (26/11/2026) — ESPACE CTA ↔ MENU ALIGNÉ sur
+            l'espace ENTRE LES MENUS : les liens portent mx-[10px]
+            chacun (20 px entre deux liens) ; le gap-[10px] du nav,
+            ajouté aux 10 px de marge droite du dernier lien, porte
+            l'espace menu → CTA au MÊME 20 px (demande de l'éditeur :
+            « augmente cet espace pour que ce soit égal à l'espace qui
+            sépare les différents menus »). */}
         <nav
           aria-label={t("Navigation principale")}
-          className="mt-[13px] hidden h-[85px] items-center justify-between rounded-[9px] bg-[#1c1c1c] pl-[30px] pr-[30px] lg:flex"
+          className="mt-[13px] hidden h-[85px] items-center justify-between gap-[10px] rounded-[9px] bg-[#1c1c1c] pl-[30px] pr-[30px] lg:flex"
         >
           <ul className="flex items-center">
             {HEADER_NAV_ITEMS.map((item) => (

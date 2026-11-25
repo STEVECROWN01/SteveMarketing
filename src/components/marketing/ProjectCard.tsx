@@ -26,9 +26,14 @@ export interface Project {
   cta: string;
   url: string;
   desktop: string;
-  desktop2x: string;
-  mobile: string;
-  mobile2x: string;
+  /* VOLET 19 : les projets créés depuis l'espace admin n'ont pas
+     de variante @2x — les champs deviennent OPTIONNELS, la capture
+     simple est servie (et porte ses propres dimensions). */
+  desktop2x?: string;
+  mobile?: string;
+  mobile2x?: string;
+  largeurDesktop?: number;
+  hauteurDesktop?: number;
 }
 
 export function ProjectCard({ project, index }: { project: Project; index: number }) {
@@ -58,8 +63,8 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
           src={project.desktop}
           src2x={project.desktop2x}
           alt={tf("Aperçu du site {name}", { name: project.name })}
-          width={1440}
-          height={900}
+          width={project.largeurDesktop ?? 1440}
+          height={project.hauteurDesktop ?? 900}
           sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 400px"
           src2xWidth={1920}
           className="border-b border-[#e4e4e4]"

@@ -4,8 +4,14 @@ import React from "react";
 import { Reveal } from "@/components/motion/Reveal";
 import { SectionHeading, CTAButton, CTAIcons } from "@/components/marketing/Marketing";
 import { ProjectCard } from "@/components/marketing/ProjectCard";
-/* VOLET 18 — i18n : CTA_LABELS / WORKS traduits via useContenu, PROJECTS via useSite. */
-import { useContenu, useSite } from "@/i18n";
+/* VOLET 18 — i18n : CTA_LABELS / WORKS traduits via useContenu.
+ * VOLET 19 (26/11/2026) — PORTFOLIO ÉVOLUTIF : les projets PUBLIÉS
+ * depuis l'espace admin s'ajoutent aux projets statiques
+ * (useTousLesProjets) ; la grille suit la règle demandée par
+ * l'éditeur — TROIS projets : trois sur la MÊME ligne ; QUATRE ou
+ * plus : TOUJOURS deux par ligne. */
+import { useContenu } from "@/i18n";
+import { useTousLesProjets } from "@/hooks/use-projets-admin";
 
 /**
  * SECTION 09 — RÉALISATIONS (fond blanc)
@@ -20,7 +26,7 @@ import { useContenu, useSite } from "@/i18n";
  */
 export function WorksSection() {
   const { CTA_LABELS, WORKS } = useContenu();
-  const { PROJECTS } = useSite();
+  const { projets: PROJECTS } = useTousLesProjets();
 
   return (
     /* Padding inférieur réduit d'un cran (demande de l'éditeur,
@@ -66,21 +72,25 @@ export function WorksSection() {
         </div>
 
         {/* Grille des projets — captures en COULEUR + « Voir Le
-            Projet ». QUATRE projets depuis le 24/11/2026 (volet 13 :
-            ajout d'ALEXANDRE MOREL) : la grille passe à DEUX colonnes
-            (2×2) au lieu de trois — quatre cartes sur une grille de
-            trois auraient laissé la quatrième seule orpheline sur sa
-            rangée ; deux rangées de deux restent équilibrées à
-            toutes les largeurs.
+            Projet ».
+            VOLET 19 (26/11/2026) — RÈGLE DE PRÉSENTATION (demande de
+            l'éditeur) : TROIS projets → TROIS SUR LA MÊME LIGNE ;
+            QUATRE OU PLUS → TOUJOURS DEUX PAR LIGNE (« quand il
+            s'agit de trois projets… trois sur la même ligne. Mais
+            quand il s'agit de quatre… deux projets par ligne. Mais
+            quand il s'agit de trois, il ne faut jamais présenter
+            deux sur une ligne et aller à la ligne encore »). Les
+            projets ajoutés depuis l'espace admin suivent la même
+            présentation, partout.
             VOLET 14 (24/11/2026) — LARGEUR RÉDUITE SUR BUREAU :
-            demande de l'éditeur (« les mockups des projets réalisés,
-            sur desktop c'est trop trop large. Tu vas réduire ça la
-            taille. Réduis la taille un peu ») : la grille passe de
-            la pleine largeur du conteneur (cartes de ~575 px à
-            1440 px) à max-w-5xl centré (~500 px par carte, −13 %) —
-            les captures desktop reprennent une échelle plus naturelle
-            sans toucher aux mobiles (une colonne, largeur de l'écran). */}
-        <div className="mx-auto mt-12 grid w-full max-w-5xl gap-5 sm:mt-14 md:grid-cols-2">
+            max-w-5xl centré (~500 px par carte en 2 colonnes) — les
+            captures desktop gardent une échelle naturelle, le
+            mobile reste sur une colonne pleine largeur. */}
+        <div
+          className={`mx-auto mt-12 grid w-full max-w-5xl gap-5 sm:mt-14 ${
+            PROJECTS.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2"
+          }`}
+        >
           {PROJECTS.map((project, i) => (
             <ProjectCard key={project.id} project={project} index={i} />
           ))}

@@ -72,7 +72,13 @@ export function BoutonLangue({ taille = "header", className = "" }: Props) {
       aria-label={libelle}
       title={libelle}
       className={`group inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full border border-[#e4e4e4]/25 bg-[#232323] font-semibold text-white transition-colors duration-300 hover:border-[#e4e4e4] hover:bg-[#e4e4e4] hover:text-[#1c1c1c] focus-visible:outline-2 focus-visible:outline-offset-4 ${
-        taille === "panneau" ? "h-12 px-4 text-[13px] sm:h-14 sm:px-5" : "h-9 px-3.5 text-[12px]"
+        taille === "panneau"
+          ? "h-12 px-4 text-[13px] sm:h-14 sm:px-5"
+          : /* VOLET 19 (26/11/2026) — hauteur ALIGNÉE sur le bouton CTA
+             * « Démarrer Un Projet » du header (min-h-[52px], demande de
+             * l'éditeur : « augmente un peu sa taille pour que sa hauteur
+             * vienne avec la hauteur du bouton du CTA du header »). */
+            "h-[52px] px-[18px] text-[13px]"
       } ${className}`}
     >
       {lang === "fr" ? <DrapeauFR /> : <DrapeauEN />}

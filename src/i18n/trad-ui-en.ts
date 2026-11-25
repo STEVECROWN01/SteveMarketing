@@ -418,7 +418,7 @@ export const TRAD_UI: Record<string, string> = {
 
   /* ============================== components/home/MarqueeBand.tsx ============================== */
   "Création De Sites Web": "Website Creation",
-  "Sites Web Qui Génèrent Des Ventes": "Websites That Generate Sales",
+  "Sites Web Qui Génèrent Des Ventes": "Websites That Drive Sales",
   "Rédaction Professionnelle Incluse": "Professional Copywriting Included",
   "Attirer Les Bons Visiteurs": "Attract The Right Visitors",
   "Design Premium": "Premium Design",

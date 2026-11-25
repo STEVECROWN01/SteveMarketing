@@ -1,13 +1,22 @@
 "use client";
 
 import React from "react";
+import { Loader2 } from "lucide-react";
 import { PageHero, SectionHeading, CTAButton, CTAIcons, ReassuranceBar } from "@/components/marketing/Marketing";
 import { Reveal } from "@/components/motion/Reveal";
 import { BrowserMockup, PhoneMockup } from "@/components/media/Media";
 import { ProjectCard } from "@/components/marketing/ProjectCard";
-/* VOLET 18 — i18n : CTA_LABELS via useContenu, PROJECTS / SITE via
-   useSite, textes inline et attributs interpolés via t()/tf(). */
-import { useContenu, useSite, useT } from "@/i18n";
+/* VOLET 18 — i18n : CTA_LABELS via useContenu, textes inline et
+   attributs interpolés via t()/tf().
+   VOLET 19 (26/11/2026) — PORTFOLIO ÉVOLUTIF : les pages projet
+   couvrent AUSSI les projets publiés depuis l'espace admin ; la
+   capture mobile est OPTIONNELLE (le bureau occupe alors toute la
+   largeur) ; la grille « autres projets » suit la même règle que
+   l'accueil (trois → trois colonnes, quatre ou plus → deux). */
+import { useContenu, useT } from "@/i18n";
+import { useTousLesProjets } from "@/hooks/use-projets-admin";
+import { PortfolioPage } from "./PortfolioPage";
+import { SITE } from "@/lib/site";
 
 /**
  * PAGE DE PRÉSENTATION D'UN PROJET (#/projet/<id>)
@@ -20,9 +29,21 @@ import { useContenu, useSite, useT } from "@/i18n";
 export function ProjectPage({ projectId }: { projectId: string }) {
   const { t, tf } = useT();
   const { CTA_LABELS } = useContenu();
-  const { PROJECTS, SITE } = useSite();
+  const { projets: PROJECTS, chargement } = useTousLesProjets();
   const index = PROJECTS.findIndex((p) => p.id === projectId);
-  if (index === -1) return null;
+  /* VOLET 19 — identifiant ADMIN en cours de chargement : écran
+     d'attente discret ; identifiant définitivement inconnu : repli
+     sur la liste des réalisations (comportement historique). */
+  if (index === -1) {
+    if (chargement) {
+      return (
+        <div className="flex min-h-[60svh] items-center justify-center" aria-hidden="true">
+          <Loader2 className="h-7 w-7 animate-spin text-[#e4e4e4]/70" />
+        </div>
+      );
+    }
+    return <PortfolioPage />;
+  }
   const project = PROJECTS[index];
   const others = PROJECTS.filter((p) => p.id !== projectId);
 
@@ -92,18 +113,24 @@ export function ProjectPage({ projectId }: { projectId: string }) {
               En dessous de lg, la colonne empilée d'origine est
               conservée (téléphone sous le bureau, pleine largeur
               puis 1/3). */}
-          <div className="mt-12 flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-12">
+          <div
+            className={`mt-12 flex flex-col gap-8 ${
+              project.mobile ? "lg:flex-row lg:items-center lg:gap-12" : ""
+            }`}
+          >
             <Reveal direction="up" delay={0.1} className="min-w-0 flex-1">
               {/* Aperçu bureau — en COULEUR (mockups projets en couleur,
                   demande de l'éditeur, 16/11/2026) ; coins un peu plus
-                  arrondis + zoom au survol (17/11/2026). */}
+                  arrondis + zoom au survol (17/11/2026). VOLET 19 :
+                  dimensions réelles du projet (admin) pour la réserve
+                  de place. */}
               <BrowserMockup
                 src={project.desktop}
                 src2x={project.desktop2x}
                 alt={tf("Aperçu desktop du site {name}", { name: project.name })}
                 url={project.url}
-                width={1440}
-                height={900}
+                width={project.largeurDesktop ?? 1440}
+                height={project.hauteurDesktop ?? 900}
                 color
                 softRadius
                 zoom
@@ -111,25 +138,29 @@ export function ProjectPage({ projectId }: { projectId: string }) {
                 sizes="(max-width: 640px) 92vw, (max-width: 1024px) 80vw, 820px"
               />
             </Reveal>
-            <Reveal
-              direction="left"
-              delay={0.2}
-              className="w-full shrink-0 sm:w-1/3 lg:w-[calc((62.5%_+_4.9px)/2.789)]"
-            >
-              {/* Aperçu mobile — coins adoucis (20 px : « l'angle est
-                  trop pointu », 17/11/2026) + zoom au survol. */}
-              <PhoneMockup
-                src={project.mobile}
-                src2x={project.mobile2x}
-                alt={tf("Aperçu mobile du site {name}", { name: project.name })}
-                width={390}
-                height={844}
-                color
-                softRadius
-                zoom
-                sizes="(max-width: 640px) 92vw, (max-width: 1023px) 33vw, 290px"
-              />
-            </Reveal>
+            {project.mobile ? (
+              <Reveal
+                direction="left"
+                delay={0.2}
+                className="w-full shrink-0 sm:w-1/3 lg:w-[calc((62.5%_+_4.9px)/2.789)]"
+              >
+                {/* Aperçu mobile — coins adoucis (20 px : « l'angle est
+                    trop pointu », 17/11/2026) + zoom au survol.
+                    VOLET 19 : OPTIONNEL (projet admin sans capture
+                    mobile → seul l'aperçu bureau est affiché). */}
+                <PhoneMockup
+                  src={project.mobile}
+                  src2x={project.mobile2x}
+                  alt={tf("Aperçu mobile du site {name}", { name: project.name })}
+                  width={project.largeurMobile ?? 390}
+                  height={project.hauteurMobile ?? 844}
+                  color
+                  softRadius
+                  zoom
+                  sizes="(max-width: 640px) 92vw, (max-width: 1023px) 33vw, 290px"
+                />
+              </Reveal>
+            ) : null}
           </div>
 
           <Reveal direction="up" delay={0.25}>
@@ -159,7 +190,13 @@ export function ProjectPage({ projectId }: { projectId: string }) {
             title={t("Découvrez les autres réalisations.")}
             tone="light"
           />
-          <div className="mt-12 grid gap-6 md:grid-cols-2">
+          {/* VOLET 19 — même règle que l'accueil : TROIS cartes →
+              trois colonnes ; QUATRE ou plus → deux par ligne. */}
+          <div
+            className={`mt-12 grid gap-6 ${
+              others.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2"
+            }`}
+          >
             {others.map((other) => (
               <ProjectCard key={other.id} project={other} index={PROJECTS.indexOf(other)} />
             ))}

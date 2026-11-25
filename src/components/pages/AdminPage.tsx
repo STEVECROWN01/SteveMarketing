@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
+  Briefcase,
   CheckCircle2,
   ChevronRight,
   Download,
@@ -28,6 +29,7 @@ import { GenerateurDocument, type PreRemplissage } from "@/components/admin/Gene
 import { GenerateurProposition } from "@/components/admin/GenerateurProposition";
 import { ListeDocuments } from "@/components/admin/ListeDocuments";
 import { EspaceFacture } from "@/components/admin/EspaceFacture";
+import { GestionPortfolio } from "@/components/admin/GestionPortfolio";
 import { BoutonAction, Carte, Pastille } from "@/components/admin/elements";
 import type { DocumentRecord } from "@/lib/documents/types";
 import { estPropositionV2, type PropositionRecord } from "@/lib/documents/proposition";
@@ -65,7 +67,7 @@ import { formatCurrency, totalDocument, formatDate } from "@/lib/documents/forma
  * visible au survol) ; bouton « Ouvrir L'Espace ».
  */
 
-type Section = "tableau" | "demandes" | "propositions" | "devis" | "factures";
+type Section = "tableau" | "demandes" | "propositions" | "devis" | "factures" | "portfolio";
 /** Vue courante des rubriques documents : liste / création / édition. */
 type VueDocs = "liste" | "creation" | "edition";
 /** Vue courante de la rubrique factures : liste / sélection du devis. */
@@ -156,31 +158,46 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
     }
   }
 
+  /* VOLET 19 (26/11/2026) — BLOC DE CONNEXION ENTIÈREMENT VISIBLE
+   * SANS DÉFILEMENT, sur TOUTES les tailles d'écran (mobile,
+   * tablette, bureau — demande de l'éditeur : « il faut que ce bloc
+   * de connexion soit entièrement visible […] sans scroll au top »).
+   * Passé : py-32 (256 px de marge verticale) + logo h-32 + grands
+   * espacements → le bloc dépassait l'écran courant sur mobile.
+   * Désormais : conteneur en unités svh (barre d'adresse mobile
+   * comprise), marges et respiration REDUITES PROGRESSIVEMENT vers
+   * les petits écrans (clamp), carte plafonnée à la hauteur du
+   * viewport — au pire cas irréductible (téléphone en paysage), un
+   * défilement INTERNE à la carte prend le relais sans jamais
+   * cacher le haut du bloc. Le contenu éventuellement SOUS la
+   * section (pied de page de l'espace) se découvre au scroll. */
   return (
-    <div className="container-site flex min-h-screen items-center justify-center py-32">
-      <div className="w-full max-w-md rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-8 text-center sm:p-10">
+    <div className="container-site flex min-h-svh items-center justify-center p-4 sm:p-6">
+      <div className="flex max-h-[calc(100svh-2rem)] w-full max-w-md flex-col overflow-y-auto rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-6 text-center sm:max-h-[calc(100svh-3rem)] sm:p-8 lg:p-10">
         {/* VOLET 17 : logo DOUBLÉ en taille, espace logo→titre
-            réduit (l'éditeur trouvait l'écart trop grand). */}
-        <span className="flex justify-center">
+            réduit. VOLET 19 : hauteur fluide — grande sur bureau,
+            réduite sur les écrans courts (le bloc doit tenir SANS
+            défilement, voir ci-dessus). */}
+        <span className="flex shrink-0 justify-center">
           <img
             src={ASSETS.logoLight}
             alt="Stevens Akpovi"
             width={600}
             height={480}
-            className="h-32 w-auto"
+            className="h-[clamp(4.5rem,13svh,8rem)] w-auto"
           />
         </span>
-        <h1 className="mt-3 font-display text-2xl font-semibold text-white">
+        <h1 className="mt-[clamp(0.5rem,1.5svh,0.75rem)] font-display text-[clamp(1.25rem,3.5svh,1.5rem)] font-semibold text-white">
           Bienvenue, Stevens !
         </h1>
-        <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-[#c8c8c8]">
+        <p className="mx-auto mt-[clamp(0.375rem,1.2svh,0.5rem)] max-w-sm text-[13px] leading-relaxed text-[#c8c8c8] sm:text-sm">
           Votre back-office vous attend : retrouvez les demandes de vos
           clients, générez vos propositions, devis et factures en quelques
           clics, et pilotez chaque projet de la première prise de contact
           au règlement. Tout est réuni ici, en privé, à l&apos;écart de la
           navigation publique — bonne session.
         </p>
-        <form onSubmit={submit} className="mt-8 space-y-4 text-left">
+        <form onSubmit={submit} className="mt-[clamp(1rem,3svh,2rem)] space-y-[clamp(0.75rem,2svh,1rem)] text-left">
           <div>
             <label htmlFor="admin-password" className="mb-1.5 block text-sm font-medium text-white">
               Mot de passe
@@ -918,13 +935,17 @@ export function AdminPage() {
   }
 
   /* VOLET 15 — les Propositions commerciales précèdent les Devis ;
-   * « Factures & documents » disparaît au profit de « Factures ». */
+   * « Factures & documents » disparaît au profit de « Factures ».
+   * VOLET 19 — rubrique PORTFOLIO : projets ajoutés au site depuis
+   * l'espace admin (brouillon / publication), demande de
+   * l'éditeur du 26/11/2026. */
   const NAV: { key: Section; label: string; icone: React.ReactNode; compteur?: number }[] = [
     { key: "tableau", label: "Tableau de bord", icone: <LayoutDashboard className="h-4 w-4" aria-hidden="true" /> },
     { key: "demandes", label: "Demandes", icone: <Inbox className="h-4 w-4" aria-hidden="true" />, compteur: nb.demandes },
     { key: "propositions", label: "Propositions commerciales", icone: <Handshake className="h-4 w-4" aria-hidden="true" />, compteur: nb.propositions },
     { key: "devis", label: "Devis", icone: <FileText className="h-4 w-4" aria-hidden="true" />, compteur: nb.devis },
     { key: "factures", label: "Factures", icone: <Receipt className="h-4 w-4" aria-hidden="true" />, compteur: nb.factures },
+    { key: "portfolio", label: "Portfolio du site", icone: <Briefcase className="h-4 w-4" aria-hidden="true" /> },
   ];
 
   /* En-tête commun des rubriques de liste (titre + bouton créer). */
@@ -1121,6 +1142,11 @@ export function AdminPage() {
                 <Receipt className="h-4 w-4" aria-hidden="true" />
                 Nouvelle facture
               </BoutonAction>
+              {/* VOLET 19 — raccourci vers la gestion du portfolio. */}
+              <BoutonAction onClick={() => allerA("portfolio")}>
+                <Briefcase className="h-4 w-4" aria-hidden="true" />
+                Ajouter un projet au portfolio
+              </BoutonAction>
             </div>
           </div>
         )}
@@ -1309,6 +1335,14 @@ export function AdminPage() {
               onModifier={(f) => setFactureCible(f as DocumentRecord)}
             />
           </>
+        )}
+
+        {/* ---------------- PORTFOLIO DU SITE (VOLET 19) ----------------
+            Projets ajoutés au site public depuis l'espace admin :
+            brouillon ou publication directe, images compressées,
+            traduction anglaise optionnelle. */}
+        {section === "portfolio" && (
+          <GestionPortfolio stockageConfigure={stockageConfigure} toast={toast} />
         )}
 
         {/* Note de bas d'espace — VOLET 15 : message court et

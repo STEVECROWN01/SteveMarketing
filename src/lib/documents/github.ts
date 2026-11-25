@@ -46,6 +46,12 @@ export function isStorageConfigured(): boolean {
   return Boolean(getConfig().token);
 }
 
+/** Configuration de stockage (dépôt, branche, jeton présent) —
+ *  partagée avec le stockage du PORTFOLIO (VOLET 19). */
+export function getConfigStockage() {
+  return { ...getConfig(), configure: isStorageConfigured() };
+}
+
 function messageStockageNonConfigure(): string {
   return (
     "Stockage des documents non configuré — définissez GITHUB_DOCS_TOKEN " +
@@ -54,7 +60,10 @@ function messageStockageNonConfigure(): string {
   );
 }
 
-async function gh(chemin: string, init: RequestInit = {}): Promise<Response> {
+/** Appel brut à l'API GitHub Contents — VOLET 19 : EXPORTÉ pour le
+ *  stockage du PORTFOLIO (mêmes dépôt privé, jeton et branche que
+ *  les documents commerciaux). */
+export async function gh(chemin: string, init: RequestInit = {}): Promise<Response> {
   const { token } = getConfig();
   const res = await fetch(`${API}${chemin}`, {
     ...init,

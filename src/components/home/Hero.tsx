@@ -38,8 +38,8 @@ import { ASSETS } from "@/lib/site";
  * EFFET DE SURVOL DE L'IMAGE (modifié le 24/11/2026 — volet 13) :
  *   les deux variantes sont enveloppées dans .mono-media.mono-touch
  *   — noir et blanc par défaut PARTOUT : sur les périphériques
- *   capables de survoler, retour progressif à la couleur + zoom
- *   léger (scale 1.035) au survol. VOLET 14 (24/11/2026) : toutes
+ *   capables de survoler, retour progressif à la couleur au
+ *   survol. VOLET 14 (24/11/2026) : toutes
  *   les images du site, celle-ci comprise, sont désormais en NOIR
  *   ET BLANC PAR DÉFAUT SUR TOUS LES ÉCRANS (mobile et tablette
  *   compris) — au SURVOL (bureau) ou à L'APPUI SIMPLE (mobile /
@@ -331,10 +331,14 @@ export function Hero() {
                   HORIZONTALE (stevens-akpovi-portrait-long.webp) sur
                   mobile/tablette (demande de l'éditeur, 16/11/2026).
                   Les deux sont enveloppées dans .mono-media : noir
-                  et blanc par défaut sur TOUS les écrans (volet 14),
-                  couleur + zoom léger au survol (bureau) ou à
+                  et blanc par défaut sur TOUS les ÉCRANS (volet 14),
+                  couleur au survol (bureau) ou à
                   l'appui simple (mobile/tablette — .couleur-active,
-                  composant InteractionCouleurs). Celle qui est
+                  composant InteractionCouleurs). VOLET 19
+                  (26/11/2026) : l'effet ZOOM des deux mockups
+                  épinglés au survol est SUPPRIMÉ (demande de
+                  l'éditeur — prop `zoom` retirée des deux mockups).
+                  Celle qui est
                   masquée en display:none
                   avec loading="lazy" n'est jamais téléchargée. */}
               <div className="hero-anim-img">
@@ -458,7 +462,6 @@ export function Hero() {
                     width={640}
                     height={400}
                     color
-                    zoom
                     priority
                     sizes="(max-width: 640px) 130px, (max-width: 1023px) 290px, 230px"
                   />
@@ -496,7 +499,6 @@ export function Hero() {
                     width={290}
                     height={628}
                     color
-                    zoom
                     priority
                     sizes="(max-width: 640px) 68px, (max-width: 1023px) 145px, 104px"
                   />

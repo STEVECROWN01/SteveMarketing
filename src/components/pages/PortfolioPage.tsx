@@ -6,9 +6,13 @@ import { PageHero, CTAButton, CTAIcons, ReassuranceBar } from "@/components/mark
 import { Reveal, RevealText } from "@/components/motion/Reveal";
 import { MonoImage } from "@/components/media/Media";
 import { useRouter } from "@/components/router-context";
-/* VOLET 18 — i18n : CTA_LABELS / WORKS via useContenu, PROJECTS via
-   useSite, textes inline et attributs interpolés via t()/tf(). */
-import { useContenu, useSite, useT } from "@/i18n";
+/* VOLET 18 — i18n : CTA_LABELS / WORKS via useContenu, textes
+   inline et attributs interpolés via t()/tf().
+   VOLET 19 (26/11/2026) — PORTFOLIO ÉVOLUTIF : les projets PUBLIÉS
+   depuis l'espace admin s'ajoutent aux projets statiques et sont
+   présentés de la MÊME façon, une ligne pleine largeur par projet. */
+import { useContenu, useT } from "@/i18n";
+import { useTousLesProjets } from "@/hooks/use-projets-admin";
 
 /**
  * PAGE RÉALISATIONS — les trois réalisations réelles uniquement.
@@ -30,7 +34,7 @@ export function PortfolioPage() {
   const router = useRouter();
   const { t, tf } = useT();
   const { CTA_LABELS, WORKS } = useContenu();
-  const { PROJECTS } = useSite();
+  const { projets: PROJECTS } = useTousLesProjets();
 
   const goProject = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
@@ -141,8 +145,8 @@ export function PortfolioPage() {
                       src={project.desktop}
                       src2x={project.desktop2x}
                       alt={tf("Aperçu du site {name}", { name: project.name })}
-                      width={1440}
-                      height={900}
+                      width={project.largeurDesktop ?? 1440}
+                      height={project.hauteurDesktop ?? 900}
                       eager={i === 0}
                       sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 560px"
                       src2xWidth={1920}

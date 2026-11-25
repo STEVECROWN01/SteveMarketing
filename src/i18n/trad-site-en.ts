@@ -27,16 +27,18 @@ export const TRAD_SITE: Record<string, string> = {
 
   /* ==================== HERO ==================== */
   "CONCEPTION DE SITES WEB PROFESSIONNELS": "PROFESSIONAL WEBSITE DESIGN",
-  "Je crée des Sites Web Professionnels qui Génèrent des Ventes.": "I Build Professional Websites That Generate Sales.",
+  "Je crée des Sites Web Professionnels qui Génèrent des Ventes.": "I Build Professional Websites That Drive Sales.",
   /* HERO.h1Lines — le titre est TOUJOURS affiché en 3 lignes. Les trois
      traductions ci-dessous se recomposent, jointes par un espace, en
-     « I Build Professional Websites That Generate Sales. » (= traduction de
-     h1) afin de préserver le contrôle h1 === h1Lines.join(" "). */
+     « I Build Professional Websites That Drive Sales. » (= traduction de
+     h1) afin de préserver le contrôle h1 === h1Lines.join(" ").
+     VOLET 19 (26/11/2026) — correction demandée par l'éditeur :
+     « Generate Sales » → « Drive Sales » (titre anglais du hero). */
   "Je crée des Sites Web": "I Build Professional",
   "Professionnels qui": "Websites That",
-  "Génèrent des Ventes.": "Generate Sales.",
+  "Génèrent des Ventes.": "Drive Sales.",
   /* HERO.h1Bold — segment en gras ; sous-chaîne de la traduction de h1. */
-  "qui Génèrent des Ventes.": "That Generate Sales.",
+  "qui Génèrent des Ventes.": "That Drive Sales.",
   /* HERO.text — contient la traduction de textBold (1re phrase), et les
      traductions de textBoldSpans (« clean code », « remarkably fast
      turnaround ») comme sous-chaînes exactes, pour le gras inline. */

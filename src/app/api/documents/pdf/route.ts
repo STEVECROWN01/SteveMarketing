@@ -3,7 +3,7 @@ import { verifySessionToken, SESSION_COOKIE } from "@/lib/admin-auth";
 import { completerDocument, saveDocument, isStorageConfigured, type ToutDocument } from "@/lib/documents/github";
 import { generatePdf } from "@/lib/documents/pdf";
 import { buildNomFichier, formatDate, formatCurrency, totalDocument, fmtMontantSimple } from "@/lib/documents/format";
-import { LOGO_DATA_URI } from "@/lib/documents/logo-base64";
+import { LOGO_DOC_DATA_URI } from "@/lib/documents/logo-base64";
 import { isEmailServiceConfigured, sendDocumentCopy } from "@/lib/email";
 import { LABELS_DOC, type DemandeDocument } from "@/lib/documents/types";
 import { estPropositionV2, type DemandeProposition } from "@/lib/documents/proposition";
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       langueSortie && !estPropositionV2(document)
         ? ({ ...document, langue: langueSortie } as ToutDocument)
         : document;
-    const pdf = await generatePdf(documentPdf, LOGO_DATA_URI);
+    const pdf = await generatePdf(documentPdf, LOGO_DOC_DATA_URI);
     const estProp = estPropositionV2(document);
     /* Proposition v2 : pas de fiche client — le nom de fichier et le
        libellé email portent le PROJET ; les autres documents gardent
