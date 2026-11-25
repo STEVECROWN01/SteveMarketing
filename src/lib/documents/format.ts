@@ -98,3 +98,94 @@ export function fmtMontantSimple(montant: number, devise: string = "EUR"): strin
   const m = MONNAIES[devise] ?? MONNAIES.EUR;
   return m.avant ? `${m.symbole}${nb}` : `${nb} ${m.symbole}`;
 }
+
+/* ------------------------------------------------------------------
+ * MONTANT EN LETTRES (VOLET 17) — « Total : 2 000,00 € (deux mille
+ * euros) — TVA non applicable » sous le tableau des devis : le
+ * total s'écrit aussi en toutes lettres, comme demandé par
+ * l'éditeur. Règles françaises : vingt/cent accordés au pluriel
+ * seulement en fin de nombre composé, mille invariable.
+ * ------------------------------------------------------------------ */
+
+const UNITES_MOTS = [
+  "zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf",
+  "dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf",
+];
+const DIZAINES = ["", "", "vingt", "trente", "quarante", "cinquante", "soixante", "", "quatre-vingt"];
+
+function deuxChiffres(n: number): string {
+  if (n < 20) return UNITES_MOTS[n];
+  const d = Math.floor(n / 10);
+  const u = n % 10;
+  if (d === 7 || d === 9) {
+    if (u === 0) return d === 7 ? "soixante-dix" : "quatre-vingt-dix";
+    if (u === 1 && d === 7) return "soixante et onze";
+    return (d === 7 ? "soixante" : "quatre-vingt") + "-" + UNITES_MOTS[10 + u];
+  }
+  const base = DIZAINES[d];
+  if (u === 0) return base + (d === 8 ? "s" : "");
+  if (u === 1 && d !== 8) return base + " et un";
+  return base + "-" + UNITES_MOTS[u];
+}
+
+function troisChiffres(n: number): string {
+  const c = Math.floor(n / 100);
+  const r = n % 100;
+  let out = "";
+  if (c === 1) out = "cent";
+  else if (c > 1) out = UNITES_MOTS[c] + " cent" + (r === 0 ? "s" : "");
+  if (r > 0) out = out ? out + " " + deuxChiffres(r) : deuxChiffres(r);
+  return out || "zéro";
+}
+
+function entierEnLettres(n: number): string {
+  if (n <= 0) return "zéro";
+  const morceaux: string[] = [];
+  let reste = n;
+  const milliards = Math.floor(reste / 1_000_000_000);
+  reste %= 1_000_000_000;
+  if (milliards) {
+    morceaux.push((milliards === 1 ? "un" : troisChiffres(milliards)) + (milliards > 1 ? " milliards" : " milliard"));
+  }
+  const millions = Math.floor(reste / 1_000_000);
+  reste %= 1_000_000;
+  if (millions) {
+    morceaux.push((millions === 1 ? "un" : troisChiffres(millions)) + (millions > 1 ? " millions" : " million"));
+  }
+  const milliers = Math.floor(reste / 1_000);
+  reste %= 1_000;
+  if (milliers) {
+    morceaux.push(milliers === 1 ? "mille" : troisChiffres(milliers) + " mille");
+  }
+  if (reste) morceaux.push(troisChiffres(reste));
+  return morceaux.join(" ");
+}
+
+/** Unités monétaires — [singulier, pluriel, centime sing., centime pl.]. */
+const UNITES_MONNAIE: Record<string, [string, string, string | null, string | null]> = {
+  EUR: ["euro", "euros", "centime", "centimes"],
+  XOF: ["franc CFA", "francs CFA", null, null],
+  XAF: ["franc CFA", "francs CFA", null, null],
+  USD: ["dollar américain", "dollars américains", "cent", "cents"],
+  CAD: ["dollar canadien", "dollars canadiens", "cent", "cents"],
+  GBP: ["livre sterling", "livres sterling", "penny", "pence"],
+  CHF: ["franc suisse", "francs suisses", "centime", "centimes"],
+};
+
+/** « 2 000 » → « deux mille euros » (devise accordée, centimes
+ *  éventuels ; le franc CFA n'a pas de subdivision). */
+export function montantEnLettres(montant: number, devise: string = "EUR"): string {
+  const u = UNITES_MONNAIE[devise] ?? UNITES_MONNAIE.EUR;
+  const arrondi = Math.round((Number(montant) || 0) * 100) / 100;
+  const entier = Math.floor(arrondi);
+  const centimes = Math.round((arrondi - entier) * 100);
+  /* « un million D'euros » / « deux millions DE francs » : les
+     échelles million/milliard exigent la préposition « de/d' ». */
+  const motUnite = entier > 1 ? u[1] : u[0];
+  const liaison = entier >= 1_000_000 ? (/^[aeéèiouh]/i.test(motUnite) ? " d'" : " de ") : " ";
+  let out = entierEnLettres(entier) + liaison + motUnite;
+  if (centimes > 0 && u[2]) {
+    out += " et " + entierEnLettres(centimes) + " " + (centimes > 1 ? u[3] : u[2]);
+  }
+  return out;
+}

@@ -1,43 +1,47 @@
 /**
- * Rendu HTML des documents (VOLET 14, 24/11/2026) — A4, deux pages
- * pour les devis et propositions, une page pour les factures.
+ * Rendu HTML des documents — DEVIS et FACTURES (VOLET 17, 25/11/2026).
  *
- * TEMPLATE COPIÉ DU PROJET K.QUOTES de l'éditeur
- * (github.com/STEVECROWN01/K.Quotes — src/components/keter/
- * document-html.ts) : même organisation visuelle, mêmes couleurs
- * (bandeaux noirs, typographie Inter, filets gris), mêmes blocs
- * (Émetteur/Destinataire, « Merci pour votre confiance. », tableau
- * Détail, bandeau TOTAL noir, Conditions/Bon pour accord, page
- * Coordonnées bancaires, mentions de bas de page), adapté à
- * l'identité « Stevens Akpovi » :
- *  - lignes de prestations LIBRES (au lieu des prestations fixes
- *    CV/LinkedIn de K.Quotes) ;
- *  - logo et wordmark STEVENS AKPOVI (public/assets/logo-noir.png) ;
- *  - SIGNATURE MANUSCRITE de Stevens (police cursive Great Vibes)
- *    sur chaque document — demande de l'éditeur : « tous les
- *    documents doivent porter mon logo. Voilà. Et ma signature. » ;
- *  - FACTURE : CACHET « PAYÉ » reproduit du projet MRSTEVEENGLISH
- *    de l'éditeur (github.com/STEVECROWN01/MrSteveEnglish —
- *    src/lib/receipt.ts) : cadre DOUBLE vert pur #008000 (150×58 pt
- *    à l'extérieur, trait 2,4 pt ; intérieur 141×49 pt, trait
- *    0,9 pt), inclinaison MONTANTE « / » de −17°, « PAYÉ » en Times
- *    bold 38 pt, date « le JJ/MM/AAAA » en 9 pt dessous, opacité
- *    0,92 — posé dans une bande dédiée, sous les totaux, comme dans
- *    le reçu original ;
- *  - PROPOSITION COMMERCIALE : mêmes codes, page 2 enrichie du
- *    DÉROULÉ DU PROJET (phases et délais).
+ * TEMPLATE PERSONNEL DE L'ÉDITEUR —
+ * corrections demandées une à une au fil des volets, toutes
+ * appliquées ici :
  *
- * Utilisé par :
- *  - l'aperçu en direct du back-office (iframe srcDoc, ApercuDocument) ;
- *  - la route /api/documents/pdf (Puppeteer setContent → page.pdf).
- * Le marqueur « PAGE 2 » ci-dessous sert au découpage de l'aperçu.
+ *  - ENTÊTE : logo seul à droite (le wordmark sous le logo est
+ *    SUPPRIMÉ), hauteur alignée sur le bloc « numéro + date » ;
+ *  - ÉMETTEUR : « Professionnel : Stevens AKPOVI » (lignes RCCM et
+ *    « Votre contact » supprimées) ;
+ *  - DESTINATAIRE : nom complet EN GRAS ;
+ *  - ligne « Objet : » SUPPRIMÉE sous le bloc émetteur/destinataire ;
+ *  - TABLEAU « Détail » : la description est RÉDIGÉE (texte riche :
+ *    gras, italique, taille supérieure, listes Word-like) — plus de
+ *    puces carrées ; le type est toujours « Service » ; le tableau
+ *    PEUT SE POURSUIVRE sur la page suivante (une ligne = un bloc
+ *    paginable) ;
+ *  - délai estimé : PLUS DANS LE TABLEAU — affiché à la suite des
+ *    conditions générales de vente, sans décalage : « Délai estimé :
+ *    … » (libellé en gras) ;
+ *  - TOTAL : la rangée noire du pied de tableau est SUPPRIMÉE — le
+ *    total s'écrit SOUS le tableau : « Total : 350 000,00 € (trois
+ *    cent cinquante mille euros) — TVA non applicable » (montant en
+ *    chiffres ET en lettres) ;
+ *  - espace de signature du « Bon pour accord » agrandi ;
+ *  - COORDONNÉES BANCAIRES : IBAN, BIC puis « Titulaire du compte »
+ *    (ligne « Banque » supprimée du document et du formulaire) ;
+ *  - la signature manuscrite « Stevens Akpovi » + les deux lignes de
+ *    texte qui l'accompagnaient APRÈS la note sont SUPPRIMÉES (devis) ;
+ *  - FACTURE : cachet « PAYÉ » conservé, signature conservée.
+ *
+ * PAGINATION : moteur commun (pagination-flux.ts) — le contenu
+ * s'écoule en blocs et se répartit en pages A4 explicites (filigrane
+ * et pied numéroté sur chaque page) ; le tableau se poursuit donc
+ * naturellement d'une page sur l'autre.
  */
 
-import type { DocumentRecord } from "./types";
-import { LABELS_DOC } from "./types";
-import { formatDate, formatDateCourte, formatCurrency } from "./format";
-import { EMETTEUR, CONDITIONS_GENERALES } from "./defaults";
 import { formatPaymentMethodWithLogo } from "./payment-logos";
+import { montantEnLettres, formatDate, formatDateCourte, formatCurrency } from "./format";
+import { descriptionOuPoints, decouperHtmlRiche } from "./texte-riche";
+import { fabriquerScriptPagination } from "./pagination-flux";
+import { LABELS_DOC, type DocumentRecord } from "./types";
+import { EMETTEUR, CONDITIONS_GENERALES } from "./defaults";
 
 function esc(v: string | null | undefined): string {
   if (v === null || v === undefined) return "";
@@ -48,6 +52,11 @@ function esc(v: string | null | undefined): string {
     .replace(/"/g, "&quot;");
 }
 
+/* Pagination du devis : marges 16 mm, contenu jusqu'à 279 mm
+ * (le pied de page occupe le bas). */
+const LIMITE_PX = Math.round((279 / 25.4) * 96);
+const DEBUT_PX = Math.round((16 / 25.4) * 96);
+
 export function renderDocumentHtml(
   d: DocumentRecord,
   logoSrc: string = "/assets/logo-noir.png",
@@ -55,17 +64,20 @@ export function renderDocumentHtml(
   const label = LABELS_DOC[d.docType];
   const estProposition = d.docType === "proposition";
   const estFacture = d.docType === "facture";
-  const nbPages = estFacture ? 1 : 2;
   const dateLabel = formatDate(d.date);
   const datePaiementLabel = d.datePaiement ? formatDateCourte(d.datePaiement) : formatDateCourte(d.date);
 
   const total = d.items.reduce((s, it) => s + (Number(it.quantite) || 0) * (Number(it.prixUnitaire) || 0), 0);
 
+  /* Délai estimé : champ du document, sinon mention de la première
+   * ligne (anciens documents). */
+  const delaiEstime =
+    (d.delaiEstime ?? "").trim() ||
+    (d.items.find((it) => (it.mentionLivraison ?? "").trim())?.mentionLivraison ?? "");
+
   const emetteurRows: [string, string][] = [
-    ["Société :", EMETTEUR.societe],
+    ["Professionnel :", `<strong>${esc(EMETTEUR.societe)}</strong>`],
     ["IFU :", EMETTEUR.ifu],
-    ["RCCM :", EMETTEUR.rccm],
-    ["Votre contact :", EMETTEUR.contact],
     ["Adresse :", EMETTEUR.adresse],
     ["Pays :", EMETTEUR.pays],
   ];
@@ -74,7 +86,7 @@ export function renderDocumentHtml(
   const c = d.client;
   const destinataireRows: [string, string][] = [
     ...(c.entreprise ? ([["Entreprise :", esc(c.entreprise)]] as [string, string][]) : []),
-    ["Nom :", esc(c.nom) || "—"],
+    ["Nom :", `<strong>${esc(c.nom) || "—"}</strong>`],
     ["Ville :", esc(c.ville) || "—"],
     ["Pays :", esc(c.pays) || "—"],
     ["Téléphone :", esc(c.telephone) || "—"],
@@ -92,8 +104,7 @@ export function renderDocumentHtml(
       : esc(d.intro);
 
   /* Cachet « PAYÉ » — reproduction du style MrSteveEnglish (voir
-     l'en-tête du fichier). Affiché sur les factures réglées ; la
-     bande dédiée centrée sous les totaux ne masque aucune ligne. */
+     l'historique) ; factures réglées uniquement. */
   const estPaye = d.statutPaiement === "Payé";
   const cachetPaye = estFacture
     ? estPaye
@@ -106,8 +117,7 @@ export function renderDocumentHtml(
       : ""
     : "";
 
-  /* Bloc Paiement (factures) — statut, date de règlement et volet
-     bancaire restitués au format attendu par le gabarit imprimable. */
+  /* Bloc Paiement (factures). */
   const blocPaiement = estFacture
     ? `
       <div class="invoice-payment-block">
@@ -128,15 +138,83 @@ export function renderDocumentHtml(
       </div>`
     : "";
 
-  /* Conditions + Bon pour accord (devis et propositions). */
+  /* Déroulé du projet (proposition commerciale ancien gabarit). */
+  const blocPhases =
+    estProposition && d.phases && d.phases.length
+      ? `
+    <div class="section-heading" data-bloc data-heading>Déroulé du projet</div>
+    <ul class="conditions-list phases-list" data-bloc>
+      ${d.phases
+        .map(
+          (p) =>
+            `<li><span class="phase-titre">${esc(p.titre)}</span><span class="phase-delai">${esc(p.delai)}</span></li>`,
+        )
+        .join("")}
+    </ul>`
+      : "";
+
+  /* Lignes du tableau : la description est DÉCOUPÉE en fragments
+   * (paragraphe / liste) et CHAQUE fragment est un bloc paginable —
+   * une description plus longue qu'une page se poursuit sur la page
+   * suivante, le tableau continue (cellules vides alignées, comme
+   * dans Word). */
+  const lignesTableau = d.items
+    .map((it) => {
+      const fragments = decouperHtmlRiche(descriptionOuPoints(it));
+      const prix = formatCurrency(Number(it.prixUnitaire) || 0, d.devise);
+      const totalLigne = formatCurrency((Number(it.quantite) || 0) * (Number(it.prixUnitaire) || 0), d.devise);
+      if (!fragments.length) {
+        return `
+  <div class="svc-part svc-debut svc-fin" data-bloc>
+    <div class="cell type-cell">${esc(it.type || "Service")}</div>
+    <div class="cell desc-cell"><div class="service-name">${esc(it.designation)}</div></div>
+    <div class="cell price-cell">${prix}</div>
+    <div class="cell qty-cell">${Number(it.quantite) || 0}</div>
+    <div class="cell total-cell">${totalLigne}</div>
+  </div>`;
+      }
+      const parties = fragments.map((fragment, k) => {
+        const debut = k === 0 ? " svc-debut" : "";
+        const fin = k === fragments.length - 1 ? " svc-fin" : "";
+        const tete = k === 0
+          ? `<div class="cell type-cell">${esc(it.type || "Service")}</div>
+    <div class="cell desc-cell"><div class="service-name">${esc(it.designation)}</div><div class="desc-riche">${fragment}</div></div>
+    <div class="cell price-cell">${prix}</div>
+    <div class="cell qty-cell">${Number(it.quantite) || 0}</div>
+    <div class="cell total-cell">${totalLigne}</div>`
+          : `<div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche">${fragment}</div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>`;
+        return `
+  <div class="svc-part${debut}${fin}" data-bloc>
+    ${tete}
+  </div>`;
+      });
+      return parties.join("");
+    })
+    .join("");
+
+  /* Total SOUS le tableau : chiffres + lettres + TVA non
+   * applicable (la rangée noire du pied de tableau est supprimée). */
+  const blocTotal = `
+  <div class="total-sous-tableau" data-bloc>
+    <p><strong>Total&nbsp;:</strong> ${formatCurrency(total, d.devise)} <span class="total-lettres">(${esc(montantEnLettres(total, d.devise))})</span> — TVA non applicable</p>
+  </div>`;
+
+  /* Conditions + Bon pour accord (devis et propositions) — le délai
+   * estimé suit IMMÉDIATEMENT la liste des CGV (« sans espace de
+   * décalage ») ; l'espace de signature est agrandi. */
   const blocConditions = !estFacture
     ? `
-    <div class="conditions-block ${d.items.length > 1 ? "conditions-block-multi" : ""}">
+    <div class="conditions-block" data-bloc>
       <div class="cb-left">
         <div class="cb-title">Conditions générales de vente</div>
         <ul class="cb-conditions-list">
           ${CONDITIONS_GENERALES.map((cond) => `<li>${esc(cond)}</li>`).join("")}
         </ul>
+        ${delaiEstime ? `<p class="delai-apres-cgv"><strong>Délai estimé&nbsp;:</strong> ${esc(delaiEstime)}</p>` : ""}
       </div>
       <div class="cb-right">
         <div class="cb-title">Bon pour accord</div>
@@ -148,22 +226,45 @@ export function renderDocumentHtml(
     </div>`
     : "";
 
-  /* Déroulé du projet (proposition, page 2). */
-  const blocPhases =
-    estProposition && d.phases && d.phases.length
-      ? `
-    <div class="section-heading">Déroulé du projet</div>
-    <ul class="conditions-list phases-list">
-      ${d.phases
-        .map(
-          (p) =>
-            `<li><span class="phase-titre">${esc(p.titre)}</span><span class="phase-delai">${esc(p.delai)}</span></li>`,
-        )
-        .join("")}
-    </ul>`
-      : "";
+  /* Validité + notes. */
+  const blocValiditeNotes = `
+  <div class="validite-notes" data-bloc>
+    <p><span class="vn-lbl">Validité du document&nbsp;:</span> ${Number(d.validiteJours) || 5} jours</p>
+    ${d.notes ? `<p><span class="vn-lbl">Notes&nbsp;:</span> ${esc(d.notes)}</p>` : ""}
+  </div>`;
 
-  return `<!DOCTYPE html>
+  /* Coordonnées bancaires — VOLET 17 : IBAN, BIC puis TITULAIRE (la
+   * ligne « Banque » est supprimée). */
+  const blocBanque = `
+  <div class="section-heading" data-bloc data-heading>Coordonnées bancaires</div>
+  <div class="bank-block" data-bloc>
+    <div class="bank-row"><span class="lbl">IBAN&nbsp;:</span> <span class="val">${esc(d.banque.iban)}</span></div>
+    <div class="bank-row"><span class="lbl">BIC&nbsp;:</span> <span class="val">${esc(d.banque.bic)}</span></div>
+    <div class="bank-row"><span class="lbl">Titulaire du compte&nbsp;:</span> <span class="val">${esc(d.banque.titulaire)}</span></div>
+    <div class="bank-row"><span class="lbl">Mode de paiement&nbsp;:</span> <span class="val">${esc(d.modePaiement)}</span></div>
+    <div class="bank-row"><span class="lbl">Conditions de règlement&nbsp;:</span> <span class="val">${esc(d.conditionsReglement)}</span></div>
+  </div>
+  ${
+    d.lienPaiement
+      ? `<div class="payment-link-section" data-bloc>
+    <div class="section-heading" data-bloc data-heading>Lien de paiement en ligne</div>
+    <div class="payment-link-block" data-bloc>
+      <a class="payment-link-url" href="${esc(d.lienPaiement)}" target="_blank" rel="noopener noreferrer">${esc(d.lienPaiement)}</a>
+    </div>
+  </div>`
+      : ""
+  }`;
+
+  /* FACTURE : signature manuscrite conservée. */
+  const blocSignatureFacture = estFacture
+    ? `
+    <div class="signature-steve signature-steve--facture" data-bloc>
+      <div class="sig-cursive">Stevens Akpovi</div>
+      <div class="sig-caption">Stevens AKPOVI — ${esc(EMETTEUR.subText)} · ${esc(EMETTEUR.email)}</div>
+    </div>`
+    : "";
+
+  const html = `<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="utf-8"/>
@@ -172,7 +273,6 @@ export function renderDocumentHtml(
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
 <style>
-  /* ---- Page : A4, marge nulle, une ou deux pages ---- */
   @page { size: A4; margin: 0; }
   * { box-sizing: border-box; }
   html, body {
@@ -184,22 +284,29 @@ export function renderDocumentHtml(
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
-  .page {
+  /* ---- Pages : A4, flux de blocs, marge 16 mm ---- */
+  .ppage {
     position: relative;
     width: 210mm;
     height: 297mm;
-    padding: 16mm 16mm 10mm 16mm;
+    margin: 0 auto 8mm;
     background: #ffffff;
     overflow: hidden;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.28);
+    padding: ${DEBUT_PX / 96 * 25.4}mm 16mm 0 16mm;
+    break-after: page;
+    page-break-after: always;
   }
-  .page.page1 { page-break-after: always; }
-  .page.page1.no-next { page-break-after: auto; }
+  .ppage.ppage-fin { break-after: auto; page-break-after: auto; }
+  @media print {
+    body { background: #ffffff; }
+    .ppage { margin: 0; box-shadow: none; }
+  }
+  .corps { position: relative; z-index: 1; }
 
-  /* ---- Filigrane (à peine visible) ---- */
-  .watermark {
-    position: absolute;
-    top: 50%;
-    left: 50%;
+  /* ---- Filigrane ---- */
+  .wm {
+    position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     width: 60%;
     max-width: 150mm;
@@ -207,18 +314,17 @@ export function renderDocumentHtml(
     pointer-events: none;
     z-index: 0;
   }
-  .watermark img { width: 100%; height: auto; display: block; }
+  .wm img { width: 100%; height: auto; display: block; }
 
-  .page-content, .page2-content { position: relative; z-index: 1; }
-
-  /* ---- Page 1 : entête ---- */
+  /* ---- Entête ---- */
   .doc-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: stretch;
     margin-bottom: 2mm;
+    min-height: 17mm;
   }
-  .doc-header-left { display: flex; flex-direction: column; }
+  .doc-header-left { display: flex; flex-direction: column; justify-content: center; }
   .doc-title {
     font-size: 26pt;
     font-weight: 800;
@@ -234,24 +340,10 @@ export function renderDocumentHtml(
     color: #6b7280;
     font-weight: 400;
   }
-  .doc-header-right { display: flex; align-items: flex-start; }
-  .doc-logo { width: 14mm; height: auto; }
-  .doc-logo-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5mm;
-  }
-  .doc-logo-wordmark {
-    font-family: 'Inter', sans-serif;
-    font-size: 7pt;
-    font-weight: 700;
-    letter-spacing: 0.2px;
-    text-align: center;
-    line-height: 1;
-    white-space: nowrap;
-    color: #000000;
-  }
+  /* VOLET 17 : le wordmark sous le logo est SUPPRIMÉ ; la hauteur
+     du logo s'aligne sur le bloc « numéro + date » (17 mm). */
+  .doc-header-right { display: flex; align-items: center; }
+  .doc-logo { height: 17mm; width: auto; }
 
   .hr { border: 0; border-top: 1px solid #d1d5db; margin: 2mm 0; }
 
@@ -294,17 +386,11 @@ export function renderDocumentHtml(
     line-height: 1.4;
   }
 
-  /* ---- Bloc remerciement / objet ---- */
+  /* ---- Bloc remerciement (plus de ligne « Objet : ») ---- */
   .thank-you { margin: 2mm 0 4mm 0; }
   .thank-you-prefix {
     font-weight: 700;
     font-size: 11pt;
-    color: #000000;
-    margin-bottom: 2px;
-  }
-  .thank-you-objet {
-    font-weight: 600;
-    font-size: 10pt;
     color: #000000;
     margin-bottom: 2px;
   }
@@ -323,108 +409,89 @@ export function renderDocumentHtml(
     margin: 4mm 0 3mm 0;
   }
 
-  /* ---- Tableau des prestations ---- */
-  .services-table {
+  /* ---- Tableau des prestations : lignes-blocs paginables ---- */
+  .svc-head, .svc-part {
+    display: grid;
+    grid-template-columns: 10% 49% 18% 7% 16%;
     width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
+  }
+  .svc-head {
+    background: #000000;
     border: 1px solid #000000;
   }
-  .services-table thead th {
-    background: #000000;
+  .svc-head .cell {
     color: #ffffff;
     font-size: 9.5pt;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     padding: 6px 8px;
-    text-align: left;
-    border-right: 1px solid #333333;
+    line-height: 1.35;
   }
-  .services-table thead th:last-child { border-right: none; }
-  .services-table thead th.num { text-align: right; }
-  .services-table thead th.center { text-align: center; }
-  .services-table thead th:first-child { text-align: center; }
-
-  .services-table tbody td {
-    padding: 5px 8px;
-    vertical-align: top;
-    border-bottom: 1px solid #000000;
+  .svc-head .cell.num { text-align: right; }
+  .svc-head .cell.center { text-align: center; }
+  .svc-head .cell:first-child { text-align: center; }
+  .svc-part {
+    border-left: 1px solid #000000;
     border-right: 1px solid #000000;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  /* Dernier fragment d'une ligne : ferme le bas du tableau. */
+  .svc-part.svc-fin { border-bottom: 1px solid #000000; }
+  /* Fragment qui OUVRE une page : le tableau reprend avec un filet
+     supérieur (posé par le moteur de pagination). */
+  .svc-part.debut-page { border-top: 1px solid #000000; }
+  .svc-part .cell {
+    padding: 5px 8px;
     font-size: 9pt;
     line-height: 1.35;
     color: #1f2937;
+    border-right: 1px solid #000000;
+    vertical-align: top;
   }
-  .services-table tbody td:last-child { border-right: 1px solid #000000; }
-  .services-table tbody td.type-cell {
+  .svc-part .cell:last-child { border-right: 1px solid #000000; }
+  .svc-part .cell.type-cell {
     font-weight: 600;
     color: #000000;
-    font-size: 9pt;
-    width: 10%;
     text-align: center;
   }
-  .services-table tbody td.desc-cell { width: 49%; }
-  .services-table tbody td.price-cell { width: 18%; text-align: right; font-variant-numeric: tabular-nums; }
-  .services-table tbody td.qty-cell { width: 7%; text-align: center; }
-  .services-table tbody td.total-cell { width: 16%; text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
-
+  .svc-part .cell.price-cell { text-align: right; font-variant-numeric: tabular-nums; }
+  .svc-part .cell.qty-cell { text-align: center; }
+  .svc-part .cell.total-cell { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .service-name {
     font-weight: 700;
     color: #000000;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
     font-size: 10pt;
   }
-  .service-bullets { margin: 0 0 3px 0; padding: 0; list-style: none; }
-  .service-bullets li {
-    position: relative;
-    padding-left: 10px;
-    margin-bottom: 0;
-    font-size: 9pt;
-    color: #374151;
+  /* Description RÉDIGÉE (texte riche, mise en forme Word-like) —
+     plus de puces carrées. */
+  .desc-riche p { margin: 0 0 3px 0; font-size: 9pt; line-height: 1.5; color: #374151; }
+  .desc-riche p:last-child { margin-bottom: 0; }
+  .desc-riche b, .desc-riche strong { font-weight: 700; color: #111111; }
+  .desc-riche i, .desc-riche em { font-style: italic; }
+  .desc-riche u { text-decoration: underline; }
+  /* « taille supérieure » (font size 5) : sous-titre */
+  .desc-riche font[size="5"], .desc-riche .txt-sup {
+    font-size: 10.5pt;
+    font-weight: 600;
+    color: #000000;
+  }
+  .desc-riche ul, .desc-riche ol { margin: 2px 0 4px 0; padding-left: 16px; }
+  .desc-riche li { font-size: 9pt; line-height: 1.5; color: #374151; margin-bottom: 1px; }
+  .desc-riche ul li { list-style-type: disc; }
+  .desc-riche ol li { list-style-type: decimal; }
+
+  /* ---- Total SOUS le tableau (plus de rangée noire) ---- */
+  .total-sous-tableau { margin-top: 4mm; }
+  .total-sous-tableau p {
+    margin: 0;
+    font-size: 11pt;
+    color: #000000;
     line-height: 1.5;
   }
-  .service-bullets li::before {
-    content: "■";
-    color: #000000;
-    position: absolute;
-    left: 0;
-    top: 0;
-    font-size: 8pt;
-    line-height: 1.7;
-  }
-  .service-delivery {
-    font-style: italic;
-    color: #6b7280;
-    font-size: 9pt;
-    margin-top: 3px;
-    line-height: 1.4;
-  }
-
-  /* TOTAL — bandeau noir unique, sans division verticale */
-  .services-table tfoot tr { background: #000000; }
-  .services-table tfoot td {
-    background: #000000;
-    color: #ffffff;
-    padding: 8px 10px;
-    font-weight: 700;
-    font-size: 10.5pt;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border: none !important;
-  }
-  .services-table tfoot td.total-label {
-    text-align: left;
-    width: 50%;
-    white-space: nowrap;
-  }
-  .services-table tfoot td.total-amount {
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-    width: 50%;
-    min-width: 0;
-    padding-left: 4px;
-  }
+  .total-sous-tableau .total-lettres { color: #374151; font-style: italic; }
 
   /* ---- Conditions / Bon pour accord ---- */
   .conditions-block {
@@ -433,21 +500,12 @@ export function renderDocumentHtml(
     gap: 8mm;
     margin-top: 12mm;
   }
-  .conditions-block.conditions-block-multi { margin-top: 6mm; }
   .cb-left .cb-title, .cb-right .cb-title {
     font-size: 10.5pt;
     font-weight: 700;
     margin-bottom: 12px;
     color: #000000;
   }
-  .cb-left .cb-row {
-    font-size: 9pt;
-    margin-bottom: 1px;
-    line-height: 1.5;
-    color: #1f2937;
-  }
-  .cb-left .cb-row .lbl { color: #000000; font-weight: 600; }
-  .cb-left .cb-row .val { color: #000000; font-weight: 400; }
   .cb-conditions-list { margin: 0; padding: 0; list-style: none; }
   .cb-conditions-list li {
     position: relative;
@@ -466,6 +524,13 @@ export function renderDocumentHtml(
     font-size: 7pt;
     line-height: 1.8;
   }
+  /* Délai estimé : À LA SUITE des CGV, sans décalage. */
+  .delai-apres-cgv {
+    margin: 2px 0 0 0;
+    font-size: 9pt;
+    color: #1f2937;
+    line-height: 1.5;
+  }
   .cb-right { padding-left: 0; border-left: none; }
   .cb-right .cb-title { margin-bottom: 8mm; }
   .cb-right .cb-date-line {
@@ -473,8 +538,9 @@ export function renderDocumentHtml(
     color: #6b7280;
     margin-bottom: 10mm;
   }
+  /* VOLET 17 : espace de signature AGRANDI (18 mm → 30 mm). */
   .signature-line {
-    margin-top: 18mm;
+    margin-top: 30mm;
     border-top: 1px solid #000000;
     padding-top: 3px;
     font-size: 8.5pt;
@@ -484,7 +550,12 @@ export function renderDocumentHtml(
   .signature-line .sig-separator { color: #6b7280; margin: 0 4px; font-weight: 400; }
   .signature-line .sig-quality-inline { color: #6b7280; font-weight: 400; font-style: italic; }
 
-  /* ---- Bloc Paiement (factures) : habillage du volet règlement ---- */
+  /* ---- Validité + notes ---- */
+  .validite-notes { margin-top: 10mm; }
+  .validite-notes p { margin: 0 0 3px 0; font-size: 9pt; line-height: 1.5; color: #1f2937; }
+  .validite-notes .vn-lbl { color: #000000; font-weight: 600; }
+
+  /* ---- Bloc Paiement (factures) ---- */
   .invoice-payment-block {
     background: rgba(75, 138, 107, 0.08);
     border: 1px solid rgba(75, 138, 107, 0.3);
@@ -510,12 +581,7 @@ export function renderDocumentHtml(
   .ipb-value { color: #000000; font-weight: 600; }
   .ipb-value.paid { color: #2E7D32; font-weight: 700; }
 
-  /* ---- CACHET « PAYÉ » — style MrSteveEnglish (reproduction) ----
-     Cadre double vert pur #008000 : extérieur 150×58 pt (trait
-     2,4 pt), intérieur (trait 0,9 pt à 4,5 pt du bord), inclinaison
-     MONTANTE « / » de −17°, « PAYÉ » Times bold 38 pt + date 9 pt,
-     opacité 0,92. Bande dédiée centrée sous les totaux : ne masque
-     aucune ligne (leçon QA du reçu original). */
+  /* ---- CACHET « PAYÉ » ---- */
   .cachet-bande {
     display: flex;
     justify-content: center;
@@ -568,55 +634,28 @@ export function renderDocumentHtml(
     color: #008000;
   }
 
-  /* ---- Signature manuscrite de Stevens ---- */
+  /* ---- Signature manuscrite (FACTURE uniquement) ---- */
   .signature-steve { margin-top: 8mm; }
-  /* FACTURE : signature compacte — la page unique accumule cachet et
-     bloc Paiement ; sans compacité, la signature descendait dans le
-     pied de page (chevauchement mesuré au contrôle visuel volet 14). */
   .signature-steve.signature-steve--facture { margin-top: 3mm; }
   .signature-steve .sig-cursive {
     font-family: 'Great Vibes', cursive;
-    font-size: 26pt;
+    font-size: 21pt;
     line-height: 1.05;
     color: #1f2937;
   }
-  .signature-steve.signature-steve--facture .sig-cursive { font-size: 21pt; }
   .signature-steve .sig-caption {
     margin-top: 1pt;
-    font-size: 8.5pt;
+    font-size: 8pt;
     color: #6b7280;
     line-height: 1.3;
   }
-  .signature-steve.signature-steve--facture .sig-caption { font-size: 8pt; }
 
-  /* ---- Pied de page ---- */
-  .doc-footer {
-    position: absolute;
-    left: 16mm;
-    right: 16mm;
-    bottom: 6mm;
-    z-index: 2;
-  }
-  .doc-footer .footer-hr {
-    border: 0;
-    border-top: 1px solid #e5e7eb;
-    margin-bottom: 4px;
-  }
-  .doc-footer .footer-row {
-    display: flex;
-    justify-content: space-between;
-    font-size: 8.5pt;
-    color: #6b7280;
-  }
-  .doc-footer .footer-left .line-1 { font-weight: 400; color: #9ca3af; }
-  .doc-footer .footer-left .line-2 { color: #bcbcbc; }
-
-  /* ---- Page 2 : banque + déroulé + conditions ---- */
+  /* ---- Coordonnées bancaires ---- */
   .section-heading {
     font-size: 14pt;
     font-weight: 700;
     color: #000000;
-    margin: 0 0 4mm 0;
+    margin: 14mm 0 4mm 0;
     padding-bottom: 4px;
     border-bottom: 1px solid #d1d5db;
   }
@@ -637,23 +676,6 @@ export function renderDocumentHtml(
     font-weight: 400;
     font-variant-numeric: tabular-nums;
   }
-  .payment-link-row {
-    display: flex;
-    margin-top: 3px;
-    padding: 3px 0;
-    font-size: 10.5pt;
-    line-height: 1.5;
-  }
-  .payment-link-row .lbl {
-    color: #000000;
-    font-weight: 600;
-    min-width: 50mm;
-  }
-  .payment-link-row .val {
-    color: #000000;
-    font-weight: 400;
-    word-break: break-all;
-  }
   .payment-link-section { margin-top: 12mm; }
   .payment-link-block { margin-top: 3mm; padding: 4mm 0; }
   .payment-link-url {
@@ -664,7 +686,6 @@ export function renderDocumentHtml(
     font-size: 10.5pt;
   }
 
-  .conditions-section { margin-top: 14mm; }
   .conditions-list { margin: 4mm 0 0 0; padding: 0; list-style: none; }
   .conditions-list li {
     position: relative;
@@ -691,192 +712,120 @@ export function renderDocumentHtml(
   .phases-list .phase-titre { font-weight: 600; color: #000000; }
   .phases-list .phase-delai { color: #6b7280; font-size: 10pt; white-space: nowrap; }
 
-  .shalom {
-    margin-top: 12mm;
-    text-align: center;
-    font-weight: 800;
-    color: #000000;
-    font-size: 13pt;
-    letter-spacing: 1px;
+  /* ---- Pied de page ---- */
+  .pied {
+    position: absolute;
+    left: 16mm;
+    right: 16mm;
+    bottom: 6mm;
+    z-index: 2;
   }
+  .pied .footer-hr {
+    border: 0;
+    border-top: 1px solid #e5e7eb;
+    margin-bottom: 4px;
+  }
+  .pied .footer-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 8.5pt;
+    color: #6b7280;
+  }
+  .pied .footer-left .line-1 { font-weight: 400; color: #9ca3af; }
+  .pied .footer-left .line-2 { color: #bcbcbc; }
+  .pied .p-num { font-size: 8.5pt; color: #6b7280; }
+
+  /* ---- Flux continu (repli sans script) ---- */
+  #pc-flux { width: 178mm; margin: 0 auto; }
+  #pc-gabarits { display: none; }
 </style>
 </head>
 <body>
 
-<!-- ============ PAGE 1 ============ -->
-<div class="page page1 ${estFacture ? "no-next" : ""}">
-  <div class="watermark"><img src="${logoSrc}" alt="Filigrane Stevens Akpovi" /></div>
-
-  <div class="page-content">
-    <div class="doc-header">
-      <div class="doc-header-left">
-        <div class="doc-title ${estProposition ? "doc-title--long" : ""}">${label} <span class="doc-num">${esc(d.numero)}</span></div>
-        <div class="doc-date">${dateLabel}</div>
-      </div>
-      <div class="doc-header-right">
-        <div class="doc-logo-container">
-          <img class="doc-logo" src="${logoSrc}" alt="Stevens Akpovi" />
-          <div class="doc-logo-wordmark">STEVENS AKPOVI</div>
-        </div>
-      </div>
+<div id="pc-flux">
+  <!-- Entête : numéro + date à gauche, LOGO SEUL à droite -->
+  <div class="doc-header" data-bloc>
+    <div class="doc-header-left">
+      <div class="doc-title ${estProposition ? "doc-title--long" : ""}">${label} <span class="doc-num">${esc(d.numero)}</span></div>
+      <div class="doc-date">${dateLabel}</div>
     </div>
-
-    <hr class="hr" />
-
-    <div class="parties">
-      <div class="party-block">
-        <div class="party-label">Emetteur</div>
-        ${emetteurRows
-          .map((r, i) => {
-            const subText = i === 0 ? `<div class="party-subtext">${esc(emetteurSubText)}</div>` : "";
-            return `<div class="party-row"><span class="lbl">${r[0]}</span><span class="val">${r[1]}</span></div>${subText}`;
-          })
-          .join("")}
-      </div>
-      <div class="party-block">
-        <div class="party-label">Destinataire</div>
-        ${destinataireRows
-          .map((r) => `<div class="party-row"><span class="lbl">${r[0]}</span><span class="val">${r[1]}</span></div>`)
-          .join("")}
-      </div>
+    <div class="doc-header-right">
+      <img class="doc-logo" src="${esc(logoSrc)}" alt="Stevens Akpovi" />
     </div>
-
-    <hr class="hr" />
-
-    <div class="thank-you">
-      <div class="thank-you-prefix">Merci pour votre confiance.</div>
-      <div class="thank-you-objet">Objet : ${esc(d.objet)}.</div>
-      <div class="thank-you-body">${remerciement}</div>
-    </div>
-
-    <div class="detail-heading">Détail</div>
-
-    <table class="services-table">
-      <thead>
-        <tr>
-          <th style="width: 10%">Type</th>
-          <th style="width: 49%">Description</th>
-          <th class="num" style="width: 18%">Prix unitaire</th>
-          <th class="center" style="width: 7%">Qté</th>
-          <th class="num" style="width: 16%">Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${d.items
-          .map(
-            (it) => `
-        <tr>
-          <td class="type-cell">${esc(it.type)}</td>
-          <td class="desc-cell">
-            <div class="service-name">${esc(it.designation)}</div>
-            ${(it.points && it.points.length)
-              ? `<ul class="service-bullets">
-                ${it.points.filter(Boolean).map((b) => `<li>${esc(b)}</li>`).join("")}
-              </ul>`
-              : ""}
-            ${it.mentionLivraison ? `<div class="service-delivery">${esc(it.mentionLivraison)}</div>` : ""}
-          </td>
-          <td class="price-cell">${formatCurrency(Number(it.prixUnitaire) || 0, d.devise)}</td>
-          <td class="qty-cell">${Number(it.quantite) || 0}</td>
-          <td class="total-cell">${formatCurrency((Number(it.quantite) || 0) * (Number(it.prixUnitaire) || 0), d.devise)}</td>
-        </tr>`,
-          )
-          .join("")}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="3" class="total-label">TOTAL</td>
-          <td colspan="2" class="total-amount">${formatCurrency(total, d.devise)}</td>
-        </tr>
-      </tfoot>
-    </table>
-
-    ${cachetPaye}
-    ${blocPaiement}
-    ${blocConditions}
-    ${estFacture ? `
-    <div class="signature-steve signature-steve--facture">
-      <div class="sig-cursive">Stevens Akpovi</div>
-      <div class="sig-caption">Stevens AKPOVI — ${esc(EMETTEUR.subText)} · ${esc(EMETTEUR.email)}</div>
-    </div>` : ""}
   </div>
 
-  <div class="doc-footer">
+  <div class="hr" data-bloc></div>
+
+  <div class="parties" data-bloc>
+    <div class="party-block">
+      <div class="party-label">Emetteur</div>
+      ${emetteurRows
+        .map((r, i) => {
+          const subText = i === 0 ? `<div class="party-subtext">${esc(emetteurSubText)}</div>` : "";
+          return `<div class="party-row"><span class="lbl">${r[0]}</span><span class="val">${r[1]}</span></div>${subText}`;
+        })
+        .join("")}
+    </div>
+    <div class="party-block">
+      <div class="party-label">Destinataire</div>
+      ${destinataireRows
+        .map((r) => `<div class="party-row"><span class="lbl">${r[0]}</span><span class="val">${r[1]}</span></div>`)
+        .join("")}
+    </div>
+  </div>
+
+  <div class="hr" data-bloc></div>
+
+  <div class="thank-you" data-bloc>
+    <div class="thank-you-prefix">Merci pour votre confiance.</div>
+    <div class="thank-you-body">${remerciement}</div>
+  </div>
+
+  <div class="detail-heading" data-bloc data-heading>Détail</div>
+
+  <div class="svc-head" data-bloc data-heading>
+    <div class="cell">Type</div>
+    <div class="cell">Description</div>
+    <div class="cell num">Prix unitaire</div>
+    <div class="cell center">Qté</div>
+    <div class="cell num">Total</div>
+  </div>
+  ${lignesTableau}
+  ${blocTotal}
+
+  ${cachetPaye}
+  ${blocPaiement}
+  ${blocConditions}
+  ${blocValiditeNotes}
+  ${blocPhases}
+  ${blocBanque}
+  ${blocSignatureFacture}
+</div>
+
+<!-- Gabarits clonés par le script de pagination -->
+<div id="pc-gabarits" aria-hidden="true">
+  <div class="pied">
     <hr class="footer-hr" />
     <div class="footer-row">
       <div class="footer-left">
         <div class="line-1">${label} ${esc(d.numero)}</div>
         <div class="line-2">Document confidentiel — Stevens AKPOVI</div>
       </div>
-      <div class="footer-right">Page 1 sur ${nbPages}</div>
+      <div class="p-num">Page 1 sur 1</div>
     </div>
   </div>
+  <div class="wm"><img src="${esc(logoSrc)}" alt="Filigrane Stevens Akpovi" /></div>
 </div>
 
-${
-  estFacture
-    ? ""
-    : `
-<!-- ============ PAGE 2 ============ -->
-<div class="page">
-  <div class="watermark"><img src="${logoSrc}" alt="Filigrane Stevens Akpovi" /></div>
-
-  <div class="page2-content">
-    ${blocPhases}
-
-    <div class="section-heading" style="${blocPhases ? "margin-top:12mm" : ""}">Coordonnées bancaires</div>
-
-    <div class="bank-block">
-      <div class="bank-row"><span class="lbl">Titulaire du compte :</span> <span class="val">${esc(d.banque.titulaire)}</span></div>
-      <div class="bank-row"><span class="lbl">IBAN :</span> <span class="val">${esc(d.banque.iban)}</span></div>
-      <div class="bank-row"><span class="lbl">BIC :</span> <span class="val">${esc(d.banque.bic)}</span></div>
-      <div class="bank-row"><span class="lbl">Banque :</span> <span class="val">${esc(d.banque.banque)}</span></div>
-      <div class="bank-row"><span class="lbl">Mode de paiement :</span> <span class="val">${esc(d.modePaiement)}</span></div>
-      <div class="bank-row"><span class="lbl">Conditions de règlement :</span> <span class="val">${esc(d.conditionsReglement)}</span></div>
-    </div>
-
-    ${
-      d.lienPaiement
-        ? `<div class="payment-link-section">
-             <div class="section-heading">Lien de paiement en ligne</div>
-             <div class="payment-link-block">
-               <a class="payment-link-url" href="${esc(d.lienPaiement)}" target="_blank" rel="noopener noreferrer">${esc(d.lienPaiement)}</a>
-             </div>
-           </div>`
-        : ""
-    }
-
-    <div class="conditions-section">
-      <div class="cb-row" style="font-size:9pt;margin-bottom:3px;line-height:1.5;color:#1f2937;">
-        <span style="color:#000000;font-weight:600;">Validité du document :</span>
-        <span style="color:#000000;font-weight:400;"> ${Number(d.validiteJours) || 5} jours</span>
-      </div>
-      <div class="cb-row" style="font-size:9pt;margin-bottom:3px;line-height:1.5;color:#1f2937;">
-        <span style="color:#000000;font-weight:600;">Notes :</span>
-        <span style="color:#000000;font-weight:400;"> ${esc(d.notes)}</span>
-      </div>
-      <div class="signature-steve">
-        <div class="sig-cursive">Stevens Akpovi</div>
-        <div class="sig-caption">Stevens AKPOVI — ${esc(EMETTEUR.subText)}<br/>${esc(EMETTEUR.email)} · ${esc(EMETTEUR.siteWeb)}</div>
-      </div>
-      <div class="shalom">SHALOM ALEIKHEM</div>
-    </div>
-  </div>
-
-  <div class="doc-footer">
-    <hr class="footer-hr" />
-    <div class="footer-row">
-      <div class="footer-left">
-        <div class="line-1">${label} ${esc(d.numero)}</div>
-        <div class="line-2">Document confidentiel — Stevens AKPOVI</div>
-      </div>
-      <div class="footer-right">Page 2 sur 2</div>
-    </div>
-  </div>
-</div>
-`
-}
-
+<script>${fabriquerScriptPagination({
+    limitePx: LIMITE_PX,
+    debutP1Px: DEBUT_PX,
+    debutNPx: DEBUT_PX,
+    enteteCompacte: false,
+    formatPage: "simple",
+  })}</script>
 </body>
 </html>`;
+
+  return html;
 }

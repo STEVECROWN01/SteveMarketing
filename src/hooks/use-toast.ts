@@ -16,6 +16,9 @@ type ToasterToast = ToastProps & {
   title?: React.ReactNode
   description?: React.ReactNode
   action?: ToastActionElement
+  /* VOLET 17 : icône optionnelle (ex. coche verte connexion /
+     porte verte déconnexion) rendue à gauche du texte. */
+  icon?: React.ReactNode
 }
 
 const actionTypes = {

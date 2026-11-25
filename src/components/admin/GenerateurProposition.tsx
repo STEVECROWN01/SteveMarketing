@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from "react";
 import { Download, Loader2, Plus, Save, Trash2 } from "lucide-react";
 import { ApercuDocument } from "./ApercuDocument";
+import type { FonctionToast } from "./GenerateurDocument";
 import { BoutonAction, Carte, Champ, Pastille, TitreSection, styleInput } from "./elements";
 import { DEVISES } from "@/lib/documents/types";
 import {
@@ -80,7 +81,7 @@ export function GenerateurProposition({
   prochainNumero: number;
   stockageConfigure: boolean;
   onEnregistre: () => void;
-  toast: (t: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
+  toast: FonctionToast;
   initial?: PropositionRecord | null;
 }) {
   const [form, setForm] = useState<Formulaire>(() => etatInitial(prochainNumero, initial));
@@ -421,8 +422,9 @@ export function GenerateurProposition({
               Ajouter une échéance
             </BoutonAction>
             <p className="text-xs leading-relaxed text-[#c8c8c8]/80">
-              Deux échéances se placent côte à côte ; trois sur une même ligne ; quatre en
-              deux rangées de deux — le document s'organise automatiquement.
+              Conseil&nbsp;: structurez le règlement en échéances cohérentes avec
+              l&apos;avancement du projet (ex.&nbsp;: 50&nbsp;% au démarrage, 50&nbsp;% à la
+              livraison) — la somme des pourcentages doit totaliser 100&nbsp;%.
             </p>
           </div>
         </Carte>

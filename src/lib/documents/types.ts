@@ -18,28 +18,38 @@
 
 export type DocType = "proposition" | "devis" | "facture";
 
-/** Ligne du tableau « Détail » (structure des lignes de K.Quotes). */
+/** Ligne du tableau « Détail ». VOLET 17 : la description est un
+ *  texte RICHE rédigé dans le formulaire (gras, italique, taille
+ *  supérieure, listes) — plus de liste de puces fixes ; le type est
+ *  toujours « Service » (posé automatiquement, plus de champ). */
 export type LigneDocument = {
   id: string;
-  /** Colonne TYPE — « Service », « Pack », « Option »… (libre). */
+  /** Colonne TYPE — toujours « Service » (automatique). */
   type: string;
   /** Nom de la prestation (gras, première ligne de la cellule). */
   designation: string;
-  /** Puces carrées sous la désignation (une par ligne). */
-  points: string[];
-  /** Mention italique de délai/livraison sous les puces. */
+  /** Description rédigée — HTML riche ASSAINI (b, i, taille
+   *  supérieure, listes numérotées / à puces). */
+  description?: string;
+  /** ANCIEN format : puces carrées (documents déjà enregistrés). */
+  points?: string[];
+  /** ANCIEN format : mention italique de délai (remplacée par le
+   *  délai estimé du document, affiché après les CGV). */
   mentionLivraison?: string;
   quantite: number;
   prixUnitaire: number;
 };
 
-/** Coordonnées bancaires (page « Coordonnées bancaires » des devis,
- *  mêmes champs que K.Quotes : titulaire, IBAN, BIC, banque). */
+/** Coordonnées bancaires : VOLET 17 — l'ordre d'affichage est
+ *  IBAN, BIC puis TITULAIRE DU COMPTE (demande de l'éditeur) ; la
+ *  ligne « Banque » a été supprimée du document ET du formulaire. */
 export type CoordonneesBancaires = {
   titulaire: string;
   iban: string;
   bic: string;
-  banque: string;
+  /** ANCIEN champ (conservé pour les documents déjà enregistrés,
+ *   plus affiché). */
+  banque?: string;
 };
 
 /** Phase du déroulé (proposition commerciale, page 2). */
@@ -76,6 +86,11 @@ export type DocumentRecord = {
   items: LigneDocument[];
   /** Code devise (XOF par défaut — FCFA). */
   devise: string;
+
+  /** VOLET 17 — délai estimé de la prestation : affiché À LA SUITE
+   *  des conditions générales de vente (« Délai estimé : … » en
+   *  gras), plus jamais dans le tableau. */
+  delaiEstime?: string;
 
   conditionsReglement: string;
   modePaiement: string;

@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
+  CheckCircle2,
   ChevronRight,
   Download,
   Eye,
@@ -140,7 +141,12 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.ok) throw new Error(data?.error ?? "Mot de passe incorrect.");
-      toast({ title: "Espace ouvert", description: "Back-office accessible." });
+      /* VOLET 17 : icône verte sur le toast de connexion. */
+      toast({
+        title: "Espace ouvert",
+        description: "Back-office accessible.",
+        icon: <CheckCircle2 className="h-5 w-5 text-[#22c55e]" aria-hidden="true" />,
+      });
       onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Connexion impossible.");
@@ -152,29 +158,28 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
   return (
     <div className="container-site flex min-h-screen items-center justify-center py-32">
       <div className="w-full max-w-md rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-8 text-center sm:p-10">
-        {/* VOLET 16 : le logo du site remplace l'icône cadenas —
-            centré horizontalement dans la carte. */}
+        {/* VOLET 17 : logo DOUBLÉ en taille, espace logo→titre
+            réduit (l'éditeur trouvait l'écart trop grand). */}
         <span className="flex justify-center">
           <img
             src={ASSETS.logoLight}
             alt="Stevens Akpovi"
-            width={300}
-            height={240}
-            className="h-16 w-auto"
+            width={600}
+            height={480}
+            className="h-32 w-auto"
           />
         </span>
-        <h1 className="mt-6 font-display text-2xl font-semibold text-white">
-          Backoffice
+        <h1 className="mt-3 font-display text-2xl font-semibold text-white">
+          Bienvenue, Stevens !
         </h1>
         <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-[#c8c8c8]">
-          <span className="font-medium text-white">Bienvenue, Stevens.</span>{" "}
           Votre back-office vous attend : retrouvez les demandes de vos
           clients, générez vos propositions, devis et factures en quelques
           clics, et pilotez chaque projet de la première prise de contact
           au règlement. Tout est réuni ici, en privé, à l&apos;écart de la
           navigation publique — bonne session.
         </p>
-        <form onSubmit={submit} className="mt-8 space-y-4">
+        <form onSubmit={submit} className="mt-8 space-y-4 text-left">
           <div>
             <label htmlFor="admin-password" className="mb-1.5 block text-sm font-medium text-white">
               Mot de passe
@@ -705,7 +710,12 @@ export function AdminPage() {
     setVueFactures("liste");
     setFactureCible(null);
     setPreRemplissage(null);
-    toast({ title: "Espace fermé" });
+    /* VOLET 17 : icône verte sur le toast de déconnexion. */
+    toast({
+      title: "Espace fermé",
+      description: "À bientôt dans votre back-office.",
+      icon: <LogOut className="h-5 w-5 text-[#22c55e]" aria-hidden="true" />,
+    });
   }
 
   /** Changement de rubrique : les listes reprennent la main. */
@@ -1082,7 +1092,9 @@ export function AdminPage() {
             />
           </>
         )}
-        {section === "propositions" && (vueDocs === "liste" || !docEnEdition) && (
+        {/* VOLET 17 : la vue liste n'apparaît PLUS sous la page de
+            création — uniquement sur la page de présentation. */}
+        {section === "propositions" && (vueDocs === "liste" || (vueDocs === "edition" && !docEnEdition)) && (
           <>
             <EnteteListe
               titre="Propositions commerciales"
@@ -1141,7 +1153,7 @@ export function AdminPage() {
             />
           </>
         )}
-        {section === "devis" && (vueDocs === "liste" || !docEnEdition) && (
+        {section === "devis" && (vueDocs === "liste" || (vueDocs === "edition" && !docEnEdition)) && (
           <>
             <EnteteListe
               titre="Devis"

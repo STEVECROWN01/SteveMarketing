@@ -12,9 +12,11 @@
 
 import type { CoordonneesBancaires, DemandeDocument, LigneDocument } from "./types";
 
-/** Émetteur — identité affichée en haut de chaque document. */
+/** Émetteur — identité affichée en haut de chaque document.
+ *  VOLET 17 : « Professionnel : Stevens AKPOVI » (majuscules,
+ *    demande de l'éditeur). */
 export const EMETTEUR = {
-  societe: "Stevens Akpovi",
+  societe: "Stevens AKPOVI",
   subText: "Concepteur de sites web professionnels",
   ifu: "0202212825543",
   rccm: "RB/PKO/23 A 18020",
@@ -25,12 +27,12 @@ export const EMETTEUR = {
   email: "stevensakpovi@gmail.com",
 } as const;
 
-/** Coordonnées bancaires par défaut (celles du projet K.Quotes). */
+/** Coordonnées bancaires par défaut (celles du projet K.Quotes) —
+ *  VOLET 17 : plus de champ « Banque » (ligne supprimée). */
 export const BANQUE_DEFAUT: CoordonneesBancaires = {
   titulaire: "TCHOGNON STEVENS AKPOVI",
   iban: "MT33CFTE28904000000000006119777",
   bic: "CFTEMTM1XXX",
-  banque: "Moneco",
 };
 
 /** Conditions générales de vente — celles de K.Quotes, adaptées aux
@@ -53,7 +55,7 @@ function nouvelleLigne(partial: Partial<LigneDocument> & { designation: string; 
   return {
     id: Math.random().toString(36).slice(2, 10),
     type: "Service",
-    points: [],
+    description: "",
     quantite: 1,
     ...partial,
   };
@@ -61,7 +63,8 @@ function nouvelleLigne(partial: Partial<LigneDocument> & { designation: string; 
 
 /** Pré-remplissage par défaut d'un NOUVEAU DEVIS : prestation type
  *  de l'offre de Stevens (site web professionnel), client à
- *  compléter. L'éditeur ajuste, génère, télécharge. */
+ *  compléter. VOLET 17 : description RÉDIGÉE (texte riche) au lieu
+ *  des puces, délai estimé porté par le document. */
 export function devisParDefaut(): Omit<DemandeDocument, "docType" | "numeroClient" | "date"> {
   return {
     client: { nom: "", entreprise: "", ville: "", pays: "Bénin", telephone: "", email: "" },
@@ -70,21 +73,20 @@ export function devisParDefaut(): Omit<DemandeDocument, "docType" | "numeroClien
       "Le présent devis concerne la création d'un site web professionnel conçu pour valoriser votre activité, attirer les bons visiteurs et transformer leur intérêt en demandes concrètes.",
     items: [
       nouvelleLigne({
-        type: "Service",
         designation: "Site Web Professionnel — Conception complète",
-        points: [
-          "Écoute stratégique et compréhension de votre activité",
-          "Conception sur mesure au code pur, sans template générique",
-          "Rédaction professionnelle des textes (copywriting inclus)",
-          "Référencement de base (SEO) dès la conception",
-          "Adaptation mobile, tablette et ordinateur",
-          "Mise en ligne et livraison dans un délai très court",
-        ],
-        mentionLivraison: "02 à 03 semaines",
+        description: [
+          "Écoute stratégique et compréhension de votre activité.",
+          "Conception sur mesure au code pur, sans template générique.",
+          "Rédaction professionnelle des textes (copywriting inclus).",
+          "Référencement de base (SEO) dès la conception.",
+          "Adaptation mobile, tablette et ordinateur.",
+          "Mise en ligne et livraison dans un délai très court.",
+        ].join("\n"),
         prixUnitaire: 350000,
       }),
     ],
     devise: "EUR",
+    delaiEstime: "02 à 03 semaines",
     conditionsReglement: "À réception",
     modePaiement: "Virement bancaire",
     validiteJours: VALIDITE_JOURS,
@@ -132,29 +134,26 @@ export function exempleModele(): Partial<DemandeDocument> & { phases: { titre: s
       "Le présent document concerne la création d'un site web professionnel pour le Cabinet Essentiel & Stratégie : présenter vos expertises, rassurer vos futurs clients et faciliter la prise de rendez-vous.",
     items: [
       nouvelleLigne({
-        type: "Service",
         designation: "Site Web Professionnel — 5 pages",
-        points: [
-          "Page d'accueil orientée conversion",
-          "Présentation du cabinet et des expertises",
-          "Détail des services et accompagnements",
-          "Témoignages et questions fréquentes",
-          "Formulaire de contact et prise de rendez-vous",
-        ],
-        mentionLivraison: "Délai estimé : 10 jours | Livraison numérique",
+        description: [
+          "Page d'accueil orientée conversion.",
+          "Présentation du cabinet et des expertises.",
+          "Détail des services et accompagnements.",
+          "Témoignages et questions fréquentes.",
+          "Formulaire de contact et prise de rendez-vous.",
+        ].join("\n"),
         prixUnitaire: 450000,
       }),
       nouvelleLigne({
-        type: "Option",
         designation: "Rédaction professionnelle complète (copywriting)",
-        points: [
-          "Rédaction des textes de toutes les pages",
-          "Ton professionnel adapté à votre clientèle",
-        ],
-        mentionLivraison: "Inclus dans le délai du site",
+        description: [
+          "Rédaction des textes de toutes les pages.",
+          "Ton professionnel adapté à votre clientèle.",
+        ].join("\n"),
         prixUnitaire: 75000,
       }),
     ],
+    delaiEstime: "10 jours",
     phases: [
       { titre: "Écoute stratégique et cadrage du projet", delai: "Jours 1 à 2" },
       { titre: "Conception et rédaction professionnelles", delai: "Jours 3 à 6" },

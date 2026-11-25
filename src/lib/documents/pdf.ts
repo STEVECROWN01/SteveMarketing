@@ -87,11 +87,11 @@ async function getBrowser(): Promise<Browser> {
   return browserInstance;
 }
 
-/** Génère le PDF A4 du document (2 pages devis, 1 page facture —
- *  piloté par le CSS du template ; PROPOSITION COMMERCIALE v2 :
- *  pagination automatique par le script du document). `logoSrc`
- *  est un data URI base64 : setContent n'a pas d'URL de base pour
- *  résoudre /assets/logo-noir.png. */
+/** Génère le PDF A4 du document — pagination automatique par le
+ *  script embarqué (VOLET 17 : propositions, devis et factures ;
+ *  le tableau des devis se poursuit d'une page à l'autre).
+ *  `logoSrc` est un data URI base64 : setContent n'a pas d'URL de
+ *  base pour résoudre /assets/logo-noir.png. */
 export async function generatePdf(
   document: DocumentRecord | PropositionRecord,
   logoSrc?: string,
@@ -129,21 +129,19 @@ export async function generatePdf(
     `(() => Promise.race([(document.fonts && document.fonts.ready) || Promise.resolve(), new Promise((r) => setTimeout(r, 5000))]))()`,
   );
 
-  /* PROPOSITION COMMERCIALE (VOLET 16) : attendre la pagination
-     automatique STABLE — le script du document répartit les blocs
-     en pages A4 explicites puis pose window.__paginePc ; les polices
-     Poppins (Google Fonts) peuvent arriver après coup et déclencher
-     un re-paginage : on attend qu'aucune passe n'ait eu lieu depuis
-     900 ms. 20 s maximum, toléré : en cas d'échec le flux continu
-     s'imprime (repli dégradé). */
-  if (estProposition) {
-    await page
-      .waitForFunction(
-        "window.__paginePc === true && (Date.now() - (window.__paginePcAt || 0)) > 900",
-        { timeout: 20000, polling: 400 },
-      )
-      .catch(() => undefined);
-  }
+  /* PAGINATION AUTOMATIQUE (VOLET 17 : propositions, devis et
+     factures) : attendre la pagination STABLE — le script du document
+     répartit les blocs en pages A4 explicites puis pose
+     window.__paginePc ; les polices (Google Fonts) peuvent arriver
+     après coup et déclencher un re-paginage : on attend qu'aucune
+     passe n'ait eu lieu depuis 900 ms. 20 s maximum, toléré : en cas
+     d'échec le flux continu s'imprime (repli dégradé). */
+  await page
+    .waitForFunction(
+      "window.__paginePc === true && (Date.now() - (window.__paginePcAt || 0)) > 900",
+      { timeout: 20000, polling: 400 },
+    )
+    .catch(() => undefined);
 
   const pdfBuffer = await page.pdf({
     format: "A4",

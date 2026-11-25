@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Download, Inbox, Loader2, Pencil, Plus, Save, Sparkles, Trash2 } from "lucide-react";
+import { Download, Inbox, Loader2, Plus, Save, Sparkles, Trash2 } from "lucide-react";
 import { ApercuDocument } from "./ApercuDocument";
+import { EditeurTexteRiche } from "./EditeurTexteRiche";
 import { BoutonAction, Carte, Champ, Pastille, TitreSection, styleInput } from "./elements";
 import {
   DEVISES,
@@ -10,7 +11,6 @@ import {
   type DocType,
   type DocumentRecord,
   type LigneDocument,
-  type PhaseProjet,
 } from "@/lib/documents/types";
 import { buildNumero, totalDocument, formatCurrency } from "@/lib/documents/format";
 import {
@@ -20,28 +20,33 @@ import {
 } from "@/lib/documents/defaults";
 
 /**
- * GÉNÉRATEUR DE DOCUMENTS COMMERCIAUX (VOLET 14 + 15) — formulaire +
- * aperçu en direct + génération. Devis et Propositions partagent ce
- * composant (la proposition ajoute le DÉROULÉ DU PROJET et change
- * le préfixe du numéro) ; la FACTURE, elle, est générée DEPUIS UN
- * DEVIS EXISTANT (EspaceFacture), jamais à partir d'une feuille
- * vierge — demande de l'éditeur.
+ * GÉNÉRATEUR DE DOCUMENTS COMMERCIAUX — DEVIS (VOLET 17).
  *
- * VOLET 15 : le composant sait aussi MODIFIER un document existant
- * (prop `initial`) — formulaire pré-rempli, numéro et identifiant
- * conservés, l'enregistrement met à jour le document en place.
+ * Le formulaire suit EXACTEMENT la structure du document imprimé,
+ * dans l'ordre : entête (client, date, introduction, délai estimé),
+ * tableau des prestations (désignation + description RÉDIGÉE en
+ * texte riche, quantité, prix), conditions (validité, notes) puis
+ * coordonnées bancaires (IBAN, BIC, titulaire — plus de champ
+ * « Banque »). La FACTURE reste générée depuis un devis existant
+ * (EspaceFacture) ; les PROPOSITIONS de l'ancien gabarit passent
+ * toujours ici en édition.
  *
- * « Générer le PDF » télécharge automatiquement le document,
- * l'enregistre dans le stockage privé et en envoie une copie à
- * l'adresse personnelle de l'éditeur — chaque effet est non
- * bloquant, le téléchargement passe toujours.
+ * VOLET 17 : plus de champ « Type » (toujours « Service », posé
+ * automatiquement dans le tableau) ; la condition de règlement
+ * reste « À réception » automatiquement.
  */
 
 type Formulaire = Omit<DocumentRecord, "id" | "numero" | "createdAt" | "updatedAt" | "docType">;
 
-/** Pré-remplissage depuis une DEMANDE reçue (VOLET 16) : contact
- *  du demandeur + récapitulatif de sa demande (affiché au-dessus du
- *  formulaire, jamais imprimé sur le document). */
+/** Toast avec icône (VOLET 17). */
+export type FonctionToast = (t: {
+  title: string;
+  description?: string;
+  variant?: "default" | "destructive";
+  icon?: React.ReactNode;
+}) => void;
+
+/** Pré-remplissage depuis une DEMANDE reçue (VOLET 16). */
 export type PreRemplissage = {
   client?: Partial<{
     nom: string;
@@ -66,10 +71,9 @@ function nouvelleLigneVide(): LigneDocument {
     id: Math.random().toString(36).slice(2, 10),
     type: "Service",
     designation: "",
-    points: [],
+    description: "",
     prixUnitaire: 0,
     quantite: 1,
-    mentionLivraison: "02 à 03 semaines",
   };
 }
 
@@ -80,9 +84,6 @@ function etatInitial(
   preRemplissage: PreRemplissage | null,
 ): Formulaire {
   if (initial) {
-    /* ÉDITION : on reprend le document tel quel ; le numéro et
-     * l'identifiant (conservés par l'appelant avec `initial`) ne
-     * dépendent plus du champ « Numéro client ». */
     const { id: _id, numero: _numero, createdAt: _c, updatedAt: _u, docType: _d, ...rest } = initial;
     return rest as unknown as Formulaire;
   }
@@ -111,7 +112,7 @@ export function GenerateurDocument({
   prochainNumero: number;
   stockageConfigure: boolean;
   onEnregistre: () => void;
-  toast: (t: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
+  toast: FonctionToast;
   /** VOLET 15 : document existant à MODIFIER (null = création). */
   initial?: DocumentRecord | null;
   /** VOLET 16 : pré-remplissage depuis une demande reçue. */
@@ -124,9 +125,7 @@ export function GenerateurDocument({
   const [enregistrement, setEnregistrement] = useState(false);
 
   const enEdition = Boolean(initial);
-  const estProposition = docType === "proposition";
   const libelle = docType === "proposition" ? "Proposition" : "Devis";
-  /* En édition, le numéro du document est conservé tel quel. */
   const numero = initial?.numero ?? buildNumero(Number(form.numeroClient) || 1, docType);
   const total = totalDocument(form.items);
 
@@ -151,15 +150,7 @@ export function GenerateurDocument({
   const majItem = (id: string, patch: Partial<LigneDocument>) =>
     setForm((f) => ({ ...f, items: f.items.map((it) => (it.id === id ? { ...it, ...patch } : it)) }));
 
-  const majPhase = (index: number, patch: Partial<PhaseProjet>) =>
-    setForm((f) => ({
-      ...f,
-      phases: (f.phases ?? []).map((p, i) => (i === index ? { ...p, ...patch } : p)),
-    }));
-
-  /* VOLET 16 : la condition de règlement est TOUJOURS « À réception »
-     (demande de l'éditeur) — plus de champ dans le formulaire, la
-     valeur est posée automatiquement à chaque enregistrement. */
+  /* La condition de règlement est TOUJOURS « À réception ». */
   const corpsDocument = () => ({
     ...form,
     conditionsReglement: "À réception",
@@ -262,7 +253,7 @@ export function GenerateurDocument({
       objet: ex.objet ?? f.objet,
       intro: ex.intro ?? f.intro,
       items: ex.items ?? f.items,
-      ...(estProposition ? { phases: ex.phases ?? [] } : {}),
+      delaiEstime: ex.delaiEstime ?? f.delaiEstime,
     }));
     toast({
       title: "Exemple-modèle chargé",
@@ -272,7 +263,7 @@ export function GenerateurDocument({
 
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_470px]">
-      {/* ---------------- Formulaire ---------------- */}
+      {/* ---------------- Formulaire (ordre du document) ---------------- */}
       <div className="space-y-6">
         {/* Demande à l'origine (VOLET 16 — jamais imprimée) */}
         {preRemplissage?.origine ? (
@@ -298,11 +289,11 @@ export function GenerateurDocument({
           </Carte>
         ) : null}
 
-        {/* Client */}
+        {/* 1 — Entête du document : client, date, introduction, délai */}
         <Carte className="p-5 sm:p-6">
-          <TitreSection note={`Numéro : ${numero}`}>Client & document</TitreSection>
+          <TitreSection note={`Numéro : ${numero}`}>Entête du document</TitreSection>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Champ label="Nom complet *" indicatif="obligatoire">
+            <Champ label="Nom complet *" indicatif="imprimé en gras">
               <input
                 className={styleInput}
                 value={form.client.nom}
@@ -350,13 +341,21 @@ export function GenerateurDocument({
                 onChange={(e) => maj("intro", e.target.value)}
               />
             </Champ>
+            <Champ label="Délai estimé" indicatif="affiché à la suite des CGV" className="sm:col-span-2">
+              <input
+                className={styleInput}
+                value={form.delaiEstime ?? ""}
+                onChange={(e) => maj("delaiEstime", e.target.value)}
+                placeholder="02 à 03 semaines"
+              />
+            </Champ>
           </div>
         </Carte>
 
-        {/* Prestations */}
+        {/* 2 — Tableau « Détail » : désignation + description rédigée */}
         <Carte className="p-5 sm:p-6">
           <TitreSection note={`Total : ${formatCurrency(total, form.devise)}`}>
-            Prestations
+            Détail des prestations
           </TitreSection>
           <div className="space-y-4">
             {form.items.map((item, index) => (
@@ -374,12 +373,21 @@ export function GenerateurDocument({
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-[110px_minmax(0,1fr)]">
-                  <Champ label="Type">
-                    <input className={styleInput} value={item.type} onChange={(e) => majItem(item.id, { type: e.target.value })} placeholder="Service" />
-                  </Champ>
-                  <Champ label="Désignation">
-                    <input className={styleInput} value={item.designation} onChange={(e) => majItem(item.id, { designation: e.target.value })} placeholder="Site Web Professionnel — …" />
+                {/* Désignation — pleine largeur */}
+                <Champ label="Désignation">
+                  <input className={styleInput} value={item.designation} onChange={(e) => majItem(item.id, { designation: e.target.value })} placeholder="Site Web Professionnel — …" />
+                </Champ>
+                {/* Description rédigée — ÉDITEUR RICHE, seule sur sa
+                    ligne pour rédiger à l'aise (gras, italique, taille
+                    supérieure, listes). */}
+                <div className="mt-3">
+                  <Champ label="Description (texte riche)" indicatif="imprimée sous la désignation">
+                    <EditeurTexteRiche
+                      valeur={item.description ?? ""}
+                      onChange={(html) => majItem(item.id, { description: html })}
+                      placeholder="Rédigez la description de la prestation — gras, italique, taille supérieure, listes…"
+                      minHeight={200}
+                    />
                   </Champ>
                 </div>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -388,19 +396,6 @@ export function GenerateurDocument({
                   </Champ>
                   <Champ label="Prix unitaire">
                     <input className={styleInput} type="number" min={0} step="any" value={item.prixUnitaire} onChange={(e) => majItem(item.id, { prixUnitaire: Number(e.target.value) || 0 })} />
-                  </Champ>
-                </div>
-                <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                  <Champ label="Points (une ligne = une puce carrée)">
-                    <textarea
-                      className={`${styleInput} min-h-[96px] resize-y`}
-                      value={item.points.join("\n")}
-                      onChange={(e) => majItem(item.id, { points: e.target.value.split("\n") })}
-                      placeholder={"Écoute stratégique…\nConception sur mesure…"}
-                    />
-                  </Champ>
-                  <Champ label="Délai estimé">
-                    <input className={styleInput} value={item.mentionLivraison ?? ""} onChange={(e) => majItem(item.id, { mentionLivraison: e.target.value })} placeholder="02 à 03 semaines" />
                   </Champ>
                 </div>
               </div>
@@ -415,42 +410,20 @@ export function GenerateurDocument({
           </div>
         </Carte>
 
-        {/* Déroulé (proposition) */}
-        {estProposition && (
-          <Carte className="p-5 sm:p-6">
-            <TitreSection note="page 2 du document">Déroulé du projet</TitreSection>
-            <div className="space-y-3">
-              {(form.phases ?? []).map((phase, i) => (
-                <div key={i} className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_170px_44px] sm:items-end">
-                  <Champ label={`Phase ${i + 1}`}>
-                    <input className={styleInput} value={phase.titre} onChange={(e) => majPhase(i, { titre: e.target.value })} placeholder="Écoute stratégique et cadrage" />
-                  </Champ>
-                  <Champ label="Délai">
-                    <input className={styleInput} value={phase.delai} onChange={(e) => majPhase(i, { delai: e.target.value })} placeholder="Jours 1 à 2" />
-                  </Champ>
-                  <button
-                    type="button"
-                    onClick={() => setForm((f) => ({ ...f, phases: (f.phases ?? []).filter((_, j) => j !== i) }))}
-                    className="flex h-[46px] w-full items-center justify-center rounded-lg border border-[#ea384c]/30 text-[#ffdede] transition-colors hover:border-[#ea384c] sm:w-[44px]"
-                    aria-label={`Supprimer la phase ${i + 1}`}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              ))}
-              <BoutonAction
-                onClick={() => setForm((f) => ({ ...f, phases: [...(f.phases ?? []), { titre: "", delai: "" }] }))}
-                className="w-full"
-              >
-                <Plus className="h-4 w-4" aria-hidden="true" />
-                Ajouter une phase
-              </BoutonAction>
-            </div>
-          </Carte>
-        )}
+        {/* 3 — Validité & notes (avant les CGV imprimées) */}
+        <Carte className="p-5 sm:p-6">
+          <TitreSection note="conditions générales imprimées automatiquement">Validité & notes</TitreSection>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Champ label="Validité (jours)">
+              <input className={styleInput} type="number" min={1} value={form.validiteJours} onChange={(e) => maj("validiteJours", Number(e.target.value) || 15)} />
+            </Champ>
+            <Champ label="Notes" className="sm:col-span-2">
+              <textarea className={`${styleInput} min-h-[72px] resize-y`} value={form.notes} onChange={(e) => maj("notes", e.target.value)} />
+            </Champ>
+          </div>
+        </Carte>
 
-        {/* Règlement & banque — VOLET 16 : plus de champ « Conditions
-            de règlement », toujours « À réception » automatiquement. */}
+        {/* 4 — Règlement & coordonnées bancaires (IBAN, BIC, titulaire) */}
         <Carte className="p-5 sm:p-6">
           <TitreSection note="règlement toujours à réception">Règlement & coordonnées bancaires</TitreSection>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -470,23 +443,17 @@ export function GenerateurDocument({
                 ))}
               </select>
             </Champ>
-            <Champ label="Validité (jours)">
-              <input className={styleInput} type="number" min={1} value={form.validiteJours} onChange={(e) => maj("validiteJours", Number(e.target.value) || 15)} />
-            </Champ>
-            <Champ label="Titulaire du compte">
-              <input className={styleInput} value={form.banque.titulaire} onChange={(e) => maj("banque", { ...form.banque, titulaire: e.target.value })} />
-            </Champ>
             <Champ label="IBAN" className="sm:col-span-2">
               <input className={styleInput} value={form.banque.iban} onChange={(e) => maj("banque", { ...form.banque, iban: e.target.value })} />
             </Champ>
             <Champ label="BIC" className="sm:col-span-2">
               <input className={styleInput} value={form.banque.bic} onChange={(e) => maj("banque", { ...form.banque, bic: e.target.value })} />
             </Champ>
+            <Champ label="Titulaire du compte" className="sm:col-span-2">
+              <input className={styleInput} value={form.banque.titulaire} onChange={(e) => maj("banque", { ...form.banque, titulaire: e.target.value })} />
+            </Champ>
             <Champ label="Lien de paiement en ligne (optionnel)" className="sm:col-span-2">
               <input className={styleInput} value={form.lienPaiement ?? ""} onChange={(e) => maj("lienPaiement", e.target.value)} placeholder="https://…" />
-            </Champ>
-            <Champ label="Notes" className="sm:col-span-2">
-              <textarea className={`${styleInput} min-h-[72px] resize-y`} value={form.notes} onChange={(e) => maj("notes", e.target.value)} />
             </Champ>
           </div>
         </Carte>

@@ -9,21 +9,21 @@ import { estPropositionV2, type PropositionRecord } from "@/lib/documents/propos
 import { renderPropositionHtml } from "@/lib/documents/proposition-html";
 
 /**
- * APERÇU EN DIRECT DES DOCUMENTS (VOLET 14 → 16) — le VRAI HTML du
+ * APERÇU EN DIRECT DES DOCUMENTS (VOLET 14 → 17) — le VRAI HTML du
  * PDF, une page A4 à la fois :
  *
- *  - PLEINE HAUTEUR (VOLET 16, demande de l'éditeur) : l'aperçu est
- *    calé (sticky) pendant le défilement du formulaire et remplit
- *    TOUT la hauteur de l'espace qui lui est dédié — l'échelle se
- *    calcule sur la TAILLE RÉELLE du panneau (mesure continue,
- *    ResizeObserver) et s'adapte à tous les écrans ; l'espace laissé
- *    sous l'aperçu est identique à celui au-dessus.
- *  - PROPOSITION COMMERCIALE (VOLET 16) : rendu paginé par le script
- *    du document (renderPropositionHtml) — l'iframe annonce son
- *    nombre de pages (postMessage) et le panneau pilote la page
- *    affichée (« aller-page »).
- *  - DEVIS / FACTURES : pages explicites du gabarit historique,
- *    découpage sur le marqueur « PAGE 2 ».
+ *  - PLEINE HAUTEUR : l'aperçu est calé (sticky) pendant le
+ *    défilement du formulaire et remplit TOUT la hauteur de l'espace
+ *    dédié (échelle mesurée en continu, ResizeObserver) ; l'espace
+ *    sous l'aperçu égale celui au-dessus.
+ *  - PAGINATION UNIFIÉE (VOLET 17) : propositions, devis et factures
+ *    partagent le MÊME moteur — l'iframe pagine le document et
+ *    annonce son nombre de pages (postMessage) ; le panneau pilote
+ *    la page affichée (« aller-page »).
+ *  - PAGE CONSERVÉE (VOLET 17, demande de l'éditeur) : la mise à
+ *    jour EN TEMPS RÉEL ne ramène PLUS à la première page — l'aperçu
+ *    reste sur la page en cours de visualisation (bornée au
+ *    nombre de pages) ; seul un CHANGEMENT de document repart de la page 1.
  */
 
 /** Dimensions d'une page A4 à 96 dpi. */
@@ -32,31 +32,22 @@ const A4_H = 1123;
 
 export function ApercuDocument({ document }: { document: DocumentRecord | PropositionRecord }) {
   const conteneurRef = useRef<HTMLDivElement>(null);
-  const iframePropRef = useRef<HTMLIFrameElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const pageRef = useRef(1);
   const [echelle, setEchelle] = useState(0.5);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   const estProp = estPropositionV2(document);
+  const libelle = estProp
+    ? "Proposition Commerciale"
+    : LABELS_DOC[(document as DocumentRecord).docType];
+  const numero = document.numero;
 
-  /* ---------- Contenu : proposition paginée OU gabarit historique ----------
-     (débounce 350 ms : la saisie au clavier ne recharge pas l'iframe
-     à chaque frappe — polices + pagination restent fluides) ---------- */
+  /* ---------- Contenu (débounce 350 ms : frappe fluide) ---------- */
   const brut = useMemo(() => {
-    if (estProp) {
-      return { page1Html: "", page2Html: "", propHtml: renderPropositionHtml(document) };
-    }
-    const complet = renderDocumentHtml(document as DocumentRecord);
-    const headMatch = complet.match(/<head>[\s\S]*?<\/head>/);
-    const head = headMatch ? headMatch[0] : "";
-    const marqueur = "<!-- ============ PAGE 2 ============ -->";
-    const parties = complet.split(marqueur);
-    const corps1 = parties[0].match(/<body>([\s\S]*)$/);
-    const p1 = `<!DOCTYPE html><html lang="fr">${head}<body>${corps1 ? corps1[1] : parties[0]}</body></html>`;
-    const corps2 = (parties[1] || "").replace(/<\/body>\s*<\/html>\s*$/, "");
-    const p2 = corps2 ? `<!DOCTYPE html><html lang="fr">${head}<body>${corps2}</body></html>` : "";
-    return { page1Html: p1, page2Html: p2, propHtml: "" };
+    if (estProp) return renderPropositionHtml(document);
+    return renderDocumentHtml(document as DocumentRecord);
   }, [document]);
 
   const [contenu, setContenu] = useState(brut);
@@ -64,46 +55,48 @@ export function ApercuDocument({ document }: { document: DocumentRecord | Propos
     const t = setTimeout(() => setContenu(brut), 350);
     return () => clearTimeout(t);
   }, [brut]);
-  const { page1Html, page2Html, propHtml } = contenu;
 
-  /* Total de pages (gabarit historique : 1 ou 2 pages connues). */
+  /* ---------- Changement de DOCUMENT → retour page 1 ---------- */
+  const identite = `${libelle}-${numero}`;
+  const identiteRef = useRef(identite);
   useEffect(() => {
-    if (estProp) return;
-    setPage(1);
-    setTotalPages(page2Html ? 2 : 1);
-  }, [estProp, page2Html]);
+    if (identiteRef.current !== identite) {
+      identiteRef.current = identite;
+      pageRef.current = 1;
+      setPage(1);
+    }
+  }, [identite]);
 
-  /* ---------- Proposition : protocole postMessage avec l'iframe ----------
-     Une re-pagination (polices arrivées en retard) ré-annonce « pages » :
-     on conserve la PAGE COURANTE au lieu de revenir à la première. */
+  /* ---------- Protocole postMessage : pages annoncées ----------
+     Toute re-pagination (mise à jour temps réel, polices arrivées)
+     ré-annonce « pages » : on CONSERVE la page courante (bornée au
+     total) au lieu de revenir à la première. */
   useEffect(() => {
-    if (!estProp) return;
-    setPage(1);
-    pageRef.current = 1;
-    setTotalPages(0);
+    setTotalPages(1);
     const recevoir = (ev: MessageEvent) => {
       const m = ev.data;
       if (m && m.source === "apercu-document" && m.type === "pages") {
-        const n = Number(m.total) || 1;
+        const n = Math.max(1, Number(m.total) || 1);
         setTotalPages(n);
-        iframePropRef.current?.contentWindow?.postMessage(
-          { type: "aller-page", page: Math.min(pageRef.current, n) },
+        pageRef.current = Math.min(pageRef.current, n);
+        setPage((p) => Math.min(p, n));
+        iframeRef.current?.contentWindow?.postMessage(
+          { type: "aller-page", page: pageRef.current },
           "*",
         );
       }
     };
     window.addEventListener("message", recevoir);
     return () => window.removeEventListener("message", recevoir);
-  }, [estProp, propHtml]);
+  }, [contenu]);
 
-  /* Page demandée → l'iframe de la proposition. */
+  /* Page demandée par les flèches → l'iframe. */
   useEffect(() => {
-    if (!estProp || !totalPages) return;
     pageRef.current = page;
-    iframePropRef.current?.contentWindow?.postMessage({ type: "aller-page", page }, "*");
-  }, [estProp, page, totalPages]);
+    iframeRef.current?.contentWindow?.postMessage({ type: "aller-page", page }, "*");
+  }, [page, totalPages]);
 
-  /* ---------- Pleine hauteur : échelle sur la taille RÉELLE du panneau ---------- */
+  /* ---------- Pleine hauteur : échelle sur la taille réelle ---------- */
   useEffect(() => {
     const el = conteneurRef.current;
     if (!el) return;
@@ -142,11 +135,7 @@ export function ApercuDocument({ document }: { document: DocumentRecord | Propos
     boxShadow: "0 6px 30px rgba(0,0,0,0.4)",
   };
 
-  const libelle = estProp
-    ? "Proposition Commerciale"
-    : LABELS_DOC[(document as DocumentRecord).docType];
-  const numero = document.numero;
-  const total = estProp ? totalPages || 1 : page2Html ? 2 : 1;
+  const total = Math.max(totalPages, 1);
   const pageAffichee = Math.min(page, total);
 
   return (
@@ -183,34 +172,22 @@ export function ApercuDocument({ document }: { document: DocumentRecord | Propos
         </div>
       </div>
 
-      {/* Zone d'aperçu : la page remplît la hauteur disponible */}
+      {/* Zone d'aperçu : la page remplit la hauteur disponible */}
       <div ref={conteneurRef} className="relative flex-1 overflow-hidden bg-[#141414]">
-        {estProp ? (
-          <div style={feuille}>
-            <iframe
-              ref={iframePropRef}
-              title="Aperçu de la proposition commerciale"
-              srcDoc={propHtml}
-              scrolling="no"
-              style={iframe}
-            />
-          </div>
-        ) : (
-          <div style={feuille}>
-            <iframe
-              key={`p1-${page}`}
-              title="Aperçu du document — page 1"
-              srcDoc={pageAffichee === 1 ? page1Html : page2Html}
-              scrolling="no"
-              style={iframe}
-            />
-          </div>
-        )}
+        <div style={feuille}>
+          <iframe
+            ref={iframeRef}
+            title={`Aperçu du document — ${libelle}`}
+            srcDoc={contenu}
+            scrolling="no"
+            style={iframe}
+          />
+        </div>
       </div>
 
       <div className="flex items-center justify-between border-t border-[#e4e4e4]/10 bg-[#1c1c1c] px-4 py-2.5 text-[10px] text-[#c8c8c8]">
         <span className="font-mono tracking-wider uppercase">A4 · {libelle}</span>
-        <span>Mise à jour en temps réel</span>
+        <span>Mise à jour en temps réel — page conservée</span>
       </div>
     </div>
   );

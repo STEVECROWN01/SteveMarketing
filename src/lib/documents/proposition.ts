@@ -150,15 +150,15 @@ export function propositionV2ParDefaut(): Omit<
     delai: "02 à 03 semaines",
     sections: {
       presentation: [
-        "Dans un environnement professionnel où la visibilité, la crédibilité et la qualité de présentation jouent un rôle déterminant, disposer d'un espace numérique personnel constitue un véritable levier de développement.",
-        "Je vous propose la conception et le développement d'un site web professionnel sur mesure, destiné à valoriser votre expertise, vos activités et vos réalisations.",
-        "Pensé comme un véritable espace de présentation et de communication professionnelle, votre site offrira à vos interlocuteurs une vision claire de votre positionnement et de vos domaines d'intervention.",
-        "Il sera conçu pour accompagner l'évolution de vos activités et faciliter vos échanges avec les partenaires, clients et organisations susceptibles de collaborer avec vous.",
+        "Dans un environnement professionnel où la visibilité, la crédibilité et la qualité de présentation jouent un rôle déterminant, disposer d’un espace numérique personnel constitue un véritable levier de développement.",
+        "Je vous propose la conception et le développement d’un site web professionnel sur mesure, destiné à valoriser votre expertise, vos activités et vos réalisations.",
+        "Pensé comme un véritable espace de présentation et de communication professionnelle, votre site offrira à vos interlocuteurs une vision claire de votre positionnement et de vos domaines d’intervention.",
+        "Il sera conçu pour accompagner l’évolution de vos activités et faciliter vos échanges avec les partenaires, clients et organisations susceptibles de collaborer avec vous.",
       ],
       objectifsIntro: "Votre site aura pour objectifs de :",
       objectifs: [
         "Renforcer votre présence et votre visibilité professionnelles.",
-        "Présenter clairement vos activités et vos domaines d'expertise.",
+        "Présenter clairement vos activités et vos domaines d’expertise.",
         "Valoriser vos réalisations et vos productions.",
         "Faciliter la découverte de votre travail par de nouveaux interlocuteurs.",
         "Centraliser vos contenus professionnels dans un espace qui vous appartient.",
@@ -170,15 +170,15 @@ export function propositionV2ParDefaut(): Omit<
           id: blocId(),
           titre: "Conception et développement sur mesure",
           intro:
-            "Création d'un site web professionnel adapté à votre activité et à votre positionnement.",
+            "Création d’un site web professionnel adapté à votre activité et à votre positionnement.",
           lead: "La prestation comprend :",
           points: [
             "La conception et le développement sur mesure.",
-            "L'intégration du design validé.",
+            "L’intégration du design validé.",
             "Une interface responsive adaptée aux ordinateurs, tablettes et smartphones.",
             "Une navigation claire et cohérente.",
-            "L'intégration des animations et interactions prévues dans le projet.",
-            "L'intégration des contenus et des éléments visuels validés.",
+            "L’intégration des animations et interactions prévues dans le projet.",
+            "L’intégration des contenus et des éléments visuels validés.",
           ],
           post: "",
         },
@@ -187,7 +187,7 @@ export function propositionV2ParDefaut(): Omit<
           titre: "Site bilingue français / anglais",
           intro: "Votre site sera disponible en français et en anglais.",
           lead:
-            "La prestation comprend l'intégration des contenus validés dans les deux langues et la mise en place d'un système de navigation entre les versions linguistiques.",
+            "La prestation comprend l’intégration des contenus validés dans les deux langues et la mise en place d’un système de navigation entre les versions linguistiques.",
           points: [],
           post: "",
         },
@@ -195,12 +195,12 @@ export function propositionV2ParDefaut(): Omit<
           id: blocId(),
           titre: "Copywriting professionnel",
           intro:
-            "La rédaction et l'optimisation des contenus des pages de votre site sont incluses.",
+            "La rédaction et l’optimisation des contenus des pages de votre site sont incluses.",
           lead: "Le copywriting sera conçu pour :",
           points: [
             "Présenter clairement votre activité.",
             "Valoriser votre expertise et votre positionnement.",
-            "Mettre en évidence vos domaines d'intervention.",
+            "Mettre en évidence vos domaines d’intervention.",
             "Faciliter la compréhension de votre offre professionnelle.",
             "Encourager les prises de contact et les demandes de collaboration.",
           ],
@@ -225,7 +225,7 @@ export function propositionV2ParDefaut(): Omit<
           id: blocId(),
           titre: "Back-office personnalisé",
           intro:
-            "Un espace d'administration personnalisé sera développé afin de vous permettre de gérer vos contenus sans intervention technique pour chaque modification.",
+            "Un espace d’administration personnalisé sera développé afin de vous permettre de gérer vos contenus sans intervention technique pour chaque modification.",
           lead: "Le back-office vous permettra notamment de :",
           points: [
             "Créer de nouveaux contenus.",
@@ -246,9 +246,9 @@ export function propositionV2ParDefaut(): Omit<
           lead: "Elle comprendra notamment :",
           points: [
             "La structuration des titres et des contenus.",
-            "L'intégration des métadonnées SEO des pages principales.",
-            "L'optimisation des titres et descriptions.",
-            "La mise en place d'URLs lisibles.",
+            "L’intégration des métadonnées SEO des pages principales.",
+            "L’optimisation des titres et descriptions.",
+            "La mise en place d’URLs lisibles.",
             "Les optimisations techniques de base prévues dans le projet.",
           ],
           post:
@@ -258,12 +258,12 @@ export function propositionV2ParDefaut(): Omit<
           id: blocId(),
           titre: "Tests et mise en ligne",
           intro:
-            "Avant la livraison, votre site fera l'objet de vérifications portant notamment sur :",
+            "Avant la livraison, votre site fera l’objet de vérifications portant notamment sur :",
           lead: "",
           points: [
             "Le fonctionnement des pages et des liens.",
             "La navigation entre les langues.",
-            "L'affichage sur les différents formats d'écran.",
+            "L’affichage sur les différents formats d’écran.",
             "Le fonctionnement des formulaires et du back-office.",
             "La cohérence des contenus intégrés.",
           ],
@@ -272,9 +272,9 @@ export function propositionV2ParDefaut(): Omit<
         },
       ],
       investissementTexte:
-        "Ce montant couvre l'ensemble des prestations décrites dans le présent document.",
+        "Ce montant couvre l’ensemble des prestations décrites dans le présent document.",
       investissementNotes: [
-        "Les frais éventuels de nom de domaine, d'hébergement, de services tiers payants et de maintenance après livraison ne sont pas inclus, sauf accord écrit contraire.",
+        "Les frais éventuels de nom de domaine, d’hébergement, de services tiers payants et de maintenance après livraison ne sont pas inclus, sauf accord écrit contraire.",
         "Aucun coût supplémentaire lié aux prestations incluses ne sera engagé sans votre accord préalable.",
       ],
       calendrierIntro:
@@ -311,11 +311,11 @@ export function propositionV2ParDefaut(): Omit<
         "La validation de cette proposition permettra de formaliser le devis et de confirmer le calendrier de réalisation.",
         "Les éléments nécessaires au démarrage vous seront communiqués après validation.",
         "Le projet sera réalisé sur la base du périmètre défini dans la présente proposition.",
-        "Toute demande supplémentaire ou modification importante du périmètre initial fera l'objet d'une évaluation préalable et, si nécessaire, d'un accord complémentaire.",
+        "Toute demande supplémentaire ou modification importante du périmètre initial fera l’objet d’une évaluation préalable et, si nécessaire, d’un accord complémentaire.",
       ],
       conclusion: [
-        "Cette proposition vise à vous fournir un espace professionnel qui vous appartient, conçu pour valoriser votre expertise, centraliser vos activités et accompagner l'évolution de votre parcours.",
-        "L'objectif est de vous livrer une solution professionnelle, évolutive et simple à administrer, qui puisse soutenir durablement votre visibilité et vos collaborations.",
+        "Cette proposition vise à vous fournir un espace professionnel qui vous appartient, conçu pour valoriser votre expertise, centraliser vos activités et accompagner l’évolution de votre parcours.",
+        "L’objectif est de vous livrer une solution professionnelle, évolutive et simple à administrer, qui puisse soutenir durablement votre visibilité et vos collaborations.",
         "Je reste à votre disposition pour toute précision complémentaire et serai ravi de vous accompagner dans la réalisation de ce projet.",
       ],
     },
