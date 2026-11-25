@@ -116,25 +116,25 @@ export const LABELS_DOC: Record<DocType, string> = {
   facture: "Facture",
 };
 
+/** Devises — l'EURO vient en tête (choix par défaut du
+ *  générateur, demande de l'éditeur, volet 15). */
 export const DEVISES: { code: string; label: string }[] = [
-  { code: "XOF", label: "Franc CFA (FCFA)" },
   { code: "EUR", label: "Euro (€)" },
+  { code: "XOF", label: "Franc CFA (FCFA)" },
   { code: "USD", label: "Dollar US ($)" },
   { code: "CAD", label: "Dollar canadien ($ CA)" },
   { code: "GBP", label: "Livre sterling (£)" },
   { code: "CHF", label: "Franc suisse (CHF)" },
 ];
 
+/** Modes de paiement proposés (volet 15 : Cash, PayPal, M-Pesa et
+ *  Celtiis Cash retirés à la demande de l'éditeur). */
 export const MODES_PAIEMENT = [
   "Virement bancaire",
   "MTN Mobile Money",
   "Moov Money",
   "Orange Money",
   "Wave",
-  "Celtiis Cash",
-  "M-Pesa",
-  "PayPal",
-  "Cash",
 ] as const;
 
 export const CONDITIONS_REGLEMENT = [

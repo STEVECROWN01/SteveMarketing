@@ -43,8 +43,8 @@ export const CONDITIONS_GENERALES: string[] = [
   "Les informations transmises par le client restent strictement confidentielles.",
 ];
 
-/** Validité par défaut des devis (jours) — comme K.Quotes. */
-export const VALIDITE_JOURS = 5;
+/** Validité par défaut des devis (jours) — 15 jours (volet 15). */
+export const VALIDITE_JOURS = 15;
 
 export const NOTE_DEFAUT =
   "Je reste à votre disposition pour toute question complémentaire et vous remercie pour votre confiance.";
@@ -80,11 +80,11 @@ export function devisParDefaut(): Omit<DemandeDocument, "docType" | "numeroClien
           "Adaptation mobile, tablette et ordinateur",
           "Mise en ligne et livraison dans un délai très court",
         ],
-        mentionLivraison: "Délai estimé : 7 à 14 jours | Livraison numérique",
+        mentionLivraison: "02 à 03 semaines",
         prixUnitaire: 350000,
       }),
     ],
-    devise: "XOF",
+    devise: "EUR",
     conditionsReglement: "À réception",
     modePaiement: "Virement bancaire",
     validiteJours: VALIDITE_JOURS,

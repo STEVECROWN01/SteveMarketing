@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Download, Loader2, Plus, Save, Sparkles, Trash2 } from "lucide-react";
+import { Download, Loader2, Pencil, Plus, Save, Sparkles, Trash2 } from "lucide-react";
 import { ApercuDocument } from "./ApercuDocument";
 import { BoutonAction, Carte, Champ, Pastille, TitreSection, styleInput } from "./elements";
 import {
@@ -21,18 +21,21 @@ import {
 } from "@/lib/documents/defaults";
 
 /**
- * GÉNÉRATEUR DE DOCUMENTS COMMERCIAUX (VOLET 14) — formulaire +
+ * GÉNÉRATEUR DE DOCUMENTS COMMERCIAUX (VOLET 14 + 15) — formulaire +
  * aperçu en direct + génération. Devis et Propositions partagent ce
  * composant (la proposition ajoute le DÉROULÉ DU PROJET et change
  * le préfixe du numéro) ; la FACTURE, elle, est générée DEPUIS UN
- * DEVIS EXISTANT (ListeDocuments), jamais à partir d'une feuille
+ * DEVIS EXISTANT (EspaceFacture), jamais à partir d'une feuille
  * vierge — demande de l'éditeur.
  *
- * Système K.Quotes : « Générer le PDF » télécharge automatiquement
- * le document, en enregistre un exemplaire dans le stockage (dépôt
- * GitHub privé) et en envoie une copie à l'adresse personnelle de
- * l'éditeur (Resend) — chaque effet est non bloquant, le
- * téléchargement passe toujours.
+ * VOLET 15 : le composant sait aussi MODIFIER un document existant
+ * (prop `initial`) — formulaire pré-rempli, numéro et identifiant
+ * conservés, l'enregistrement met à jour le document en place.
+ *
+ * « Générer le PDF » télécharge automatiquement le document,
+ * l'enregistre dans le stockage privé et en envoie une copie à
+ * l'adresse personnelle de l'éditeur — chaque effet est non
+ * bloquant, le téléchargement passe toujours.
  */
 
 type Formulaire = Omit<DocumentRecord, "id" | "numero" | "createdAt" | "updatedAt" | "docType">;
@@ -45,10 +48,22 @@ function nouvelleLigneVide(): LigneDocument {
     points: [],
     prixUnitaire: 0,
     quantite: 1,
+    mentionLivraison: "02 à 03 semaines",
   };
 }
 
-function etatInitial(docType: DocType, prochainNumero: number): Formulaire {
+function etatInitial(
+  docType: DocType,
+  prochainNumero: number,
+  initial: DocumentRecord | null,
+): Formulaire {
+  if (initial) {
+    /* ÉDITION : on reprend le document tel quel ; le numéro et
+     * l'identifiant (conservés par l'appelant avec `initial`) ne
+     * dépendent plus du champ « Numéro client ». */
+    const { id: _id, numero: _numero, createdAt: _c, updatedAt: _u, docType: _d, ...rest } = initial;
+    return rest as unknown as Formulaire;
+  }
   const base =
     docType === "proposition" ? propositionParDefaut() : devisParDefaut();
   return {
@@ -64,19 +79,25 @@ export function GenerateurDocument({
   stockageConfigure,
   onEnregistre,
   toast,
+  initial = null,
 }: {
   docType: "devis" | "proposition";
   prochainNumero: number;
   stockageConfigure: boolean;
   onEnregistre: () => void;
   toast: (t: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
+  /** VOLET 15 : document existant à MODIFIER (null = création). */
+  initial?: DocumentRecord | null;
 }) {
-  const [form, setForm] = useState<Formulaire>(() => etatInitial(docType, prochainNumero));
+  const [form, setForm] = useState<Formulaire>(() => etatInitial(docType, prochainNumero, initial));
   const [generation, setGeneration] = useState(false);
   const [enregistrement, setEnregistrement] = useState(false);
 
+  const enEdition = Boolean(initial);
   const estProposition = docType === "proposition";
-  const numero = buildNumero(Number(form.numeroClient) || 1, docType);
+  const libelle = docType === "proposition" ? "Proposition" : "Devis";
+  /* En édition, le numéro du document est conservé tel quel. */
+  const numero = initial?.numero ?? buildNumero(Number(form.numeroClient) || 1, docType);
   const total = totalDocument(form.items);
 
   const pourApercu: DocumentRecord = useMemo(
@@ -117,7 +138,11 @@ export function GenerateurDocument({
       const res = await fetch("/api/documents/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ document: { ...form, docType, numero }, enregistrer: true, envoyerEmail: true }),
+        body: JSON.stringify({
+          document: { ...form, docType, numero, ...(initial ? { id: initial.id, createdAt: initial.createdAt } : {}) },
+          enregistrer: true,
+          envoyerEmail: true,
+        }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
@@ -137,7 +162,7 @@ export function GenerateurDocument({
       const emailOk = res.headers.get("X-Email-Sent") === "1";
       const stockageOk = res.headers.get("X-Stockage-Ok") === "1";
       toast({
-        title: `${docType === "proposition" ? "Proposition" : "Devis"} ${numero} généré`,
+        title: `${libelle} ${numero} ${enEdition ? "mis à jour" : "généré"}`,
         description: [
           "Téléchargement lancé.",
           stockageOk ? "Enregistré dans le stockage." : "Stockage non effectué (non configuré).",
@@ -163,13 +188,18 @@ export function GenerateurDocument({
       const res = await fetch("/api/documents", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ document: { ...form, docType, numero } }),
+        body: JSON.stringify({
+          document: { ...form, docType, numero, ...(initial ? { id: initial.id, createdAt: initial.createdAt } : {}) },
+        }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.ok) {
         throw new Error(data?.error ?? "Enregistrement impossible.");
       }
-      toast({ title: `Enregistré : ${numero}`, description: "Le document est disponible dans les listes." });
+      toast({
+        title: `${enEdition ? "Mis à jour" : "Enregistré"} : ${numero}`,
+        description: "Le document est disponible dans les listes.",
+      });
       onEnregistre();
     } catch (e) {
       toast({
@@ -235,20 +265,18 @@ export function GenerateurDocument({
             <Champ label="Email">
               <input className={styleInput} type="email" value={form.client.email ?? ""} onChange={(e) => majClient("email", e.target.value)} placeholder="client@exemple.com" />
             </Champ>
-            <Champ label="Numéro client" indicatif=" relie devis et facture">
+            <Champ label="Numéro client" indicatif={enEdition ? "conservé en édition" : " relie devis et facture"}>
               <input
                 className={styleInput}
                 type="number"
                 min={1}
                 value={form.numeroClient}
+                readOnly={enEdition}
                 onChange={(e) => maj("numeroClient", Number(e.target.value) || 1)}
               />
             </Champ>
             <Champ label="Date d'émission">
               <input className={styleInput} type="date" value={form.date} onChange={(e) => maj("date", e.target.value)} />
-            </Champ>
-            <Champ label="Objet" className="sm:col-span-2">
-              <input className={styleInput} value={form.objet} onChange={(e) => maj("objet", e.target.value)} />
             </Champ>
             <Champ label="Introduction (après « Merci pour votre confiance. »)" className="sm:col-span-2">
               <textarea
@@ -289,15 +317,12 @@ export function GenerateurDocument({
                     <input className={styleInput} value={item.designation} onChange={(e) => majItem(item.id, { designation: e.target.value })} placeholder="Site Web Professionnel — …" />
                   </Champ>
                 </div>
-                <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   <Champ label="Quantité">
                     <input className={styleInput} type="number" min={1} value={item.quantite} onChange={(e) => majItem(item.id, { quantite: Number(e.target.value) || 0 })} />
                   </Champ>
                   <Champ label="Prix unitaire">
                     <input className={styleInput} type="number" min={0} step="any" value={item.prixUnitaire} onChange={(e) => majItem(item.id, { prixUnitaire: Number(e.target.value) || 0 })} />
-                  </Champ>
-                  <Champ label="Total ligne" indicatif="calculé">
-                    <input className={`${styleInput} text-[#c8c8c8]`} readOnly value={formatCurrency((Number(item.quantite) || 0) * (Number(item.prixUnitaire) || 0), form.devise)} />
                   </Champ>
                 </div>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -309,8 +334,8 @@ export function GenerateurDocument({
                       placeholder={"Écoute stratégique…\nConception sur mesure…"}
                     />
                   </Champ>
-                  <Champ label="Mention de délai / livraison (italique)">
-                    <input className={styleInput} value={item.mentionLivraison ?? ""} onChange={(e) => majItem(item.id, { mentionLivraison: e.target.value })} placeholder="Délai estimé : 7 à 14 jours | Livraison numérique" />
+                  <Champ label="Délai estimé">
+                    <input className={styleInput} value={item.mentionLivraison ?? ""} onChange={(e) => majItem(item.id, { mentionLivraison: e.target.value })} placeholder="02 à 03 semaines" />
                   </Champ>
                 </div>
               </div>
@@ -387,13 +412,10 @@ export function GenerateurDocument({
               </select>
             </Champ>
             <Champ label="Validité (jours)">
-              <input className={styleInput} type="number" min={1} value={form.validiteJours} onChange={(e) => maj("validiteJours", Number(e.target.value) || 5)} />
+              <input className={styleInput} type="number" min={1} value={form.validiteJours} onChange={(e) => maj("validiteJours", Number(e.target.value) || 15)} />
             </Champ>
             <Champ label="Titulaire du compte">
               <input className={styleInput} value={form.banque.titulaire} onChange={(e) => maj("banque", { ...form.banque, titulaire: e.target.value })} />
-            </Champ>
-            <Champ label="Banque">
-              <input className={styleInput} value={form.banque.banque} onChange={(e) => maj("banque", { ...form.banque, banque: e.target.value })} />
             </Champ>
             <Champ label="IBAN" className="sm:col-span-2">
               <input className={styleInput} value={form.banque.iban} onChange={(e) => maj("banque", { ...form.banque, iban: e.target.value })} />
@@ -438,9 +460,9 @@ export function GenerateurDocument({
           </Pastille>
         </div>
         <p className="text-xs leading-relaxed text-[#c8c8c8]/80">
-          « Générer le PDF » télécharge le document, l&apos;enregistre dans le stockage des documents
-          (dépôt GitHub privé dédié) et en envoie une copie à stevensakpovi@gmail.com — chaque étape
-          est indiquée dans la confirmation.
+          « Générer le PDF » télécharge le document, l&apos;enregistre dans votre
+          back-office et vous en envoie une copie par email — chaque étape est
+          confirmée à l&apos;écran.
         </p>
       </div>
 

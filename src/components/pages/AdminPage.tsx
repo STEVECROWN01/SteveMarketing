@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  ArrowLeft,
   ChevronRight,
   Download,
   Eye,
@@ -13,45 +14,57 @@ import {
   Loader2,
   Lock,
   LogOut,
+  Plus,
   Receipt,
   RefreshCw,
   ShieldCheck,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LEAD_STATUSES } from "@/lib/validation";
+import { ASSETS } from "@/lib/site";
 import { GenerateurDocument } from "@/components/admin/GenerateurDocument";
 import { ListeDocuments } from "@/components/admin/ListeDocuments";
+import { EspaceFacture } from "@/components/admin/EspaceFacture";
 import { BoutonAction, Carte, Pastille } from "@/components/admin/elements";
 import type { DocumentRecord } from "@/lib/documents/types";
-import { formatCurrency, totalDocument } from "@/lib/documents/format";
+import { formatCurrency, totalDocument, formatDate } from "@/lib/documents/format";
 
 /**
- * ESPACE ADMINISTRATEUR — BACK-OFFICE (VOLET 14, 24/11/2026).
+ * ESPACE ADMINISTRATEUR — BACK-OFFICE (VOLET 14, restructuré VOLET 15
+ * du 25/11/2026).
  *
- * L'espace #/admin devient un VRAI BACK-OFFICE (demande de
- * l'éditeur : « je veux que tu implémentes l'espace admin, je veux
- * que tu le présentes comme un back-office »), en conservant le
- * design du site (fonds #070707/#232323, bordures #e4e4e4, Sora)
- * avec un rendu plus professionnel et élégant :
+ * Le back-office conserve le design du site (fonds #070707/#232323,
+ * bordures #e4e4e4, Sora) avec la structure demandée par l'éditeur :
  *
- *  - TABLEAU DE BORD : compteurs (demandes, devis, factures,
- *    propositions), état du stockage et de l'email, raccourcis ;
+ *  - BARRE SUPÉRIEURE : logo du site (version blanche) + mention
+ *    « BACK-OFFICE » à droite du logo (volet 15 — remplace le titre
+ *    « Stevens Akpovi — Espace administrateur » et l'ancien
+ *    sur-titre) ;
+ *  - TABLEAU DE BORD : compteurs (demandes, propositions, devis,
+ *    factures), état du stockage et de l'email, raccourcis ;
  *  - DEMANDES : l'existant (demandes devis/audit/messages reçues,
  *    statuts, export CSV) ;
- *  - DEVIS & PROPOSITIONS : générateurs (template K.Quotes) avec
- *    aperçu A4 en direct, exemple-modèle, enregistrement, PDF
- *    téléchargé automatiquement + copie email ;
- *  - FACTURES & DOCUMENTS : chaque DEVIS enregistré porte son
- *    option « Générer la facture » (cachet PAYÉ MrSteveEnglish) ;
- *    liste, aperçu, téléchargement et suppression des documents
- *    existants, servis depuis le stockage GitHub privé.
+ *  - PROPOSITIONS COMMERCIALES / DEVIS / FACTURES (volet 15) : chaque
+ *    rubrique liste TOUS ses documents dans l'ordre de création (comme
+ *    la rubrique Demandes), avec un bouton « Créer… » en haut à
+ *    droite qui ouvre l'espace de création. Chaque document porte ses
+ *    icônes d'action : modifier, générer la facture (devis),
+ *    supprimer, plus aperçu et téléchargement. « Créer une nouvelle
+ *    facture » ouvre d'abord la SÉLECTION DU DEVIS à facturer, puis
+ *    l'espace de génération de facture pour le devis choisi ;
+ *  - l'ancienne rubrique « Factures & documents » disparaît (plus
+ *    d'utilité : chaque type vit dans sa rubrique).
  *
- * CONNEXION (volet 14) : icône ŒIL pour révéler le mot de passe
- * (demande de l'éditeur) ; le bouton « Ouvrir La Session » devient
- * « Ouvrir L'Espace » (demande de l'éditeur).
+ * CONNEXION (volet 14) : icône ŒIL noire sur pastille claire pour
+ * révéler le mot de passe (volet 15 : l'icône est NOIRE et reste
+ * visible au survol) ; bouton « Ouvrir L'Espace ».
  */
 
-type Section = "tableau" | "demandes" | "devis" | "propositions" | "factures";
+type Section = "tableau" | "demandes" | "propositions" | "devis" | "factures";
+/** Vue courante des rubriques documents : liste / création / édition. */
+type VueDocs = "liste" | "creation" | "edition";
+/** Vue courante de la rubrique factures : liste / sélection du devis. */
+type VueFactures = "liste" | "selection";
 
 interface Lead {
   id: string;
@@ -97,8 +110,10 @@ function formatDateHeure(iso: string): string {
 
 /* ------------------------------------------------------------------
  * CONNEXION — message de bienvenue personnalisé (Stevens), icône
- * œil À L'INTÉRIEUR du champ (volet 14 + précisions même jour),
- * bouton « Ouvrir L'Espace »
+ * œil À L'INTÉRIEUR du champ (volet 14), bouton « Ouvrir L'Espace ».
+ * VOLET 15 : l'icône œil est NOIRE sur une pastille claire — elle
+ * reste parfaitement visible au survol (l'éditeur soulignait que la
+ * couleur de survol gommait l'icône).
  * ------------------------------------------------------------------ */
 function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
   const [password, setPassword] = useState("");
@@ -139,16 +154,6 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
           Espace administrateur
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-[#c8c8c8]">
-          {/* PRÉCISION VOLET 14 (24/11/2026) : l'ancienne description
-              technique (« Accès réservé — back-office : demandes
-              reçues… ») devient un message de bienvenue qui S'ADRESSE
-              DIRECTEMENT à l'éditeur (demande : « corrige la
-              description… en message professionnel de bienvenue à moi
-              Stevens l'admin, qui m'adresse directement, sur quoi
-              gérer dans mon espace, très cool accueillant et
-              présentant »). Structure copywriting : salutation → ce
-              que l'espace fait (demandes, génération, pilotage) →
-              signature « bonne session ». */}
           <span className="font-medium text-white">Bienvenue, Stevens.</span>{" "}
           Votre back-office vous attend : retrouvez les demandes de vos
           clients, générez vos propositions, devis et factures en quelques
@@ -161,14 +166,10 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
             <label htmlFor="admin-password" className="mb-1.5 block text-sm font-medium text-white">
               Mot de passe
             </label>
-            {/* VOLET 14 — icône œil : révéler / masquer le mot de passe
-                (demande de l'éditeur : « ajoute une icône d'œil sur
-                lequel on peut cliquer pour afficher le mot de passe »).
-                PRÉCISION MÊME JOUR : le bouton vit À L'INTÉRIEUR du
-                champ, aligné à droite (« et non à l'extérieur du
-                champ ») — enveloppe relative, bouton en absolute
-                centré verticalement, padding droit du champ (pr-14)
-                pour que la saisie ne passe jamais sous l'icône. */}
+            {/* Icône œil à l'intérieur du champ (volet 14). VOLET 15 :
+                pastille CLAIRE + icône NOIRE — le contraste reste
+                entier au repos comme au survol (hover : la pastille
+                s'éclaircit, l'icône demeure noire). */}
             <div className="relative">
               <input
                 id="admin-password"
@@ -185,7 +186,7 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
                 onClick={() => setVoirMotDePasse((v) => !v)}
                 aria-label={voirMotDePasse ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                 aria-pressed={voirMotDePasse}
-                className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-[#c8c8c8] transition-colors hover:text-white"
+                className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-[#e4e4e4] text-black transition-colors hover:bg-white"
               >
                 {voirMotDePasse ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
               </button>
@@ -196,9 +197,6 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
               {error}
             </p>
           )}
-          {/* VOLET 14 — « Ouvrir La Session » devient « Ouvrir L'Espace »
-              (demande de l'éditeur : « change le nom du bouton Ouvrir la
-              session en un nom Ouvrir l'espace »). */}
           <button
             type="submit"
             disabled={loading}
@@ -448,6 +446,119 @@ function PanneauDemandes({
 }
 
 /* ------------------------------------------------------------------
+ * SÉLECTION DU DEVIS À FACTURER (VOLET 15) — « Créer une nouvelle
+ * facture » présente TOUS les devis existants (ordre de création) ;
+ * l'éditeur en sélectionne un, soumet, et l'espace de génération de
+ * facture s'ouvre pour ce devis.
+ * ------------------------------------------------------------------ */
+function SelectionDevis({
+  documents,
+  onChoisir,
+}: {
+  documents: DocumentRecord[];
+  onChoisir: (devis: DocumentRecord) => void;
+}) {
+  const devis = useMemo(
+    () =>
+      documents
+        .filter((d) => d.docType === "devis")
+        .sort((a, b) => (a.createdAt || "").localeCompare(b.createdAt || "")),
+    [documents],
+  );
+  const [choisi, setChoisi] = useState<string | null>(null);
+
+  if (devis.length === 0) {
+    return (
+      <Carte className="flex flex-col items-center gap-3 px-6 py-16 text-center">
+        <FileText className="h-8 w-8 text-[#e4e4e4]" aria-hidden="true" />
+        <p className="max-w-md text-sm leading-relaxed text-[#c8c8c8]">
+          Aucun devis enregistré pour l&apos;instant. Créez d&apos;abord un devis : la facture
+          reprend toujours les prestations et le total d&apos;un devis.
+        </p>
+      </Carte>
+    );
+  }
+
+  return (
+    <Carte>
+      <div className="scroll-slim overflow-x-auto">
+        <table className="w-full min-w-[820px] text-left text-sm">
+          <thead>
+            <tr className="border-b border-[#e4e4e4]/10 text-[11px] tracking-widest text-[#c8c8c8] uppercase">
+              <th className="w-12 px-5 py-4" aria-label="Sélection" />
+              <th className="px-5 py-4">Numéro</th>
+              <th className="px-5 py-4">Client</th>
+              <th className="px-5 py-4">Date</th>
+              <th className="px-5 py-4">Total</th>
+              <th className="px-5 py-4">Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            {devis.map((d) => {
+              const facture = documents.find((f) => f.docType === "facture" && f.devisSource === d.numero);
+              const selectionne = choisi === d.id;
+              return (
+                <tr
+                  key={d.id}
+                  onClick={() => setChoisi(d.id)}
+                  className={`cursor-pointer border-b border-[#e4e4e4]/8 transition-colors ${
+                    selectionne ? "bg-[#2f2f2f]" : "hover:bg-[#2f2f2f]/40"
+                  }`}
+                >
+                  <td className="px-5 py-4">
+                    <input
+                      type="radio"
+                      name="devis-a-facturer"
+                      checked={selectionne}
+                      onChange={() => setChoisi(d.id)}
+                      onClick={(e) => e.stopPropagation()}
+                      aria-label={`Sélectionner le devis ${d.numero} de ${d.client.nom}`}
+                      className="h-4 w-4 accent-[#e4e4e4]"
+                    />
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-4 font-medium text-white">{d.numero}</td>
+                  <td className="max-w-[220px] px-5 py-4">
+                    <p className="truncate font-medium text-white">{d.client.nom}</p>
+                    {d.client.entreprise ? <p className="truncate text-xs text-[#c8c8c8]">{d.client.entreprise}</p> : null}
+                  </td>
+                  <td className="whitespace-nowrap px-5 py-4 text-[#c8c8c8]">{formatDate(d.date)}</td>
+                  <td className="whitespace-nowrap px-5 py-4 font-medium text-white">
+                    {formatCurrency(totalDocument(d.items), d.devise)}
+                  </td>
+                  <td className="px-5 py-4">
+                    {facture ? (
+                      <Pastille ton="valide">Facturée ({facture.numero})</Pastille>
+                    ) : (
+                      <Pastille>À facturer</Pastille>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e4e4e4]/10 px-5 py-4">
+        <p className="text-xs text-[#c8c8c8]">
+          La facture reprendra exactement les prestations et le total du devis sélectionné.
+        </p>
+        <BoutonAction
+          variant="principal"
+          disabled={!choisi}
+          onClick={() => {
+            const d = devis.find((x) => x.id === choisi);
+            if (d) onChoisir(d);
+          }}
+        >
+          <ChevronRight className="h-4 w-4" aria-hidden="true" />
+          Continuer
+        </BoutonAction>
+      </div>
+    </Carte>
+  );
+}
+
+/* ------------------------------------------------------------------
  * PAGE ADMIN — coquille back-office
  * ------------------------------------------------------------------ */
 export function AdminPage() {
@@ -460,6 +571,12 @@ export function AdminPage() {
   const [stockageConfigure, setStockageConfigure] = useState(false);
   const [emailConfigure, setEmailConfigure] = useState(false);
   const { toast } = useToast();
+
+  /* VOLET 15 — vues des rubriques documents. */
+  const [vueDocs, setVueDocs] = useState<VueDocs>("liste");
+  const [docEnEdition, setDocEnEdition] = useState<DocumentRecord | null>(null);
+  const [vueFactures, setVueFactures] = useState<VueFactures>("liste");
+  const [factureCible, setFactureCible] = useState<DocumentRecord | null>(null);
 
   const chargerDocuments = useCallback(async () => {
     setDocsChargement(true);
@@ -535,7 +652,41 @@ export function AdminPage() {
     setAuthed(false);
     setLeads([]);
     setDocuments([]);
+    setVueDocs("liste");
+    setDocEnEdition(null);
+    setVueFactures("liste");
+    setFactureCible(null);
     toast({ title: "Espace fermé" });
+  }
+
+  /** Changement de rubrique : les listes reprennent la main. */
+  function allerA(s: Section) {
+    setSection(s);
+    setVueDocs("liste");
+    setDocEnEdition(null);
+    setVueFactures("liste");
+  }
+
+  /** Raccourci « Créer… » : ouvre directement l'espace de création. */
+  function ouvrirCreation(s: "propositions" | "devis") {
+    setSection(s);
+    setVueDocs("creation");
+    setDocEnEdition(null);
+    setVueFactures("liste");
+  }
+
+  /** Raccourci « Nouvelle facture » : ouvre la sélection du devis. */
+  function ouvrirSelectionFacture() {
+    setSection("factures");
+    setVueDocs("liste");
+    setDocEnEdition(null);
+    setVueFactures("selection");
+  }
+
+  /** Icône « modifier » d'un document de la liste. */
+  function modifierDocument(d: DocumentRecord) {
+    setDocEnEdition(d);
+    setVueDocs("edition");
   }
 
   const nb = {
@@ -579,24 +730,83 @@ export function AdminPage() {
     );
   }
 
+  /* VOLET 15 — les Propositions commerciales précèdent les Devis ;
+   * « Factures & documents » disparaît au profit de « Factures ». */
   const NAV: { key: Section; label: string; icone: React.ReactNode; compteur?: number }[] = [
     { key: "tableau", label: "Tableau de bord", icone: <LayoutDashboard className="h-4 w-4" aria-hidden="true" /> },
     { key: "demandes", label: "Demandes", icone: <Inbox className="h-4 w-4" aria-hidden="true" />, compteur: nb.demandes },
+    { key: "propositions", label: "Propositions commerciales", icone: <Handshake className="h-4 w-4" aria-hidden="true" />, compteur: nb.propositions },
     { key: "devis", label: "Devis", icone: <FileText className="h-4 w-4" aria-hidden="true" />, compteur: nb.devis },
-    { key: "propositions", label: "Propositions", icone: <Handshake className="h-4 w-4" aria-hidden="true" />, compteur: nb.propositions },
-    { key: "factures", label: "Factures & Documents", icone: <Receipt className="h-4 w-4" aria-hidden="true" />, compteur: documents.length },
+    { key: "factures", label: "Factures", icone: <Receipt className="h-4 w-4" aria-hidden="true" />, compteur: nb.factures },
   ];
+
+  /* En-tête commun des rubriques de liste (titre + bouton créer). */
+  function EnteteListe({
+    titre,
+    compteur,
+    libelleBouton,
+    onCreer,
+  }: {
+    titre: string;
+    compteur: number;
+    libelleBouton: string;
+    onCreer: () => void;
+  }) {
+    return (
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">
+          {titre}
+          <span className="ml-2 align-middle text-sm font-normal text-[#c8c8c8]">({compteur})</span>
+        </h2>
+        <BoutonAction variant="principal" onClick={onCreer}>
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          {libelleBouton}
+        </BoutonAction>
+      </div>
+    );
+  }
+
+  /* En-tête des espaces création / édition / sélection (retour). */
+  function EnteteDocument({
+    titre,
+    description,
+    onRetour,
+    libelleRetour,
+  }: {
+    titre: string;
+    description: string;
+    onRetour: () => void;
+    libelleRetour: string;
+  }) {
+    return (
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">{titre}</h2>
+          <p className="mt-1 text-sm text-[#c8c8c8]">{description}</p>
+        </div>
+        <BoutonAction onClick={onRetour}>
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          {libelleRetour}
+        </BoutonAction>
+      </div>
+    );
+  }
 
   return (
     <div className="section-deep min-h-screen">
-      {/* Barre supérieure */}
+      {/* Barre supérieure — VOLET 15 : logo du site + « BACK-OFFICE »
+          à droite du logo (remplace le titre et l'ancien sur-titre). */}
       <div className="border-b border-[#e4e4e4]/10 bg-[#070707]">
-        <div className="container-site flex flex-wrap items-center justify-between gap-4 py-5">
-          <div>
-            <p className="text-eyebrow">Back-office</p>
-            <h1 className="mt-1 font-display text-xl font-semibold text-white sm:text-2xl">
-              Stevens Akpovi — Espace administrateur
-            </h1>
+        <div className="container-site flex flex-wrap items-center justify-between gap-4 py-4">
+          <div className="flex items-center gap-4">
+            <img
+              src={ASSETS.logoLight}
+              alt="Stevens Akpovi"
+              width={50}
+              height={40}
+              className="h-10 w-auto"
+            />
+            <h1 className="text-eyebrow text-[#c8c8c8]">Back-office</h1>
           </div>
           <div className="flex items-center gap-3">
             <BoutonAction
@@ -625,7 +835,7 @@ export function AdminPage() {
             <button
               key={item.key}
               type="button"
-              onClick={() => setSection(item.key)}
+              onClick={() => allerA(item.key)}
               aria-current={section === item.key ? "page" : undefined}
               className={`flex min-h-[44px] shrink-0 items-center gap-2.5 rounded-full border px-5 py-2.5 text-sm transition-colors ${
                 section === item.key
@@ -654,14 +864,14 @@ export function AdminPage() {
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {[
                 { label: "Demandes reçues", valeur: nb.demandes, note: `${nb.nouvelles} nouvelle${nb.nouvelles > 1 ? "s" : ""}`, section: "demandes" as Section },
+                { label: "Propositions commerciales", valeur: nb.propositions, note: "offres prêtes à générer", section: "propositions" as Section },
                 { label: "Devis", valeur: nb.devis, note: `prochain n° client : ${prochainNumero}`, section: "devis" as Section },
                 { label: "Factures", valeur: nb.factures, note: totalFacture ? `total facturé : ${formatCurrency(totalFacture, documents.find((d) => d.docType === "facture")?.devise ?? "XOF")}` : "aucune pour l'heure", section: "factures" as Section },
-                { label: "Propositions", valeur: nb.propositions, note: "modèle prêt à générer", section: "propositions" as Section },
               ].map((carte) => (
                 <button
                   key={carte.label}
                   type="button"
-                  onClick={() => setSection(carte.section)}
+                  onClick={() => allerA(carte.section)}
                   className="rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-5 text-left transition-colors hover:border-[#e4e4e4]/40"
                 >
                   <p className="text-xs font-semibold tracking-[0.18em] text-[#c8c8c8] uppercase">{carte.label}</p>
@@ -700,7 +910,7 @@ export function AdminPage() {
                   </div>
                   <p className="mt-2 text-xs leading-relaxed text-[#c8c8c8]">
                     {emailConfigure
-                      ? "Chaque document généré est envoyé en pièce jointe à stevensakpovi@gmail.com (Resend)."
+                      ? "Chaque document généré est envoyé en pièce jointe à votre boîte mail privée."
                       : "Définissez RESEND_API_KEY pour recevoir une copie de chaque document par email (pièce jointe PDF) — voir DEPLOIEMENT.md."}
                   </p>
                 </div>
@@ -709,17 +919,17 @@ export function AdminPage() {
 
             {/* Raccourcis */}
             <div className="flex flex-wrap gap-3">
-              <BoutonAction variant="principal" onClick={() => setSection("devis")}>
-                <FileText className="h-4 w-4" aria-hidden="true" />
-                Nouveau devis
-              </BoutonAction>
-              <BoutonAction onClick={() => setSection("propositions")}>
+              <BoutonAction variant="principal" onClick={() => ouvrirCreation("propositions")}>
                 <Handshake className="h-4 w-4" aria-hidden="true" />
                 Nouvelle proposition
               </BoutonAction>
-              <BoutonAction onClick={() => setSection("factures")}>
+              <BoutonAction onClick={() => ouvrirCreation("devis")}>
+                <FileText className="h-4 w-4" aria-hidden="true" />
+                Nouveau devis
+              </BoutonAction>
+              <BoutonAction onClick={ouvrirSelectionFacture}>
                 <Receipt className="h-4 w-4" aria-hidden="true" />
-                Factures & documents
+                Nouvelle facture
               </BoutonAction>
             </div>
           </div>
@@ -730,37 +940,15 @@ export function AdminPage() {
           <PanneauDemandes leads={leads} loading={loading} onActualiser={chargerDemandes} onMajStatut={majStatut} />
         )}
 
-        {/* ---------------- DEVIS ---------------- */}
-        {section === "devis" && (
+        {/* ---------------- PROPOSITIONS COMMERCIALES ---------------- */}
+        {section === "propositions" && vueDocs === "creation" && (
           <>
-            <div className="mb-6">
-              <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">Nouveau devis</h2>
-              <p className="mt-1 text-sm text-[#c8c8c8]">
-                Template du projet K.Quotes — chaque devis enregistré ouvre ensuite son option
-                « Générer la facture » dans la liste des documents.
-              </p>
-            </div>
-            <GenerateurDocument
-              key={`devis-${prochainNumero}`}
-              docType="devis"
-              prochainNumero={prochainNumero}
-              stockageConfigure={stockageConfigure}
-              onEnregistre={chargerDocuments}
-              toast={toast}
+            <EnteteDocument
+              titre="Nouvelle proposition commerciale"
+              description="Présentez votre offre en détail : prestations, déroulé du projet et conditions."
+              onRetour={() => allerA("propositions")}
+              libelleRetour="Retour aux propositions"
             />
-          </>
-        )}
-
-        {/* ---------------- PROPOSITIONS ---------------- */}
-        {section === "propositions" && (
-          <>
-            <div className="mb-6">
-              <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">Nouvelle proposition commerciale</h2>
-              <p className="mt-1 text-sm text-[#c8c8c8]">
-                Document haut de gamme : présentation, prestations détaillées, déroulé du projet,
-                conditions et bon pour accord. Chargez l&apos;exemple-modèle pour découvrir le rendu.
-              </p>
-            </div>
             <GenerateurDocument
               key={`proposition-${prochainNumero}`}
               docType="proposition"
@@ -771,39 +959,162 @@ export function AdminPage() {
             />
           </>
         )}
-
-        {/* ---------------- FACTURES & DOCUMENTS ---------------- */}
-        {section === "factures" && (
+        {section === "propositions" && vueDocs === "edition" && docEnEdition && (
           <>
-            <div className="mb-6">
-              <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">Factures & documents existants</h2>
-              <p className="mt-1 text-sm text-[#c8c8c8]">
-                Toutes les factures sont générées depuis un devis (option « Générer la facture »,
-                avec cachet « PAYÉ »). Les documents sont conservés dans le dépôt GitHub privé
-                dédié et téléchargeables à tout moment.
-              </p>
-            </div>
+            <EnteteDocument
+              titre={`Modifier la proposition ${docEnEdition.numero}`}
+              description="Ajustez la proposition, puis régénérez le PDF mis à jour."
+              onRetour={() => allerA("propositions")}
+              libelleRetour="Retour aux propositions"
+            />
+            <GenerateurDocument
+              key={`edition-${docEnEdition.id}`}
+              docType="proposition"
+              initial={docEnEdition}
+              prochainNumero={prochainNumero}
+              stockageConfigure={stockageConfigure}
+              onEnregistre={chargerDocuments}
+              toast={toast}
+            />
+          </>
+        )}
+        {section === "propositions" && (vueDocs === "liste" || !docEnEdition) && (
+          <>
+            <EnteteListe
+              titre="Propositions commerciales"
+              compteur={nb.propositions}
+              libelleBouton="Créer une nouvelle proposition"
+              onCreer={() => ouvrirCreation("propositions")}
+            />
             <ListeDocuments
+              docType="proposition"
               documents={documents}
               chargement={docsChargement}
               stockageConfigure={stockageConfigure}
               onRafraichir={chargerDocuments}
               toast={toast}
+              onModifier={modifierDocument}
             />
           </>
         )}
 
-        {/* Note d'architecture */}
+        {/* ---------------- DEVIS ---------------- */}
+        {section === "devis" && vueDocs === "creation" && (
+          <>
+            <EnteteDocument
+              titre="Nouveau devis"
+              description="Renseignez le client et sa prestation, puis générez un devis professionnel prêt à envoyer."
+              onRetour={() => allerA("devis")}
+              libelleRetour="Retour aux devis"
+            />
+            <GenerateurDocument
+              key={`devis-${prochainNumero}`}
+              docType="devis"
+              prochainNumero={prochainNumero}
+              stockageConfigure={stockageConfigure}
+              onEnregistre={chargerDocuments}
+              toast={toast}
+            />
+          </>
+        )}
+        {section === "devis" && vueDocs === "edition" && docEnEdition && (
+          <>
+            <EnteteDocument
+              titre={`Modifier le devis ${docEnEdition.numero}`}
+              description="Ajustez le devis, puis régénérez le PDF mis à jour."
+              onRetour={() => allerA("devis")}
+              libelleRetour="Retour aux devis"
+            />
+            <GenerateurDocument
+              key={`edition-${docEnEdition.id}`}
+              docType="devis"
+              initial={docEnEdition}
+              prochainNumero={prochainNumero}
+              stockageConfigure={stockageConfigure}
+              onEnregistre={chargerDocuments}
+              toast={toast}
+            />
+          </>
+        )}
+        {section === "devis" && (vueDocs === "liste" || !docEnEdition) && (
+          <>
+            <EnteteListe
+              titre="Devis"
+              compteur={nb.devis}
+              libelleBouton="Créer un nouveau devis"
+              onCreer={() => ouvrirCreation("devis")}
+            />
+            <ListeDocuments
+              docType="devis"
+              documents={documents}
+              chargement={docsChargement}
+              stockageConfigure={stockageConfigure}
+              onRafraichir={chargerDocuments}
+              toast={toast}
+              onModifier={modifierDocument}
+              onFacturer={(d) => setFactureCible(d)}
+            />
+          </>
+        )}
+
+        {/* ---------------- FACTURES ---------------- */}
+        {section === "factures" && vueFactures === "selection" && (
+          <>
+            <EnteteDocument
+              titre="Créer une nouvelle facture"
+              description="Sélectionnez le devis à facturer : la facture reprendra exactement ses prestations et son total."
+              onRetour={() => setVueFactures("liste")}
+              libelleRetour="Retour aux factures"
+            />
+            <SelectionDevis documents={documents} onChoisir={(d) => setFactureCible(d)} />
+          </>
+        )}
+        {section === "factures" && vueFactures === "liste" && (
+          <>
+            <EnteteListe
+              titre="Factures"
+              compteur={nb.factures}
+              libelleBouton="Créer une nouvelle facture"
+              onCreer={() => setVueFactures("selection")}
+            />
+            <ListeDocuments
+              docType="facture"
+              documents={documents}
+              chargement={docsChargement}
+              stockageConfigure={stockageConfigure}
+              onRafraichir={chargerDocuments}
+              toast={toast}
+              onModifier={(f) => setFactureCible(f)}
+            />
+          </>
+        )}
+
+        {/* Note de bas d'espace — VOLET 15 : message court et
+            professionnel, sans référence technique. */}
         <div className="mt-10 flex items-start gap-3 rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] px-6 py-5">
           <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#e4e4e4]" aria-hidden="true" />
           <p className="text-sm leading-relaxed text-[#c8c8c8]">
-            Espace indépendant, non listé dans la navigation publique. Génération de documents
-            (propositions commerciales, devis, factures avec cachet « PAYÉ ») sur le template du
-            projet K.Quotes, stockage dans le dépôt GitHub privé dédié, copie email à
-            stevensakpovi@gmail.com — et consultation des demandes reçues via le site.
+            Espace privé de pilotage : demandes clients, documents commerciaux et suivi des
+            projets — à l&apos;écart de la navigation publique.
           </p>
         </div>
       </div>
+
+      {/* ---------- Espace de génération de facture (commun) ----------
+          Après une génération réussie depuis la vue « sélection du
+          devis », la rubrique Factures revient à sa liste (la nouvelle
+          facture y apparaît). */}
+      {factureCible ? (
+        <EspaceFacture
+          document={factureCible}
+          onFerme={(succes) => {
+            setFactureCible(null);
+            if (succes && section === "factures") setVueFactures("liste");
+          }}
+          onRafraichir={chargerDocuments}
+          toast={toast}
+        />
+      ) : null}
     </div>
   );
 }

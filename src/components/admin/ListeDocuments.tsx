@@ -1,49 +1,57 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Download, Eye, FileText, Loader2, Receipt, Trash2, X } from "lucide-react";
+import { Download, Eye, FileText, Loader2, Pencil, Receipt, Trash2, X } from "lucide-react";
 import { ApercuDocument } from "./ApercuDocument";
-import { BoutonAction, Carte, Champ, Pastille, styleInput } from "./elements";
+import { Carte, Pastille } from "./elements";
 import type { DocumentRecord, DocType } from "@/lib/documents/types";
 import { LABELS_DOC } from "@/lib/documents/types";
-import { formatDate, formatCurrency, totalDocument, numeroDevisVersFacture } from "@/lib/documents/format";
+import { formatDate, formatCurrency, totalDocument } from "@/lib/documents/format";
 
 /**
- * LISTE DES DOCUMENTS EXISTANTS (VOLET 14) — le back-office « sert
- * les documents depuis le stockage » (dépôt GitHub privé dédié) :
- * consulter l'aperçu, télécharger le PDF, supprimer, et pour chaque
- * DEVIS générer LA FACTURE correspondante (demande de l'éditeur :
- * « c'est quand on va finir de générer un devis qu'on pourra sur le
- * devis, chaque devis généré aura une option de génération de
- * facture ») — la facture reprend le devis (règle K.Quotes : D→F,
- * mêmes chiffres) avec son CACHET « PAYÉ » (style MrSteveEnglish).
+ * LISTE DES DOCUMENTS D'UN TYPE (VOLET 15) — chaque rubrique du
+ * back-office (Propositions commerciales, Devis, Factures) présente
+ * SES documents, TOUS visibles d'un coup comme la rubrique Demandes,
+ * dans l'ORDRE DE CRÉATION. Le bouton « Créer… » de la rubrique vit
+ * dans AdminPage ; chaque ligne porte ses icônes d'action :
+ *
+ *  - œil : aperçu plein écran ;
+ *  - téléchargement : PDF à la demande ;
+ *  - crayon : modification (générateur pour devis/proposition,
+ *    espace de facturation pour facture) ;
+ *  - reçue (devis) : génération de la facture correspondante ;
+ *  - corbeille : suppression du stockage.
  */
 
-type Filtre = "tous" | DocType;
-
 export function ListeDocuments({
+  docType,
   documents,
   chargement,
   stockageConfigure,
   onRafraichir,
   toast,
+  onModifier,
+  onFacturer,
 }: {
+  docType: DocType;
   documents: DocumentRecord[];
   chargement: boolean;
   stockageConfigure: boolean;
   onRafraichir: () => void;
   toast: (t: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
+  onModifier: (d: DocumentRecord) => void;
+  onFacturer?: (d: DocumentRecord) => void;
 }) {
-  const [filtre, setFiltre] = useState<Filtre>("tous");
   const [apercu, setApercu] = useState<DocumentRecord | null>(null);
-  const [devisAFacturer, setDevisAFacturer] = useState<DocumentRecord | null>(null);
-  const [statutPaiement, setStatutPaiement] = useState<"Payé" | "En attente">("Payé");
-  const [datePaiement, setDatePaiement] = useState(new Date().toISOString().slice(0, 10));
   const [enCours, setEnCours] = useState<string | null>(null);
 
+  /* ORDRE DE CRÉATION : du premier au dernier document créé. */
   const visibles = useMemo(
-    () => (filtre === "tous" ? documents : documents.filter((d) => d.docType === filtre)),
-    [documents, filtre],
+    () =>
+      documents
+        .filter((d) => d.docType === docType)
+        .sort((a, b) => (a.createdAt || "").localeCompare(b.createdAt || "")),
+    [documents, docType],
   );
 
   const factureExistante = (numeroDevis: string) =>
@@ -92,37 +100,6 @@ export function ListeDocuments({
     }
   }
 
-  async function genererFacture() {
-    if (!devisAFacturer) return;
-    const numeroFacture = numeroDevisVersFacture(devisAFacturer.numero);
-    setEnCours("facture");
-    try {
-      const facture: DocumentRecord = {
-        ...devisAFacturer,
-        docType: "facture",
-        numero: numeroFacture,
-        id: `facture-${numeroFacture}`.toLowerCase(),
-        devisSource: devisAFacturer.numero,
-        statutPaiement,
-        datePaiement: statutPaiement === "Payé" ? datePaiement : undefined,
-        phases: undefined,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      const nom = await telecharger(facture, true);
-      toast({
-        title: `Facture ${numeroFacture} générée`,
-        description: `Téléchargée (${nom}) — enregistrée et liée au devis ${devisAFacturer.numero}.`,
-      });
-      setDevisAFacturer(null);
-      onRafraichir();
-    } catch (e) {
-      toast({ title: "Génération de facture impossible", description: e instanceof Error ? e.message : undefined, variant: "destructive" });
-    } finally {
-      setEnCours(null);
-    }
-  }
-
   async function supprimer(record: DocumentRecord) {
     if (!window.confirm(`Supprimer définitivement ${record.numero} (${record.client.nom}) du stockage ?`)) return;
     setEnCours(`${record.numero}-suppr`);
@@ -144,7 +121,7 @@ export function ListeDocuments({
       <Carte className="flex flex-col items-center gap-4 px-6 py-16 text-center">
         <FileText className="h-8 w-8 text-[#e4e4e4]" aria-hidden="true" />
         <p className="max-w-xl text-sm leading-relaxed text-[#c8c8c8]">
-          Les documents existants sont conservés dans un dépôt GitHub privé dédié. Pour les lister,
+          Les documents existants sont conservés dans un stockage privé dédié. Pour les lister,
           définissez la variable d&apos;environnement <code className="rounded bg-[#1c1c1c] px-1.5 py-0.5 text-white">GITHUB_DOCS_TOKEN</code> côté
           serveur (jeton d&apos;accès GitHub) — voir DEPLOIEMENT.md. La GÉNÉRATION (PDF, téléchargement,
           email) fonctionne déjà sans cette variable ; seul l&apos;archivage l&apos;attend.
@@ -155,36 +132,23 @@ export function ListeDocuments({
 
   return (
     <div>
-      {/* Filtres */}
-      <div className="mb-5 flex flex-wrap items-center gap-2.5">
-        {(
-          [
-            ["tous", `Tous (${documents.length})`],
-            ["proposition", `Propositions (${documents.filter((d) => d.docType === "proposition").length})`],
-            ["devis", `Devis (${documents.filter((d) => d.docType === "devis").length})`],
-            ["facture", `Factures (${documents.filter((d) => d.docType === "facture").length})`],
-          ] as [Filtre, string][]
-        ).map(([cle, libelle]) => (
-          <button
-            key={cle}
-            type="button"
-            onClick={() => setFiltre(cle)}
-            className={`min-h-[40px] rounded-full px-4 py-2 text-xs font-medium transition-colors ${
-              filtre === cle
-                ? "border border-[#e4e4e4] bg-white text-[#1c1c1c]"
-                : "border border-[#e4e4e4]/20 text-[#c8c8c8] hover:border-[#e4e4e4]/40"
-            }`}
-          >
-            {libelle}
-          </button>
-        ))}
-        {chargement ? <Loader2 className="h-4 w-4 animate-spin text-[#c8c8c8]" aria-hidden="true" /> : null}
-      </div>
+      {chargement ? (
+        <div className="mb-4 flex items-center gap-2 text-sm text-[#c8c8c8]">
+          <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+          Chargement…
+        </div>
+      ) : null}
 
       {visibles.length === 0 ? (
         <Carte className="flex flex-col items-center gap-3 px-6 py-16 text-center">
           <FileText className="h-8 w-8 text-[#e4e4e4]" aria-hidden="true" />
-          <p className="text-sm text-[#c8c8c8]">Aucun document dans cette catégorie pour l&apos;instant.</p>
+          <p className="text-sm text-[#c8c8c8]">
+            {docType === "facture"
+              ? "Aucune facture pour l'instant — créez-en une à partir d'un devis."
+              : docType === "devis"
+                ? "Aucun devis pour l'instant — créez votre premier devis."
+                : "Aucune proposition pour l'instant — créez votre première proposition."}
+          </p>
         </Carte>
       ) : (
         <Carte className="scroll-slim overflow-x-auto">
@@ -192,7 +156,6 @@ export function ListeDocuments({
             <thead>
               <tr className="border-b border-[#e4e4e4]/10 text-[11px] tracking-widest text-[#c8c8c8] uppercase">
                 <th className="px-5 py-4">Numéro</th>
-                <th className="px-5 py-4">Type</th>
                 <th className="px-5 py-4">Client</th>
                 <th className="px-5 py-4">Date</th>
                 <th className="px-5 py-4">Total</th>
@@ -205,8 +168,7 @@ export function ListeDocuments({
                 const facture = d.docType === "devis" ? factureExistante(d.numero) : undefined;
                 return (
                   <tr key={d.id} className="border-b border-[#e4e4e4]/8 transition-colors hover:bg-[#2f2f2f]/40">
-                    <td className="px-5 py-4 font-medium text-white">{d.numero}</td>
-                    <td className="px-5 py-4 text-[#c8c8c8]">{LABELS_DOC[d.docType]}</td>
+                    <td className="whitespace-nowrap px-5 py-4 font-medium text-white">{d.numero}</td>
                     <td className="max-w-[220px] px-5 py-4">
                       <p className="truncate font-medium text-white">{d.client.nom}</p>
                       {d.client.entreprise ? <p className="truncate text-xs text-[#c8c8c8]">{d.client.entreprise}</p> : null}
@@ -255,11 +217,25 @@ export function ListeDocuments({
                             <Download className="h-4 w-4" />
                           )}
                         </button>
-                        {d.docType === "devis" && !facture ? (
-                          <BoutonAction onClick={() => setDevisAFacturer(d)} className="min-h-[36px] px-4 text-xs">
-                            <Receipt className="h-3.5 w-3.5" aria-hidden="true" />
-                            Générer la facture
-                          </BoutonAction>
+                        <button
+                          type="button"
+                          onClick={() => onModifier(d)}
+                          className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-[#e4e4e4]"
+                          aria-label={`Modifier ${d.numero}`}
+                          title="Modifier"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        {d.docType === "devis" && onFacturer ? (
+                          <button
+                            type="button"
+                            onClick={() => onFacturer(d)}
+                            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-[#e4e4e4]"
+                            aria-label={`Générer la facture du devis ${d.numero}`}
+                            title="Générer la facture"
+                          >
+                            <Receipt className="h-4 w-4" />
+                          </button>
                         ) : null}
                         <button
                           type="button"
@@ -310,76 +286,6 @@ export function ListeDocuments({
             </div>
             <div className="flex-1 overflow-hidden bg-[#141414] p-4">
               <ApercuDocument document={apercu} />
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {/* ---------- Génération de facture depuis un devis ---------- */}
-      {devisAFacturer ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
-          aria-label={`Générer la facture du devis ${devisAFacturer.numero}`}
-          onClick={(e) => e.target === e.currentTarget && setDevisAFacturer(null)}
-        >
-          <div className="w-full max-w-lg rounded-2xl border border-[#e4e4e4]/15 bg-[#232323] p-6 sm:p-8">
-            <div className="mb-5 flex items-start justify-between gap-4">
-              <div>
-                <p className="text-eyebrow">Facture</p>
-                <h3 className="mt-1 font-display text-xl font-semibold text-white">
-                  Facturer le devis {devisAFacturer.numero}
-                </h3>
-                <p className="mt-1 text-sm text-[#c8c8c8]">
-                  {devisAFacturer.client.nom} — {formatCurrency(totalDocument(devisAFacturer.items), devisAFacturer.devise)} ·
-                  la facture portera le numéro {numeroDevisVersFacture(devisAFacturer.numero)}.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setDevisAFacturer(null)}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-white"
-                aria-label="Annuler"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Champ label="Statut du paiement">
-                <select
-                  className={styleInput}
-                  value={statutPaiement}
-                  onChange={(e) => setStatutPaiement(e.target.value === "Payé" ? "Payé" : "En attente")}
-                >
-                  <option value="Payé" className="bg-[#232323]">Payé (cachet « PAYÉ »)</option>
-                  <option value="En attente" className="bg-[#232323]">En attente</option>
-                </select>
-              </Champ>
-              <Champ label="Date de règlement">
-                <input className={styleInput} type="date" value={datePaiement} onChange={(e) => setDatePaiement(e.target.value)} />
-              </Champ>
-            </div>
-            <p className="mt-4 text-xs leading-relaxed text-[#c8c8c8]/80">
-              Le PDF de la facture reprend exactement les prestations et le total du devis ; le cachet
-              « PAYÉ » (double cadre vert incliné) est apposé lorsque le statut est « Payé ». La facture
-              est enregistrée dans le stockage et liée au devis.
-            </p>
-            <div className="mt-6 flex flex-wrap justify-end gap-3">
-              <BoutonAction onClick={() => setDevisAFacturer(null)}>Annuler</BoutonAction>
-              <BoutonAction variant="principal" onClick={genererFacture} disabled={enCours === "facture"}>
-                {enCours === "facture" ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                    Génération…
-                  </>
-                ) : (
-                  <>
-                    <Receipt className="h-4 w-4" aria-hidden="true" />
-                    Générer la facture
-                  </>
-                )}
-              </BoutonAction>
             </div>
           </div>
         </div>

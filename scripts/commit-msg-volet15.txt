@@ -1,0 +1,66 @@
+VOLET 15 — BACK-OFFICE RESTRUCTURÉ : LISTES PAR TYPE (PROPOSITIONS AVANT DEVIS, FACTURES), CRÉATION ET MODIFICATION DEPUIS CHAQUE RUBRIQUE, FACTURE VIA SÉLECTION DU DEVIS, LOGO + « BACK-OFFICE », FORMULAIRE ÉPURÉ, ŒIL NOIR
+
+Demandes de l'éditeur (25/11/2026), 44/44 contrôles verts
+(scripts/sonde-volet15-2026-11-25.js — la sonde intercepte
+/api/documents* avec de faux documents : aucun test n'écrit dans le
+stockage réel).
+
+CONNEXION
+- Icône œil NOIRE sur pastille claire (bg #e4e4e4, hover blanc) :
+  l'icône reste parfaitement visible au repos comme au survol
+  (l'éditeur signalait que la couleur de survol gommait l'icône).
+
+BARRE SUPÉRIEURE
+- Le titre « Stevens Akpovi — Espace administrateur » et le
+  sur-titre « Back-office » laissent place au LOGO du site
+  (version blanche) avec, à droite du logo, la mention
+  « BACK-OFFICE ».
+
+NAVIGATION
+- Propositions commerciales AVANT Devis ; « Propositions
+  commerciales » remplace « Propositions » ; « Factures » remplace
+  « Factures & Documents » (rubrique supprimée : chaque type de
+  document vit désormais dans sa propre rubrique).
+
+RUBRIQUES DOCUMENTS (nouveau composant EspaceFacture.tsx,
+ListeDocuments réécrit)
+- Chaque rubrique liste TOUS ses documents dans l'ORDRE DE
+  CRÉATION (comme la rubrique Demandes), avec en haut à droite un
+  bouton « Créer une nouvelle proposition / un nouveau devis / une
+  nouvelle facture » qui ouvre l'espace de création ;
+- Icônes d'action devant chaque document : modifier (crayon),
+  générer la facture (reçue, devis), supprimer (corbeille), plus
+  aperçu (œil) et téléchargement PDF ;
+- « Créer une nouvelle facture » ouvre d'abord la SÉLECTION DU
+  DEVIS (tous les devis, ordre de création, statut à
+  facturer/facturée) ; « Continuer » ouvre l'espace de génération
+  de facture pour le devis choisi ; modifier une facture rouvre ce
+  même espace pré-rempli (statut, date de règlement) ;
+- GenerateurDocument sait MODIFIER un document existant (prop
+  `initial`) : formulaire pré-rempli, numéro et identifiant
+  conservés, enregistrement mis à jour en place.
+
+TABLEAU DE BORD
+- Message d'intro court et professionnel : « Espace privé de
+  pilotage : demandes clients, documents commerciaux et suivi des
+  projets — à l'écart de la navigation publique. » ;
+- « Copie email des documents » : « Chaque document généré est
+  envoyé en pièce jointe à votre boîte mail privée. » (plus
+  d'adresse en clair) ;
+- Raccourcis « Nouvelle proposition / Nouveau devis / Nouvelle
+  facture » ouvrant directement les espaces de création ;
+- Aucune mention de K.Quotes dans l'espace admin (UI + commentaires
+  des composants admin).
+
+FORMULAIRE DES GÉNÉRATEURS
+- Modes de paiement épurés : Virement, MTN Mobile Money, Moov
+  Money, Orange Money, Wave (Cash, PayPal, M-Pesa, Celtiis Cash
+  supprimés) ;
+- Champ « Banque » supprimé (titulaire/IBAN/BIC conservés, la
+  banque reste portée par les valeurs par défaut) ;
+- Validité par défaut : 15 jours ;
+- « Mention de délai / livraison » devient « Délai estimé », valeur
+  par défaut « 02 à 03 semaines » (aussi pré-remplie pour chaque
+  nouvelle prestation) ;
+- Devise par défaut : euro (EUR en tête de liste) ;
+- Champs « Objet » et « Total ligne » supprimés.

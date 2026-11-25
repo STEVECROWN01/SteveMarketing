@@ -6,11 +6,11 @@ import { renderDocumentHtml } from "@/lib/documents/document-html";
 import { LABELS_DOC } from "@/lib/documents/types";
 
 /**
- * Aperçu en direct du document (VOLET 14) — copie du LivePreview de
- * K.Quotes : le VRAI HTML du PDF, découpé en pages A4 séparées
- * (une par iframe srcDoc, style et ombres de feuille), mise à
- * l'échelle responsive (0,40 mobile / 0,55 tablette / 0,62 bureau —
- * le panneau du back-office est plus étroit que celui de K.Quotes).
+ * Aperçu en direct du document (VOLET 14) — le VRAI HTML du PDF,
+ * découpé en pages A4 séparées (une par iframe srcDoc, style et
+ * ombres de feuille), mise à l'échelle responsive (0,40 mobile /
+ * 0,55 tablette / 0,62 bureau — le panneau du back-office est plus
+ * étroit qu'une page A4).
  */
 export function ApercuDocument({ document }: { document: DocumentRecord }) {
   const { page1Html, page2Html } = useMemo(() => {
