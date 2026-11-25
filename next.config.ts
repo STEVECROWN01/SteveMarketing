@@ -17,6 +17,22 @@ const nextConfig: NextConfig = {
      et ne doivent PAS être groupés par le traceur de Next — ils
      restent des dépendances externes du serveur. */
   serverExternalPackages: ["puppeteer-core", "@sparticuz/chromium"],
+  /* VOLET 19 (26/11/2026) — CORRECTIF CRITIQUE DE LA GÉNÉRATION PDF
+     SUR VERCEL : serverExternalPackages empêche le paquet d'être
+     GROUPÉ, mais le traceur de fichiers de Next ne copiait PAS son
+     répertoire bin/ (chromium.br, 67 Mo ; fonts.tar.br ;
+     al2023.tar.br ; swiftshader.tar.br — lus dynamiquement au
+     runtime via fs, donc invisibles au tracé statique). Résultat en
+     production : la fonction serverless démarrait sans binaire et
+     TOUTE génération de facture/devis échouait (« input directory
+     /var/task/node_modules/@sparticuz/chromium/bin does not exist »).
+     Vérifié sur le build local : route.js.nft.json de la route PDF
+     listait 7 fichiers @sparticuz (JS seulement), ZÉRO fichier de
+     bin/. outputFileTracingIncludes force l'inclusion du répertoire
+     binaire pour CETTE route (seule à lancer Puppeteer). */
+  outputFileTracingIncludes: {
+    "/api/documents/pdf": ["./node_modules/@sparticuz/chromium/bin/**"],
+  },
   reactStrictMode: false,
   // Indicateur « N » de développement désactivé (n'apparaît pas en production)
   devIndicators: false,
