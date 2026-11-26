@@ -238,7 +238,8 @@ export function ProjectPage({ projectId }: { projectId: string }) {
                 size="lg"
                 icon={CTAIcons.calendar}
                 ariaLabel={tf("Réserver un appel de 30 minutes sur Calendly — {calendlyMention}", { calendlyMention: SITE.calendlyMention })}
-              >
+          arrow="up-right"
+        >
                 {CTA_LABELS.appel}
               </CTAButton>
               <CTAButton

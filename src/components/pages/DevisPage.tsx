@@ -3,7 +3,7 @@
 import React from "react";
 import { Star } from "lucide-react";
 import { Reveal, RevealText } from "@/components/motion/Reveal";
-import { LeadForm } from "@/components/forms/LeadForm";
+import { LeadForm, type ServiceDevis } from "@/components/forms/LeadForm";
 /* VOLET 18 — i18n : textes inline via t()/tf() ; la phrase croisée
    « Vous préférez commencer par une conversation ?… » est traduite
    ENTIÈRE (clé complète) puis découpée sur le libellé du lien pour
@@ -41,15 +41,74 @@ function CheckOne({ className = "" }: { className?: string }) {
  * carte blanche à ombre douce, Prénom/Nom sur deux colonnes,
  * consentement SMS, questions à choix unique et bouton vert
  * « Obtenir Un Devis » pleine largeur.
+ *
+ * VOLET 20 (26/11/2026) — PAGES DE DEVIS DÉDIÉES PAR SERVICE
+ * (demande de l'éditeur : « tous les boutons de demande de devis
+ * redirigent vers la demande de devis de conception de site web.
+ * Or par exemple sur la page de référencement et la page de
+ * publicité Meta Ads… il s'agit d'autres services… il faut qu'on
+ * crée des pages dédiées… très bien adaptées tout en concevant et
+ * respectant le design du site web ») : la page s'adapte au SERVICE —
+ * sur-titre, titre, introduction, bénéfices et questions du
+ * formulaire. Le variant « site » (#/demander-un-devis, défaut)
+ * garde les textes historiques MOT POUR MOT.
  */
-const BENEFITS = [
-  "Attirer les bons visiteurs",
-  "Transformer les visiteurs en clients",
-  "Présenter votre activité avec professionnalisme",
-];
+const BENEFITS: Record<ServiceDevis, string[]> = {
+  site: [
+    "Attirer les bons visiteurs",
+    "Transformer les visiteurs en clients",
+    "Présenter votre activité avec professionnalisme",
+  ],
+  seo: [
+    "Apparaître sur les recherches de vos clients",
+    "Attirer des visiteurs qualifiés, pas seulement du trafic",
+    "Construire une visibilité qui dure, sans publicité",
+  ],
+  metaads: [
+    "Toucher exactement vos clients idéaux",
+    "Des campagnes pensées pour générer des ventes",
+    "Un pilotage clair : budget, résultats, prochaines étapes",
+  ],
+};
 
-export function DevisPage() {
+export function DevisPage({ service = "site" }: { service?: ServiceDevis }) {
   const { t } = useT();
+
+  /* VOLET 20 — contenus par service ; le variant « site » garde les
+   * textes historiques. */
+  const eyebrow =
+    service === "seo"
+      ? "DEMANDE DE DEVIS — RÉFÉRENCEMENT SEO"
+      : service === "metaads"
+        ? "DEMANDE DE DEVIS — PUBLICITÉ META ADS"
+        : "DEMANDE DE DEVIS PERSONNALISÉ";
+  const titre =
+    service === "seo"
+      ? t("Gagnez En Visibilité Sur Google Pour Attirer Plus De Clients")
+      : service === "metaads"
+        ? t("Transformez Facebook Et Instagram En Sources De Clients")
+        : t("Optimisez Votre Site Web Pour Augmenter Vos Ventes");
+  const titreGras =
+    service === "seo"
+      ? t("Attirer Plus De Clients")
+      : service === "metaads"
+        ? t("Sources De Clients")
+        : t("Augmenter Vos Ventes");
+  const intro =
+    service === "seo"
+      ? t(
+          "Je positionne votre site sur Google pour qu'il attire durablement les visiteurs les plus susceptibles de devenir vos clients — sans dépendre de la publicité.",
+        )
+      : service === "metaads"
+        ? t(
+            "Je conçois et pilote vos campagnes publicitaires Facebook et Instagram pour toucher les bonnes personnes, avec un message clair et des objectifs de vente précis.",
+          )
+        : t(
+            "Je prends des sites web obsolètes et les transforme en sites web qui attirent davantage de visiteurs, transforment ces visiteurs en clients et valorisent votre image de marque.",
+          );
+
+  const benefices = BENEFITS[service];
+
   const libelleAppel = t("Réservez un appel de 30 minutes");
   const [avantAppel, apresAppel] = (() => {
     const phrase = t("Vous préférez commencer par une conversation\u00A0? Réservez un appel de 30 minutes — gratuit et sans engagement.");
@@ -66,20 +125,20 @@ export function DevisPage() {
         <div className="container-site">
           <div className="mx-auto max-w-3xl text-center">
             <Reveal direction="up">
-              <p className="text-eyebrow">{t("DEMANDE DE DEVIS PERSONNALISÉ")}</p>
+              <p className="text-eyebrow">{t(eyebrow)}</p>
             </Reveal>
 
             <RevealText
               as="h1"
-              text={t("Optimisez Votre Site Web Pour Augmenter Vos Ventes")}
-              boldText={t("Augmenter Vos Ventes")}
+              text={titre}
+              boldText={titreGras}
               delay={0.06}
               className="text-hero-title on-paper mt-5"
             />
 
             <Reveal direction="up" delay={0.14}>
               <p className="text-body mx-auto mt-6 max-w-2xl on-paper-muted">
-                {t("Je prends des sites web obsolètes et les transforme en sites web qui attirent davantage de visiteurs, transforment ces visiteurs en clients et valorisent votre image de marque.")}
+                {intro}
               </p>
             </Reveal>
 
@@ -88,7 +147,7 @@ export function DevisPage() {
                 un cercle, un par ligne, alignés à gauche, le groupe centré. */}
             <Reveal direction="up" delay={0.18}>
               <ul className="mx-auto mt-8 flex w-fit flex-col items-start gap-3.5">
-                {BENEFITS.map((benefit) => (
+                {benefices.map((benefit) => (
                   <li
                     key={benefit}
                     className="flex items-center gap-3 text-left text-[16px] font-medium text-[#1c1c1c]"
@@ -130,10 +189,10 @@ export function DevisPage() {
       <section aria-label={t("Formulaire de demande de devis")} className="section-light pb-24 pt-4 sm:pb-28">
         <div className="container-site">
           {/* Formulaire de devis — carte blanche façon sheragency
-              (« New Client Application ») */}
+              (« New Client Application »), adapté au service (VOLET 20). */}
           <Reveal direction="up" delay={0.26}>
             <div className="mx-auto max-w-[680px]">
-              <LeadForm kind="quote" />
+              <LeadForm kind="quote" service={service} />
             </div>
           </Reveal>
 

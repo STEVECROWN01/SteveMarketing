@@ -4,6 +4,15 @@ import { db } from "@/lib/db";
 import { leadSchema } from "@/lib/validation";
 import { notifyOwner, sendReceipt, isEmailServiceConfigured } from "@/lib/email";
 import { SITE } from "@/lib/site";
+/* VOLET 20 (26/11/2026) — STOCKAGE GITHUB DES DEMANDES : chaque
+   demande soumise par un visiteur est AUSSI enregistrée dans le
+   dossier privé `demandes/` du dépôt GitHub (demande de l'éditeur
+   : « bien vrai c'est envoyé par mail, mais il faut que ce soit
+   directement transmis dans mon espace admin… et puisque nous
+   n'avons pas de base de données pour toujours conserver cela, il
+   faut que cela soit stocké dans le projet GitHub, dans un
+   dossier dédié aux demandes et aux messages »). Non bloquant. */
+import { stockerDemande, type DemandeStockee } from "@/lib/documents/demandes-stockage";
 
 export const runtime = "nodejs";
 
@@ -66,22 +75,9 @@ export async function POST(req: NextRequest) {
     // Enregistrement en base de données — tolérant aux environnements sans
     // base persistante (ex. serverless sans base configurée) : la notification
     // email au propriétaire fait alors foi d'enregistrement fiable.
-    let lead: {
-      id: string;
-      type: "quote" | "audit" | "contact";
-      name: string;
-      email: string;
-      phone?: string | null;
-      company?: string | null;
-      website?: string | null;
-      activity?: string | null;
-      discovery?: string | null;
-      serviceType?: string | null;
-      budget?: string | null;
-      timeline?: string | null;
-      message: string;
-    };
+    let lead: DemandeStockee;
     let dbPersisted = true;
+    let idDemande = `gh-${crypto.randomUUID().slice(0, 12)}`;
     try {
       // NB : Lead.type est une chaîne libre en base — le résultat est
       // restreint au union vérifié par le schéma ci-dessus.
@@ -101,7 +97,8 @@ export async function POST(req: NextRequest) {
           message: data.message,
           source: "site web",
         },
-      })) as typeof lead;
+      })) as unknown as DemandeStockee;
+      idDemande = lead.id;
     } catch (dbError) {
       dbPersisted = false;
       console.warn(
@@ -109,8 +106,9 @@ export async function POST(req: NextRequest) {
         dbError instanceof Error ? dbError.message : dbError
       );
       lead = {
-        id: `email-${crypto.randomUUID().slice(0, 8)}`,
+        id: idDemande,
         type: data.type,
+        status: "new",
         name: data.name,
         email: data.email,
         phone: data.phone ?? null,
@@ -122,6 +120,9 @@ export async function POST(req: NextRequest) {
         budget: data.budget ?? null,
         timeline: data.timeline ?? null,
         message: data.message,
+        emailSent: false,
+        source: "site web",
+        createdAt: new Date().toISOString(),
       };
     }
 
@@ -144,17 +145,35 @@ export async function POST(req: NextRequest) {
           // la mise à jour du marqueur est non bloquante
         }
       }
+      lead.emailSent = ownerSent;
     } else if (dbPersisted) {
       console.info(
         `[leads] Demande ${lead.id} (${lead.type}) enregistrée — destinataire ${SITE.email} — service email non configuré (RESEND_API_KEY absente)`
       );
     }
 
+    /* VOLET 20 — COPIE GITHUB (après la notification : le marqueur
+     * emailSent est exact) : la demande est stockée dans le dossier
+     * privé `demandes/` du dépôt (visible dans la rubrique Demandes
+     * du back-office, fusionnée avec la base). En cas d'échec DB +
+     * email, cette copie fait foi d'enregistrement fiable. */
+    const githubPersisted = await stockerDemande({
+      ...(lead as DemandeStockee),
+      id: idDemande,
+      type: data.type,
+      status: lead.status || "new",
+      discovery: data.discovery ?? null,
+      emailSent: lead.emailSent ?? notified,
+      source: lead.source ?? "site web",
+      createdAt: lead.createdAt || new Date().toISOString(),
+    });
+
     // Sans base persistante ET sans notification email partie, la demande
     // ne serait fiablement conservée nulle part : refus honnête vers le visiteur.
-    if (!dbPersisted && !notified) {
+    // VOLET 20 — la copie GitHub compte désormais comme conservation fiable.
+    if (!dbPersisted && !notified && !githubPersisted) {
       console.error(
-        "[leads] Rejet : ni base de données ni service email disponibles pour conserver la demande."
+        "[leads] Rejet : ni base de données, ni stockage GitHub, ni service email disponibles pour conserver la demande."
       );
       return NextResponse.json(
         {

@@ -114,6 +114,14 @@ function PageSwitch() {
         return <ContactPage />;
       case "devis":
         return <DevisPage />;
+      /* VOLET 20 — pages de demande de devis DÉDIÉES par service
+          (Référencement SEO, Publicité Meta Ads) : même page, même
+          design — contenus, bénéfices et questions adaptés au
+          service (demande de l'éditeur). */
+      case "devisSeo":
+        return <DevisPage service="seo" />;
+      case "devisMetaAds":
+        return <DevisPage service="metaads" />;
       case "audit":
         return <AuditPage />;
       case "appel":

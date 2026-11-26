@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { leadStatusSchema } from "@/lib/validation";
 import { verifySessionToken, SESSION_COOKIE } from "@/lib/admin-auth";
+/* VOLET 20 — le statut suit AUSSI la copie GitHub de la demande
+   (le back-office liste la fusion base + dossier privé). */
+import { majStatutDemande } from "@/lib/documents/demandes-stockage";
 
 export const runtime = "nodejs";
 
@@ -22,6 +25,11 @@ export async function PATCH(
     return NextResponse.json({ ok: false, error: "Statut invalide." }, { status: 422 });
   }
 
+  /* VOLET 20 — la demande peut vivre SEULEMENT dans le stockage
+   * GitHub (environnements sans base) : le statut y est posé
+   * d'office, silencieusement si elle n'y vit pas. */
+  await majStatutDemande(id, parsed.data.status);
+
   try {
     const lead = await db.lead.update({
       where: { id },
@@ -29,6 +37,8 @@ export async function PATCH(
     });
     return NextResponse.json({ ok: true, lead });
   } catch {
-    return NextResponse.json({ ok: false, error: "Demande introuvable." }, { status: 404 });
+    /* Absente de la base : la mise à jour GitHub suffit (la
+       rubrique Demandes liste la fusion des deux stockages). */
+    return NextResponse.json({ ok: true });
   }
 }

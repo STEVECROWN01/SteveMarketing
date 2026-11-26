@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifySessionToken, SESSION_COOKIE } from "@/lib/admin-auth";
-import { getDocument, deleteDocument, isStorageConfigured } from "@/lib/documents/github";
+import {
+  getDocument,
+  deleteDocument,
+  supprimerFichier,
+  listDocuments,
+  isStorageConfigured,
+} from "@/lib/documents/github";
 
 export const runtime = "nodejs";
 
@@ -38,7 +44,18 @@ export async function GET(
   }
 }
 
-/** Suppression d'un document enregistré. */
+/**
+ * Suppression d'un document enregistré.
+ *
+ * VOLET 20 (26/11/2026) — SUPPRESSION EN CASCADE (demande de
+ * l'éditeur) : « un devis supprimé doit entraîner automatiquement
+ * la suppression de la facture correspondante. Donc lors de la
+ * suppression d'un devis, le modal de confirmation doit avertir et
+ * préciser que la suppression de ce devis va automatiquement
+ * engendrer la suppression de la facture correspondante. » La
+ * facture liée (devisSource = numéro du devis) et le PDF signé
+ * éventuel sont supprimés avec le devis.
+ */
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
@@ -54,8 +71,39 @@ export async function DELETE(
   }
   const { id } = await params;
   try {
+    /* VOLET 20 — avant la suppression : si le document est un DEVIS,
+     * retrouver SA FACTURE liée (devisSource) pour l'entraîner. */
+    let factureLiee: { id: string; numero: string } | null = null;
+    const cible = await getDocument(id);
+    if (cible && cible.docType === "devis") {
+      try {
+        const tous = await listDocuments();
+        const facture = tous.find(
+          (d) => d.docType === "facture" && d.devisSource === cible.numero,
+        );
+        if (facture) factureLiee = { id: facture.id, numero: facture.numero };
+      } catch {
+        /* la recherche de la facture liée est non bloquante */
+      }
+    }
+
+    /* VOLET 20 — le PDF SIGNÉ du devis part avec lui. */
+    if (cible && cible.docType === "devis" && cible.devisSigne) {
+      await supprimerFichier(
+        `devis-signes/${id}.pdf`,
+        `devis signés : suppression ${cible.numero}`,
+      ).catch(() => undefined);
+    }
+
     await deleteDocument(id);
-    return NextResponse.json({ ok: true });
+
+    /* VOLET 20 — cascade : la facture correspondante disparaît avec
+     * son devis. */
+    if (factureLiee) {
+      await deleteDocument(factureLiee.id).catch(() => undefined);
+    }
+
+    return NextResponse.json({ ok: true, ...(factureLiee ? { factureSupprimee: factureLiee.numero } : {}) });
   } catch (e) {
     console.error("[documents] Suppression impossible :", e);
     return NextResponse.json(

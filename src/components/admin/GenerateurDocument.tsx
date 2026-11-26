@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Download, Inbox, Languages, Loader2, Plus, Save, Sparkles, Trash2 } from "lucide-react";
+import { FileCheck2, Inbox, Languages, Loader2, Plus, Save, Sparkles, Trash2 } from "lucide-react";
 import { ApercuDocument } from "./ApercuDocument";
 import { EditeurTexteRiche } from "./EditeurTexteRiche";
-import { BoutonAction, Carte, Champ, Pastille, TitreSection, styleInput } from "./elements";
+import { BoutonAction, Carte, Champ, Pastille, TitreSection, styleInput, styleInputDate } from "./elements";
 import {
   DEVISES,
   MODES_PAIEMENT,
@@ -56,7 +56,12 @@ export type FonctionToast = (t: {
   icon?: React.ReactNode;
 }) => void;
 
-/** Pré-remplissage depuis une DEMANDE reçue (VOLET 16). */
+/** Pré-remplissage depuis une DEMANDE reçue (VOLET 16) ou depuis
+ *  une PROPOSITION COMMERCIALE (VOLET 20).
+ *
+ *  VOLET 20 — `champs` : valeurs COMPLÈTES du formulaire pré-remplies
+ *  depuis une proposition commerciale (items rédigés par l'expert,
+ *  délai, montant, devise…) — voir AdminPage.creerDevisDepuisProposition. */
 export type PreRemplissage = {
   client?: Partial<{
     nom: string;
@@ -67,6 +72,7 @@ export type PreRemplissage = {
     email: string;
   }>;
   origine?: {
+    titre?: string;
     nom: string;
     email?: string;
     telephone?: string | null;
@@ -74,6 +80,11 @@ export type PreRemplissage = {
     date: string;
     message: string;
   };
+  /** VOLET 20 — champs du document pré-remplis (proposition). */
+  champs?: Partial<Omit<Formulaire, "client" | "numeroClient" | "date">>;
+  /** VOLET 20 — numéro CLIENT imposé (depuis une proposition : les
+   *  documents d'un même client restent reliés). */
+  numeroClient?: number;
 };
 
 function nouvelleLigneVide(): LigneDocument {
@@ -99,12 +110,17 @@ function etatInitial(
   }
   const base =
     docType === "proposition" ? propositionParDefaut() : devisParDefaut();
+  const avecClient = preRemplissage?.client
+    ? { client: { ...(base as unknown as Formulaire).client, ...preRemplissage.client } }
+    : {};
+  /* VOLET 20 — champs COMPLETS pré-remplis (génération d'un devis
+   * depuis une proposition commerciale) : items, délai, montant…
+   * Le numéro CLIENT d'une proposition est réutilisé quand fourni. */
   return {
     ...(base as unknown as Formulaire),
-    ...(preRemplissage?.client
-      ? { client: { ...(base as unknown as Formulaire).client, ...preRemplissage.client } }
-      : {}),
-    numeroClient: prochainNumero,
+    ...avecClient,
+    ...(preRemplissage?.champs ?? {}),
+    numeroClient: preRemplissage?.numeroClient ?? prochainNumero,
     date: new Date().toISOString().slice(0, 10),
   };
 }
@@ -133,8 +149,6 @@ export function GenerateurDocument({
   );
   const [generation, setGeneration] = useState(false);
   const [enregistrement, setEnregistrement] = useState(false);
-  /* VOLET 18 — menu « version du PDF » ouvert par « Générer le PDF ». */
-  const [choixLanguePdf, setChoixLanguePdf] = useState(false);
 
   const enEdition = Boolean(initial);
   const libelle = docType === "proposition" ? "Proposition" : "Devis";
@@ -204,12 +218,14 @@ export function GenerateurDocument({
     ...(initial ? { id: initial.id, createdAt: initial.createdAt } : {}),
   });
 
-  /* VOLET 18 — `langueSortie` : version du PDF téléchargé (et de sa
-   * copie email). L'ENREGISTREMENT garde la langue du document
-   * (form.langue, posée par le bouton FR/EN) : la version de sortie
-   * ne l'écrase jamais. Les propositions n'envoient pas ce champ
-   * (français seul). */
-  async function genererPdf(langueSortie: "fr" | "en") {
+  /* VOLET 20 — GÉNÉRATION SANS TÉLÉCHARGEMENT AUTOMATIQUE (demande
+   * de l'éditeur : le document généré est ENREGISTRÉ dans le
+   * stockage privé (et envoyé par copie email) ; le téléchargement
+   * sur l'appareil passe UNIQUEMENT par le bouton dédié de la
+   * liste — avec choix FR/EN pour les devis). La langue du document
+   * reste celle du formulaire (bouton FR/EN) : plus de menu de
+   * version au moment de la génération. */
+  async function genererDocument() {
     if (generation) return;
     if (!form.client.nom.trim()) {
       toast({ title: "Nom du client requis", description: "Renseignez au moins le nom du client.", variant: "destructive" });
@@ -222,7 +238,6 @@ export function GenerateurDocument({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           document: corpsDocument(),
-          ...(docType === "devis" ? { langueSortie } : {}),
           enregistrer: true,
           envoyerEmail: true,
         }),
@@ -231,25 +246,17 @@ export function GenerateurDocument({
         const data = await res.json().catch(() => null);
         throw new Error(data?.error ?? "Génération impossible.");
       }
-      const blob = await res.blob();
-      const nom =
-        res.headers.get("Content-Disposition")?.match(/filename="?([^";]+)"?/)?.[1] ?? `${numero}.pdf`;
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = nom;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      /* Le PDF renvoyé est simplement consommé (copie email) — aucun
+       * téléchargement automatique sur l'appareil. */
+      await res.blob();
       const emailOk = res.headers.get("X-Email-Sent") === "1";
       const stockageOk = res.headers.get("X-Stockage-Ok") === "1";
       toast({
         title: `${libelle} ${numero} ${enEdition ? "mis à jour" : "généré"}`,
         description: [
-          `Version ${langueSortie === "en" ? "anglaise" : "française"} téléchargée.`,
-          stockageOk ? "Enregistré dans le stockage." : "Stockage non effectué (non configuré).",
+          stockageOk ? "Enregistré dans le stockage et disponible dans la liste." : "Stockage non effectué (non configuré).",
           emailOk ? "Copie envoyée par email." : "Copie email non envoyée (Resend non configuré).",
+          "Téléchargez-le depuis la liste (bouton dédié).",
         ].join(" "),
       });
       onEnregistre();
@@ -295,12 +302,6 @@ export function GenerateurDocument({
     }
   }
 
-  /* VOLET 18 — choix de la version dans le menu → génération. */
-  function lancerGeneration(langue: "fr" | "en") {
-    setChoixLanguePdf(false);
-    void genererPdf(langue);
-  }
-
   function chargerExemple() {
     const ex = exempleModele();
     setForm((f) => ({
@@ -322,26 +323,30 @@ export function GenerateurDocument({
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_470px]">
       {/* ---------------- Formulaire (ordre du document) ---------------- */}
       <div className="space-y-6">
-        {/* Demande à l'origine (VOLET 16 — jamais imprimée) */}
+        {/* Demande / proposition à l'origine (VOLET 16 — jamais imprimée).
+            VOLET 20 : titre paramétrable (proposition commerciale à
+            l'origine du devis). */}
         {preRemplissage?.origine ? (
           <Carte className="border-[#e4e4e4]/25 bg-[#1c1c1c] p-5">
             <div className="mb-3 flex items-center gap-2.5">
               <Inbox className="h-4 w-4 text-[#e4e4e4]" aria-hidden="true" />
               <h3 className="font-display text-base font-semibold text-white">
-                Demande à l&apos;origine de ce devis
+                {preRemplissage.origine.titre ?? "Demande à l'origine de ce devis"}
               </h3>
             </div>
             <p className="text-xs text-[#c8c8c8]">
               {preRemplissage.origine.nom}
               {preRemplissage.origine.email ? ` — ${preRemplissage.origine.email}` : ""}
               {preRemplissage.origine.entreprise ? ` — ${preRemplissage.origine.entreprise}` : ""}
-              {` · reçue le ${preRemplissage.origine.date}`}
+              {` · ${preRemplissage.origine.date}`}
             </p>
             <p className="mt-2 max-h-32 overflow-y-auto whitespace-pre-line text-sm leading-relaxed text-[#d9d9d9]">
               {preRemplissage.origine.message}
             </p>
             <p className="mt-3 text-[11px] text-[#c8c8c8]/70">
-              Les coordonnées du demandeur sont déjà reportées ci-dessous dans la fiche client.
+              {preRemplissage.origine.titre
+                ? "Les informations utiles de la proposition sont déjà reportées dans le formulaire ci-dessous."
+                : "Les coordonnées du demandeur sont déjà reportées ci-dessous dans la fiche client."}
             </p>
           </Carte>
         ) : null}
@@ -410,7 +415,9 @@ export function GenerateurDocument({
               />
             </Champ>
             <Champ label="Date d'émission">
-              <input className={styleInput} type="date" value={form.date} onChange={(e) => maj("date", e.target.value)} />
+              {/* VOLET 20 — [color-scheme:dark] : pictogramme calendrier
+                  natif BLANC sur fond sombre. */}
+              <input className={styleInputDate} type="date" value={form.date} onChange={(e) => maj("date", e.target.value)} />
             </Champ>
             <Champ label="Introduction (après « Merci pour votre confiance. »)" className="sm:col-span-2">
               <textarea
@@ -536,15 +543,13 @@ export function GenerateurDocument({
           </div>
         </Carte>
 
-        {/* Actions */}
+        {/* Actions — VOLET 20 : la génération ENREGISTRE le document
+            (stockage + copie email) SANS le télécharger ; le
+            téléchargement vit dans la liste (bouton dédié). */}
         <div className="flex flex-wrap items-center gap-3">
           <BoutonAction
             variant="principal"
-            onClick={() =>
-              /* VOLET 18 — devis : menu « version du PDF » ; proposition :
-                 génération directe en français (comportement inchangé). */
-              docType === "devis" ? setChoixLanguePdf(true) : genererPdf("fr")
-            }
+            onClick={() => void genererDocument()}
             disabled={generation}
           >
             {generation ? (
@@ -554,8 +559,8 @@ export function GenerateurDocument({
               </>
             ) : (
               <>
-                <Download className="h-4 w-4" aria-hidden="true" />
-                Générer le PDF
+                <FileCheck2 className="h-4 w-4" aria-hidden="true" />
+                Générer le document
               </>
             )}
           </BoutonAction>
@@ -572,9 +577,9 @@ export function GenerateurDocument({
           </Pastille>
         </div>
         <p className="text-xs leading-relaxed text-[#c8c8c8]/80">
-          « Générer le PDF » télécharge le document, l&apos;enregistre dans votre
-          back-office et vous en envoie une copie par email — chaque étape est
-          confirmée à l&apos;écran.
+          « Générer le document » l&apos;enregistre dans votre back-office et vous en
+          envoie une copie par email — le téléchargement se fait depuis la liste
+          (bouton dédié, avec choix de la version pour les devis).
         </p>
       </div>
 
@@ -582,45 +587,6 @@ export function GenerateurDocument({
       <div className="xl:sticky xl:top-6 xl:h-[calc(100vh-3rem)]">
         <ApercuDocument document={pourApercu} />
       </div>
-
-      {/* ---------------- VOLET 18 : version du PDF (devis) ---------------- */}
-      {choixLanguePdf ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Version du PDF"
-          onClick={(e) => e.target === e.currentTarget && setChoixLanguePdf(false)}
-        >
-          <div className="w-full max-w-sm rounded-2xl border border-[#e4e4e4]/15 bg-[#232323] p-6">
-            <p className="text-eyebrow">Générer le PDF</p>
-            <h3 className="mt-1 font-display text-xl font-semibold text-white">Version du document</h3>
-            <p className="mt-1 text-sm text-[#c8c8c8]">
-              {libelle} {numero} — la langue enregistrée du document reste le{" "}
-              {(form.langue ?? "fr") === "en" ? "anglais" : "français"}.
-            </p>
-            <div className="mt-5 space-y-3">
-              <BoutonAction
-                className="w-full"
-                variant={(form.langue ?? "fr") === "fr" ? "principal" : "secondaire"}
-                onClick={() => lancerGeneration("fr")}
-              >
-                Version française
-              </BoutonAction>
-              <BoutonAction
-                className="w-full"
-                variant={(form.langue ?? "fr") === "en" ? "principal" : "secondaire"}
-                onClick={() => lancerGeneration("en")}
-              >
-                Version anglaise
-              </BoutonAction>
-            </div>
-            <div className="mt-5 flex justify-end">
-              <BoutonAction onClick={() => setChoixLanguePdf(false)}>Annuler</BoutonAction>
-            </div>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

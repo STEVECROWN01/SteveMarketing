@@ -168,6 +168,18 @@ export function ProcessPage() {
           page (demande de l'éditeur, 16/11/2026) — plus rien n'est
           rangé à gauche. Sur mobile : titre horizontal, trait de
           séparation horizontal fondu, déroulés.
+          VOLET 20 (26/11/2026) — TITRE + TRAIT CALÉS PENDANT LE
+          DÉFILEMENT (demande de l'éditeur : « je veux que au scroll
+          le titre qui est écrit verticalement à gauche avec le trait
+          de séparation vertical se cale à l'écran afin que les étapes
+          listées à droite puissent scroller. Et c'est jusqu'à la fin
+          d'arriver à la fin du scroll que la section toute entière
+          va scroller pour continuer en dessous ») : le groupe
+          titre + trait est STICKY — il reste fixé à l'écran pendant
+          que la liste défile, et la section entière reprend son
+          défilement une fois la dernière étape passée. Le trait suit
+          la HAUTEUR DE L'ÉCRAN (il ne s'étend plus seulement à la
+          hauteur de la liste).
           CIBLE DU BOUTON « Voir Comment Je Travaille » de la
           section ci-dessus : ancre interne #comment-je-travaille
           (scroll-mt-20 compense le header fixe). */}
@@ -181,23 +193,28 @@ export function ProcessPage() {
         <div aria-hidden="true" className="separator-fade absolute inset-x-0 top-0" />
         <div className="container-site">
           <div className="lg:flex lg:items-start lg:justify-center lg:gap-12">
-            {/* Titre vertical (bureau) — du bas vers le haut, GRANDE
-                taille, EN GRAS (demande de l'éditeur, 16/11/2026). */}
-            <div className="hidden shrink-0 items-center py-1 lg:flex">
+            {/* Titre vertical + trait (bureau) — STICKY : calés à
+                l'écran pendant le défilement des étapes (VOLET 20).
+                Titre : du bas vers le haut, GRANDE taille, EN GRAS
+                (demande de l'éditeur, 16/11/2026). Trait : fondu en
+                haut et en bas, étendu sur la hauteur de l'écran. */}
+            <div className="hidden shrink-0 self-start lg:sticky lg:top-32 lg:z-10 lg:flex lg:h-[calc(100svh-13rem)] lg:items-center lg:gap-12">
               <h2
                 id="methode-processus-titre"
                 className="font-display text-[clamp(2.25rem,3vw,3.25rem)] font-bold leading-tight tracking-[0.01em] text-white [writing-mode:vertical-rl] rotate-180"
               >
                 {t("Comment Je Travaille")}
               </h2>
-            </div>
 
-            {/* Trait vertical de séparation — fondu en haut et en bas,
-                exactement à la hauteur de la liste (self-stretch). */}
-            <div
-              aria-hidden="true"
-              className="hidden w-px shrink-0 self-stretch bg-gradient-to-b from-transparent via-[#e4e4e4]/40 to-transparent lg:block"
-            />
+              {/* Trait vertical de séparation — fondu en haut et en
+                  bas, étendu sur la hauteur du groupe sticky (la
+                  hauteur de l'écran, VOLET 20 : il accompagne le
+                  titre pendant tout le défilement des étapes). */}
+              <div
+                aria-hidden="true"
+                className="hidden w-px shrink-0 self-stretch bg-gradient-to-b from-transparent via-[#e4e4e4]/40 to-transparent lg:block"
+              />
+            </div>
 
             {/* Titre horizontal (mobile/tablette) + trait fondu */}
             <div className="lg:hidden">
@@ -344,7 +361,7 @@ export function ProcessPage() {
           </Reveal>
           <Reveal direction="up" delay={0.12}>
             <div className="mt-9 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
-              <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg">
+              <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" arrow="up-right">
                 {CTA_LABELS.appel}
               </CTAButton>
               <CTAButton action={{ kind: "page", page: "devis" }} variant="secondary" size="lg">

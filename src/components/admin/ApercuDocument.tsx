@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Maximize2, Minimize2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2, Search, X, ZoomIn, ZoomOut } from "lucide-react";
 import type { DocumentRecord } from "@/lib/documents/types";
 import { LABELS_DOC } from "@/lib/documents/types";
 import { renderDocumentHtml } from "@/lib/documents/document-html";
@@ -9,7 +9,7 @@ import { estPropositionV2, type PropositionRecord } from "@/lib/documents/propos
 import { renderPropositionHtml } from "@/lib/documents/proposition-html";
 
 /**
- * APERÇU EN DIRECT DES DOCUMENTS (VOLET 14 → 19) — le VRAI HTML du
+ * APERÇU EN DIRECT DES DOCUMENTS (VOLET 14 → 20) — le VRAI HTML du
  * PDF, une page A4 à la fois :
  *
  *  - PLEINE HAUTEUR : l'aperçu est calé (sticky) pendant le
@@ -20,28 +20,43 @@ import { renderPropositionHtml } from "@/lib/documents/proposition-html";
  *    partagent le MÊME moteur — l'iframe pagine le document et
  *    annonce son nombre de pages (postMessage) ; le panneau pilote
  *    la page affichée (« aller-page »).
- *  - PAGE CONSERVÉE (VOLET 17, demande de l'éditeur) : la mise à
- *    jour EN TEMPS RÉEL ne ramène PLUS à la première page — l'aperçu
- *    reste sur la page en cours de visualisation (bornée au
- *    nombre de pages) ; seul un CHANGEMENT de document repart de la page 1.
- *  - VOLET 19 (26/11/2026) — RÉORGANISATION DEMANDÉE PAR L'ÉDITEUR :
- *    + PIED du panneau : gauche « A4 · Mise à jour en temps réel »
- *      (l'ancien libellé de type « A4 · Proposition Commerciale »
- *      disparaît), DROITE : la NAVIGATION DE PAGE (flèches + compteur)
- *      descendue de l'entête ;
- *    + ENTÊTE du panneau : à la place de la navigation, un BOUTON
- *      PLEIN ÉCRAN (icône « deux flèches obliques opposées »,
- *      Maximize2) — un clic ouvre l'aperçu EN GRAND sur tout
- *      l'écran, comme le document ouvert, EN TEMPS RÉEL (même iframe,
- *      même page, mise à jour en continu), sur ordinateur, tablette
- *      et mobile ; Échap ou le bouton inverse (Minimize2) referme.
+ *  - PAGE CONSERVÉE (VOLET 17) : la mise à jour EN TEMPS RÉEL ne
+ *    ramène PLUS à la première page.
+ *  - PLEIN ÉCRAN (VOLET 19) : bouton « deux flèches obliques opposées »
+ *    (Maximize2) — l'aperçu occupe tout l'écran, EN TEMPS RÉEL, sur
+ *    ordinateur, tablette et mobile ; Échap ou Minimize2 referme.
+ *  - VOLET 20 (26/11/2026) — ZOOM DU DOCUMENT (demande de l'éditeur) :
+ *    SUR TOUS LES APERÇUS PLEIN ÉCRAN, à GAUCHE du bouton plein écran,
+ *    un groupe LOUPE « − / % / + » ajuste l'échelle du document par
+ *    PALIERS DE POURCENTAGE : 50 %, 75 %, 100 % (taille normale),
+ *    125 %, 150 %. À 100 % l'aperçu s'ajuste pour tenir dans l'écran ;
+ *    au-delà, la zone défile ; en dessous, le document se réduit,
+ *    toujours centré.
+ *  - VOLET 20 — OUVERTURE DEPUIS LES LISTES : prop `initialPleinEcran`
+ *    + `onFermer` — le bouton « œil » d'une liste affiche DIRECTEMENT
+ *    le PANNEAU d'aperçu en plein écran (plus de modale intermédiaire
+ *    avec le nom du client) ; la croix ou Échap referment l'aperçu.
  */
 
 /** Dimensions d'une page A4 à 96 dpi. */
 const A4_L = 794;
 const A4_H = 1123;
 
-export function ApercuDocument({ document }: { document: DocumentRecord | PropositionRecord }) {
+/** VOLET 20 — paliers de zoom (pourcentages), 100 % = taille normale. */
+const PALIERS_ZOOM = [50, 75, 100, 125, 150];
+
+export function ApercuDocument({
+  document,
+  initialPleinEcran = false,
+  onFermer,
+}: {
+  document: DocumentRecord | PropositionRecord;
+  /** Ouvrir DIRECTEMENT en plein écran (bouton « œil » des listes). */
+  initialPleinEcran?: boolean;
+  /** Présent = aperçu plein écran AUTONOME (croix + Échap referment
+   *  TOUT l'aperçu) — utilisé par les listes de documents. */
+  onFermer?: () => void;
+}) {
   const conteneurRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const pageRef = useRef(1);
@@ -50,8 +65,14 @@ export function ApercuDocument({ document }: { document: DocumentRecord | Propos
   const [echelle, setEchelle] = useState(0.5);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  /* VOLET 19 — plein écran : l'aperçu occupe tout le viewport. */
-  const [pleinEcran, setPleinEcran] = useState(false);
+  /* VOLET 19 — plein écran : l'aperçu occupe tout le viewport.
+   * VOLET 20 — `initialPleinEcran` : ouvert d'emblée en plein écran
+   * (bouton « œIL » des listes : le panneau s'affiche directement,
+   * sans modale). */
+  const [pleinEcran, setPleinEcran] = useState(initialPleinEcran);
+  /* VOLET 20 — zoom du document (plein écran) : indice dans PALIERS_ZOOM. */
+  const [zoomIndex, setZoomIndex] = useState(() => PALIERS_ZOOM.indexOf(100));
+  const zoom = PALIERS_ZOOM[zoomIndex] ?? 100;
 
   const estProp = estPropositionV2(document);
   const libelle = estProp
@@ -71,7 +92,7 @@ export function ApercuDocument({ document }: { document: DocumentRecord | Propos
     return () => clearTimeout(t);
   }, [brut]);
 
-  /* ---------- Changement de DOCUMENT → retour page 1 ---------- */
+  /* ---------- Changement de DOCUMENT → retour page 1 et zoom 100 % ---------- */
   const identite = `${libelle}-${numero}`;
   const identiteRef = useRef(identite);
   useEffect(() => {
@@ -79,6 +100,8 @@ export function ApercuDocument({ document }: { document: DocumentRecord | Propos
       identiteRef.current = identite;
       pageRef.current = 1;
       setPage(1);
+      /* VOLET 20 — le zoom revient à 100 % quand on change de document. */
+      setZoomIndex(PALIERS_ZOOM.indexOf(100));
     }
   }, [identite]);
 
@@ -130,7 +153,10 @@ export function ApercuDocument({ document }: { document: DocumentRecord | Propos
     return () => ro.disconnect();
   }, [pleinEcran]);
 
-  /* ---------- VOLET 19 — plein écran : Échap + défilement verrouillé ----------
+  /* ---------- Plein écran : Échap + défilement verrouillé ----------
+     VOLET 20 — en mode AUTONOME (onFermer fourni, ouvert par le
+     bouton « œIL » d'une liste), Échap referme TOUT l'aperçu ;
+     sinon Échap quitte simplement le plein écran (retour au panneau).
      (NB : `window.document` — la PROP `document` du composant
      masque le global dans cette portée.) */
   useEffect(() => {
@@ -138,7 +164,8 @@ export function ApercuDocument({ document }: { document: DocumentRecord | Propos
     const surTouche = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
-        setPleinEcran(false);
+        if (onFermer) onFermer();
+        else setPleinEcran(false);
       }
     };
     window.addEventListener("keydown", surTouche);
@@ -150,16 +177,35 @@ export function ApercuDocument({ document }: { document: DocumentRecord | Propos
       window.document.body.style.overflow = precedent;
       boutonPleinEcranRef.current?.focus();
     };
-  }, [pleinEcran]);
+  }, [pleinEcran, onFermer]);
+
+  /* ---------- VOLET 20 — échelle effective : ajustée × zoom ---------- */
+  const echelleEffective = echelle * (zoom / 100);
+  /* Au-delà de 100 %, le document dépasse la zone : la zone DÉFILE
+   * (plus de centrage absolu) ; à 100 % ou moins, il reste centré. */
+  const depasse = echelleEffective > echelle + 0.0001;
 
   const feuille: React.CSSProperties = {
     width: `${A4_L}px`,
     height: `${A4_H}px`,
-    transform: `scale(${echelle})`,
+    transform: `scale(${echelleEffective})`,
     transformOrigin: "top left",
     position: "absolute",
-    left: `max(12px, calc(50% - ${(A4_L * echelle) / 2}px))`,
-    top: `max(12px, calc(50% - ${(A4_H * echelle) / 2}px))`,
+    left: `max(12px, calc(50% - ${(A4_L * echelleEffective) / 2}px))`,
+    top: `max(12px, calc(50% - ${(A4_H * echelleEffective) / 2}px))`,
+    flexShrink: 0,
+  };
+  /* Variante « document agrandi » : ancré en haut à gauche dans une
+   * boîte à la taille du document agrandi — la zone d'aperçu défile
+   * naturellement dans les deux directions. */
+  const feuilleAgrandie: React.CSSProperties = {
+    width: `${A4_L}px`,
+    height: `${A4_H}px`,
+    transform: `scale(${echelleEffective})`,
+    transformOrigin: "top left",
+    position: "absolute",
+    left: "16px",
+    top: "16px",
     flexShrink: 0,
   };
   const iframe: React.CSSProperties = {
@@ -175,8 +221,8 @@ export function ApercuDocument({ document }: { document: DocumentRecord | Propos
   const total = Math.max(totalPages, 1);
   const pageAffichee = Math.min(page, total);
 
-  /* Navigation de page — VOLET 19 : elle vit désormais dans le PIED
-   * du panneau (demande de l'éditeur), en haut comme en plein écran. */
+  /* Navigation de page — vit dans le PIED du panneau, en haut comme
+   * en plein écran. */
   const navigation = (
     <div className="flex shrink-0 items-center gap-1.5">
       <button
@@ -222,28 +268,83 @@ export function ApercuDocument({ document }: { document: DocumentRecord | Propos
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          {/* VOLET 19 — BOUTON PLEIN ÉCRAN (à la place de la
-              navigation de pages, descendue au pied) : icône « deux
-              flèches obliques opposées » (Maximize2), le pictogramme
-              d'agrandissement des plateformes. Un clic ouvre l'aperçu
-              sur TOUT l'écran, en temps réel ; l'icône inverse
-              (Minimize2) le referme. */}
+          {/* VOLET 20 — ZOOM DU DOCUMENT (plein écran uniquement, à
+              GAUCHE du bouton plein écran — demande de l'éditeur) :
+              groupe LOUPE « − / % / + », paliers 50 / 75 / 100 / 125 /
+              150 %. 100 % = taille d'aperçu normale (ajustée à
+              l'écran) ; en dessous le document se réduit ; au-dessus
+              il s'agrandit et la zone défile. */}
           {pleinEcran ? (
-            <button
-              ref={boutonQuitterRef}
-              type="button"
-              onClick={() => setPleinEcran(false)}
-              aria-label="Quitter le plein écran"
-              title="Quitter le plein écran (Échap)"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e4e4e4]/25 bg-[#232323] text-white transition-colors hover:border-[#e4e4e4] hover:bg-[#e4e4e4] hover:text-[#1c1c1c] focus-visible:outline-2 focus-visible:outline-offset-4"
+            <div
+              className="flex items-center gap-1 rounded-full border border-[#e4e4e4]/25 bg-[#232323] px-2 py-1"
+              role="group"
+              aria-label="Zoom de l'aperçu"
             >
-              <Minimize2 className="h-4.5 w-4.5" aria-hidden="true" />
-            </button>
+              <Search className="ml-1 h-3.5 w-3.5 text-[#c8c8c8]" aria-hidden="true" />
+              <button
+                type="button"
+                onClick={() => setZoomIndex((i) => Math.max(0, i - 1))}
+                disabled={zoomIndex <= 0}
+                aria-label="Dézoomer le document"
+                title="Dézoomer"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-white transition-colors hover:bg-[#e4e4e4]/15 disabled:opacity-30 disabled:hover:bg-transparent"
+              >
+                <ZoomOut className="h-4 w-4" aria-hidden="true" />
+              </button>
+              <span className="min-w-[46px] text-center font-mono text-[11px] tracking-wider text-white" aria-live="polite">
+                {zoom}&nbsp;%
+              </span>
+              <button
+                type="button"
+                onClick={() => setZoomIndex((i) => Math.min(PALIERS_ZOOM.length - 1, i + 1))}
+                disabled={zoomIndex >= PALIERS_ZOOM.length - 1}
+                aria-label="Zoomer le document"
+                title="Zoomer"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-white transition-colors hover:bg-[#e4e4e4]/15 disabled:opacity-30 disabled:hover:bg-transparent"
+              >
+                <ZoomIn className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </div>
+          ) : null}
+
+          {/* Bouton plein écran — en mode AUTONOME (ouvert depuis une
+              liste), une CROIX referme l'aperçu ; sinon Minimize2
+              ramène au panneau intégré au formulaire. */}
+          {pleinEcran ? (
+            onFermer ? (
+              <button
+                ref={boutonQuitterRef}
+                type="button"
+                onClick={onFermer}
+                aria-label="Fermer l'aperçu"
+                title="Fermer l'aperçu (Échap)"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e4e4e4]/25 bg-[#232323] text-white transition-colors hover:border-[#e4e4e4] hover:bg-[#e4e4e4] hover:text-[#1c1c1c] focus-visible:outline-2 focus-visible:outline-offset-4"
+              >
+                <X className="h-4.5 w-4.5" aria-hidden="true" />
+              </button>
+            ) : (
+              <button
+                ref={boutonQuitterRef}
+                type="button"
+                onClick={() => {
+                  setPleinEcran(false);
+                  setZoomIndex(PALIERS_ZOOM.indexOf(100));
+                }}
+                aria-label="Quitter le plein écran"
+                title="Quitter le plein écran (Échap)"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e4e4e4]/25 bg-[#232323] text-white transition-colors hover:border-[#e4e4e4] hover:bg-[#e4e4e4] hover:text-[#1c1c1c] focus-visible:outline-2 focus-visible:outline-offset-4"
+              >
+                <Minimize2 className="h-4.5 w-4.5" aria-hidden="true" />
+              </button>
+            )
           ) : (
             <button
               ref={boutonPleinEcranRef}
               type="button"
-              onClick={() => setPleinEcran(true)}
+              onClick={() => {
+                setPleinEcran(true);
+                setZoomIndex(PALIERS_ZOOM.indexOf(100));
+              }}
               aria-label="Ouvrir l'aperçu en plein écran"
               title="Ouvrir l'aperçu en plein écran"
               className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e4e4e4]/25 bg-[#232323] text-white transition-colors hover:border-[#e4e4e4] hover:bg-[#e4e4e4] hover:text-[#1c1c1c] focus-visible:outline-2 focus-visible:outline-offset-4"
@@ -255,24 +356,46 @@ export function ApercuDocument({ document }: { document: DocumentRecord | Propos
       </div>
 
       {/* Zone d'aperçu : la page remplit la hauteur disponible
-          (plein écran : tout l'écran, même iframe, temps réel). */}
-      <div ref={conteneurRef} className="relative flex-1 overflow-hidden bg-[#141414]">
-        <div style={feuille}>
-          <iframe
-            ref={iframeRef}
-            title={`Aperçu du document — ${libelle}`}
-            srcDoc={contenu}
-            scrolling="no"
-            style={iframe}
-          />
-        </div>
+          (plein écran : tout l'écran, même iframe, temps réel).
+          VOLET 20 — au-delà de 100 % de zoom, la zone DÉFILE
+          (document agrandi ancré en haut à gauche). */}
+      <div
+        ref={conteneurRef}
+        className={`relative flex-1 bg-[#141414] ${depasse ? "overflow-auto" : "overflow-hidden"}`}
+      >
+        {depasse ? (
+          <div
+            style={{
+              width: `${Math.round(A4_L * echelleEffective) + 32}px`,
+              height: `${Math.round(A4_H * echelleEffective) + 32}px`,
+              position: "relative",
+            }}
+          >
+            <div style={feuilleAgrandie}>
+              <iframe
+                ref={iframeRef}
+                title={`Aperçu du document — ${libelle}`}
+                srcDoc={contenu}
+                scrolling="no"
+                style={iframe}
+              />
+            </div>
+          </div>
+        ) : (
+          <div style={feuille}>
+            <iframe
+              ref={iframeRef}
+              title={`Aperçu du document — ${libelle}`}
+              srcDoc={contenu}
+              scrolling="no"
+              style={iframe}
+            />
+          </div>
+        )}
       </div>
 
-      {/* VOLET 19 — PIED du panneau : « A4 · Mise à jour en temps
-          réel » à gauche, NAVIGATION DE PAGE à droite (demande de
-          l'éditeur : l'ancien texte « Mise à jour en temps réel —
-          page conservée » cède la place à la navigation descendue de
-          l'entête). */}
+      {/* PIED du panneau : « A4 · Mise à jour en temps réel » à
+          gauche, NAVIGATION DE PAGE à droite. */}
       <div className="flex items-center justify-between gap-3 border-t border-[#e4e4e4]/10 bg-[#1c1c1c] px-4 py-2 text-[10px] text-[#c8c8c8]">
         <span className="font-mono tracking-wider uppercase">A4 · Mise à jour en temps réel</span>
         {navigation}

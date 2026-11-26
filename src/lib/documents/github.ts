@@ -156,26 +156,102 @@ export async function getDocument(id: string): Promise<ToutDocument | null> {
 /** Supprime un document enregistré. */
 export async function deleteDocument(id: string): Promise<void> {
   if (!isStorageConfigured()) throw new Error(messageStockageNonConfigure());
-  const { repo, branch } = getConfig();
   const nomFichier = id.endsWith(".json") ? id : `${id}.json`;
-  const chemin = `/repos/${repo}/contents/${DOSSIER}/${nomFichier}`;
+  await supprimerFichier(`${DOSSIER}/${nomFichier}`, `documents : suppression ${nomFichier}`);
+}
 
-  const existant = await gh(`${chemin}?ref=${encodeURIComponent(branch)}`);
-  if (existant.status === 404) return;
-  if (!existant.ok) throw new Error(`GitHub (lecture pour suppression) : ${existant.status}`);
-  const sha = ((await existant.json()) as { sha?: string }).sha;
+/* ------------------------------------------------------------------
+ * VOLET 20 (26/11/2026) — FICHIERS AVANCÉS DANS LE DÉPÔT PRIVÉ.
+ *
+ * Utilisé par le PORTFOLIO (projets), les DEVIS SIGNÉS (PDF
+ * téléversés) et les DEMANDES du site (formulaires publics) : un
+ * même jeu de primitives dossiers/fichiers sur l'API Contents.
+ * `chemin` / `dossier` sont les chemins DANS LE DÉPÔT (ex.
+ * « demandes/gh-xxx.json », « devis-signes/devis-d2600001.pdf ») —
+ * l'URL complète /repos/<repo>/contents/<chemin> est construite
+ * ici.
+ * ------------------------------------------------------------------ */
 
-  const res = await gh(chemin, {
-    method: "DELETE",
+/** Enregistre (crée ou met à jour) un fichier du dépôt privé.
+ *  `contenuBase64` SANS préfixe data:. */
+export async function enregistrerFichier(
+  chemin: string,
+  contenuBase64: string,
+  message: string,
+): Promise<void> {
+  if (!isStorageConfigured()) throw new Error(messageStockageNonConfigure());
+  const { repo, branch } = getConfig();
+  const url = `/repos/${repo}/contents/${chemin}`;
+
+  const existant = await gh(`${url}?ref=${encodeURIComponent(branch)}`);
+  const sha = existant.ok ? ((await existant.json()) as { sha?: string }).sha : undefined;
+
+  const res = await gh(url, {
+    method: "PUT",
     body: JSON.stringify({
-      message: `documents : suppression ${nomFichier}`,
+      message,
+      content: contenuBase64,
       branch,
       ...(sha ? { sha } : {}),
     }),
   });
   if (!res.ok) {
-    throw new Error(`GitHub (suppression) : ${res.status} ${res.statusText}`);
+    const texte = await res.text().catch(() => "");
+    throw new Error(`GitHub (enregistrement fichier) : ${res.status} ${texte.slice(0, 200)}`);
   }
+}
+
+/** Lit un fichier du dépôt privé (binaire ou texte). */
+export async function lireFichier(chemin: string): Promise<Buffer | null> {
+  if (!isStorageConfigured()) throw new Error(messageStockageNonConfigure());
+  const { repo, branch } = getConfig();
+  const res = await gh(
+    `/repos/${repo}/contents/${chemin}?ref=${encodeURIComponent(branch)}`,
+  );
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`GitHub (lecture fichier) : ${res.status} ${res.statusText}`);
+  const data = (await res.json()) as { content?: string; encoding?: string };
+  if (!data.content) return null;
+  return Buffer.from(data.content, data.encoding === "base64" ? "base64" : "utf8");
+}
+
+/** Supprime un fichier du dépôt privé (silencieux si absent). */
+export async function supprimerFichier(chemin: string, message: string): Promise<void> {
+  if (!isStorageConfigured()) throw new Error(messageStockageNonConfigure());
+  const { repo, branch } = getConfig();
+  const url = `/repos/${repo}/contents/${chemin}`;
+
+  const existant = await gh(`${url}?ref=${encodeURIComponent(branch)}`);
+  if (existant.status === 404) return;
+  if (!existant.ok) throw new Error(`GitHub (lecture pour suppression) : ${existant.status}`);
+  const sha = ((await existant.json()) as { sha?: string }).sha;
+
+  const res = await gh(url, {
+    method: "DELETE",
+    body: JSON.stringify({
+      message,
+      branch,
+      ...(sha ? { sha } : {}),
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(`GitHub (suppression fichier) : ${res.status} ${res.statusText}`);
+  }
+}
+
+/** Liste les entrées d'un dossier du dépôt privé (nom + type, tels
+ *  que renvoyés par l'API Contents). */
+export async function listerDossier(
+  dossier: string,
+): Promise<{ name: string; type: string }[]> {
+  if (!isStorageConfigured()) throw new Error(messageStockageNonConfigure());
+  const { repo, branch } = getConfig();
+  const res = await gh(
+    `/repos/${repo}/contents/${dossier}?ref=${encodeURIComponent(branch)}&t=${Date.now()}`,
+  );
+  if (res.status === 404) return [];
+  if (!res.ok) throw new Error(`GitHub (liste dossier) : ${res.status} ${res.statusText}`);
+  return (await res.json()) as { name: string; type: string }[];
 }
 
 /** Complète un document partiel en enregistrement complet

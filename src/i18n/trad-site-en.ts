@@ -269,6 +269,14 @@ export const TRAD_SITE: Record<string, string> = {
   "Demander Un Devis": "Request A Quote",
   "Demander Un Devis — Stevens Akpovi": "Request A Quote — Stevens Akpovi",
   "Décrivez votre activité et votre projet : Stevens Akpovi vous répond avec un devis personnalisé, établi à partir de votre besoin.": "Describe your business and your project: Stevens Akpovi will get back to you with a custom quote, prepared based on your needs.",
+  /* VOLET 20 (26/11/2026) — pages de devis DÉDIÉES par service
+     (Référencement SEO, Publicité Meta Ads). */
+  "Devis Référencement SEO": "SEO Quote",
+  "Devis Publicité Meta Ads": "Meta Ads Advertising Quote",
+  "Devis Référencement SEO — Stevens Akpovi": "SEO Quote — Stevens Akpovi",
+  "Devis Publicité Meta Ads — Stevens Akpovi": "Meta Ads Advertising Quote — Stevens Akpovi",
+  "Demandez votre devis de référencement SEO : positionnez votre site sur Google et attirez durablement des visiteurs qualifiés.": "Request your SEO quote: get your website ranking on Google and durably attract qualified visitors.",
+  "Demandez votre devis de publicité Meta Ads : des campagnes Facebook et Instagram ciblées, pensées pour générer des ventes.": "Request your Meta Ads advertising quote: targeted Facebook and Instagram campaigns designed to generate sales.",
   "Audit Gratuit": "Free Audit",
   "Audit Gratuit De Votre Site — Stevens Akpovi": "Free Website Audit — Stevens Akpovi",
   "Votre site vous rapporte-t-il assez de clients ? Recevez un audit concret : ce qui fonctionne, ce qui freine vos visiteurs, les priorités — gratuitement.": "Is your website bringing you enough clients? Get a concrete audit: what works, what's holding your visitors back, and the priorities — for free.",

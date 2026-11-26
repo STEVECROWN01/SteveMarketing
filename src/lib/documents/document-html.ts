@@ -44,7 +44,7 @@
  */
 
 import { getPaymentMethodLogo } from "./payment-logos";
-import { montantEnLettres, formatDate, formatDateCourte, formatCurrency } from "./format";
+import { formatDate, formatDateCourte, formatCurrency } from "./format";
 import { descriptionOuPoints, decouperHtmlRiche } from "./texte-riche";
 import { fabriquerScriptPagination } from "./pagination-flux";
 import { LABELS_DOC, type DocumentRecord } from "./types";
@@ -331,14 +331,33 @@ export function renderDocumentHtml(
   ];
 
   /* VOLET 18 — remerciement de facture traduit (l'intro est rédigée
-   * par l'éditeur : elle reste telle quelle). */
+   * par l'éditeur : elle reste telle quelle).
+   * VOLET 20 (26/11/2026) — FACTURE : le bloc d'introduction
+   * (« Merci pour votre confiance. » + intro + « Nous remercions
+   * notre client pour sa confiance. ») est SUPPRIMÉ de la facture
+   * (demande de l'éditeur) — il reste sur les devis. */
   const remerciement = estFacture
-    ? `${esc(d.intro)} ${L.remerciementFacture}`
-    : esc(d.intro);
+    ? ""
+    : `${esc(d.intro)}`;
+  const blocRemerciement = estFacture
+    ? ""
+    : `
+  <div class="thank-you" data-bloc>
+    <div class="thank-you-prefix">${L.merci}</div>
+    <div class="thank-you-body">${remerciement}</div>
+  </div>`;
 
-  /* Cachet « PAYÉ » — reproduction du style MrSteveEnglish (voir
-     l'historique) ; factures réglées uniquement. VOLET 18 : libellé
-     et préfixe de date traduits. */
+  /* CACHET — VOLET 20 (26/11/2026), reproduction EXACTE du cachet du
+     reçu d'exemple (mesuré sur le PDF : 213 × 85 px à 827 px de page
+     → 153 × 61 pt, double filet — extérieur 3,2 pt, écart 2,2 pt,
+     intérieur 1,8 pt — angles vifs, rotation −17° antihoraire, vert
+     #008000 PLEIN, « PAYÉ » gras serif ~37 pt + « le JJ/MM/AAAA »
+     10 pt sans-serif centré dessous) : factures PAYÉES → cachet vert
+     « PAYÉ » AVEC la date de règlement ; factures EN ATTENTE → le
+     MÊME cachet en GRIS avec « EN ATTENTE » SANS date. Le cachet est
+     posé SUR les deux lignes à pointillés (Total + TVA), centré
+     verticalement et horizontalement sur l'ensemble des deux
+     lignes (demande de l'éditeur). */
   const estPaye = d.statutPaiement === "Payé";
   /* VOLET 18 — statut AFFICHÉ : la valeur enregistrée reste
    * française ("Payé"/"En attente", donnée du document) ; la
@@ -348,15 +367,13 @@ export function renderDocumentHtml(
     : langue === "en"
       ? L.enAttente
       : d.statutPaiement ?? "En attente";
-  const cachetPaye = estFacture
-    ? estPaye
-      ? `
-      <div class="cachet-bande">
-        <div class="cachet-paye" role="img" aria-label="Cachet payé">
-          <span class="cp-texte"><span class="cp-paye">${L.paye}</span><span class="cp-date">${L.le} ${datePaiementLabel}</span></span>
+  const cachet = estFacture
+    ? `
+      <div class="cachet-overlay${estPaye ? "" : " cachet-overlay--attente"}" role="img" aria-label="Cachet ${estPaye ? L.paye : L.enAttente}">
+        <div class="cachet-paye">
+          <span class="cp-texte"><span class="cp-paye">${estPaye ? L.paye : L.enAttente.toUpperCase()}</span>${estPaye ? `<span class="cp-date">${L.le} ${datePaiementLabel}</span>` : ""}</span>
         </div>
       </div>`
-      : ""
     : "";
 
   /* Bloc Paiement (factures) — VOLET 18 : libellés traduits, mode
@@ -440,14 +457,16 @@ export function renderDocumentHtml(
     })
     .join("");
 
-  /* Total SOUS le tableau — VOLET 19 (26/11/2026), demande de
-   * l'éditeur : « Total » EN GRAS ET GROS à gauche, pointillés
-   * jusqu'au PRIX totalement à droite ; LIGNE SUIVANTE : « TVA »
-   * aussi en gras et gros, pointillés jusqu'à « Non applicable » à
-   * droite. Le montant en lettres (VOLET 17) reste en note discrète
-   * sous les deux lignes. Libellés traduits (langue du document). */
+  /* Total SOUS le tableau — VOLET 19 : « Total » et « TVA » EN GRAS
+   * ET GROS à gauche, pointillés jusqu'au prix à droite. VOLET 20
+   * (26/11/2026) : le montant en LETTRES (parenthèses) est
+   * SUPPRIMÉ des devis comme des factures (demande de l'éditeur) ;
+   * sur les FACTURES l'espace entre le tableau et le total est
+   * AUGMENTÉ (10 mm) et le CACHET (PAYÉ / EN ATTENTE) se pose SUR
+   * les deux lignes à pointillés, centré verticalement et
+   * horizontalement. */
   const blocTotal = `
-  <div class="total-sous-tableau" data-bloc>
+  <div class="total-sous-tableau${estFacture ? " total-sous-tableau--facture" : ""}" data-bloc>
     <div class="total-ligne">
       <span class="total-libelle">${L.totalCourt}</span>
       <span class="total-pointilles" aria-hidden="true"></span>
@@ -458,7 +477,7 @@ export function renderDocumentHtml(
       <span class="total-pointilles" aria-hidden="true"></span>
       <span class="total-valeur">${L.tvaNonApplicable}</span>
     </div>
-    <p class="total-lettres">(${esc(montantEnLettres(total, d.devise, langue))})</p>
+    ${cachet}
   </div>`;
 
   /* Conditions + Bon pour accord (devis et propositions) — le délai
@@ -486,8 +505,18 @@ export function renderDocumentHtml(
     </div>`
     : "";
 
-  /* Validité + notes — VOLET 18 : libellés traduits. */
-  const blocValiditeNotes = `
+  /* Validité + notes — VOLET 18 : libellés traduits.
+   * VOLET 20 — FACTURE : la ligne « Validité du document : … » est
+   * SUPPRIMÉE (demande de l'éditeur) ; seules les NOTES éventuelles
+   * restent imprimées. */
+  const blocValiditeNotes = estFacture
+    ? d.notes
+      ? `
+  <div class="validite-notes" data-bloc>
+    <p><span class="vn-lbl">${L.notes}</span> ${esc(d.notes)}</p>
+  </div>`
+      : ""
+    : `
   <div class="validite-notes" data-bloc>
     <p><span class="vn-lbl">${L.validite}</span> ${Number(d.validiteJours) || 5} ${L.jours}</p>
     ${d.notes ? `<p><span class="vn-lbl">${L.notes}</span> ${esc(d.notes)}</p>` : ""}
@@ -496,8 +525,12 @@ export function renderDocumentHtml(
   /* Coordonnées bancaires — VOLET 17 : IBAN, BIC puis TITULAIRE (la
    * ligne « Banque » est supprimée). VOLET 18 : libellés traduits,
    * valeurs système (mode de paiement, condition de règlement par
-   * défaut) affichées dans la langue. */
-  const blocBanque = `
+   * défaut) affichées dans la langue.
+   * VOLET 20 (26/11/2026) — FACTURE : le bloc « Coordonnées
+   * bancaires » (et le lien de paiement éventuel) est SUPPRIMÉ de
+   * la facture (demande de l'éditeur) — il reste sur les devis. */
+  const blocBanque = !estFacture
+    ? `
   <div class="section-heading" data-bloc data-heading>${L.coordonneesBancaires}</div>
   <div class="bank-block" data-bloc>
     <div class="bank-row"><span class="lbl">${L.iban}</span> <span class="val">${esc(d.banque.iban)}</span></div>
@@ -515,16 +548,13 @@ export function renderDocumentHtml(
     </div>
   </div>`
       : ""
-  }`;
-
-  /* FACTURE : signature manuscrite conservée. */
-  const blocSignatureFacture = estFacture
-    ? `
-    <div class="signature-steve signature-steve--facture" data-bloc>
-      <div class="sig-cursive">Stevens Akpovi</div>
-      <div class="sig-caption">Stevens AKPOVI — ${esc(emetteurSubText)} · ${esc(EMETTEUR.email)}</div>
-    </div>`
+  }`
     : "";
+
+  /* VOLET 20 (26/11/2026) — FACTURE : la signature manuscrite
+   * « Stevens Akpovi / Stevens AKPOVI — Concepteur de sites web
+   * professionnels · stevensakpovi@gmail.com » est SUPPRIMÉE de la
+   * facture (demande de l'éditeur). */
 
   const html = `<!DOCTYPE html>
 <html lang="${langue}">
@@ -781,8 +811,13 @@ export function renderDocumentHtml(
   /* ---- Total SOUS le tableau — VOLET 19 : lignes à POINTILLÉS.
      « Total » et « TVA » en GRAS ET GROS à gauche, la valeur
      totalement à droite, pointillés entre les deux (demande de
-     l'éditeur). Le montant en lettres reste en note italique. ---- */
-  .total-sous-tableau { margin-top: 5mm; }
+     l'éditeur). VOLET 20 : le montant en lettres disparaît ; sur
+     les FACTURES l'espace tableau → total est AUGMENTÉ (10 mm) et
+     le CACHET se pose sur les deux lignes à pointillés. ---- */
+  .total-sous-tableau { margin-top: 5mm; position: relative; }
+  .total-sous-tableau--facture { margin-top: 10mm; }
+  .total-sous-tableau .total-ligne,
+  .total-sous-tableau .total-ligne + .total-ligne { position: relative; z-index: 2; }
   .total-ligne { display: flex; align-items: baseline; margin: 0; }
   .total-ligne + .total-ligne { margin-top: 2.5mm; }
   .total-libelle {
@@ -808,13 +843,82 @@ export function renderDocumentHtml(
     border-bottom: 1.1mm dotted #000000;
     margin: 0 8px 2.5px;
   }
-  .total-lettres {
-    margin: 2mm 0 0 0;
-    font-size: 10pt;
-    color: #374151;
-    font-style: italic;
-    line-height: 1.5;
+
+  /* ---- CACHET (VOLET 20, 26/11/2026) — reproduction EXACTE du
+     reçu d'exemple : rectangle 153 × 61 pt (2,5 : 1) à angles vifs,
+     DOUBLE filet (extérieur 3,2 pt, écart 2,2 pt, intérieur
+     1,8 pt), rotation −17° (oblique ASCENDANT), encre PLEINE —
+     VERT #008000 pour « PAYÉ » (avec « le JJ/MM/AAAA » dessous,
+     gras serif ~36 pt + sans-serif 10 pt), GRIS #6b7280 pour
+     « EN ATTENTE » (sans date). Le cachet est posé SUR les deux
+     lignes à pointillés du bloc Total : centré VERTICALEMENT et
+     HORIZONTALEMENT sur l'ensemble des deux lignes. ---- */
+  .cachet-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
   }
+  .cachet-paye {
+    position: relative;
+    width: 153pt;
+    height: 61pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(-17deg);
+  }
+  .cachet-overlay--attente .cachet-paye { width: 172pt; }
+  .cachet-paye::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 3.2pt solid #008000;
+    border-radius: 2pt;
+  }
+  .cachet-paye::after {
+    content: "";
+    position: absolute;
+    inset: 5.4pt;
+    border: 1.8pt solid #008000;
+    border-radius: 1pt;
+  }
+  .cachet-paye .cp-texte {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: -3pt;
+  }
+  .cachet-paye .cp-paye {
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: 700;
+    font-size: 36pt;
+    line-height: 0.95;
+    color: #008000;
+    letter-spacing: 0;
+  }
+  .cachet-overlay--attente .cachet-paye .cp-paye {
+    font-size: 23pt;
+    letter-spacing: 2pt;
+  }
+  .cachet-paye .cp-date {
+    margin-top: 2.5pt;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 10pt;
+    color: #008000;
+  }
+  /* Cachet EN ATTENTE : la même matrice, encre GRISE. */
+  .cachet-overlay--attente .cachet-paye::before,
+  .cachet-overlay--attente .cachet-paye::after { border-color: #6b7280; }
+  .cachet-overlay--attente .cachet-paye .cp-paye,
+  .cachet-overlay--attente .cachet-paye .cp-date { color: #6b7280; }
 
   /* ---- Conditions / Bon pour accord ---- */
   .conditions-block {
@@ -904,62 +1008,8 @@ export function renderDocumentHtml(
   .ipb-value { color: #000000; font-weight: 600; }
   .ipb-value.paid { color: #2E7D32; font-weight: 700; }
 
-  /* ---- CACHET « PAYÉ » ---- */
-  .cachet-bande {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 3mm;
-    min-height: 0;
-  }
-  .cachet-paye {
-    position: relative;
-    width: 150pt;
-    height: 58pt;
-    transform: rotate(-17deg);
-    opacity: 0.92;
-  }
-  .cachet-paye::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border: 2.4pt solid #008000;
-    border-radius: 2pt;
-  }
-  .cachet-paye::after {
-    content: "";
-    position: absolute;
-    inset: 4.5pt;
-    border: 0.9pt solid #008000;
-    border-radius: 1pt;
-  }
-  .cachet-paye .cp-texte {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  .cachet-paye .cp-paye {
-    font-family: 'Times New Roman', Times, serif;
-    font-weight: 700;
-    font-size: 38pt;
-    line-height: 0.95;
-    color: #008000;
-    letter-spacing: 1pt;
-  }
-  .cachet-paye .cp-date {
-    margin-top: 1pt;
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: 9pt;
-    color: #008000;
-  }
-
-  /* ---- Signature manuscrite (FACTURE uniquement) ---- */
+  /* ---- Signature manuscrite ---- */
   .signature-steve { margin-top: 8mm; }
-  .signature-steve.signature-steve--facture { margin-top: 3mm; }
   .signature-steve .sig-cursive {
     font-family: 'Great Vibes', cursive;
     font-size: 21pt;
@@ -1099,10 +1149,7 @@ export function renderDocumentHtml(
 
   <div class="hr" data-bloc></div>
 
-  <div class="thank-you" data-bloc>
-    <div class="thank-you-prefix">${L.merci}</div>
-    <div class="thank-you-body">${remerciement}</div>
-  </div>
+  ${blocRemerciement}
 
   <div class="detail-heading" data-bloc data-heading>${L.detail}</div>
 
@@ -1116,13 +1163,11 @@ export function renderDocumentHtml(
   ${lignesTableau}
   ${blocTotal}
 
-  ${cachetPaye}
   ${blocPaiement}
   ${blocConditions}
   ${blocValiditeNotes}
   ${blocPhases}
   ${blocBanque}
-  ${blocSignatureFacture}
 </div>
 
 <!-- Gabarits clonés par le script de pagination -->

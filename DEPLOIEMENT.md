@@ -57,7 +57,7 @@ Variables spécifiques (toutes OPTIONNELLES pour la génération) :
 
 | Variable | Rôle | Sans elle |
 | --- | --- | --- |
-| `GITHUB_DOCS_TOKEN` | Jeton GitHub (portée « repo ») : archivage des documents en JSON dans le dossier `documents/` du DÉPÔT PRIVÉ `STEVECROWN01/SteveMarketing-Documents` | La liste et l'archivage des documents existants attendent ; la GÉNÉRATION (PDF, téléchargement, email) fonctionne déjà |
+| `GITHUB_DOCS_TOKEN` | Jeton GitHub (portée « repo ») : archivage des documents en JSON dans le dossier `documents/` du DÉPÔT PRIVÉ `STEVECROWN01/SteveMarketing-Documents` — et, depuis le volet 20 : les DEMANDES du site (devis, audits, messages) dans `demandes/`, les devis SIGNÉS téléversés dans `devis-signes/`, les projets du portfolio dans `portfolio/` | La liste et l'archivage des documents existants attendent ; la GÉNÉRATION (PDF, téléchargement, email) fonctionne déjà |
 | `GITHUB_DOCS_REPO` | Dépôt de stockage (défaut : `STEVECROWN01/SteveMarketing-Documents`) | Valeur par défaut utilisée |
 | `GITHUB_DOCS_BRANCH` | Branche (défaut : `main`) | Valeur par défaut utilisée |
 

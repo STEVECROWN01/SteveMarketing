@@ -119,6 +119,26 @@ export const PAGES = {
     description:
       "Décrivez votre activité et votre projet : Stevens Akpovi vous répond avec un devis personnalisé, établi à partir de votre besoin.",
   },
+  /* VOLET 20 (26/11/2026) — PAGES DE DEVIS DÉDIÉES PAR SERVICE
+   * (demande de l'éditeur) : les boutons « Demander un devis » des
+   * pages Référencement SEO et Publicité Meta Ads mènent à des
+   * pages de demande dédiées à CHAQUE service (plus la page générique
+   * de conception de site web). Contrats de longueur respectés
+   * (title ≤ 60, description ≤ 155). */
+  devisSeo: {
+    hash: "#/devis-referencement-seo",
+    label: "Devis Référencement SEO",
+    title: "Devis Référencement SEO — Stevens Akpovi",
+    description:
+      "Demandez votre devis de référencement SEO : positionnez votre site sur Google et attirez durablement des visiteurs qualifiés.",
+  },
+  devisMetaAds: {
+    hash: "#/devis-publicite-meta-ads",
+    label: "Devis Publicité Meta Ads",
+    title: "Devis Publicité Meta Ads — Stevens Akpovi",
+    description:
+      "Demandez votre devis de publicité Meta Ads : des campagnes Facebook et Instagram ciblées, pensées pour générer des ventes.",
+  },
   audit: {
     hash: "#/audit-gratuit",
     label: "Audit Gratuit",

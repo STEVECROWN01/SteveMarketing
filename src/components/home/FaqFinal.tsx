@@ -45,7 +45,8 @@ export function FaqSection() {
                   variant="dark"
                   className="mt-5"
                   icon={CTAIcons.calendar}
-                >
+          arrow="up-right"
+        >
                   {CTA_LABELS.appel}
                 </CTAButton>
                 <p className="mt-4 text-xs font-medium text-[#1c1c1c]/70">
@@ -125,7 +126,8 @@ export function FinalCtaSection() {
               size="lg"
               icon={CTAIcons.calendar}
               ariaLabel={t("Réserver Un Appel — 30 minutes, gratuit et sans engagement")}
-            >
+          arrow="up-right"
+        >
               {FINAL_CTA.cta1}
             </CTAButton>
             <CTAButton

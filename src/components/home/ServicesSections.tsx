@@ -150,6 +150,7 @@ export function IncludedSection() {
               variant="primary"
               size="lg"
               icon={CTAIcons.calendar}
+              arrow="up-right"
             >
               {INCLUDED.cta}
             </CTAButton>

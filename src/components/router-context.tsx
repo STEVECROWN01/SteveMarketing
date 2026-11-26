@@ -31,6 +31,8 @@ export type AppPage =
   | "aPropos"
   | "contact"
   | "devis"
+  | "devisSeo"
+  | "devisMetaAds"
   | "audit"
   | "appel"
   | "legal"
@@ -58,6 +60,8 @@ const PAGE_KEYS: Record<AppPage, keyof typeof PAGES | "admin"> = {
   aPropos: "aPropos",
   contact: "contact",
   devis: "devis",
+  devisSeo: "devisSeo",
+  devisMetaAds: "devisMetaAds",
   audit: "audit",
   appel: "appel",
   legal: "legal",
@@ -83,6 +87,8 @@ const HASH_TO_PAGE: Record<string, AppPage> = {
   "a-propos": "aPropos",
   contact: "contact",
   "demander-un-devis": "devis",
+  "devis-referencement-seo": "devisSeo",
+  "devis-publicite-meta-ads": "devisMetaAds",
   "audit-gratuit": "audit",
   "reserver-un-appel": "appel",
   "mentions-legales": "legal",
@@ -172,6 +178,8 @@ const PAGE_TO_HASH: Record<AppPage, string> = {
   aPropos: "a-propos",
   contact: "contact",
   devis: "demander-un-devis",
+  devisSeo: "devis-referencement-seo",
+  devisMetaAds: "devis-publicite-meta-ads",
   audit: "audit-gratuit",
   appel: "reserver-un-appel",
   legal: "mentions-legales",

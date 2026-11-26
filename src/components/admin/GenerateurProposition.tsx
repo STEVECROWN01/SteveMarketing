@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Download, Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { FileCheck2, Loader2, Plus, Save, Trash2 } from "lucide-react";
 import { ApercuDocument } from "./ApercuDocument";
 import type { FonctionToast } from "./GenerateurDocument";
-import { BoutonAction, Carte, Champ, Pastille, TitreSection, styleInput } from "./elements";
+import { BoutonAction, Carte, Champ, Pastille, TitreSection, styleInput, styleInputDate } from "./elements";
 import { DEVISES } from "@/lib/documents/types";
 import {
   propositionV2ParDefaut,
@@ -127,7 +127,11 @@ export function GenerateurProposition({
     0,
   );
 
-  async function genererPdf() {
+  /* VOLET 20 — GÉNÉRATION SANS TÉLÉCHARGEMENT AUTOMATIQUE (demande de
+   * l'éditeur) : la génération ENREGISTRE la proposition (stockage
+   * privé + copie email) — le téléchargement passe UNIQUEMENT par le
+   * bouton dédié de la liste. */
+  async function genererProposition() {
     if (generation) return;
     if (!form.titre.trim()) {
       toast({ title: "Titre requis", description: "Renseignez le titre de la proposition.", variant: "destructive" });
@@ -148,25 +152,17 @@ export function GenerateurProposition({
         const data = await res.json().catch(() => null);
         throw new Error(data?.error ?? "Génération impossible.");
       }
-      const blob = await res.blob();
-      const nom =
-        res.headers.get("Content-Disposition")?.match(/filename="?([^";]+)"?/)?.[1] ?? `${numero}.pdf`;
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = nom;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      /* Le PDF renvoyé est simplement consommé (copie email) — aucun
+       * téléchargement automatique sur l'appareil. */
+      await res.blob();
       const emailOk = res.headers.get("X-Email-Sent") === "1";
       const stockageOk = res.headers.get("X-Stockage-Ok") === "1";
       toast({
         title: `Proposition ${numero} ${enEdition ? "mise à jour" : "générée"}`,
         description: [
-          "Téléchargement lancé.",
-          stockageOk ? "Enregistrée dans le stockage." : "Stockage non effectué (non configuré).",
+          stockageOk ? "Enregistrée dans le stockage et disponible dans la liste." : "Stockage non effectué (non configuré).",
           emailOk ? "Copie envoyée par email." : "Copie email non envoyée (Resend non configuré).",
+          "Téléchargez-la depuis la liste (bouton dédié).",
         ].join(" "),
       });
       onEnregistre();
@@ -236,6 +232,38 @@ export function GenerateurProposition({
             <Champ label="Prestataire">
               <input className={styleInput} value={form.prestataire} onChange={(e) => maj("prestataire", e.target.value)} placeholder="Stevens AKPOVI" />
             </Champ>
+            {/* VOLET 20 — DESTINATAIRE (demande de l'éditeur) : « sur la
+                première page, dans le bloc où il y a le budget, mon
+                nom, délai estimé… ajouter le nom complet de celui à
+                qui on adresse la proposition. S'il y a un champ nom
+                complet, nom d'entreprise : si c'est à une entreprise,
+                on remplit le champ nom d'entreprise ; si c'est un
+                professionnel, seulement le champ nom complet. Et le
+                nom sera utilisé pour le devis. » */}
+            <Champ
+              label="Nom complet du destinataire"
+              indicatif="la personne à qui la proposition est adressée"
+              className="sm:col-span-2"
+            >
+              <input
+                className={styleInput}
+                value={form.destinataire?.nomComplet ?? ""}
+                onChange={(e) => maj("destinataire", { ...form.destinataire, nomComplet: e.target.value })}
+                placeholder="Ex. Aïcha Dossou"
+              />
+            </Champ>
+            <Champ
+              label="Nom d'entreprise du destinataire"
+              indicatif="si la proposition s'adresse à une entreprise"
+              className="sm:col-span-2"
+            >
+              <input
+                className={styleInput}
+                value={form.destinataire?.entreprise ?? ""}
+                onChange={(e) => maj("destinataire", { ...form.destinataire, entreprise: e.target.value })}
+                placeholder="Ex. Cabinet Essentiel & Stratégie (laisser vide pour un professionnel indépendant)"
+              />
+            </Champ>
             <Champ label="Montant total" indicatif={fmtMontantSimple(form.montant, form.devise)}>
               <input className={styleInput} type="number" min={0} step="any" value={form.montant} onChange={(e) => maj("montant", Number(e.target.value) || 0)} />
             </Champ>
@@ -250,7 +278,9 @@ export function GenerateurProposition({
               <input className={styleInput} value={form.delai} onChange={(e) => maj("delai", e.target.value)} placeholder="02 à 03 semaines" />
             </Champ>
             <Champ label="Date d'émission">
-              <input className={styleInput} type="date" value={form.date} onChange={(e) => maj("date", e.target.value)} />
+              {/* VOLET 20 — pictogramme calendrier natif BLANC
+                  ([color-scheme:dark]). */}
+              <input className={styleInputDate} type="date" value={form.date} onChange={(e) => maj("date", e.target.value)} />
             </Champ>
             <Champ label="Numéro client" indicatif={enEdition ? "conservé en édition" : "relie les documents du client"}>
               <input
@@ -461,9 +491,11 @@ export function GenerateurProposition({
           </div>
         </Carte>
 
-        {/* Actions */}
+        {/* Actions — VOLET 20 : génération = enregistrement + copie
+            email, SANS téléchargement automatique (le téléchargement
+            vit dans la liste, bouton dédié). */}
         <div className="flex flex-wrap items-center gap-3">
-          <BoutonAction variant="principal" onClick={genererPdf} disabled={generation}>
+          <BoutonAction variant="principal" onClick={() => void genererProposition()} disabled={generation}>
             {generation ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -471,8 +503,8 @@ export function GenerateurProposition({
               </>
             ) : (
               <>
-                <Download className="h-4 w-4" aria-hidden="true" />
-                Générer le PDF
+                <FileCheck2 className="h-4 w-4" aria-hidden="true" />
+                Générer la proposition
               </>
             )}
           </BoutonAction>
@@ -485,9 +517,9 @@ export function GenerateurProposition({
           </Pastille>
         </div>
         <p className="text-xs leading-relaxed text-[#c8c8c8]/80">
-          « Générer le PDF » télécharge la proposition, l&apos;enregistre dans votre
-          back-office et vous en envoie une copie par email — chaque étape est
-          confirmée à l&apos;écran.
+          « Générer la proposition » l&apos;enregistre dans votre back-office et vous en
+          envoie une copie par email — le téléchargement se fait depuis la liste
+          (bouton dédié).
         </p>
       </div>
 

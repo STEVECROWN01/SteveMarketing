@@ -52,6 +52,23 @@ export type CoordonneesBancaires = {
   banque?: string;
 };
 
+/** VOLET 20 (26/11/2026) — DEVIS SIGNÉ : métadonnées du PDF signé
+ *  téléversé par l'éditeur (« pour marquer un devis signé, il faut
+ *  uploader le devis signé. Et c'est ce devis signé qui sera ajouté
+ *  dans la partie des devis signés »). Le FICHIER vit dans le
+ *  dépôt privé (dossier devis-signes/) ; seul ce résumé est
+ *  enregistré dans le JSON du devis — les listes restent légères. */
+export type FichierSigne = {
+  /** Nom de fichier d'origine (affiché, téléchargement). */
+  nomFichier: string;
+  /** Type MIME (application/pdf). */
+  mime: string;
+  /** Taille en octets. */
+  taille: number;
+  /** Date de signature / d'enregistrement (ISO). */
+  date: string;
+};
+
 /** Phase du déroulé (proposition commerciale, page 2). */
 export type PhaseProjet = {
   titre: string;
@@ -115,6 +132,10 @@ export type DocumentRecord = {
   datePaiement?: string;
   /** Facture uniquement : numéro du devis à l'origine. */
   devisSource?: string;
+
+  /** VOLET 20 — Devis uniquement : PDF signé téléversé par
+   *  l'éditeur (le devis est « signé » quand ce champ existe). */
+  devisSigne?: FichierSigne;
 
   createdAt: string;
   updatedAt: string;

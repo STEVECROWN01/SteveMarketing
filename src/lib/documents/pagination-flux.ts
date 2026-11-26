@@ -89,6 +89,23 @@ export function fabriquerScriptPagination(conf: ConfPagination): string {
       flux.appendChild(blocs[r]);
     }
 
+    /* VOLET 20 (26/11/2026) — EN-TÊTE DU TABLEAU « Détail » : quand
+       le tableau se POURSUIT sur une page suivante (une ligne-bloc
+       svc-part ouvre la page), l'en-tête du tableau (svc-head) est
+       REPRIS en tête de cette page (demande de l'éditeur : « sur la
+       page où ça continue, l'entête du tableau doit être repris sur
+       cette page suivante-là aussi pour qu'on reconnaisse les
+       colonnes »). Sans svc-head (proposition commerciale), tout
+       reste inchangé. */
+    var enteteTableau = null;
+    for (var e = 0; e < blocs.length; e++) {
+      if (blocs[e].classList && blocs[e].classList.contains('svc-head')) {
+        enteteTableau = blocs[e];
+        break;
+      }
+    }
+    var hEnteteTableau = enteteTableau ? enteteTableau.offsetHeight : 0;
+
     var hauteurs = blocs.map(hPx);
 
     /* Répartition : la page 1 démarre à DEBUT_P1, les suivantes à
@@ -97,8 +114,12 @@ export function fabriquerScriptPagination(conf: ConfPagination): string {
        le début du bloc qui suit.
        NOTE : le PREMIER bloc d'une page de suite voit sa marge
        haute ANNULÉE au montage (marginTop = 0) — elle ne doit donc
-       pas compter dans la capacité (bug mesuré : pages sur-numéraires). */
+       pas compter dans la capacité (bug mesuré : pages sur-numéraires).
+       VOLET 20 : une page qui OUVRIRA avec une ligne du tableau
+       (continuation) voit sa capacité réduite de la hauteur de
+       l'en-tête du tableau qui y est REPRIS. */
     var repartis = [[]];
+    var avecEntete = [false];
     var h = 0;
     var cap = LIMITE - DEBUT_P1;
     for (var j = 0; j < blocs.length; j++) {
@@ -126,7 +147,21 @@ export function fabriquerScriptPagination(conf: ConfPagination): string {
       } else if (reste < 0 || (heading && reste < garder)) {
         repartis.push([]);
         h = 0;
-        cap = LIMITE - DEBUT_N;
+        /* VOLET 20 — la page qui s'ouvre sur une LIGNE DU TABLEAU
+           (svc-part) est une page de CONTINUATION : l'en-tête du
+           tableau y est repris — sa hauteur est retranchée de la
+           capacité pour ne rien déborder. */
+        if (
+          enteteTableau &&
+          b.classList &&
+          b.classList.contains('svc-part')
+        ) {
+          avecEntete.push(true);
+          cap = LIMITE - DEBUT_N - hEnteteTableau;
+        } else {
+          avecEntete.push(false);
+          cap = LIMITE - DEBUT_N;
+        }
         bh = b.offsetHeight; /* premier de la nouvelle page */
       }
       repartis[repartis.length - 1].push(b);
@@ -148,6 +183,15 @@ export function fabriquerScriptPagination(conf: ConfPagination): string {
       }
       var corps = document.createElement('div');
       corps.className = 'corps';
+      /* VOLET 20 — page de CONTINUATION du tableau : l'en-tête du
+         tableau (svc-head) est REPRIS en tête de page (clone sans
+         data-bloc — jamais re-collecté lors d'une re-pagination). */
+      if (p > 0 && avecEntete[p] && enteteTableau) {
+        var cloneEntete = enteteTableau.cloneNode(true);
+        cloneEntete.removeAttribute('data-bloc');
+        cloneEntete.removeAttribute('data-heading');
+        corps.appendChild(cloneEntete);
+      }
       for (var k = 0; k < repartis[p].length; k++) {
         var bloc = repartis[p][k];
         if (k === 0 && p > 0) {

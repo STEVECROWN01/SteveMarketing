@@ -100,10 +100,10 @@ export function SeoPage() {
         intro={t("Améliorez votre positionnement sur Google, renforcez votre visibilité et attirez des visiteurs sur la durée, sans dépendre de la publicité, grâce à une stratégie de référencement adaptée à votre marché.")}
       >
         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
-          <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
+<CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar} arrow="up-right">
             {CTA_LABELS.appel}
           </CTAButton>
-          <CTAButton action={{ kind: "page", page: "devis" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
+          <CTAButton action={{ kind: "page", page: "devisSeo" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
             {CTA_LABELS.devis}
           </CTAButton>
         </div>
@@ -203,7 +203,7 @@ export function SeoPage() {
                   {t("Vous visez des clients dans plusieurs pays ou plusieurs langues ? Le référencement international adapte votre présence à chaque marché : contenus adaptés à chaque audience, structure pensée pour les recherches locales et cohérence de votre image professionnelle d'un pays à l'autre.")}
                 </p>
                 <div className="mt-8">
-                  <CTAButton action={{ kind: "page", page: "devis" }} variant="ghostDark" size="lg">
+                  <CTAButton action={{ kind: "page", page: "devisSeo" }} variant="ghostDark" size="lg">
                     {t("Discuter De Mon Projet International")}
                   </CTAButton>
                 </div>
@@ -286,10 +286,10 @@ export function SeoPage() {
           </Reveal>
           <Reveal direction="up" delay={0.12}>
             <div className="mt-9 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
-              <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
+    <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar} arrow="up-right">
                 {CTA_LABELS.appel}
               </CTAButton>
-              <CTAButton action={{ kind: "page", page: "devis" }} variant="secondary" size="lg" icon={CTAIcons.quote}>
+              <CTAButton action={{ kind: "page", page: "devisSeo" }} variant="secondary" size="lg" icon={CTAIcons.quote}>
                 {CTA_LABELS.devis}
               </CTAButton>
             </div>

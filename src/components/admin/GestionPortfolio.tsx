@@ -2,7 +2,8 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Globe,
+  Camera,
+  ExternalLink,
   Image as ImageIcon,
   Loader2,
   Pencil,
@@ -11,113 +12,54 @@ import {
   Trash2,
   Eye,
   EyeOff,
-  Languages,
-  ExternalLink,
 } from "lucide-react";
-import { BoutonAction, Carte, Champ, Pastille, styleInput, TitreSection } from "./elements";
-import type { ProjetAdmin, ImageProjet, TraductionProjet } from "@/lib/portfolio/types";
-import { TAILLE_IMAGE_MAX } from "@/lib/portfolio/types";
+import { BoutonAction, Carte, Champ, ModaleConfirmation, Pastille, styleInput, TitreSection } from "./elements";
+import type { ProjetAdmin, ImageProjet } from "@/lib/portfolio/types";
+/* VOLET 20 (26/11/2026) — l'espace portfolio ne doit JAMAIS être
+   vide (demande de l'éditeur) : les projets STATIQUES du site
+   (ceux en ligne actuellement) sont TOUJOURS listés — en plus des
+   projets administrés ici. */
+import { PROJECTS as PROJETS_SITE } from "@/lib/site";
+import { useRouter } from "@/components/router-context";
 
 /**
- * GESTION DU PORTFOLIO DEPUIS L'ESPACE ADMIN (VOLET 19, 26/11/2026).
+ * GESTION DU PORTFOLIO DEPUIS L'ESPACE ADMIN (VOLET 19 → VOLET 20).
  *
- * Demande de l'éditeur : « créer une partie dans l'espace admin pour
- * mettre à jour mon portfolio… remplir toutes les informations,
- * enregistrer comme brouillon ou enregistrer et publier
- * directement. Le projet s'ajoute sur le site web comme tous les
- * autres, présenté de la même façon. »
+ * VOLET 20 (26/11/2026) — reprise EXACTE des demandes de l'éditeur :
  *
- * - LISTE : vignette, nom, catégorie, statut (Publié/Brouillon),
- *   date de dernière mise à jour, actions Modifier / Publier ou
- *   Dépublier / Supprimer ;
- * - FORMULAIRE : nom, catégorie, description, libellé du bouton,
- *   URL du site, capture d'ordinateur (requis pour publier),
- *   capture mobile (recommandée — la page projet l'affiche),
- *   traduction anglaise optionnelle (le site est bilingue) ;
- * - deux boutons d'enregistrement : « Enregistrer comme brouillon »
- *   et « Enregistrer et publier » ;
- * - images COMPRIMÉES DANS LE NAVIGATEUR (canvas → WebP, largeur
- *   plafonnée : 1280 px ordinateur / 640 px mobile) avant l'envoi —
- *   légères, nettes, sans dépendance.
+ *  - la liste ne doit JAMAIS être vide : TOUS les projets en ligne
+ *    sur le site (projets statiques + projets administrés) sont
+ *    TOUJOURS listés et affichés ici, en plus du bouton d'ajout ;
+ *  - ANCIENS textes d'aide SUPPRIMÉS : la note « Les projets publiés
+ *    s'ajoutent à la suite… » et le bloc « Aucun projet géré ici
+ *    pour l'instant… » disparaissent ;
+ *  - PLUS DE VERSION ANGLAISE à remplir (« ce n'est pas à moi de
+ *    mettre la version anglaise lors de l'ajout du projet ») : le
+ *    site traduit lui-même — le champ et le bloc disparaissent ;
+ *  - MOCKUPS EXTRAITS AUTOMATIQUEMENT de l'URL du projet (« je
+ *    n'ai qu'à ajouter l'URL du projet et le site extrait
+ *    directement le mockup mobile et desktop ») : le site en ligne
+ *    est ouvert et capturé (ordinateur + mobile) — plus aucun
+ *    téléversement d'image ;
+ *  - le champ « Catégorie » est RENOMMÉ « Titre » (ce n'est pas une
+ *    catégorie, c'est un titre) ;
+ *  - le champ « Libellé du bouton » SUPPRIMÉ : le libellé est
+ *    toujours « Voir Le Site », posé automatiquement par le site ;
+ *  - suppression d'un projet : MODALE DE CONFIRMATION
+ *    PERSONNALISÉE (plus de window.confirm).
+ *
+ * - deux boutons d'enregistrement conservés : « Enregistrer comme
+ *   brouillon » et « Enregistrer et publier » ;
+ * - les projets ADMINISTRÉS (brouillon/publié) restent modifiables ;
+ *   les projets STATIQUES du site sont présentés en lecture seule
+ *   (ils vivent dans le code du site).
  */
 
 type TypeToast = (t: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
 
 /* ------------------------------------------------------------------ */
-/* Compression d'image dans le navigateur                              */
+/* Aperçu d'une capture                                               */
 /* ------------------------------------------------------------------ */
-
-async function chargerBitmap(fichier: File): Promise<ImageBitmap | HTMLImageElement> {
-  if ("createImageBitmap" in window) {
-    try {
-      return await createImageBitmap(fichier);
-    } catch {
-      /* repli ci-dessous */
-    }
-  }
-  return new Promise((resoudre, rejeter) => {
-    const url = URL.createObjectURL(fichier);
-    const img = new Image();
-    img.onload = () => resoudre(img);
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-      rejeter(new Error("Image illisible."));
-    };
-    img.src = url;
-  });
-}
-
-function dimensions(bmp: ImageBitmap | HTMLImageElement): { l: number; h: number } {
-  if ("width" in bmp && "height" in bmp && !(bmp instanceof HTMLImageElement)) {
-    return { l: bmp.width, h: bmp.height };
-  }
-  const img = bmp as HTMLImageElement;
-  return { l: img.naturalWidth, h: img.naturalHeight };
-}
-
-/** Compresse une capture : redimensionne (largeur max) puis encode
- *  en WebP (JPEG en repli). Retourne l'enregistrement base64. */
-async function comprimerCapture(fichier: File, largeurMax: number): Promise<ImageProjet> {
-  const bmp = await chargerBitmap(fichier);
-  const { l, h } = dimensions(bmp);
-  const ratio = Math.min(1, largeurMax / (l || largeurMax));
-  const largeur = Math.max(1, Math.round(l * ratio));
-  const hauteur = Math.max(1, Math.round(h * ratio));
-  const canvas = document.createElement("canvas");
-  canvas.width = largeur;
-  canvas.height = hauteur;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Compression impossible (canvas).");
-  ctx.drawImage(bmp as CanvasImageSource, 0, 0, largeur, hauteur);
-  if ("close" in bmp && typeof bmp.close === "function") bmp.close();
-
-  const blob = await new Promise<Blob | null>((resoudre) =>
-    canvas.toBlob(resoudre, "image/webp", 0.85),
-  );
-  const blobFinal = blob ?? await new Promise<Blob | null>((resoudre) =>
-    canvas.toBlob(resoudre, "image/jpeg", 0.85),
-  );
-  if (!blobFinal) throw new Error("Encodage de l'image impossible.");
-  const data = await new Promise<string>((resoudre) => {
-    const lecteur = new FileReader();
-    lecteur.onload = () => resoudre(String(lecteur.result));
-    lecteur.onerror = () => resoudre("");
-    lecteur.readAsDataURL(blobFinal);
-  });
-  const base64 = data.slice(data.indexOf(",") + 1);
-  if (!base64) throw new Error("Lecture de l'image impossible.");
-  if (base64.length > TAILLE_IMAGE_MAX) {
-    throw new Error(
-      "Capture trop lourde même après compression — essayez un fichier plus léger.",
-    );
-  }
-  return {
-    data: base64,
-    mime: blob ? "image/webp" : "image/jpeg",
-    largeur,
-    hauteur,
-  };
-}
 
 function apercuDataUri(image: ImageProjet | null | undefined): string {
   if (!image?.data) return "";
@@ -133,129 +75,27 @@ function formatDateCourte(iso: string): string {
 }
 
 /* ------------------------------------------------------------------ */
-/* Champ de capture avec compression et aperçu                         */
-/* ------------------------------------------------------------------ */
-
-function ChampCapture({
-  label,
-  indicatif,
-  image,
-  onChoisir,
-  erreur,
-}: {
-  label: string;
-  indicatif: string;
-  image: ImageProjet | null;
-  onChoisir: (image: ImageProjet | null) => void;
-  erreur: string | null;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [encours, setEncours] = useState(false);
-
-  async function surFichiers(fichiers: FileList | null) {
-    const fichier = fichiers?.[0];
-    if (!fichier) return;
-    if (!fichier.type.startsWith("image/")) {
-      onChoisir(null);
-      return;
-    }
-    setEncours(true);
-    try {
-      onChoisir(await comprimerCapture(fichier, label.startsWith("Capture d") ? 1280 : 640));
-    } catch (e) {
-      onChoisir(null);
-      alert(e instanceof Error ? e.message : "Image impossible à traiter.");
-    } finally {
-      setEncours(false);
-      if (inputRef.current) inputRef.current.value = "";
-    }
-  }
-
-  return (
-    <Champ label={label} indicatif={indication(indicatif, image)}>
-      <div className="flex flex-wrap items-center gap-4">
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          className="relative flex h-[104px] w-[168px] shrink-0 items-center justify-center overflow-hidden rounded-lg border border-dashed border-[#e4e4e4]/30 bg-[#1c1c1c] transition-colors hover:border-[#e4e4e4]/60"
-        >
-          {image ? (
-            <img
-              src={apercuDataUri(image)}
-              alt=""
-              width={image.largeur}
-              height={image.hauteur}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <span className="flex flex-col items-center gap-2 text-[#c8c8c8]/70">
-              <ImageIcon className="h-6 w-6" aria-hidden="true" />
-              <span className="text-[11px]">Choisir une image</span>
-            </span>
-          )}
-          {encours ? (
-            <span className="absolute inset-0 flex items-center justify-center bg-[#070707]/70">
-              <Loader2 className="h-5 w-5 animate-spin text-white" aria-hidden="true" />
-            </span>
-          ) : null}
-        </button>
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          className="sr-only"
-          onChange={(e) => surFichiers(e.target.files)}
-          aria-label={label}
-        />
-        <div className="min-w-0 flex-1 text-xs leading-relaxed text-[#c8c8c8]">
-          <p>Glissez une capture nette du site (PNG, JPG, WebP).</p>
-          <p className="mt-1">
-            Elle est automatiquement redimensionnée et compressée (WebP)
-            avant l&apos;enregistrement.
-          </p>
-          {image ? (
-            <p className="mt-1 text-[#86efac]">
-              {image.largeur} × {image.hauteur} px · {(image.data.length / 1024).toFixed(0)} Ko
-            </p>
-          ) : null}
-          {erreur ? <p className="mt-1 text-[#ffdede]">{erreur}</p> : null}
-        </div>
-      </div>
-    </Champ>
-  );
-
-  function indication(defaut: string, img: ImageProjet | null): string {
-    if (img) return `${defaut} — remplacée à la prochaine sélection`;
-    return defaut;
-  }
-}
-
-/* ------------------------------------------------------------------ */
-/* Formulaire de projet                                                */
+/* Formulaire de projet                                               */
 /* ------------------------------------------------------------------ */
 
 type Formulaire = {
   id: string | null;
   nom: string;
-  categorie: string;
+  titre: string;
   description: string;
-  cta: string;
   url: string;
   desktop: ImageProjet | null;
   mobile: ImageProjet | null;
-  en: TraductionProjet;
 };
 
 const FORMULAIRE_VIDE: Formulaire = {
   id: null,
   nom: "",
-  categorie: "",
+  titre: "",
   description: "",
-  cta: "Voir Le Site",
   url: "",
   desktop: null,
   mobile: null,
-  en: {},
 };
 
 function FormulaireProjet({
@@ -266,7 +106,10 @@ function FormulaireProjet({
 }: {
   initial: ProjetAdmin | null;
   onAnnuler: () => void;
-  onEnregistre: (projet: ProjetAdmin, statut: "brouillon" | "publie") => Promise<void>;
+  onEnregistre: (
+    projet: ProjetAdmin,
+    statut: "brouillon" | "publie",
+  ) => Promise<void>;
   toast: TypeToast;
 }) {
   const [f, setF] = useState<Formulaire>(() =>
@@ -274,37 +117,82 @@ function FormulaireProjet({
       ? {
           id: initial.id,
           nom: initial.nom,
-          categorie: initial.categorie,
+          titre: initial.categorie,
           description: initial.description,
-          cta: initial.cta,
           url: initial.url,
           desktop: initial.desktop,
           mobile: initial.mobile,
-          en: initial.traductions ?? {},
         }
       : FORMULAIRE_VIDE,
   );
   const [enregistrement, setEnregistrement] = useState<"brouillon" | "publie" | null>(null);
-  const [anglaisOuvert, setAnglaisOuvert] = useState(() =>
-    Boolean(initial?.traductions && Object.values(initial.traductions).some((v) => (v ?? "").trim())),
-  );
+  /* VOLET 20 — capture automatique des mockups depuis l'URL. */
+  const [captureEnCours, setCaptureEnCours] = useState(false);
 
   const maj = <K extends keyof Formulaire>(cle: K, valeur: Formulaire[K]) =>
     setF((ancien) => ({ ...ancien, [cle]: valeur }));
-  const majEn = (cle: keyof TraductionProjet, valeur: string) =>
-    setF((ancien) => ({ ...ancien, en: { ...ancien.en, [cle]: valeur } }));
+
+  /* VOLET 20 — CAPTURE AUTOMATIQUE : le site en ligne est ouvert et
+   * capturé (ordinateur 1280 × 800 + mobile 390 × 844) — l'éditeur
+   * n'a qu'à donner l'URL du projet. Retourne les captures (posées
+   * dans le formulaire), ou null en cas d'échec. */
+  async function capturer(
+    url: string,
+  ): Promise<{ desktop: ImageProjet; mobile: ImageProjet } | null> {
+    const cible = url.trim();
+    if (!cible) {
+      toast({
+        title: "URL requise",
+        description: "Renseignez d'abord l'URL du site du projet.",
+        variant: "destructive",
+      });
+      return null;
+    }
+    setCaptureEnCours(true);
+    try {
+      const res = await fetch("/api/admin/projects/capture", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: cible }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.ok) {
+        throw new Error(data?.error ?? "Capture impossible.");
+      }
+      const captures = {
+        desktop: data.desktop as ImageProjet,
+        mobile: data.mobile as ImageProjet,
+      };
+      setF((ancien) => ({ ...ancien, desktop: captures.desktop, mobile: captures.mobile }));
+      toast({
+        title: "Aperçus capturés",
+        description: "Les captures ordinateur et mobile sont prêtes.",
+      });
+      return captures;
+    } catch (e) {
+      toast({
+        title: "Capture impossible",
+        description: e instanceof Error ? e.message : "Vérifiez l'URL du site.",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setCaptureEnCours(false);
+    }
+  }
 
   async function enregistrer(statut: "brouillon" | "publie") {
     if (enregistrement) return;
     if (statut === "publie") {
-      /* Contrôles côté client (le serveur revérifie). */
+      /* Contrôles côté client (le serveur revérifie) — VOLET 20 :
+       * plus de libellé de bouton (posé par le site) ; le champ
+       * « catégorie » s'appelle désormais « TITRE ». */
       const manques: string[] = [];
       if (!f.nom.trim()) manques.push("le nom");
-      if (!f.categorie.trim()) manques.push("la catégorie");
+      if (!f.titre.trim()) manques.push("le titre");
       if (!f.description.trim()) manques.push("la description");
-      if (!f.cta.trim()) manques.push("le libellé du bouton");
       if (!f.url.trim()) manques.push("l'URL du site");
-      if (!f.desktop) manques.push("la capture d'ordinateur");
+      if (!f.desktop) manques.push("les aperçus (capturez le site)");
       if (manques.length) {
         toast({
           title: "Publication impossible",
@@ -323,18 +211,37 @@ function FormulaireProjet({
     }
     setEnregistrement(statut);
     try {
+      /* VOLET 20 — « je n'ai qu'à ajouter l'URL du projet » : si
+       * aucune capture n'existe encore, elle est faite
+       * AUTOMATIQUEMENT avant l'enregistrement. */
+      let desktop = f.desktop;
+      let mobile = f.mobile;
+      if (!desktop && f.url.trim()) {
+        const captures = await capturer(f.url);
+        if (captures) {
+          desktop = captures.desktop;
+          mobile = captures.mobile;
+        } else if (statut === "publie") {
+          /* Publication sans capture possible : on arrête (la
+             capture peut être relancée). */
+          setEnregistrement(null);
+          return;
+        }
+        /* Brouillon : enregistré sans capture — elle pourra être
+           * refaite à la modification. */
+      }
       await onEnregistre(
         {
           id: f.id ?? "",
           nom: f.nom.trim(),
-          categorie: f.categorie.trim(),
+          categorie: f.titre.trim(),
           description: f.description.trim(),
-          cta: f.cta.trim(),
+          cta: "Voir Le Site",
           url: f.url.trim(),
           statut,
-          desktop: f.desktop,
-          mobile: f.mobile,
-          traductions: Object.values(f.en).some((v) => (v ?? "").trim()) ? f.en : null,
+          desktop,
+          mobile,
+          traductions: null,
           createdAt: "",
           updatedAt: "",
         },
@@ -360,12 +267,15 @@ function FormulaireProjet({
             placeholder="Ex. MAISON KÔDA"
           />
         </Champ>
-        <Champ label="Catégorie" indicatif="ex. Site web professionnel pour coach">
+        {/* VOLET 20 — l'ancien champ « Catégorie » s'appelle
+            « TITRE » : ce n'est pas une catégorie, c'est un titre
+            (demande de l'éditeur). */}
+        <Champ label="Titre" indicatif="sous le nom du projet (ex. Site web immobilier)">
           <input
             className={styleInput}
-            value={f.categorie}
-            onChange={(e) => maj("categorie", e.target.value)}
-            placeholder="Ex. Plateforme immobilière"
+            value={f.titre}
+            onChange={(e) => maj("titre", e.target.value)}
+            placeholder="Ex. Site web professionnel pour coach"
           />
         </Champ>
       </div>
@@ -381,112 +291,94 @@ function FormulaireProjet({
         </Champ>
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-2">
-        <Champ label="Libellé du bouton" indicatif="par défaut « Voir Le Site »">
-          <input
-            className={styleInput}
-            value={f.cta}
-            onChange={(e) => maj("cta", e.target.value)}
-            placeholder="Voir Le Site"
-          />
-        </Champ>
-        <Champ label="URL du site en ligne" indicatif="obligatoire pour publier">
-          <input
-            className={styleInput}
-            value={f.url}
-            onChange={(e) => maj("url", e.target.value)}
-            placeholder="https://exemple.vercel.app"
-            inputMode="url"
-          />
-        </Champ>
-      </div>
-
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <ChampCapture
-          label="Capture d'ordinateur"
-          indicatif="obligatoire pour publier"
-          image={f.desktop}
-          onChoisir={(image) => maj("desktop", image)}
-          erreur={null}
-        />
-        <ChampCapture
-          label="Capture mobile"
-          indicatif="recommandée — page projet"
-          image={f.mobile}
-          onChoisir={(image) => maj("mobile", image)}
-          erreur={null}
-        />
-      </div>
-
-      {/* ---- Version anglaise (optionnelle) ---- */}
-      <div className="mt-6 rounded-xl border border-[#e4e4e4]/12 bg-[#1c1c1c] p-4">
-        <button
-          type="button"
-          onClick={() => setAnglaisOuvert((v) => !v)}
-          className="flex w-full items-center justify-between gap-3 text-left"
-          aria-expanded={anglaisOuvert}
-        >
-          <span className="flex items-center gap-2 text-sm font-medium text-white">
-            <Languages className="h-4 w-4 text-[#c8c8c8]" aria-hidden="true" />
-            Version anglaise (optionnelle)
-            <Pastille ton="neutre">site bilingue</Pastille>
-          </span>
-          <span className="text-xs text-[#c8c8c8]">{anglaisOuvert ? "replier" : "déplier"}</span>
-        </button>
-        {anglaisOuvert ? (
-          <div className="mt-4 grid gap-4 lg:grid-cols-2">
-            <Champ label="Nom (anglais)" indicatif="laisser vide = garder le français">
-              <input
-                className={styleInput}
-                value={f.en.nom ?? ""}
-                onChange={(e) => majEn("nom", e.target.value)}
-              />
-            </Champ>
-            <Champ label="Catégorie (anglais)">
-              <input
-                className={styleInput}
-                value={f.en.categorie ?? ""}
-                onChange={(e) => majEn("categorie", e.target.value)}
-              />
-            </Champ>
-            <div className="lg:col-span-2">
-              <Champ label="Description (anglais)">
-                <textarea
-                  className={`${styleInput} min-h-[90px] resize-y`}
-                  value={f.en.description ?? ""}
-                  onChange={(e) => majEn("description", e.target.value)}
-                />
-              </Champ>
-            </div>
-            <Champ label="Libellé du bouton (anglais)">
-              <input
-                className={styleInput}
-                value={f.en.cta ?? ""}
-                onChange={(e) => majEn("cta", e.target.value)}
-                placeholder="View The Website"
-              />
-            </Champ>
+      <div className="mt-4">
+        {/* VOLET 20 — URL SEULE : les mockups ordinateur et mobile
+            sont EXTRAILS AUTOMATIQUEMENT du site en ligne (capture)
+            — plus aucun téléversement d'image. */}
+        <Champ label="URL du site en ligne" indicatif="obligatoire pour publier — les aperçus en sont extraits automatiquement">
+          <div className="flex flex-wrap items-center gap-3">
+            <input
+              className={`${styleInput} flex-1`}
+              value={f.url}
+              onChange={(e) => maj("url", e.target.value)}
+              placeholder="https://exemple.vercel.app"
+              inputMode="url"
+            />
+            <BoutonAction
+              onClick={() => void capturer(f.url)}
+              disabled={captureEnCours}
+              className="shrink-0"
+            >
+              {captureEnCours ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Camera className="h-4 w-4" aria-hidden="true" />
+              )}
+              {captureEnCours ? "Capture…" : "Capturer les aperçus"}
+            </BoutonAction>
           </div>
-        ) : null}
+        </Champ>
+      </div>
+
+      {/* Aperçus extraits (ou en attente) */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        {(
+          [
+            ["Aperçu ordinateur", f.desktop, 1280, 800],
+            ["Aperçu mobile", f.mobile, 240, 520],
+          ] as const
+        ).map(([libelle, image, w, h]) => (
+          <div key={libelle}>
+            <p className="mb-1.5 text-xs font-medium text-white">{libelle}</p>
+            <div
+              className="flex items-center justify-center overflow-hidden rounded-lg border border-dashed border-[#e4e4e4]/30 bg-[#1c1c1c]"
+              style={{ height: `${Math.round((h / w) * 168)}px`, width: "168px" }}
+            >
+              {image ? (
+                <img
+                  src={apercuDataUri(image)}
+                  alt=""
+                  width={image.largeur}
+                  height={image.hauteur}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="flex flex-col items-center gap-2 px-4 text-center text-[#c8c8c8]/70">
+                  <ImageIcon className="h-5 w-5" aria-hidden="true" />
+                  <span className="text-[11px] leading-snug">
+                    {f.url.trim()
+                      ? "Extrait automatiquement depuis l'URL"
+                      : "Renseignez l'URL du site"}
+                  </span>
+                </span>
+              )}
+            </div>
+            {image ? (
+              <p className="mt-1.5 text-xs text-[#86efac]">
+                {image.largeur} × {image.hauteur} px · {(image.data.length / 1024).toFixed(0)} Ko
+              </p>
+            ) : null}
+          </div>
+        ))}
       </div>
 
       {/* ---- Actions ---- */}
       <div className="mt-7 flex flex-wrap items-center gap-3 border-t border-[#e4e4e4]/10 pt-5">
-        <BoutonAction onClick={() => enregistrer("brouillon")} disabled={enregistrement !== null}>
+        <BoutonAction onClick={() => enregistrer("brouillon")} disabled={enregistrement !== null || captureEnCours}>
           {enregistrement === "brouillon" ? (
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
           ) : null}
           Enregistrer comme brouillon
         </BoutonAction>
-        <BoutonAction variant="principal" onClick={() => enregistrer("publie")} disabled={enregistrement !== null}>
+        <BoutonAction variant="principal" onClick={() => enregistrer("publie")} disabled={enregistrement !== null || captureEnCours}>
           {enregistrement === "publie" ? (
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
           ) : (
-            <Globe className="h-4 w-4" aria-hidden="true" />
+            <Eye className="h-4 w-4" aria-hidden="true" />
           )}
           Enregistrer et publier
         </BoutonAction>
-        <BoutonAction onClick={onAnnuler} disabled={enregistrement !== null}>
+        <BoutonAction onClick={onAnnuler} disabled={enregistrement !== null || captureEnCours}>
           Annuler
         </BoutonAction>
         <p className="text-xs text-[#c8c8c8]/80">
@@ -513,6 +405,10 @@ export function GestionPortfolio({
   const [actionRapide, setActionRapide] = useState<string | null>(null);
   const [enCreation, setEnCreation] = useState(false);
   const [enEdition, setEnEdition] = useState<ProjetAdmin | null>(null);
+  /* VOLET 20 — modale de confirmation PERSONNALISÉE pour la
+   * suppression d'un projet (plus de window.confirm). */
+  const [suppression, setSuppression] = useState<ProjetAdmin | null>(null);
+  const router = useRouter();
 
   const charger = useCallback(async () => {
     setChargement(true);
@@ -607,12 +503,11 @@ export function GestionPortfolio({
     }
   }
 
-  async function supprimer(projet: ProjetAdmin) {
-    if (actionRapide) return;
-    const confirme = window.confirm(
-      `Supprimer définitivement « ${projet.nom} » ?${projet.statut === "publie" ? " Il disparaîtra aussi du site public." : ""}`,
-    );
-    if (!confirme) return;
+  /* VOLET 20 — suppression derrière une MODALE DE CONFIRMATION
+   * PERSONNALISÉE (plus de window.confirm). */
+  async function confirmerSuppression() {
+    const projet = suppression;
+    if (!projet) return;
     setActionRapide(projet.id);
     try {
       const res = await fetch("/api/admin/projects", {
@@ -629,6 +524,7 @@ export function GestionPortfolio({
       await charger();
     } finally {
       setActionRapide(null);
+      setSuppression(null);
     }
   }
 
@@ -642,8 +538,9 @@ export function GestionPortfolio({
               {enCreation ? "Ajouter un projet" : `Modifier « ${enEdition?.nom} »`}
             </h2>
             <p className="mt-1 text-sm text-[#c8c8c8]">
-              Remplissez les informations du projet : il sera présenté sur le site exactement
-              comme les autres réalisations.
+              Renseignez le nom, le titre, la description et l&apos;URL du site : les aperçus
+              ordinateur et mobile sont extraits automatiquement, et le site traduit lui-même
+              le projet en anglais.
             </p>
           </div>
           <BoutonAction
@@ -677,7 +574,8 @@ export function GestionPortfolio({
           Portfolio du site
           <span className="ml-2 align-middle text-sm font-normal text-[#c8c8c8]">
             ({publies} publié{publies > 1 ? "s" : ""} · {projets.length - publies} brouillon
-            {projets.length - publies > 1 ? "s" : ""})
+            {projets.length - publies > 1 ? "s" : ""} · {PROJETS_SITE.length} projet
+            {PROJETS_SITE.length > 1 ? "s" : ""} du site)
           </span>
         </h2>
         <div className="flex flex-wrap items-center gap-3">
@@ -711,21 +609,14 @@ export function GestionPortfolio({
         <div className="flex items-center justify-center rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] py-16">
           <Loader2 className="h-6 w-6 animate-spin text-[#e4e4e4]" aria-hidden="true" />
         </div>
-      ) : projets.length === 0 ? (
-        <Carte className="p-8 text-center">
-          <p className="text-sm text-[#c8c8c8]">
-            Aucun projet géré ici pour l&apos;instant. Les quatre réalisations actuelles du site
-            restent en place ; chaque nouveau projet que vous ajoutez viendra s&apos;y joindre,
-            présenté de la même façon, partout sur le site.
-          </p>
-        </Carte>
       ) : (
         <div className="space-y-3">
+          {/* VOLET 20 — PROJETS ADMINISTRÉS (brouillons et publiés). */}
           {projets.map((projet) => (
             <Carte key={projet.id} className="flex flex-wrap items-center gap-4 p-4 sm:p-5">
               <div className="h-[64px] w-[104px] shrink-0 overflow-hidden rounded-lg border border-[#e4e4e4]/12 bg-[#1c1c1c]">
                 {projet.desktop ? (
-                        <img
+                  <img
                     src={apercuDataUri(projet.desktop)}
                     alt=""
                     width={projet.desktop.largeur}
@@ -746,8 +637,7 @@ export function GestionPortfolio({
                   </Pastille>
                 </div>
                 <p className="mt-1 text-xs text-[#c8c8c8]">
-                  {projet.categorie || "sans catégorie"} · maj{" "}
-                  {formatDateCourte(projet.updatedAt)}
+                  {projet.categorie || "sans titre"} · maj {formatDateCourte(projet.updatedAt)}
                 </p>
                 {projet.url ? (
                   <a
@@ -786,9 +676,55 @@ export function GestionPortfolio({
                   )}
                   {projet.statut === "publie" ? "Dépublier" : "Publier"}
                 </BoutonAction>
-                <BoutonAction variant="danger" onClick={() => supprimer(projet)} disabled={actionRapide === projet.id} titre="Supprimer">
+                <BoutonAction variant="danger" onClick={() => setSuppression(projet)} disabled={actionRapide === projet.id} titre="Supprimer">
                   <Trash2 className="h-4 w-4" aria-hidden="true" />
                   Supprimer
+                </BoutonAction>
+              </div>
+            </Carte>
+          ))}
+
+          {/* VOLET 20 — PROJETS DU SITE (réalisations actuelles, en
+              ligne) : TOUJOURS listés — l'espace portfolio n'est
+              jamais vide. Ils vivent dans le code du site : consultés
+              ici en lecture seule (page projet + site en ligne). */}
+          {PROJETS_SITE.map((projet) => (
+            <Carte key={projet.id} className="flex flex-wrap items-center gap-4 border-[#e4e4e4]/12 bg-[#1c1c1c] p-4 sm:p-5">
+              <div className="h-[64px] w-[104px] shrink-0 overflow-hidden rounded-lg border border-[#e4e4e4]/12 bg-[#070707]">
+                {/* Aperçu léger : la variante 640 px existe pour deux
+                    projets ; sinon l'aperçu standard. */}
+                <img
+                  src={(projet as { desktopSmall?: string }).desktopSmall ?? projet.desktop}
+                  alt=""
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="min-w-[180px] flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-medium text-white">{projet.name}</p>
+                  <Pastille ton="valide">En ligne sur le site</Pastille>
+                </div>
+                <p className="mt-1 text-xs text-[#c8c8c8]">{projet.category}</p>
+                {projet.url ? (
+                  <a
+                    href={projet.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1 inline-flex items-center gap-1 text-xs text-[#e4e4e4] underline decoration-[#e4e4e4]/40 underline-offset-2 hover:decoration-[#e4e4e4]"
+                  >
+                    {projet.url.replace(/^https?:\/\//, "")}
+                    <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                  </a>
+                ) : null}
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <BoutonAction
+                  onClick={() => router.navigate("projet", projet.id)}
+                  titre="Voir la page projet du site"
+                >
+                  <Eye className="h-4 w-4" aria-hidden="true" />
+                  Voir le projet
                 </BoutonAction>
               </div>
             </Carte>
@@ -796,12 +732,30 @@ export function GestionPortfolio({
         </div>
       )}
 
-      <p className="mt-6 text-xs leading-relaxed text-[#c8c8c8]/80">
-        Les projets publiés s&apos;ajoutent à la suite des réalisations déjà présentées sur le
-        site (accueil, page Réalisations, pages projet) — jamais en tête de liste : les
-        mockups de la page d&apos;accueil restent inchangés. Sur l&apos;accueil, trois projets
-        partagent une même ligne ; à partir de quatre, ils se rangent par deux.
-      </p>
+      {/* VOLET 20 — MODALE DE CONFIRMATION PERSONNALISÉE pour la
+          suppression d'un projet du portfolio. */}
+      <ModaleConfirmation
+        ouvert={Boolean(suppression)}
+        titre={`Supprimer « ${suppression?.nom ?? ""} » ?`}
+        message={
+          suppression ? (
+            <>
+              <p>
+                Le projet <strong className="text-white">{suppression.nom}</strong> sera
+                définitivement retiré du stockage.
+                {suppression.statut === "publie"
+                  ? " Il disparaîtra aussi du site public."
+                  : ""}
+              </p>
+              <p className="mt-3 text-xs text-[#c8c8c8]/70">Cette action est irréversible.</p>
+            </>
+          ) : null
+        }
+        libelleConfirmer="Supprimer définitivement"
+        enCours={Boolean(suppression && actionRapide === suppression.id)}
+        onAnnuler={() => setSuppression(null)}
+        onConfirmer={() => void confirmerSuppression()}
+      />
     </div>
   );
 }

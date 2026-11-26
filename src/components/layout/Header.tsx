@@ -93,6 +93,16 @@ export function Header() {
   // fermeture du menu (audit clavier du 19/11 : après Échap, le focus
   // tombait sur un lien du pied de page sous l'overlay).
   const burgerRef = useRef<HTMLButtonElement>(null);
+  /* VOLET 20 — ALIGNEMENT « AUTRES LIENS » ↔ BOUTON SWITCH : le bord
+   * DROIT de la colonne « Autres liens » doit s'aligner sur le bord
+   * GAUCHE du bouton de switch bilingue du coin supérieur droit
+   * (demande de l'éditeur). La largeur du bouton switch dépend de
+   * son contenu (drapeau + code) : le retrait droit de la zone des
+   * colonnes est MESURÉ au pixel près sur le groupe d'angle réel,
+   * puis suivi au redimensionnement. */
+  const colonnesRef = useRef<HTMLDivElement>(null);
+  const groupeAngleRef = useRef<HTMLDivElement>(null);
+  const [retraitColonnes, setRetraitColonnes] = useState<number | null>(null);
 
   /** Ferme le menu et rend le focus au bouton qui l'a ouvert — le
    *  pattern dialog du WAI-ARIA : à la fermeture d'un dialogue modal,
@@ -188,6 +198,38 @@ export function Header() {
   }, [menuOpen]);
 
   const isActive = (key: string) => router.page === key;
+
+  /* VOLET 20 — MESURE de l'alignement « Autres liens » ↔ switch : le
+   * bord droit de la zone des colonnes est ramené au bord GAUCHE du
+   * groupe d'angle (switch bilingue + croix). Mesuré après montage
+   * (l'animation d'entrée scale(0.995) est négligeable), revérifié
+   * après 400 ms puis au redimensionnement — UNIQUEMENT quand les
+   * deux colonnes sont côte à côte (≥ 560 px). */
+  useEffect(() => {
+    if (!menuOpen) {
+      setRetraitColonnes(null);
+      return;
+    }
+    const calc = () => {
+      const colonnes = colonnesRef.current;
+      const groupe = groupeAngleRef.current;
+      if (!colonnes || !groupe) return;
+      if (!window.matchMedia("(min-width: 560px)").matches) {
+        setRetraitColonnes(null);
+        return;
+      }
+      const rColonnes = colonnes.getBoundingClientRect();
+      const rGroupe = groupe.getBoundingClientRect();
+      setRetraitColonnes(Math.max(0, rColonnes.right - rGroupe.left));
+    };
+    calc();
+    const t = window.setTimeout(calc, 400);
+    window.addEventListener("resize", calc);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener("resize", calc);
+    };
+  }, [menuOpen]);
 
   /** « Démarrer un projet » → page dédiée de demande de devis
    *  (#/demander-un-devis) — demande de l'éditeur, 13/11/2026. */
@@ -342,7 +384,11 @@ export function Header() {
                   sous la pastille hamburger : au survol, TOUT le
                   bouton prend la couleur de survol du bouton du
                   header (remplissage #e4e4e4, croix sombre). */}
-              <div className="absolute right-4 top-4 flex items-center gap-2.5 sm:right-6 sm:top-6 sm:gap-3">
+              {/* Groupe d'angle supérieur droit — VOLET 18 : bouton de
+                  switch bilingue À GAUCHE du bouton de fermeture ;
+                  VOLET 20 : réference de l'alignement de la colonne
+                  « Autres liens » (son bord GAUCHE). */}
+              <div ref={groupeAngleRef} className="absolute right-4 top-4 flex items-center gap-2.5 sm:right-6 sm:top-6 sm:gap-3">
                 <BoutonLangue taille="panneau" />
                 <button
                   type="button"
@@ -355,9 +401,27 @@ export function Header() {
               </div>
 
               {/* Menus — deux colonnes (demande de l'éditeur,
-                  15/11/2026) : pages majeures à gauche, « Autre » à
-                  droite ; empilées sur très petits écrans. */}
-              <div className="flex min-h-0 flex-1 flex-col justify-center gap-9 py-4 min-[560px]:flex-row min-[560px]:items-start min-[560px]:gap-14 lg:gap-24">
+                  15/11/2026) : pages majeures à gauche, « Autres
+                  liens » à droite ; empilées sur très petits écrans.
+                  VOLET 20 (26/11/2026) — ALIGNEMENT « AUTRES LIENS »
+                  (demande de l'éditeur : « la colonne Autres liens
+                  est trop allée vers la droite… il faut pousser ça
+                  vers la gauche un peu afin que sa fin verticale
+                  s'aligne avec le début vertical du bouton Switch
+                  bilingue ») : le bord DROIT de la zone des colonnes
+                  s'aligne sur le bord GAUCHE du bouton de switch
+                  bilingue du coin supérieur droit — retrait MESURÉ
+                  (voir useEffect ci-dessus), appliqué uniquement
+                  quand les colonnes sont côte à côte (≥ 560 px). */}
+              <div
+                ref={colonnesRef}
+                style={
+                  retraitColonnes !== null && retraitColonnes > 0
+                    ? { paddingRight: `${Math.round(retraitColonnes)}px` }
+                    : undefined
+                }
+                className="flex min-h-0 flex-1 flex-col justify-center gap-9 py-4 min-[560px]:flex-row min-[560px]:items-start min-[560px]:gap-14 sm:gap-24"
+              >
                 <nav aria-label={t("Navigation plein écran — pages")} className="min-w-0 flex-1">
                   <ul className="flex flex-col">
                     {MENU_MAIN_ITEMS.map((item, i) => (

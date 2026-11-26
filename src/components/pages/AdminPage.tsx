@@ -35,6 +35,9 @@ import type { DocumentRecord } from "@/lib/documents/types";
 import { estPropositionV2, type PropositionRecord } from "@/lib/documents/proposition";
 import type { ToutDocument } from "@/lib/documents/github";
 import { formatCurrency, totalDocument, formatDate } from "@/lib/documents/format";
+/* VOLET 20 — pré-remplissage expert d'un devis depuis une
+   proposition commerciale (bouton « générer le devis »). */
+import { preRemplissageDevisDepuisProposition } from "@/lib/documents/devis-depuis-proposition";
 
 /**
  * ESPACE ADMINISTRATEUR — BACK-OFFICE (VOLET 14, restructuré VOLET 15
@@ -887,6 +890,29 @@ export function AdminPage() {
     setVueFactures("selection");
   }
 
+  /** VOLET 20 — générer un DEVIS depuis une proposition commerciale
+   *  (bouton « générer le devis » de la liste des propositions) :
+   *  l'espace de création s'ouvre PRÉ-REMPLI — nom du destinataire,
+   *  numéro client, montant, périmètre rédigé en texte riche mis en
+   *  forme, délai, calendrier, modalités en notes (rédaction experte
+   *  de devis). */
+  function creerDevisDepuisProposition(prop: PropositionRecord) {
+    setSection("devis");
+    setVueDocs("creation");
+    setDocEnEdition(null);
+    setVueFactures("liste");
+    setPreRemplissage(preRemplissageDevisDepuisProposition(prop));
+  }
+
+  /** VOLET 20 — devis MARQUÉ SIGNÉ (PDF téléversé) : redirection
+   *  automatique vers la GÉNÉRATION DE FACTURE de ce devis (demande
+   *  de l'éditeur : « lorsqu'on marque un devis signé,
+   *  automatiquement on est redirigé vers la génération de facture
+   *  de ce devis »). */
+  function devisSigne(devis: DocumentRecord) {
+    setFactureCible(devis);
+  }
+
   /** Icône « modifier » d'un document de la liste. */
   function modifierDocument(d: ToutDocument) {
     setDocEnEdition(d);
@@ -1002,20 +1028,25 @@ export function AdminPage() {
 
   return (
     <div className="section-deep min-h-screen">
-      {/* Barre supérieure — VOLET 16 : logo agrandi (hauteur
-          alignée sur celle des boutons à droite) et mention
-          « BACK-OFFICE » plus grande, alignée sur le BAS du logo. */}
+      {/* Barre supérieure — VOLET 20 (26/11/2026) : logo AGRANDI
+          pour que sa HAUTEUR VISUELLE s'aligne sur celle des deux
+          boutons de droite (Actualiser / Fermer L'Espace, 44 px —
+          le glyphe du logo n'occupe que ~58 % de la hauteur du
+          fichier, il faut donc ~75 px de boîte pour 44 px de
+          contenu) ; la mention « BACK-OFFICE » est désormais
+          CENTRÉE VERTICALEMENT par rapport au logo (demande de
+          l'éditeur), plus calée vers le bas. */}
       <div className="border-b border-[#e4e4e4]/10 bg-[#070707]">
         <div className="container-site flex flex-wrap items-center justify-between gap-4 py-4">
-          <div className="flex items-stretch gap-4">
+          <div className="flex items-center gap-4">
             <img
               src={ASSETS.logoLight}
               alt="Stevens Akpovi"
               width={55}
               height={44}
-              className="h-11 w-auto self-center"
+              className="h-[75px] w-auto self-center"
             />
-            <h1 className="self-end pb-1 text-[13px] font-semibold tracking-[0.24em] text-[#c8c8c8] uppercase">
+            <h1 className="self-center text-[13px] font-semibold tracking-[0.24em] text-[#c8c8c8] uppercase">
               Back-office
             </h1>
           </div>
@@ -1237,6 +1268,9 @@ export function AdminPage() {
               onRafraichir={chargerDocuments}
               toast={toast}
               onModifier={modifierDocument}
+              /* VOLET 20 — générer un devis pré-rempli depuis la
+                  proposition (rédaction experte). */
+              onGenererDevis={creerDevisDepuisProposition}
             />
           </>
         )}
@@ -1297,6 +1331,9 @@ export function AdminPage() {
               toast={toast}
               onModifier={modifierDocument}
               onFacturer={(d) => setFactureCible(d as DocumentRecord)}
+              /* VOLET 20 — devis marqué signé : redirection automatique
+                   vers la génération de facture. */
+              onSigne={devisSigne}
             />
           </>
         )}

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Loader2, Receipt, X } from "lucide-react";
-import { BoutonAction, Champ, styleInput } from "./elements";
+import { BoutonAction, Champ, styleInput, styleInputDate } from "./elements";
 import type { DocumentRecord } from "@/lib/documents/types";
 import { formatCurrency, totalDocument, numeroDevisVersFacture } from "@/lib/documents/format";
 
@@ -26,11 +26,17 @@ import { formatCurrency, totalDocument, numeroDevisVersFacture } from "@/lib/doc
  * VOLET 18 — BILINGUE FR/EN : la facture ENREGISTRÉE hérite de la
  * langue du devis d’origine (base.langue).
  * VOLET 19 (26/11/2026, retour de l’éditeur) — PLUS AUCUN CHOIX DE
- * LANGUE à la génération : « si le devis est en français, la facture
- * doit respecter cela, pas de choix. Si le devis est fait en
- * anglais, pas de choix, la facture doit respecter cela ». Le bouton
- * génère directement dans LA LANGUE DU DOCUMENT (celle du devis
- * d’origine) — l’ancien menu « version du PDF » est SUPPRIMÉ.
+ * LANGUE à la génération : la facture suit la langue du devis.
+ * VOLET 20 (26/11/2026, retour de l’éditeur) —
+ *  - STATUT PAR DÉFAUT : une facture NOUVELLE est « En attente »
+ *    (« c’est à moi de marquer le statut payé quand ce sera payé ») ;
+ *    une facture EXISTANTE conserve son statut enregistré ;
+ *  - PLUS AUCUN TÉLÉCHARGEMENT AUTOMATIQUE : la génération
+ *    ENREGISTRE la facture (stockage privé + copie email) et c’est
+ *    TOUT — le téléchargement passe par le bouton dédié de la liste
+ *    (uniquement pour les factures PAYÉES, demande de l’éditeur) ;
+ *  - toast : « La facture est enregistrée et liée au devis D… »
+ *    (sans mention de téléchargement).
  */
 export function EspaceFacture({
   document: base,
@@ -47,20 +53,16 @@ export function EspaceFacture({
 }) {
   const estDevis = base.docType === "devis";
   const numeroFacture = estDevis ? numeroDevisVersFacture(base.numero) : base.numero;
+  /* VOLET 20 — une facture NOUVELLE naît « En attente » (demande de
+   * l'éditeur) ; une facture EXISTANTE conserve son statut
+   * enregistré (c'est ici qu'on la marque « Payé »). */
   const [statutPaiement, setStatutPaiement] = useState<"Payé" | "En attente">(
-    base.docType === "facture" ? (base.statutPaiement ?? "Payé") : "Payé",
+    base.docType === "facture" ? (base.statutPaiement ?? "En attente") : "En attente",
   );
   const [datePaiement, setDatePaiement] = useState(
     base.docType === "facture" && base.datePaiement ? base.datePaiement : new Date().toISOString().slice(0, 10),
   );
   const [enCours, setEnCours] = useState(false);
-  /* VOLET 19 — la langue du PDF est celle du DEVIS D'ORIGINE, sans
-   * aucun choix (demande de l'éditeur : la facture RESPECTE la
-   * langue du devis d'origine). */
-  const langueFacture = (base.langue ?? "fr") as "fr" | "en";
-
-  /* `langueSortie` n'est plus envoyé : le PDF suit la langue propre
-   * de la facture (héritée du devis). */
   async function genererFacture() {
     if (enCours) return;
     setEnCours(true);
@@ -97,20 +99,17 @@ export function EspaceFacture({
         const data = await res.json().catch(() => null);
         throw new Error(data?.error ?? "Génération impossible.");
       }
-      const blob = await res.blob();
-      const nom =
-        res.headers.get("Content-Disposition")?.match(/filename="?([^";]+)"?/)?.[1] ?? `${numeroFacture}.pdf`;
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = nom;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
+      /* VOLET 20 — PLUS DE TÉLÉCHARGEMENT AUTOMATIQUE : la génération
+       * enregistre la facture (stockage privé + copie email) ; le
+       * téléchargement passe par le bouton dédié de la liste
+       * (factures PAYÉES uniquement). Le PDF renvoyé est simplement
+       * consommé (aucun fichier posé sur l'appareil). */
+      await res.blob();
       toast({
         title: `Facture ${numeroFacture} ${base.docType === "facture" ? "mise à jour" : "générée"}`,
-        description: `Téléchargement lancé (${langueFacture === "en" ? "en anglais — langue du devis" : "en français — langue du devis"}) — la facture est enregistrée${estDevis ? ` et liée au devis ${base.numero}` : ""}.`,
+        description: estDevis
+          ? `La facture est enregistrée et liée au devis ${base.numero}.`
+          : "La facture est enregistrée.",
       });
       onRafraichir();
       onFerme(true);
@@ -168,12 +167,17 @@ export function EspaceFacture({
             </select>
           </Champ>
           <Champ label="Date de règlement">
-            <input className={styleInput} type="date" value={datePaiement} onChange={(e) => setDatePaiement(e.target.value)} />
+            {/* VOLET 20 — [color-scheme:dark] : le pictogramme
+                calendrier NATIF du champ date est rendu BLANC sur le
+                fond sombre (il était noir, donc invisible — demande
+                de l'éditeur). */}
+            <input className={styleInputDate} type="date" value={datePaiement} onChange={(e) => setDatePaiement(e.target.value)} />
           </Champ>
         </div>
         <p className="mt-4 text-xs leading-relaxed text-[#c8c8c8]/80">
           Le PDF de la facture reprend exactement les prestations et le total du devis ; le cachet
-          « PAYÉ » est apposé lorsque le statut est « Payé ». La facture est enregistrée et liée au devis.
+          « PAYÉ » est apposé lorsque le statut est « Payé ». La facture est enregistrée et liée au
+          devis — son téléchargement reste possible depuis la liste dès qu&apos;elle est payée.
         </p>
         <div className="mt-6 flex flex-wrap justify-end gap-3">
           <BoutonAction onClick={() => onFerme()}>Annuler</BoutonAction>

@@ -30,7 +30,7 @@ export function AboutPage() {
         intro={t("Concepteur de sites web professionnels orientés conversion. Stratégie, design et parcours de décision — au service de votre activité.")}
       >
         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
-          <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
+          <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar} arrow="up-right">
             {ABOUT.cta}
           </CTAButton>
           <CTAButton action={{ kind: "page", page: "contact" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
@@ -87,7 +87,7 @@ export function AboutPage() {
                     {t("Faisons connaissance — 30 minutes suffisent pour commencer.")}
                   </p>
                   <div className="mt-5">
-                    <CTAButton action={{ kind: "calendly" }} variant="primary" icon={CTAIcons.calendar}>
+                    <CTAButton action={{ kind: "calendly" }} variant="primary" icon={CTAIcons.calendar} arrow="up-right">
                       {CTA_LABELS.appel}
                     </CTAButton>
                   </div>

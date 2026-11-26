@@ -85,7 +85,8 @@ export function AboutSection() {
                   variant="ghostDark"
                   size="lg"
                   icon={CTAIcons.calendar}
-                >
+          arrow="up-right"
+        >
                   {ABOUT.cta}
                 </CTAButton>
               </div>

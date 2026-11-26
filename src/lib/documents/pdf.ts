@@ -159,3 +159,59 @@ process.on("exit", () => {
     void browserInstance.close().catch(() => {});
   }
 });
+
+/* ------------------------------------------------------------------
+ * VOLET 20 (26/11/2026) — CAPTURE AUTOMATIQUE DES MOCKUPS D'UN
+ * PROJET (portfolio admin).
+ *
+ * Demande de l'éditeur : « concernant l'image, je n'ai qu'à ajouter
+ * l'URL du projet et le site extrait directement le mockup mobile
+ * et desktop. Donc ce n'est pas à moi d'ajouter l'image à mettre en
+ * mockup pour desktop et mobile. » La capture ouvre le site en
+ * ligne dans Chromium (même moteur que les PDF) : viewport
+ * ORDINATEUR (1280 × 800) puis viewport MOBILE (390 × 844), PNG
+ * compressé en WebP (sharp, qualité 82) — léger comme les captures
+ * historiques, prêt pour l'enregistrement base64 du projet.
+ * ------------------------------------------------------------------ */
+
+/** Capture une page (une vue) en WebP base64. */
+async function capturerVue(
+  page: import("puppeteer-core").Page,
+  largeur: number,
+  hauteur: number,
+): Promise<{ data: string; mime: string; largeur: number; hauteur: number }> {
+  await page.setViewport({ width: largeur, height: hauteur, deviceScaleFactor: 1 });
+  /* Laisser le site réagir au changement de viewport (re-rendu,
+     animations d'apparition) avant la capture. */
+  await new Promise((r) => setTimeout(r, 1400));
+  const png = await page.screenshot({ type: "png", captureBeyondViewport: false });
+  const sharp = (await import("sharp")).default;
+  const webp = await sharp(Buffer.from(png))
+    .webp({ quality: 82 })
+    .toBuffer();
+  return {
+    data: webp.toString("base64"),
+    mime: "image/webp",
+    largeur,
+    hauteur,
+  };
+}
+
+/** Capture les mockups ORDINATEUR + MOBILE d'une URL de projet. */
+export async function capturerMockups(
+  url: string,
+): Promise<{ desktop: { data: string; mime: string; largeur: number; hauteur: number }; mobile: { data: string; mime: string; largeur: number; hauteur: number } }> {
+  const browser = await getBrowser();
+  const page = await browser.newPage();
+  try {
+    await page
+      .goto(url, { waitUntil: "networkidle2", timeout: 45000 })
+      .catch(() => undefined);
+    await new Promise((r) => setTimeout(r, 1500));
+    const desktop = await capturerVue(page, 1280, 800);
+    const mobile = await capturerVue(page, 390, 844);
+    return { desktop, mobile };
+  } finally {
+    await page.close();
+  }
+}

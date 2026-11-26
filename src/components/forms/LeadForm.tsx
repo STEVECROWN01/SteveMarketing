@@ -82,6 +82,57 @@ const QUOTE_TIMELINES = [
   "Dans 4 mois ou plus",
 ] as const;
 
+/* VOLET 20 (26/11/2026) — PAGES DE DEVIS DÉDIÉES PAR SERVICE.
+ * Demande de l'éditeur : « par exemple le bouton demander un devis
+ * du service de référencement SEO doit diriger vers une page de
+ * demande de devis spécialement dédiée pour ce service-là et pour
+ * le service de publicité Meta Ads… très bien adaptée tout en
+ * concevant et respectant le design du site web ». La page de devis
+ * (formulaire « quote ») s'adapte au service : libellé transmis à
+ * l'admin, question « pourquoi maintenant », options et question
+ * d'échéance dédiées. Le variant « site » (défaut) garde les
+ * textes historiques MOT POUR MOT. */
+export type ServiceDevis = "site" | "seo" | "metaads";
+
+const SERVICES_DEVIS: Record<
+  ServiceDevis,
+  {
+    libelle: string;
+    questionPourquoi: string;
+    optionsPourquoi: readonly string[];
+    questionQuand: string;
+  }
+> = {
+  site: {
+    libelle: "Création de site web professionnel",
+    questionPourquoi: "Pourquoi voulez-vous refaire votre site web maintenant ?",
+    optionsPourquoi: WHY_NOW_OPTIONS,
+    questionQuand: "Quand envisagez-vous de refaire votre site web ?",
+  },
+  seo: {
+    libelle: "Référencement SEO (positionnement Google)",
+    questionPourquoi: "Pourquoi souhaitez-vous améliorer votre référencement maintenant ?",
+    optionsPourquoi: [
+      "Mon site n'apparaît pas sur Google",
+      "Je veux plus de visiteurs sans dépendre de la publicité",
+      "Je veux devancer mes concurrents sur Google",
+      "Mon trafic a baissé avec le temps",
+    ],
+    questionQuand: "Quand envisagez-vous de démarrer votre référencement ?",
+  },
+  metaads: {
+    libelle: "Publicité Meta Ads (Facebook & Instagram)",
+    questionPourquoi: "Pourquoi souhaitez-vous lancer des publicités maintenant ?",
+    optionsPourquoi: [
+      "Je veux attirer des clients rapidement",
+      "Mes publications n'atteignent pas assez de monde",
+      "Je veux vendre mes produits sur Facebook et Instagram",
+      "Mes publicités actuelles ne rapportent pas assez",
+    ],
+    questionQuand: "Quand envisagez-vous de lancer vos campagnes ?",
+  },
+};
+
 interface FormState {
   /* Devis — structure « New Client Application » */
   firstName: string;
@@ -126,10 +177,13 @@ const EMPTY: FormState = {
   honeypot: "",
 };
 
-export function LeadForm({ kind }: { kind: FormKind }) {
+export function LeadForm({ kind, service = "site" }: { kind: FormKind; service?: ServiceDevis }) {
   const isQuote = kind === "quote";
   const isContact = kind === "contact";
   const isLight = isQuote;
+  /* VOLET 20 — contenu du formulaire de DEVIS selon le service
+   * (page dédiée Référencement SEO / Publicité Meta Ads). */
+  const S = SERVICES_DEVIS[service];
   const [form, setForm] = useState<FormState>(EMPTY);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -217,9 +271,13 @@ export function LeadForm({ kind }: { kind: FormKind }) {
 
     /* Devis — façon « New Client Application » : les réponses aux
        questions à choix unique composent le contenu transmis (le
-       formulaire de référence n'a pas de zone de texte libre). */
+       formulaire de référence n'a pas de zone de texte libre).
+       VOLET 20 — le SERVICE VISÉ ouvre le message (page de devis
+       dédiée : la demande arrive dans le back-office avec son
+       contexte). */
     const quoteMessage = [
-      tf("Pourquoi refaire le site maintenant : {whyNow}", { whyNow: form.whyNow }),
+      tf("Service souhaité : {service}", { service: S.libelle }),
+      tf("Pourquoi maintenant : {whyNow}", { whyNow: form.whyNow }),
       tf("Chiffre d'affaires mensuel approximatif : {revenue}", { revenue: form.revenue }),
       form.quoteTimeline
         ? tf("Échéance envisagée : {quoteTimeline}", { quoteTimeline: form.quoteTimeline })
@@ -240,7 +298,7 @@ export function LeadForm({ kind }: { kind: FormKind }) {
       website: form.website.trim() || undefined,
       activity: form.activity.trim() || undefined,
       discovery: isContact ? form.discovery : undefined,
-      serviceType: undefined,
+      serviceType: isQuote ? S.libelle : undefined,
       budget: undefined,
       timeline: isQuote ? form.quoteTimeline || undefined : form.timeline || undefined,
       message: isQuote ? quoteMessage : form.message.trim(),
@@ -554,14 +612,15 @@ export function LeadForm({ kind }: { kind: FormKind }) {
             </span>
           </label>
 
-          {/* Question 1 — pourquoi maintenant (choix unique) */}
+          {/* Question 1 — pourquoi maintenant (choix unique, adaptée au
+              service — VOLET 20) */}
           <fieldset>
             <legend className={`${labelBase} px-0`}>
-              {t("Pourquoi voulez-vous refaire votre site web maintenant\u00A0?")}{" "}
+              {t(S.questionPourquoi)}{" "}
               <span className="text-[#2c3345]">*</span>
             </legend>
             <div className="mt-1 flex flex-col">
-              {WHY_NOW_OPTIONS.map((option) => (
+              {S.optionsPourquoi.map((option) => (
                 <label key={option} className="sher-choice">
                   <input
                     type="radio"
@@ -614,10 +673,11 @@ export function LeadForm({ kind }: { kind: FormKind }) {
             )}
           </fieldset>
 
-          {/* Question 3 — échéance (choix unique, facultatif) */}
+          {/* Question 3 — échéance (choix unique, facultatif — libellé
+              adapté au service, VOLET 20) */}
           <fieldset>
             <legend className={`${labelBase} px-0`}>
-              {t("Quand envisagez-vous de refaire votre site web\u00A0?")}
+              {t(S.questionQuand)}
             </legend>
             <div className="mt-1 flex flex-col">
               {QUOTE_TIMELINES.map((option) => (

@@ -66,6 +66,19 @@ function fmtMontant(n: number, devise: string): string {
   return /[$£]/.test(s) ? `${s}${nb}` : `${nb} ${s}`;
 }
 
+/** VOLET 20 — date longue française (« 26 novembre 2026 ») pour la
+ *  ligne « DATE D'ÉMISSION » de la première page. */
+const MOIS_FR = [
+  "janvier", "février", "mars", "avril", "mai", "juin",
+  "juillet", "août", "septembre", "octobre", "novembre", "décembre",
+];
+function fmtDateLongue(iso: string): string {
+  if (!iso) return "";
+  const d = new Date(iso + "T00:00:00");
+  if (isNaN(d.getTime())) return iso;
+  return `${d.getDate()} ${MOIS_FR[d.getMonth()]} ${d.getFullYear()}`;
+}
+
 /* Constantes de pagination (pt → px CSS : × 4/3). */
 const LIMITE_PX = Math.round(720 * 4 / 3);
 const DEBUT_P1_PX = Math.round(56.3 * 4 / 3);
@@ -279,6 +292,11 @@ ${suite}`;
   .paire .val { margin: 0; font-size: 11pt; font-weight: 500; line-height: 1.2; color: #111111; }
   .paire .val.montant { font-size: 15pt; font-weight: 700; }
   .filet-clair { margin: 16.5pt 0 0 0; border-top: 0.6pt solid #e6e6e6; }
+  /* VOLET 20 (26/11/2026) — DATE D'ÉMISSION sous le trait de
+     séparation : l'espace qui sépare le trait et la date (ci-dessous)
+     ÉGALE l'espace qui sépare le trait et le délai estimé ci-dessus
+     (16,5 pt — demande de l'éditeur). */
+  .paire-date { margin: 16.5pt 0 0 0; }
 
   /* ---- En-tête compact (pages suivantes) ---- */
   .entete-n { position: absolute; top: 0; left: 62.4pt; right: 62.4pt; z-index: 1; }
@@ -444,6 +462,22 @@ ${suite}`;
       <p class="lbl">VOTRE PROJET</p>
       <p class="val">${esc(p.projet)}</p>
     </div>
+    <!-- VOLET 20 — DESTINATAIRE : nom complet de celui à qui la
+         proposition est adressée (et son entreprise le cas échéant)
+         — c'est ce nom qui pré-remplit le client du devis généré
+         depuis la proposition. -->
+    ${
+      (p.destinataire?.nomComplet || "").trim() || (p.destinataire?.entreprise || "").trim()
+        ? `<div class="paire">
+      <p class="lbl">DESTINATAIRE</p>
+      <p class="val">${esc(
+        [(p.destinataire?.nomComplet || "").trim(), (p.destinataire?.entreprise || "").trim()]
+          .filter(Boolean)
+          .join(" — "),
+      )}</p>
+    </div>`
+        : ""
+    }
     <div class="paire">
       <p class="lbl">PRESTATAIRE</p>
       <p class="val">${esc(p.prestataire)}</p>
@@ -458,6 +492,13 @@ ${suite}`;
     </div>
   </div>
   <div class="filet-clair" data-bloc></div>
+  <!-- VOLET 20 — DATE D'ÉMISSION sous le trait de séparation :
+       l'espace trait → date égale l'espace délai estimé → trait
+       (16,5 pt de part et d'autre — demande de l'éditeur). -->
+  <div class="paire paire-date" data-bloc>
+    <p class="lbl">DATE D'ÉMISSION</p>
+    <p class="val">${esc(fmtDateLongue(p.date))}</p>
+  </div>
 
   ${section("01", "Présentation de votre projet", chapeauEtParas(s.presentation ?? []), " t01")}
 

@@ -92,10 +92,10 @@ export function MetaAdsPage() {
         intro={t("Développez votre présence sur Facebook et Instagram grâce à des campagnes publicitaires ciblées et structurées autour de vos objectifs — le complément naturel d'un site web pensé pour convertir.")}
       >
         <div className="flex flex-col gap-3.5 sm:flex-row sm:flex-wrap">
-          <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
+<CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar} arrow="up-right">
             {CTA_LABELS.appel}
           </CTAButton>
-          <CTAButton action={{ kind: "page", page: "devis" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
+          <CTAButton action={{ kind: "page", page: "devisMetaAds" }} variant="ghostLight" size="lg" icon={CTAIcons.quote}>
             {CTA_LABELS.devis}
           </CTAButton>
         </div>
@@ -236,10 +236,10 @@ export function MetaAdsPage() {
           </Reveal>
           <Reveal direction="up" delay={0.12}>
             <div className="mt-9 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
-              <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar}>
+    <CTAButton action={{ kind: "calendly" }} variant="primary" size="lg" icon={CTAIcons.calendar} arrow="up-right">
                 {CTA_LABELS.appel}
               </CTAButton>
-              <CTAButton action={{ kind: "page", page: "devis" }} variant="secondary" size="lg" icon={CTAIcons.quote}>
+              <CTAButton action={{ kind: "page", page: "devisMetaAds" }} variant="secondary" size="lg" icon={CTAIcons.quote}>
                 {CTA_LABELS.devis}
               </CTAButton>
             </div>

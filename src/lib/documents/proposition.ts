@@ -87,6 +87,12 @@ export type PropositionRecord = {
   projet: string;
   /** Bloc « PRESTATAIRE ». */
   prestataire: string;
+  /** VOLET 20 (26/11/2026) — DESTINATAIRE : nom complet de la
+   *  personne à qui la proposition est adressée, et son entreprise
+   *  le cas échéant (si l'entreprise est renseignée, elle sert de
+   *  NOM du client lors de la génération du devis depuis la
+   *  proposition — demande de l'éditeur). */
+  destinataire?: { nomComplet?: string; entreprise?: string };
   /** Bloc « MONTANT TOTAL ». */
   montant: number;
   devise: string;

@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { verifySessionToken, SESSION_COOKIE } from "@/lib/admin-auth";
+/* VOLET 20 (26/11/2026) — STOCKAGE GITHUB DES DEMANDES : la rubrique
+   « Demandes » du back-office liste la FUSION base de données +
+   dossier privé `demandes/` du dépôt GitHub (dédupliquée par
+   identifiant, la plus récente en tête). Sans base configurée, les
+   demandes du site restent ainsi intégralement visibles. */
+import { listerDemandes, type DemandeStockee } from "@/lib/documents/demandes-stockage";
 
 export const runtime = "nodejs";
 
@@ -11,8 +17,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "Non autorisé." }, { status: 401 });
   }
 
+  /* VOLET 20 — demandes du dossier privé GitHub (tolérant : liste
+   * vide si le stockage n'est pas configuré). */
+  const demandesGithub = await listerDemandes();
+
+  /* Base de données (voie historique) — indisponible sur les
+   * environnements sans base : la fusion GitHub prend seule. */
+  let demandesBase: DemandeStockee[] = [];
   try {
-    const leads = await db.lead.findMany({
+    demandesBase = (await db.lead.findMany({
       orderBy: { createdAt: "desc" },
       select: {
         id: true,
@@ -32,18 +45,20 @@ export async function GET(req: NextRequest) {
         source: true,
         createdAt: true,
       },
-    });
-
-    return NextResponse.json({ ok: true, leads });
+    })) as unknown as DemandeStockee[];
   } catch (error) {
-    console.error("[admin/leads] Base de données indisponible :", error);
-    return NextResponse.json(
-      {
-        ok: false,
-        error:
-          "La base de données est indisponible sur cet environnement. Voir DEPLOIEMENT.md — persistance des demandes (base managée).",
-      },
-      { status: 503 }
-    );
+    console.info("[admin/leads] Base de données indisponible — liste GitHub seule :", error instanceof Error ? error.message : error);
   }
+
+  /* Fusion dédupliquée par identifiant : la version BASE (statut
+   * maintenu) l'emporte, la version GitHub comble les absents. */
+  const parId = new Map<string, DemandeStockee>();
+  for (const d of demandesGithub) parId.set(d.id, d);
+  for (const d of demandesBase) parId.set(d.id, { ...parId.get(d.id), ...d });
+
+  const leads = Array.from(parId.values()).sort((a, b) =>
+    (b.createdAt || "").localeCompare(a.createdAt || ""),
+  );
+
+  return NextResponse.json({ ok: true, leads });
 }

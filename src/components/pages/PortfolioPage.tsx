@@ -164,7 +164,7 @@ export function PortfolioPage() {
                 {WORKS.cta}
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
-                <CTAButton action={{ kind: "calendly" }} variant="dark" size="lg" icon={CTAIcons.calendar}>
+                <CTAButton action={{ kind: "calendly" }} variant="dark" size="lg" icon={CTAIcons.calendar} arrow="up-right">
                   {CTA_LABELS.appel}
                 </CTAButton>
                 <CTAButton action={{ kind: "page", page: "devis" }} variant="ghostDark" size="lg" icon={CTAIcons.quote}>

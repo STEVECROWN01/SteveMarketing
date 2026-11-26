@@ -110,10 +110,13 @@ export function manquesPublication(p: {
 }): string[] {
   const manques: string[] = [];
   if (!p.nom.trim()) manques.push("le nom du projet");
-  if (!p.categorie.trim()) manques.push("la catégorie");
+  /* VOLET 20 — l'ancien champ « catégorie » s'appelle désormais
+   * « TITRE » (ce n'est pas une catégorie, c'est un titre) ; le
+   * libellé du bouton est posé automatiquement par le site (« Voir
+   * Le Site ») : plus de contrôle à son sujet. */
+  if (!p.categorie.trim()) manques.push("le titre");
   if (!p.description.trim()) manques.push("la description");
-  if (!p.cta.trim()) manques.push("le libellé du bouton");
   if (!/^https?:\/\/.+\..+/i.test(p.url.trim())) manques.push("l'URL du site (https://…)");
-  if (!p.desktop) manques.push("la capture d'ordinateur");
+  if (!p.desktop) manques.push("l'aperçu ordinateur (extrait automatiquement depuis l'URL)");
   return manques;
 }

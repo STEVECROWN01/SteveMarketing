@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useMemo, useState } from "react";
-import { useLang, useSite } from "@/i18n";
+import { useLang, useSite, traduit } from "@/i18n";
 import type { ProjetPublic, TraductionProjet } from "@/lib/portfolio/types";
 
 /** Projet au format du site (voir ProjectCard / pages). */
@@ -92,17 +92,24 @@ export function useProjetsAdmin(): { projets: ProjetPublic[]; chargement: boolea
 /* Liste COMBINÉE : projets statiques (traduits) + projets admin      */
 /* ------------------------------------------------------------------ */
 
-/** Version anglaise d'un champ admin (retombe sur le français). */
+/** Version anglaise d'un champ admin (retombe sur le français).
+ *  VOLET 20 (26/11/2026) — « ce n'est pas à moi de mettre la version
+ *  anglaise lors de l'ajout du projet : c'est le site qui s'occupe de
+ *  ça, qui traduit ça » : plus de champs anglais dans le back-office —
+ *  le champ anglais manuel disparaît, et le SITE traduit lui-même les
+ *  textes du projet (couche de traduction globale : une traduction
+ *  présente s'applique, sinon le texte français reste affiché). */
 function tradAdmin<T extends keyof TraductionProjet>(
   p: ProjetPublic,
   champ: T,
   langue: string,
 ): string {
+  const texte = String(p[champ as keyof ProjetPublic] ?? "");
   if (langue === "en") {
-    const valeur = p.en?.[champ];
-    if (typeof valeur === "string" && valeur.trim()) return valeur;
+    const manuelle = p.en?.[champ];
+    if (typeof manuelle === "string" && manuelle.trim()) return manuelle;
   }
-  return String(p[champ as keyof ProjetPublic] ?? "");
+  return traduit(texte, langue === "en" ? "en" : "fr");
 }
 
 /** TOUS les projets du site : les QUATRE projets statiques (ordre et

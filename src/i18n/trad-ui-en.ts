@@ -194,6 +194,41 @@ export const TRAD_UI: Record<string, string> = {
   "Vous préférez commencer par une conversation ? Réservez un appel de 30 minutes — gratuit et sans engagement.": "Prefer to start with a conversation? Book a 30-minute call — free and with no commitment.",
   "Réservez un appel de 30 minutes": "Book a 30-minute call",
 
+  /* VOLET 20 (26/11/2026) — pages de devis DÉDIÉES par service
+     (Référencement SEO, Publicité Meta Ads) : sur-titres, titres,
+     introductions et bénéfices. Le variant « site » reprend les
+     clés historiques ci-dessus. */
+  "DEMANDE DE DEVIS — RÉFÉRENCEMENT SEO": "QUOTE REQUEST — SEO",
+  "DEMANDE DE DEVIS — PUBLICITÉ META ADS": "QUOTE REQUEST — META ADS ADVERTISING",
+  "Gagnez En Visibilité Sur Google Pour Attirer Plus De Clients": "Gain Visibility On Google To Attract More Clients",
+  "Attirer Plus De Clients": "Attract More Clients",
+  "Transformez Facebook Et Instagram En Sources De Clients": "Turn Facebook And Instagram Into Client Sources",
+  "Sources De Clients": "Client Sources",
+  "Je positionne votre site sur Google pour qu'il attire durablement les visiteurs les plus susceptibles de devenir vos clients — sans dépendre de la publicité.": "I position your website on Google so it durably attracts the visitors most likely to become your customers — without depending on advertising.",
+  "Je conçois et pilote vos campagnes publicitaires Facebook et Instagram pour toucher les bonnes personnes, avec un message clair et des objectifs de vente précis.": "I design and manage your Facebook and Instagram advertising campaigns to reach the right people, with a clear message and precise sales goals.",
+  "Apparaître sur les recherches de vos clients": "Show up when your customers search",
+  "Attirer des visiteurs qualifiés, pas seulement du trafic": "Attract qualified visitors, not just traffic",
+  "Construire une visibilité qui dure, sans publicité": "Build lasting visibility, without advertising",
+  "Toucher exactement vos clients idéaux": "Reach exactly your ideal customers",
+  "Des campagnes pensées pour générer des ventes": "Campaigns designed to generate sales",
+  "Un pilotage clair : budget, résultats, prochaines étapes": "Clear management: budget, results, next steps",
+
+  /* ============================== components/forms/LeadForm.tsx (VOLET 20 — devis par service) ============================== */
+  "Service souhaité : {service}": "Desired service: {service}",
+  "Pourquoi maintenant : {whyNow}": "Why now: {whyNow}",
+  "Pourquoi souhaitez-vous améliorer votre référencement maintenant ?": "Why do you want to improve your SEO now?",
+  "Quand envisagez-vous de démarrer votre référencement ?": "When are you planning to start your SEO?",
+  "Pourquoi souhaitez-vous lancer des publicités maintenant ?": "Why do you want to launch advertising now?",
+  "Quand envisagez-vous de lancer vos campagnes ?": "When are you planning to launch your campaigns?",
+  "Mon site n'apparaît pas sur Google": "My website doesn't show up on Google",
+  "Je veux plus de visiteurs sans dépendre de la publicité": "I want more visitors without depending on advertising",
+  "Je veux devancer mes concurrents sur Google": "I want to outrank my competitors on Google",
+  "Mon trafic a baissé avec le temps": "My traffic has declined over time",
+  "Je veux attirer des clients rapidement": "I want to attract customers quickly",
+  "Mes publications n'atteignent pas assez de monde": "My posts don't reach enough people",
+  "Je veux vendre mes produits sur Facebook et Instagram": "I want to sell my products on Facebook and Instagram",
+  "Mes publicités actuelles ne rapportent pas assez": "My current ads aren't paying off enough",
+
   /* ============================== components/pages/AuditPage.tsx ============================== */
   "Un regard professionnel et indépendant sur votre site": "A professional, independent look at your website",
   "Des points concrets à améliorer, expliqués simplement": "Concrete improvements to make, explained simply",
