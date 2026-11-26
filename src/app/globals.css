@@ -512,7 +512,13 @@ html.hoverable .mockup-zoom:where(:hover, :focus-within) > span > img {
    resserrées ci-dessous. Le padding-top du conteneur passe de
    54 px à 76 px : le contenu étant ancré en haut (justify-start),
    les étoiles partent du padding — elles doivent rester SOUS la
-   pastille logo fixe (64 px de haut) et son halo de respiration. */
+   pastille logo fixe (64 px de haut) et son halo de respiration.
+   VOLET 19 — précision (26/11/2026) : le conteneur est passé en
+   JUSTIFY-CENTER (centrage vertical du hero sous le header,
+   demande de l'éditeur) — les paliers ci-dessous restent UTILES
+   sur les téléphones courts : quand le contenu DÉPASSE l'espace,
+   ils le compactent exactement comme avant (le centrage est alors
+   neutre, il ne reste plus d'air à répartir). */
 @media (max-width: 480px) and (max-height: 660px) {
   #hero .hero-visual {
     margin-top: 0.75rem;
@@ -556,7 +562,9 @@ html.hoverable .mockup-zoom:where(:hover, :focus-within) > span > img {
    VOLET 13 (24/11/2026) : règle .hero-desc (10 px) supprimée
    (même raison que le premier palier — .text-body partout) ;
    padding-top 54 → 76 px pour dégager la pastille logo fixe,
-   le contenu partant du padding (justify-start). */
+   le contenu partant du padding (justify-start — devenu
+   justify-center au volet 19, le padding garde son rôle de
+   dégagement de la pastille). */
 @media (max-width: 480px) and (max-height: 620px), (max-width: 300px) {
   #hero > .container-site {
     padding-top: 76px;

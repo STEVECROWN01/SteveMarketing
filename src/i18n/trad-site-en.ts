@@ -33,10 +33,14 @@ export const TRAD_SITE: Record<string, string> = {
      « I Build Professional Websites That Drive Sales. » (= traduction de
      h1) afin de préserver le contrôle h1 === h1Lines.join(" ").
      VOLET 19 (26/11/2026) — correction demandée par l'éditeur :
-     « Generate Sales » → « Drive Sales » (titre anglais du hero). */
-  "Je crée des Sites Web": "I Build Professional",
-  "Professionnels qui": "Websites That",
-  "Génèrent des Ventes.": "Drive Sales.",
+     « Generate Sales » → « Drive Sales » (titre anglais du hero).
+     MÊME JOUR, PRÉCISION DE L'ÉDITEUR — découpage des lignes anglaises
+     imposé comme le français : « I Build » en ligne 1, « Professional
+     Websites » en ligne 2, « That Drive Sales » en ligne 3, sur TOUTES
+     les tailles d'écran. */
+  "Je crée des Sites Web": "I Build",
+  "Professionnels qui": "Professional Websites",
+  "Génèrent des Ventes.": "That Drive Sales.",
   /* HERO.h1Bold — segment en gras ; sous-chaîne de la traduction de h1. */
   "qui Génèrent des Ventes.": "That Drive Sales.",
   /* HERO.text — contient la traduction de textBold (1re phrase), et les
@@ -188,10 +192,14 @@ export const TRAD_SITE: Record<string, string> = {
   "Démarrer Mon Projet": "Start My Project",
 
   /* ==================== 11 — À PROPOS (ABOUT) ====================
-     ABOUT.text et ABOUT.textHome sont identiques dans la source — une seule clé. */
+     ABOUT.text et ABOUT.textHome sont identiques dans la source — une seule clé.
+     VOLET 19 — précision (26/11/2026) : la biographie passe de CINQ
+     paragraphes à TROIS (regroupement demandé par l'éditeur) — les
+     phrases groupées restent séparées par un retour à la ligne simple
+     « \n » dans la clé ET dans la traduction (rendu <br> par RichText). */
   "QUI SUIS-JE ?": "WHO AM I?",
   "Je suis Stevens Akpovi. Et je crois qu'un bon site web doit servir le business qu'il représente.": "I'm Stevens Akpovi. And I believe a good website should serve the business it represents.",
-  "Je suis concepteur de sites web professionnels et passionné par la manière dont le numérique peut accompagner le développement des entreprises.\n\nMon travail consiste à transformer les besoins d'un professionnel en une expérience digitale claire, élégante et orientée vers ses objectifs.\n\nJe m'intéresse autant à la présentation visuelle qu'au message transmis et au chemin que suit un visiteur avant de prendre une décision.\n\nParce qu'un site réussi ne se résume pas à son apparence.\n\nIl doit donner une bonne première impression, présenter la valeur de votre activité et faciliter la relation avec vos futurs clients.": "I am a professional website designer, passionate about how digital can support the growth of businesses.\n\nMy work consists of turning a professional's needs into a clear, elegant digital experience oriented toward their goals.\n\nI pay as much attention to the visual presentation as to the message conveyed and the path a visitor follows before making a decision.\n\nBecause a successful website is about more than its appearance.\n\nIt must make a good first impression, present the value of your business, and make it easier to build relationships with your future clients.",
+  "Je suis concepteur de sites web professionnels et passionné par la manière dont le numérique peut accompagner le développement des entreprises.\n\nMon travail consiste à transformer les besoins d'un professionnel en une expérience digitale claire, élégante et orientée vers ses objectifs.\nJe m'intéresse autant à la présentation visuelle qu'au message transmis et au chemin que suit un visiteur avant de prendre une décision.\n\nParce qu'un site réussi ne se résume pas à son apparence.\nIl doit donner une bonne première impression, présenter la valeur de votre activité et faciliter la relation avec vos futurs clients.": "I am a professional website designer, passionate about how digital can support the growth of businesses.\n\nMy work consists of turning a professional's needs into a clear, elegant digital experience oriented toward their goals.\nI pay as much attention to the visual presentation as to the message conveyed and the path a visitor follows before making a decision.\n\nBecause a successful website is about more than its appearance.\nIt must make a good first impression, present the value of your business, and make it easier to build relationships with your future clients.",
   "Faisons Connaissance": "Let's Get To Know Each Other",
 
   /* ==================== 12 — FAQ ==================== */

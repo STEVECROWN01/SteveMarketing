@@ -83,12 +83,22 @@ export function WorksSection() {
             projets ajoutés depuis l'espace admin suivent la même
             présentation, partout.
             VOLET 14 (24/11/2026) — LARGEUR RÉDUITE SUR BUREAU :
-            max-w-5xl centré (~500 px par carte en 2 colonnes) — les
-            captures desktop gardent une échelle naturelle, le
-            mobile reste sur une colonne pleine largeur. */}
+            max-w-5xl centré (~500 px par carte en 2 colonnes).
+            VOLET 19 — précision (26/11/2026) — MOCKUPS PLUS PETITS
+            SUR TABLETTE ET BUREAU (demande de l'éditeur) : la grille
+            est resserrée par des plafonds de largeur propres à chaque
+            règle — 4 projets ou plus : 600 px (tablettes et bureaux
+            étroits) / 840 px (bureaux), cartes ≈ 290 → 410 px au lieu
+            de 342 → 502 ; TROIS projets : 700 px / 900 px — plancher
+            plus haut car trois cartes par ligne doivent rester
+            assez larges pour leur bouton « Voir Le Projet » (la
+            tablette reste alors à la largeur du conteneur). Le
+            mobile (< 768 px) garde ses cartes pleine largeur. */}
         <div
-          className={`mx-auto mt-12 grid w-full max-w-5xl gap-5 sm:mt-14 ${
-            PROJECTS.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2"
+          className={`mx-auto mt-12 grid w-full gap-5 sm:mt-14 ${
+            PROJECTS.length === 3
+              ? "md:max-w-[700px] md:grid-cols-3 lg:max-w-[900px]"
+              : "md:max-w-[600px] md:grid-cols-2 lg:max-w-[840px]"
           }`}
         >
           {PROJECTS.map((project, i) => (

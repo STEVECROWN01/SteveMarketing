@@ -1,0 +1,71 @@
+VOLET 19 — PRÉCISIONS (1) : TITRE EN « I BUILD / PROFESSIONAL WEBSITES / THAT DRIVE SALES », FLÈCHE OBLIQUE DU CTA, CENTRAGE VERTICAL DE L'IMAGE ET DU BLOC TEXTE, MOCKUPS DES RÉALISATIONS RÉDUITS SUR TABLETTE ET BUREAU, BIOGRAPHIE « QUI SUIS-JE ? » EN TROIS PARAGRAPHES (26/11/2026)
+
+Cinq demandes de l'éditeur, toutes mesurées par la sonde locale 62/62
+(scripts/sonde-volet19-precisions-2026-11-26.py — 280/320/375/390/768/
+1024/1440/1920 px, FR + EN, accueil + page projet + page À propos) :
+
+1. TITRE ANGLAIS EN TROIS LIGNES IMPOSÉES — « I Build » en ligne 1,
+   « Professional Websites » en ligne 2, « That Drive Sales » en
+   ligne 3, sur TOUTES les tailles d'écran (trad-site-en.ts) ; les
+   trois lignes se recomposent exactement en « I Build Professional
+   Websites That Drive Sales. » (contrôle h1 === join conservé) ;
+   aucune ligne ne se coupe, y compris à 280 px (Galaxy Fold) et
+   320 px. Non-régression FR vérifiée (« Je crée des Sites Web » /
+   « Professionnels qui » / « Génèrent des Ventes. »).
+
+2. FLÈCHE OBLIQUE ASCENDANTE DU CTA « RÉSERVER UN APPEL » — nouveau
+   prop CTAButton arrow="up-right" : même glyphe ArrowUpRight (↗)
+   que le CTA « Démarrer Un Projet » du header ; au survol elle
+   glisse en DIAGONALE (droite + haut) au lieu de glisser à droite.
+
+3. CENTRAGE VERTICAL DE L'IMAGE ET DU BLOC TEXTE (étoiles →
+   réassurance) dans l'espace [bas du header → fin du hero], quelle
+   que soit la taille d'écran :
+   - BUREAU : conteneur justify-center (ancré en haut depuis le
+     volet 13) + grille lg:items-center — mesuré à −6 px de l'axe ;
+   - MOBILE/TABLETTE : la mise en page interne devient une COLONNE
+     FLEX (flex-1, hauteur = l'espace exact sous le header) avec
+     deux zones de texte flexibles (flex-1 basis-0) autour de
+     l'image — l'air restant se répartit à parts égales, chaque zone
+     restant au moins aussi haute que son contenu ; un ajustement
+     MESURÉ (visualRef, même mécanique que descriptionEquilibree)
+     pose en plus le centre de l'image sur l'axe central, exécuté
+     dès que les polices sont prêtes (avant l'arrivée de l'image,
+     1-2 s : elle se pose directement centrée), plafonné par l'air
+     disponible (le hero ne grandit jamais, garde-fou mesuré) ;
+     mesuré à +2 px (mobile) et −10 px (tablette) de l'axe ;
+   - garde le hero ENTIÈREMENT VISIBLE SANS DÉFILEMENT sur les
+     téléphones courts (320×568 et 280×653 : hero = viewport pile) ;
+     le bloc texte, qui enjambe l'image, reste centré au ±10 px —
+     sur un empilement, l'image et le bloc texte ne peuvent pas
+     être centrés isolément (centrer l'un décale l'autre de la
+     moitié de la différence de hauteur des deux zones) : l'image,
+     objet de la demande explicite « toujours centrée », est
+     servie en priorité.
+
+4. MOCKUPS DES PROJETS PLUS PETITS SUR TABLETTE ET BUREAU — la
+   grille des réalisations (accueil ET « autres projets » des pages
+   projet, même règle) est resserrée par des plafonds de largeur :
+   4 projets ou plus : 600 px (tablettes) / 840 px (bureaux) —
+   cartes ≈ 290 → 410 px au lieu de 342 → 502 ; TROIS projets :
+   700 px / 900 px (plancher plus haut : trois cartes par ligne
+   doivent rester assez larges pour leur bouton « Voir Le
+   Projet »). Le mobile garde ses cartes pleine largeur.
+
+5. BIOGRAPHIE « QUI SUIS-JE ? » EN TROIS PARAGRAPHES — les cinq
+   paragraphes sont regroupés en trois (demande de l'éditeur) :
+   P1 seul, P2 = « Mon travail… » + « Je m'intéresse… », P3 =
+   « Parce qu'un site réussi… » + « Il doit donner… » ; les phrases
+   regroupées sont séparées par des RETOURS À LA LIGNE simples,
+   rendus <br> par RichText (mise à jour du composant : « \n »
+   simple = <br>, « \n\n » = paragraphe — aucun autre texte du
+   site n'en contient) ; la traduction anglaise suit la même
+   structure (accueil + page À propos, FR + EN vérifiés).
+
+NOTE DE MESURE — CLS : le centrage mesuré de l'image sur les
+écrans empilés déplace les textes ~30 px au chargement (l'image
+étant encore invisible : elle se pose déjà centrée) : CLS mesuré
+0,000 (bureau, aucun ajustement) à 0,057 (mobile) — sous le seuil
+« good » de Google (0,1), la géométrie d'un empilement ne
+permettant pas de centrer image et bloc texte à la fois sans ce
+déplacement.

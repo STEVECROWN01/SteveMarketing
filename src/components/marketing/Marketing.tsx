@@ -18,6 +18,13 @@ import { useT } from "@/i18n";
  * Description multi-paragraphes — espacement inter-paragraphe resserré
  * (mt-3) au lieu du saut de ligne complet hérité de whitespace-pre-line.
  * Un seul paragraphe : rendu <p> simple ; plusieurs : <div> de <p>.
+ * VOLET 19 — précision (26/11/2026) : à l'intérieur d'un paragraphe,
+ * un retour à la ligne simple « \n » devient un SAUT DE LIGNE <br>
+ * (demande de l'éditeur : la biographie « Qui suis-je ? » regroupe ses
+ * phrases en trois paragraphes avec des retours à la ligne simples
+ * à l'intérieur) ; « \n\n » et plus sépare toujours les paragraphes.
+ * Aucun autre texte du site ne contient de « \n » simple : le rendu des
+ * contenus existants est strictement inchangé.
  */
 export function RichText({
   text,
@@ -31,17 +38,33 @@ export function RichText({
     .map((p) => p.trim())
     .filter(Boolean);
   if (paragraphs.length <= 1) {
-    return <p className={className}>{paragraphs[0] ?? text}</p>;
+    return (
+      <p className={className}>
+        {renderLignes(paragraphs[0] ?? text)}
+      </p>
+    );
   }
   return (
     <div className={className}>
       {paragraphs.map((paragraph, i) => (
         <p key={i} className={i > 0 ? "mt-3" : undefined}>
-          {paragraph}
+          {renderLignes(paragraph)}
         </p>
       ))}
     </div>
   );
+}
+
+/** Rendu des lignes d'UN paragraphe : chaque « \n » simple devient un
+ *  <br> — la phrase suivante démarre dessous, sans créer de nouveau
+ *  paragraphe (pas d'espacement mt-3, retour à la ligne nu). */
+function renderLignes(paragraphe: string) {
+  return paragraphe.split("\n").map((ligne, j) => (
+    <React.Fragment key={j}>
+      {j > 0 && <br />}
+      {ligne}
+    </React.Fragment>
+  ));
 }
 
 /* ============================ En-têtes de section ============================ */
@@ -130,6 +153,7 @@ export function CTAButton({
   ariaLabel,
   hideArrow = false,
   hideArrowBelowSm = false,
+  arrow = "right",
 }: {
   action: CTAAction;
   variant?: Variant;
@@ -149,6 +173,13 @@ export function CTAButton({
    *  ce qui garantit la rangée sur une seule ligne jusqu'à 280 px
    *  de large. La flèche revient dès 640 px. */
   hideArrowBelowSm?: boolean;
+  /** Forme de la flèche de droite — VOLET 19, précision (26/11/2026) :
+   *  « right » (flèche horizontale →, défaut historique de tous les
+   *  CTA du site) ou « up-right » (flèche OBLIQUE ASCENDANTE ↗,
+   *  comme celle du CTA « Démarrer Un Projet » du header — demande
+   *  de l'éditeur pour le CTA « Réserver Un Appel » du hero ; au
+   *  survol elle glisse en diagonale vers le haut à droite). */
+  arrow?: "right" | "up-right";
 }) {
   const router = useRouter();
   const calendly = useCalendly();
@@ -228,15 +259,27 @@ export function CTAButton({
       <span className="inline-flex items-center gap-2.5">
         {icon}
         {children}
-        {!hideArrow && (
-          <ArrowRight
-            className={cn(
-              "h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1",
-              hideArrowBelowSm && "hidden sm:block",
-            )}
-            aria-hidden="true"
-          />
-        )}
+        {!hideArrow &&
+          (arrow === "up-right" ? (
+            /* Flèche oblique ascendante ↗ — même glyphe que la pastille du
+             * CTA « Démarrer Un Projet » du header (StartProjectButton) ;
+             * au survol, le glissement se fait en DIAGONALE (droite + haut). */
+            <ArrowUpRight
+              className={cn(
+                "h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-0.5",
+                hideArrowBelowSm && "hidden sm:block",
+              )}
+              aria-hidden="true"
+            />
+          ) : (
+            <ArrowRight
+              className={cn(
+                "h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1",
+                hideArrowBelowSm && "hidden sm:block",
+              )}
+              aria-hidden="true"
+            />
+          ))}
       </span>
     </a>
   );

@@ -342,7 +342,14 @@ export const METHOD = {
 export const ABOUT = {
   eyebrow: "QUI SUIS-JE ?",
   title: "Je suis Stevens Akpovi. Et je crois qu'un bon site web doit servir le business qu'il représente.",
-  text: "Je suis concepteur de sites web professionnels et passionné par la manière dont le numérique peut accompagner le développement des entreprises.\n\nMon travail consiste à transformer les besoins d'un professionnel en une expérience digitale claire, élégante et orientée vers ses objectifs.\n\nJe m'intéresse autant à la présentation visuelle qu'au message transmis et au chemin que suit un visiteur avant de prendre une décision.\n\nParce qu'un site réussi ne se résume pas à son apparence.\n\nIl doit donner une bonne première impression, présenter la valeur de votre activité et faciliter la relation avec vos futurs clients.",
+  /* VOLET 19 — précision (26/11/2026) : la biographie passe de CINQ
+   *  paragraphes à TROIS (regroupement demandé par l'éditeur). Les
+   *  phrases regroupées restent séparées par un RETOUR À LA LIGNE
+   *  simple « \n » — RichText le rend en <br> depuis le même jour —
+   *  tandis que « \n\n » sépare toujours les paragraphes : P1 seul,
+   *  P2 = « Mon travail… » + « Je m'intéresse… », P3 = « Parce qu'un
+   *  site… » + « Il doit donner… ». */
+  text: "Je suis concepteur de sites web professionnels et passionné par la manière dont le numérique peut accompagner le développement des entreprises.\n\nMon travail consiste à transformer les besoins d'un professionnel en une expérience digitale claire, élégante et orientée vers ses objectifs.\nJe m'intéresse autant à la présentation visuelle qu'au message transmis et au chemin que suit un visiteur avant de prendre une décision.\n\nParce qu'un site réussi ne se résume pas à son apparence.\nIl doit donner une bonne première impression, présenter la valeur de votre activité et faciliter la relation avec vos futurs clients.",
   cta: "Faisons Connaissance",
   /** Dernière phrase (« Je travaille à distance et accompagne des
    *  professionnels et des entreprises au-delà des frontières. »)
@@ -351,7 +358,7 @@ export const ABOUT = {
    *  biographie de la page « À propos » et celle de l'accueil
    *  (textHome) sont désormais identiques. */
   textHome:
-    "Je suis concepteur de sites web professionnels et passionné par la manière dont le numérique peut accompagner le développement des entreprises.\n\nMon travail consiste à transformer les besoins d'un professionnel en une expérience digitale claire, élégante et orientée vers ses objectifs.\n\nJe m'intéresse autant à la présentation visuelle qu'au message transmis et au chemin que suit un visiteur avant de prendre une décision.\n\nParce qu'un site réussi ne se résume pas à son apparence.\n\nIl doit donner une bonne première impression, présenter la valeur de votre activité et faciliter la relation avec vos futurs clients.",
+    "Je suis concepteur de sites web professionnels et passionné par la manière dont le numérique peut accompagner le développement des entreprises.\n\nMon travail consiste à transformer les besoins d'un professionnel en une expérience digitale claire, élégante et orientée vers ses objectifs.\nJe m'intéresse autant à la présentation visuelle qu'au message transmis et au chemin que suit un visiteur avant de prendre une décision.\n\nParce qu'un site réussi ne se résume pas à son apparence.\nIl doit donner une bonne première impression, présenter la valeur de votre activité et faciliter la relation avec vos futurs clients.",
 } as const;
 
 /* ============================ 12 — FAQ ============================ */

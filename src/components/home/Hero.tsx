@@ -104,9 +104,45 @@ import { ASSETS } from "@/lib/site";
  * (0-1 s), au lieu d'après l'hydratation. Tout ce qui est PLUS BAS
  * que le premier écran reste en révélations au scroll (comportement
  * inchangé sur tout le reste du site).
+ *
+ * CENTRAGE VERTICAL (VOLET 19 — précision de l'éditeur, 26/11/2026) :
+ * l'IMAGE du hero et le BLOC TEXTE (étoiles, titre, description,
+ * CTA, réassurance) sont désormais CENTRÉS VERTICALEMENT dans
+ * l'espace qui commence au BAS DU HEADER et finit à la FIN DU HERO,
+ * sur TOUTES LES TAILLES D'ÉCRAN (demande : « peu importe la taille
+ * d'écran, que ce soit toujours verticalement centré dans l'espace
+ * qui commence au bottom du header et qui arrive à la fin du hero.
+ * Pareil pour le bloc de texte »).
+ * Mécanique :
+ * - BUREAU : le conteneur passe en justify-center (il était ancré
+ *   en haut depuis le volet 13) ; la grille (lg:items-center) aligne
+ *   image et bloc texte l'un sur l'autre — les deux rangées se
+ *   répartissent symétriquement autour de l'image (row-span-2), les
+ *   deux colonnes partagent le MÊME axe vertical central ;
+ * - MOBILE/TABLETTE : la mise en page interne devient une COLONNE
+ *   FLEX (flex-1 : hauteur = l'espace exact sous le header, le
+ *   plancher min-content restant la pile empilée) — les deux zones
+ *   de texte portent « flex-1 basis-0 » : elles se répartissent
+ *   l'espace restant À PARTS ÉGALES au-dessus et en-dessous de
+ *   l'IMAGE, chacune centrant son contenu dans sa zone et étant
+ *   plafonnée par la hauteur de ce contenu (min-height auto), un
+ *   ajustement mesuré (voir visualRef ci-dessous) posant en plus le
+ *   CENTRE DE L'IMAGE sur l'axe central dans la limite de l'air
+ *   disponible. Sur les empilements, l'image et le bloc texte ne
+ *   peuvent pas être centrés ISOLÉMENT l'un de l'autre (le bloc
+ *   texte enjambe l'image : centrer l'un décale l'autre de la
+ *   moitié de la différence de hauteur des deux zones) — l'image,
+ *   objet de la demande explicite « toujours centrée », est servie
+ *   en priorité ; le bloc texte reste réparti symétriquement autour
+ *   d'elle (il s'étend des étoiles à la réassurance : centré dès
+ *   que la pile remplit l'espace). Quand l'espace manque
+ *   (téléphones courts), chaque zone retombe à la hauteur de son
+ *   contenu et le hero GRANDIT exactement comme avant-volet — il
+ *   reste entièrement visible grâce aux paliers de compacité
+ *   (globals.css), sans jamais rogner ni chevaucher.
  */
 export function Hero() {
-  const { t, tf } = useT();
+  const { t, tf, lang } = useT();
   const { HERO } = useContenu();
   const { PROJECTS } = useSite();
 
@@ -160,6 +196,105 @@ export function Hero() {
       cancelAnimationFrame(raf);
     };
   }, []);
+
+  /* VOLET 19 — précision (26/11/2026) — CENTRAGE VERTICAL DE
+     L'IMAGE SUR MOBILE / TABLETTE (< 1024 px, demande de l'éditeur :
+     « peu importe la taille d'écran, que [l'image] soit toujours
+     verticalement centrée dans l'espace qui commence au bottom du
+     header et qui arrive à la fin du hero »). Les zones flexibles
+     répartissent l'air restant à parts égales, mais chacune reste
+     au moins aussi haute que son contenu : quand la zone basse
+     (description, CTA, réassurance) est plus haute que la zone
+     haute (étoiles, titre), l'image reste au-dessus de l'axe — la
+     géométrie d'un empilement ne permet pas de centrer l'image et
+     le bloc texte à la fois. Un ajustement MESURÉ (même mécanique
+     que descriptionEquilibree ci-dessus) déplace la marge haute du
+     bloc visuel pour poser le CENTRE DE L'IMAGE sur le centre de
+     l'espace [bas du header → fin du hero] :
+     - il s'exécute dès que les polices sont prêtes, AVANT que
+       l'image n'apparaisse (son animation d'arrivée court de 1 à
+       2 s : elle se pose directement centrée, sans décalage
+       visible au chargement) puis se re-vérifie à 2,4 s, au
+       redimensionnement et au changement de langue ;
+     - il est PLAFONNÉ par l'air disponible : le hero ne grandit
+       JAMAIS (garde-fou : si la marge fait grandir le hero, elle
+       est réduite d'autant) — sur les écrans courts où la pile
+       remplit déjà l'espace, l'image reste aussi haute que la
+       géométrie l'autorise, exactement comme avant ;
+     - sur BUREAU (≥ 1024 px) il s'efface : la grille lg:items-center
+       + le conteneur justify-center centrent déjà tout, l'ancienne
+       marge des classes est restaurée. */
+  const visualRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const visual = visualRef.current;
+    if (!visual) return;
+    let raf = 0;
+    let raf2 = 0;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    let timerResize: ReturnType<typeof setTimeout> | undefined;
+    const ajuste = () => {
+      raf = requestAnimationFrame(() => {
+        if (window.matchMedia("(min-width: 1024px)").matches) {
+          if (visual.style.marginTop) visual.style.marginTop = "";
+          return;
+        }
+        const container = visual.closest(".container-site");
+        const img = visual.querySelector("figure:not(.hero-portrait) img");
+        if (!container || !img) return;
+        const cs = getComputedStyle(container);
+        const rect = container.getBoundingClientRect();
+        const espaceHaut = rect.top + parseFloat(cs.paddingTop);
+        const espaceBas = rect.bottom - parseFloat(cs.paddingBottom);
+        const centreEspace = (espaceHaut + espaceBas) / 2;
+        const ri = img.getBoundingClientRect();
+        const ecart = ri.top + ri.height / 2 - centreEspace; // < 0 : image trop haute
+        if (Math.abs(ecart) < 1.5) return;
+        // Marge haute actuelle (l'override inline, s'il existe, sinon la classe).
+        const margeActuelle = visual.style.marginTop
+          ? parseFloat(visual.style.marginTop)
+          : parseFloat(getComputedStyle(visual).marginTop);
+        if (!Number.isFinite(margeActuelle)) return;
+        // La marge se déplace à mi-chemin (les zones flexibles
+        // réabsorbent la moitié de l'ajout) : doubler l'écart.
+        const hero = visual.closest("section");
+        const hauteurAvant = hero ? hero.getBoundingClientRect().height : 0;
+        const cible = Math.max(0, margeActuelle - 2 * ecart);
+        visual.style.marginTop = `${cible}px`;
+        // Garde-fou : si le hero a grandi (air insuffisant), réduire d'autant.
+        raf2 = requestAnimationFrame(() => {
+          const hauteurApres = hero ? hero.getBoundingClientRect().height : 0;
+          const exces = hauteurApres - hauteurAvant;
+          if (exces > 0.5) {
+            visual.style.marginTop = `${Math.max(0, cible - exces)}px`;
+          }
+        });
+      });
+    };
+    const planifie = (delai: number) => {
+      timers.push(setTimeout(ajuste, delai));
+    };
+    // Dès que les polices sont prêtes (avant l'arrivée de l'image,
+    // 1-2 s) + filet de sécurité, puis re-vérification tardive.
+    planifie(650);
+    if (typeof document !== "undefined" && document.fonts?.ready) {
+      document.fonts.ready.then(() => planifie(40)).catch(() => undefined);
+    }
+    planifie(2400);
+    const onResize = () => {
+      if (timerResize) clearTimeout(timerResize);
+      timerResize = setTimeout(ajuste, 160);
+    };
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("resize", onResize);
+      timers.forEach(clearTimeout);
+      if (timerResize) clearTimeout(timerResize);
+      cancelAnimationFrame(raf);
+      cancelAnimationFrame(raf2);
+    };
+    // lang : un changement de langue change la hauteur des textes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   /* Description : première phrase en gras, suite normale — plus des
      segments internes en gras (HERO.textBoldSpans, demande de
@@ -217,14 +352,51 @@ export function Hero() {
         className="pointer-events-none absolute bottom-[-20%] left-[-12%] h-[420px] w-[420px] rounded-full bg-[#e4e4e4] opacity-[0.05] blur-[110px]"
       />
 
-      <div className="container-site relative flex flex-1 flex-col justify-start pb-2 pt-[76px] sm:pb-8 lg:pb-8 lg:pt-[124px]">
-        <div className="grid items-center gap-2.5 sm:gap-5 lg:grid-cols-[1.15fr_0.85fr] lg:gap-x-7 lg:gap-y-[clamp(1.25rem,2vw,2.25rem)] xl:gap-x-9">
+      {/* VOLET 19 — précision (26/11/2026) : CENTRAGE VERTICAL DU
+          CONTENU DU HERO — l'image ET le bloc texte (étoiles →
+          réassurance) dans l'espace [bas du header → fin du hero],
+          quelle que soit la taille d'écran. Deux mécanismes :
+          - MOBILE/TABLETTE : la colonne interne (flex-1 + zones
+            flexibles autour de l'image) reçoit la hauteur exacte de
+            l'espace et place l'IMAGE au centre (les deux zones de
+            texte se répartissent l'espace restant à parts égales,
+            chacune plafonnée par la hauteur de son contenu) ;
+          - BUREAU : la grille redevient auto (lg:flex-none) et le
+            conteneur (flex-1, justify-center — il était ancré en
+            haut depuis le volet 13) la centre : colonne image et
+            colonne texte partagent le même axe (lg:items-center).
+          Sur les écrans où le contenu DÉPASSE (téléphones courts),
+          les zones retombent à leur hauteur de contenu et le
+          conteneur grandit avec elles — le centrage est alors
+          neutre, les paliers de compacité restent responsables de
+          l'absence de défilement. */}
+      <div className="container-site relative flex flex-1 flex-col justify-center pb-2 pt-[76px] sm:pb-8 lg:pb-8 lg:pt-[124px]">
+        {/* VOLET 19 — précision (26/11/2026) — COLONNE FLEXIBLE :
+            en dessous de 1024 px, la mise en page interne du hero
+            devient une colonne FLEX (flex-1 : elle reçoit
+            exactement la hauteur de l'espace sous le header,
+            flex-basis 0 — son plancher min-content reste la pile
+            empilée, donc le hero ne peut que grandir comme avant,
+            jamais se rogner) : les deux zones de texte portent
+            « flex-1 basis-0 » — elles se répartissent l'espace
+            restant À PARTS ÉGALES au-dessus et en-dessous de
+            l'image, chacune centrant son contenu dans sa zone et
+            plafonnée par la hauteur de ce contenu (min-height
+            auto). À partir de 1024 px : lg:grid (grille deux
+            colonnes, rangées implicites) + lg:flex-none (hauteur =
+            contenu) + lg:items-center — le conteneur
+            justify-center prend le relais du centrage ; les
+            propriétés flex des zones sont inertes sur un item de
+            grille. NB : items-center passe en lg: SEULEMENT —
+            l'axe de align-items s'inverse entre flex-colonne
+            (horizontal) et grille (vertical). */}
+        <div className="flex flex-1 flex-col gap-2.5 sm:gap-5 lg:grid lg:grid-cols-[1.15fr_0.85fr] lg:flex-none lg:items-center lg:gap-x-7 lg:gap-y-[clamp(1.25rem,2vw,2.25rem)] xl:gap-x-9">
           {/* ---------- Bloc texte haut : note 5 étoiles, titre ---------- */}
           {/* lg:relative + lg:z-10 : sur les bureaux étroits (≈ 1024 px),
               la plaque carrée du portrait déborde jusqu'à la colonne de
               texte — le texte reste ainsi TOUJOURS au-dessus d'elle,
               jamais sous son léger voile gris (16/11/2026). */}
-          <div className="order-1 lg:col-start-1 lg:row-start-1 lg:relative lg:z-10">
+          <div className="order-1 flex flex-1 flex-col justify-center lg:col-start-1 lg:row-start-1 lg:relative lg:z-10 lg:block">
             {/* VOLET 14 (24/11/2026) — RYTHME VERTICAL RESPONSIVE : les
                 espacements du bloc texte (étoiles→titre, titre→description,
                 description→CTA) sont des marges FLUIDES en clamp(), sans
@@ -276,27 +448,25 @@ export function Hero() {
           {/* ---------- Bloc visuel : plaque + image + mockups épinglés ---------- */}
           {/* Bureau : colonne droite sur les deux rangées de la grille,
               hauteur du portrait plafonnée en svh pour que le hero
-              tienne dans l'écran. L'espace sous l'image (vers la
-              description, sur mobile/tablette) est RESPONSIVE : marge
-              fluide en svh, la même proportion sur tous les écrans
-              (demande de l'éditeur, 15/11/2026 — l'ancienne marge
-              fixe de 144 px sur tablette était trop spacieuse).
-              VOLET 14 (24/11/2026) — RESPIRATION AU-DESSUS DE L'IMAGE
-              SUR BUREAU : marge haute FLUIDE (clamp en svh) au-dessus
-              du bloc visuel complet, plaque comprise — demande de
-              l'éditeur : « sur desktop il faut augmenter l'espace
-              qu'il y a au-dessus de l'ensemble de l'image, même avec
-              le fond arrière, parce que ça ne respire pas ». La marge
-              suit la hauteur de l'écran, comme l'image (svh) : le
-              hero continue de tenir sans défilement.
-              MÊME JOUR, PRÉCISION DE L'ÉDITEUR : « pousse le bloc
-              d'image (l'ensemble, même avec le fond arrière) un peu
-              légèrement en haut » — la marge haute est réduite de
-              moitié environ (1,75→0,75 / 4,5→2,25svh / 3,5→1,75rem) :
-              le bloc monte d'un à deux dixièmes de la hauteur
-              d'écran* environ, la respiration reste mais l'image
-              remonte légèrement. (*16 à 28 px selon l'écran.) */}
-          <div className="hero-visual order-2 relative mx-auto mt-5 w-full max-w-md sm:mt-7 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-[clamp(0.75rem,2.25svh,1.75rem)] lg:max-w-none">
+              tienne dans l'écran.
+              VOLET 19 — précision (26/11/2026) — CENTRAGE VERTICAL :
+              la marge haute de bureau du volet 14 (clamp en svh,
+              « respiration au-dessus de l'image ») est SUPPRIMÉE au
+              profit du centrage exact — lg:items-center sur la grille
+              centre l'image dans SA colonne, justify-center sur le
+              conteneur centre l'ensemble sous le header : conserver
+              une marge haute décalerait l'image d'autant sous son
+              axe central. Sur MOBILE/TABLETTE, le rythme autour de
+              l'image passe sur le bloc visuel lui-même — mt-5/mb-4
+              (sm:mt-7/mb-5), quasi symétrique : la colonne flex
+              répartit l'air restant à parts égales au-dessus et
+              en-dessous de l'image, l'ajustement mesuré
+              (visualRef) la pose en plus au centre de l'espace.
+              shrink-0 : l'image ne peut jamais être comprimée. */}
+          <div
+            ref={visualRef}
+            className="hero-visual order-2 relative mx-auto mt-5 mb-4 w-full max-w-md shrink-0 sm:mt-7 sm:mb-5 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:mb-0 lg:max-w-none"
+          >
             {/* Enveloppe « w-fit » : exactement la largeur de l'image —
                 les pourcentages des mockups épinglés (largeur,
                 décalages) se réfèrent donc à l'image elle-même. */}
@@ -515,7 +685,7 @@ export function Hero() {
               « descriptionEquilibree » place la description pour
               qu'il y ait autant d'espace au-dessus qu'au-dessous —
               sans bouger le titre ni les boutons. */}
-          <div className="order-3 mt-[clamp(0.75rem,2.5svh,1.75rem)] lg:col-start-1 lg:row-start-2 lg:mt-0 lg:relative lg:z-10">
+          <div className="order-3 flex flex-1 flex-col justify-center lg:col-start-1 lg:row-start-2 lg:relative lg:z-10 lg:block">
             {/* aboveFold="rise" — translation sans fondu : ce
                 paragraphe est l'ÉLÉMENT LCP du site, il doit être
                 PEINT dès la première frame (voir Reveal.tsx et
@@ -576,6 +746,7 @@ export function Hero() {
                   variant="secondary"
                   size="lg"
                   hideArrowBelowSm
+                  arrow="up-right"
                   ariaLabel={t("Réserver Un Appel — 30 minutes, gratuit et sans engagement")}
                   className="px-2 text-[length:clamp(10px,3vw,12px)] sm:px-7 sm:text-[15px]"
                 >

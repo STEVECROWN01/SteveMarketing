@@ -191,10 +191,17 @@ export function ProjectPage({ projectId }: { projectId: string }) {
             tone="light"
           />
           {/* VOLET 19 — même règle que l'accueil : TROIS cartes →
-              trois colonnes ; QUATRE ou plus → deux par ligne. */}
+              trois colonnes ; QUATRE ou plus → deux par ligne.
+              VOLET 19 — précision (26/11/2026) : mêmes PLAFONDS DE
+              LARGEUR que la section « PROJETS RÉALISÉS » de l'accueil
+              (mockups plus petits sur tablette et bureau, demande de
+              l'éditeur) — la grille était ici pleine largeur du
+              conteneur (cartes jusqu'à ~600 px). */}
           <div
-            className={`mt-12 grid gap-6 ${
-              others.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2"
+            className={`mx-auto mt-12 grid w-full gap-6 ${
+              others.length === 3
+                ? "md:max-w-[700px] md:grid-cols-3 lg:max-w-[900px]"
+                : "md:max-w-[600px] md:grid-cols-2 lg:max-w-[840px]"
             }`}
           >
             {others.map((other) => (
