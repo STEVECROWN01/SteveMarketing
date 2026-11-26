@@ -25,18 +25,40 @@ export function Champ({
   children,
   className = "",
   indicatif,
+  /* VOLET 21 (27/11/2026) — `blocLibre` : le champ contient des
+   * CONTRÔLES INTERACTIFS (éditeur riche, boutons…) : le conteneur
+   * est un <div> et non un <label>. Un <label> transmet le clic à
+   * son premier contrôle labellisable — pour l'éditeur de texte
+   * riche, le clic dans la zone de rédaction activait le PREMIER
+   * BOUTON de la barre d'outils et le curseur disparaissait
+   * (demande de l'éditeur : « quand on clique dans le champ, le
+   * curseur doit se positionner et on doit pouvoir écrire ; le
+   * bouton d'en-tête ne doit pas s'activer »). */
+  blocLibre = false,
 }: {
   label: string;
   children: React.ReactNode;
   className?: string;
   indicatif?: string;
+  blocLibre?: boolean;
 }) {
+  const entete = (
+    <span className="mb-1.5 flex items-baseline justify-between gap-2">
+      <span className="text-xs font-medium text-white">{label}</span>
+      {indicatif ? <span className="text-[10px] text-[#c8c8c8]/70">{indicatif}</span> : null}
+    </span>
+  );
+  if (blocLibre) {
+    return (
+      <div className={`block ${className}`}>
+        {entete}
+        {children}
+      </div>
+    );
+  }
   return (
     <label className={`block ${className}`}>
-      <span className="mb-1.5 flex items-baseline justify-between gap-2">
-        <span className="text-xs font-medium text-white">{label}</span>
-        {indicatif ? <span className="text-[10px] text-[#c8c8c8]/70">{indicatif}</span> : null}
-      </span>
+      {entete}
       {children}
     </label>
   );
@@ -109,6 +131,64 @@ export function Pastille({ children, ton = "neutre" }: { children: React.ReactNo
   return (
     <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${tons[ton]}`}>
       {children}
+    </span>
+  );
+}
+
+/* ------------------------------------------------------------------
+ * VOLET 21 (27/11/2026) — BOUTON D'ICÔNE AVEC INFO-BULLE.
+ *
+ * Demande de l'éditeur : « au survol de chaque icône d'action des
+ * listes (propositions, devis, factures), une INFO-BULLE explique
+ * son rôle ». Ce bouton remplace les boutons d'action des listes :
+ * même gabarit visuel (rond 36 px, bordures du back-office), plus
+ * une info-bulle CSS AU-DESSUS de l'icône — visible immédiatement
+ * au survol (le title natif mettait ~1 s à apparaître), accessible
+ * (aria-label), et toujours lisible même sur un bouton désactivé.
+ * ------------------------------------------------------------------ */
+export function BoutonIcone({
+  titre,
+  children,
+  onClick,
+  disabled = false,
+  ton = "neutre",
+  className = "",
+}: {
+  /** Libellé de l'info-bulle ET de l'accessibilité. */
+  titre: string;
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+  ton?: "neutre" | "valide" | "danger";
+  className?: string;
+}) {
+  const fonds: Record<string, string> = {
+    neutre: "border-[#e4e4e4]/20 text-[#c8c8c8] hover:border-[#e4e4e4] hover:text-[#e4e4e4]",
+    valide: "border-[#22c55e]/30 text-[#86efac] hover:border-[#22c55e]",
+    danger: "border-[#ea384c]/30 text-[#ffdede] hover:border-[#ea384c]",
+  };
+  return (
+    <span className="group/bi relative inline-flex">
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        aria-label={titre}
+        className={`flex h-9 w-9 items-center justify-center rounded-full border transition-colors disabled:opacity-50 ${fonds[ton]} ${className}`}
+      >
+        {children}
+      </button>
+      {/* Info-bulle : au-dessus de l'icône, flèche discrète vers le
+          bas ; survol de la zone (bouton OU info-bulle) — marche
+          aussi sur un bouton désactivé (pointer-events sur le span). */}
+      <span
+        role="tooltip"
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md border border-[#e4e4e4]/15 bg-[#0f0f0f] px-2.5 py-1.5 text-[11px] font-medium text-white opacity-0 shadow-[0_6px_20px_rgba(0,0,0,0.5)] transition-opacity duration-150 group-hover/bi:opacity-100 group-focus-within/bi:opacity-100 sm:block"
+      >
+        {titre}
+        <span className="absolute left-1/2 top-full -mt-1 h-2 w-2 -translate-x-1/2 rotate-45 border-b border-r border-[#e4e4e4]/15 bg-[#0f0f0f]" />
+      </span>
     </span>
   );
 }

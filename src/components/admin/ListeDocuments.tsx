@@ -10,11 +10,14 @@ import {
   Loader2,
   Pencil,
   Receipt,
+  Send,
   Trash2,
+  Undo2,
   X,
 } from "lucide-react";
 import { ApercuDocument } from "./ApercuDocument";
-import { BoutonAction, Carte, ModaleConfirmation, Pastille } from "./elements";
+import { ApercuDevisSigne } from "./ApercuDevisSigne";
+import { BoutonAction, BoutonIcone, Carte, ModaleConfirmation, Pastille } from "./elements";
 import type { DocumentRecord, DocType } from "@/lib/documents/types";
 import { LABELS_DOC } from "@/lib/documents/types";
 import { estPropositionV2, type PropositionRecord } from "@/lib/documents/proposition";
@@ -97,6 +100,8 @@ export function ListeDocuments({
   onGenererDevis?: (p: PropositionRecord) => void;
 }) {
   const [apercu, setApercu] = useState<ToutDocument | null>(null);
+  /* VOLET 21 — visionneuse du PDF SIGNÉ d'un devis (téléversé). */
+  const [apercuSigne, setApercuSigne] = useState<DocumentRecord | null>(null);
   const [enCours, setEnCours] = useState<string | null>(null);
   /* VOLET 18 — document (devis/facture) dont l'utilisateur choisit
    * la version du PDF à télécharger. */
@@ -198,34 +203,6 @@ export function ListeDocuments({
     const record = choixLangue;
     setChoixLangue(null);
     if (record) void telechargerExistant(record, langue);
-  }
-
-  /* VOLET 20 — téléchargement du devis SIGNÉ (PDF téléversé). */
-  async function telechargerSigne(record: DocumentRecord) {
-    const cle = `${record.numero}-signe`;
-    setEnCours(cle);
-    try {
-      const res = await fetch(`/api/documents/${encodeURIComponent(record.id)}/signature`);
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        throw new Error(data?.error ?? "Téléchargement impossible.");
-      }
-      const blob = await res.blob();
-      const nom = record.devisSigne?.nomFichier?.replace(/[^\w.\-]+/g, "_") ?? `${record.numero}-signe.pdf`;
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = nom;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-      toast({ title: `Devis signé téléchargé`, description: `${record.numero} — ${record.devisSigne?.nomFichier ?? ""}` });
-    } catch (e) {
-      toast({ title: "Téléchargement impossible", description: e instanceof Error ? e.message : undefined, variant: "destructive" });
-    } finally {
-      setEnCours(null);
-    }
   }
 
   /* VOLET 20 — SUPPRESSION : modale de confirmation PERSONNALISÉE
@@ -433,6 +410,14 @@ export function ListeDocuments({
                           {doc.statutPaiement ?? "En attente"}
                         </Pastille>
                       ) : d.docType === "devis" ? (
+                        /* VOLET 21 — les DEUX statuts du devis, empilés
+                           (demande de l'éditeur) : signature en haut,
+                           facturation en bas ; « Facturé » s'affiche
+                           SEUL (sans numéro de facture entre
+                           parenthèses) et « Non facturé » apparaît
+                           tant qu'aucune facture n'existe (le
+                           bouton « générer la facture » revient
+                           aussi dès que la facture est supprimée). */
                         <div className="flex flex-col items-start gap-1.5">
                           {stSignature?.signe ? (
                             <Pastille ton="valide">Signé</Pastille>
@@ -442,143 +427,124 @@ export function ListeDocuments({
                             <Pastille>Non signé</Pastille>
                           )}
                           {facture ? (
-                            <Pastille ton="valide">Facturée ({facture.numero})</Pastille>
-                          ) : null}
+                            <Pastille ton="valide">Facturé</Pastille>
+                          ) : (
+                            <Pastille>Non facturé</Pastille>
+                          )}
                         </div>
                       ) : (
-                        <Pastille>Envoyée</Pastille>
+                        <MenuStatutProposition doc={d} onRafraichir={onRafraichir} toast={toast} />
                       )}
                     </td>
                     <td className="px-5 py-4">
                       <div className="flex items-center justify-end gap-2">
+                        {/* VOLET 21 — TOUS les boutons d'action portent
+                            une INFO-BULLE au survol (demande de
+                            l'éditeur). */}
                         {/* VOLET 20 — aperçu : le PANNEAU s'ouvre
                             directement en PLEIN ÉCRAN (plus de modale
                             au nom du client). */}
-                        <button
-                          type="button"
+                        <BoutonIcone
+                          titre="Aperçu plein écran"
                           onClick={() => setApercu(d)}
-                          className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-[#e4e4e4]"
-                          aria-label={`Aperçu de ${d.numero}`}
-                          title="Aperçu plein écran"
                         >
                           <Eye className="h-4 w-4" />
-                        </button>
+                        </BoutonIcone>
                         {/* VOLET 20 — une facture EN ATTENTE ne peut
                             PAS être téléchargée : bouton
                             INDISPONIBLE jusqu'au statut « Payé ». */}
                         {d.docType === "facture" && !payee ? (
-                          <button
-                            type="button"
+                          <BoutonIcone
+                            titre="Facture en attente — téléchargement disponible une fois payée"
                             disabled
-                            title="Facture en attente — téléchargement disponible une fois payée"
-                            aria-label="Téléchargement indisponible (facture en attente)"
-                            className="flex h-9 w-9 cursor-not-allowed items-center justify-center rounded-full border border-[#e4e4e4]/10 text-[#c8c8c8]/30"
                           >
                             <Download className="h-4 w-4" />
-                          </button>
+                          </BoutonIcone>
                         ) : (
-                          <button
-                            type="button"
+                          <BoutonIcone
+                            titre="Télécharger le PDF"
                             onClick={() =>
                               d.docType === "proposition"
                                 ? telechargerExistant(d)
                                 : setChoixLangue(doc)
                             }
                             disabled={enCours === `${d.numero}-pdf`}
-                            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-[#e4e4e4] disabled:opacity-50"
-                            aria-label={`Télécharger ${d.numero}`}
-                            title="Télécharger le PDF"
                           >
                             {enCours === `${d.numero}-pdf` ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
                               <Download className="h-4 w-4" />
                             )}
-                          </button>
+                          </BoutonIcone>
                         )}
-                        {/* VOLET 20 — devis SIGNÉ : téléchargement du
-                            PDF signé téléversé. */}
+                        {/* VOLET 21 — devis SIGNÉ : le bouton ne
+                            TÉLÉCHARGE plus, il OUVRE la VISIONNEUSE
+                            plein écran du PDF signé (le
+                            téléchargement vit DANS l'aperçu). La
+                            version générée reste visualisable par le
+                            bouton « œil ». */}
                         {d.docType === "devis" && stSignature?.signe ? (
-                          <button
-                            type="button"
-                            onClick={() => void telechargerSigne(doc)}
-                            disabled={enCours === `${d.numero}-signe`}
-                            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#22c55e]/30 text-[#86efac] transition-colors hover:border-[#22c55e]"
-                            aria-label={`Télécharger le devis signé ${d.numero}`}
-                            title="Télécharger le devis signé"
+                          <BoutonIcone
+                            titre="Voir le devis signé"
+                            ton="valide"
+                            onClick={() => setApercuSigne(doc)}
                           >
-                            {enCours === `${d.numero}-signe` ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <FileSignature className="h-4 w-4" />
-                            )}
-                          </button>
+                            <FileSignature className="h-4 w-4" />
+                          </BoutonIcone>
                         ) : null}
-                        <button
-                          type="button"
-                          onClick={() => onModifier(d)}
-                          className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-[#e4e4e4]"
-                          aria-label={`Modifier ${d.numero}`}
-                          title="Modifier"
-                        >
+                        <BoutonIcone titre="Modifier" onClick={() => onModifier(d)}>
                           <Pencil className="h-4 w-4" />
-                        </button>
+                        </BoutonIcone>
                         {/* VOLET 20 — MARQUER SIGNÉ (devis non signés
                             seulement) : téléverse le devis signé,
                             le range dans les devis signés puis
                             ouvre la génération de facture. */}
                         {d.docType === "devis" && !stSignature?.signe && onSigne ? (
-                          <button
-                            type="button"
+                          <BoutonIcone
+                            titre="Marquer signé (téléverser le devis signé)"
                             onClick={() => {
                               setSignature(doc);
                               setFichierSignature(null);
                             }}
-                            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-[#e4e4e4]"
-                            aria-label={`Marquer le devis ${d.numero} signé`}
-                            title="Marquer signé (téléverser le devis signé)"
                           >
                             <FileSignature className="h-4 w-4" />
-                          </button>
+                          </BoutonIcone>
                         ) : null}
                         {/* VOLET 20 — proposition : GÉNÉRER LE DEVIS
                             pré-rempli depuis cette proposition. */}
                         {d.docType === "proposition" && onGenererDevis && prop ? (
-                          <button
-                            type="button"
+                          <BoutonIcone
+                            titre="Générer le devis (pré-rempli)"
                             onClick={() => onGenererDevis(prop)}
-                            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-[#e4e4e4]"
-                            aria-label={`Générer un devis depuis la proposition ${d.numero}`}
-                            title="Générer le devis (pré-rempli)"
                           >
                             <FilePlus2 className="h-4 w-4" />
-                          </button>
+                          </BoutonIcone>
                         ) : null}
-                        {d.docType === "devis" && onFacturer ? (
-                          <button
-                            type="button"
+                        {/* VOLET 21 — le bouton « générer la facture »
+                            n'apparaît que si le devis N'EST PAS déjà
+                            facturé (demande de l'éditeur) ; il
+                            REVIENT dès que la facture est supprimée
+                            (statut « Non facturé »). */}
+                        {d.docType === "devis" && onFacturer && !facture ? (
+                          <BoutonIcone
+                            titre="Générer la facture"
                             onClick={() => onFacturer(doc)}
-                            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-[#e4e4e4]"
-                            aria-label={`Générer la facture du devis ${d.numero}`}
-                            title="Générer la facture"
                           >
                             <Receipt className="h-4 w-4" />
-                          </button>
+                          </BoutonIcone>
                         ) : null}
-                        <button
-                          type="button"
+                        <BoutonIcone
+                          titre="Supprimer du stockage"
+                          ton="danger"
                           onClick={() => setSuppression(d)}
                           disabled={enCours === `${d.numero}-suppr`}
-                          className="flex h-9 w-9 items-center justify-center rounded-full border border-[#ea384c]/30 text-[#ffdede] transition-colors hover:border-[#ea384c] disabled:opacity-50"
-                          aria-label={`Supprimer ${d.numero}`}
-                          title="Supprimer du stockage"
                         >
                           {enCours === `${d.numero}-suppr` ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
                             <Trash2 className="h-4 w-4" />
                           )}
-                        </button>
+                        </BoutonIcone>
                       </div>
                     </td>
                   </tr>
@@ -772,6 +738,132 @@ export function ListeDocuments({
           initialPleinEcran
           onFermer={() => setApercu(null)}
         />
+      ) : null}
+
+      {/* ---------- VOLET 21 : VISIONNEUSE du devis SIGNÉ (PDF
+          téléversé) — plein écran, téléchargement DANS l'aperçu. ---------- */}
+      {apercuSigne ? (
+        <ApercuDevisSigne document={apercuSigne} onFermer={() => setApercuSigne(null)} />
+      ) : null}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------
+ * VOLET 21 (27/11/2026) — STATUT D'ENVOI D'UNE PROPOSITION
+ * COMMERCIALE, CLIQUABLE.
+ *
+ * Demande de l'éditeur : « au niveau des propositions commerciales,
+ * le statut doit être cliquable : après la génération, la
+ * proposition est NON ENVOYÉE par défaut ; quand on clique sur le
+ * statut, une petite liste d'options permet de la marquer ENVOYÉE
+ * (ou de la ramener à non envoyée). » La pastille ouvre un petit
+ * menu (Marquer comme envoyée / Marquer comme non envoyée) — le
+ * choix est ENREGISTRÉ avec la proposition (champ `envoyee`,
+ * stockage privé) et la liste se rafraîchit.
+ * ------------------------------------------------------------------ */
+function MenuStatutProposition({
+  doc,
+  onRafraichir,
+  toast,
+}: {
+  doc: ToutDocument;
+  onRafraichir: () => void;
+  toast: (t: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
+}) {
+  const [ouvert, setOuvert] = useState(false);
+  const [enCours, setEnCours] = useState(false);
+  const envoyee = Boolean((doc as { envoyee?: boolean }).envoyee);
+
+  async function basculer(nouvelle: boolean) {
+    if (enCours || nouvelle === envoyee) {
+      setOuvert(false);
+      return;
+    }
+    setOuvert(false);
+    setEnCours(true);
+    try {
+      const res = await fetch("/api/documents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ document: { ...doc, envoyee: nouvelle } }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.ok) throw new Error(data?.error ?? "Enregistrement impossible.");
+      toast({
+        title: `Proposition ${doc.numero} ${nouvelle ? "marquée envoyée" : "remise en non envoyée"}`,
+        description: nouvelle
+          ? "Le statut est passé à « Envoyée »."
+          : "Le statut est revenu à « Non envoyée ».",
+      });
+      onRafraichir();
+    } catch (e) {
+      toast({
+        title: "Changement de statut impossible",
+        description: e instanceof Error ? e.message : undefined,
+        variant: "destructive",
+      });
+    } finally {
+      setEnCours(false);
+    }
+  }
+
+  return (
+    <div className="relative inline-flex">
+      <button
+        type="button"
+        onClick={() => setOuvert((o) => !o)}
+        disabled={enCours}
+        aria-haspopup="menu"
+        aria-expanded={ouvert}
+        title="Cliquer pour changer le statut d'envoi"
+        className="cursor-pointer rounded-full transition-transform hover:scale-[1.03] focus:outline-none"
+      >
+        {enCours ? (
+          <Pastille>
+            <Loader2 className="mr-1.5 h-3 w-3 animate-spin" aria-hidden="true" />
+            Mise à jour…
+          </Pastille>
+        ) : envoyee ? (
+          <Pastille ton="valide">Envoyée</Pastille>
+        ) : (
+          <Pastille>Non envoyée</Pastille>
+        )}
+      </button>
+      {ouvert ? (
+        <>
+          {/* clic hors du menu : referme */}
+          <button
+            type="button"
+            aria-label="Fermer le menu de statut"
+            className="fixed inset-0 z-40 cursor-default"
+            onClick={() => setOuvert(false)}
+          />
+          <div
+            role="menu"
+            aria-label={`Statut d'envoi — ${doc.numero}`}
+            className="absolute left-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-xl border border-[#e4e4e4]/15 bg-[#232323] p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.55)]"
+          >
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => void basculer(true)}
+              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm text-white transition-colors hover:bg-[#e4e4e4]/10"
+            >
+              <Send className="h-4 w-4 shrink-0 text-[#86efac]" aria-hidden="true" />
+              Marquer comme envoyée
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => void basculer(false)}
+              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm text-[#c8c8c8] transition-colors hover:bg-[#e4e4e4]/10"
+            >
+              <Undo2 className="h-4 w-4 shrink-0" aria-hidden="true" />
+              Marquer comme non envoyée
+            </button>
+          </div>
+        </>
       ) : null}
     </div>
   );

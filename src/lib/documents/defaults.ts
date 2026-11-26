@@ -22,7 +22,7 @@ export const EMETTEUR = {
   societe: "Stevens AKPOVI",
   subText: "Concepteur de sites web professionnels",
   subTextEn: "Professional website designer",
-  ifu: "0202212825543",
+  ifu: "0 2022 7071 1767",
   rccm: "RB/PKO/23 A 18020",
   contact: "Stevens AKPOVI",
   adresse: "Parakou, Borgou, Bénin",

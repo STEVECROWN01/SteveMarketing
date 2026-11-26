@@ -104,7 +104,18 @@ export function htmlRicheOuTexteBrut(html: string | null | undefined): string {
  *  propre bloc paginable : le tableau remplit la page jusqu'en bas
  *  et se poursuit naturellement. Les fragments d'une même liste
  *  portent « li-suite » (+ --debut / --fin) : marges calquées sur
- *  celles d'une liste unique — visuellement RIEN ne change. */
+ *  celles d'une liste unique — visuellement RIEN ne change.
+ *
+ *  VOLET 21 (27/11/2026) — PARAGRAPHES LONGS : même correctif pour
+ *  les <p> denses (bug reconfirmé par l'éditeur : une description
+ *  rédigée en un long paragraphe formait UN SEUL bloc — le tableau
+ *  ENTIER disparaissait de la page en laissant un grand vide, puis
+ *  « reculait » encore d'une page en continuant de taper). Un
+ *  paragraphe long est ÉCLATÉ PHRASE PAR PHRASE (p-suite) : le
+ *  tableau se coupe en bas de page (près du pied) et se poursuit
+ *  sur la page suivante, l'en-tête du tableau y est repris.
+ *  Rendu visuel IDENTIQUE : les phrases se suivent sans marge,
+ *  comme un paragraphe unique. */
 export function decouperHtmlRiche(html: string | null | undefined): string[] {
   const riche = htmlRicheOuTexteBrut(html);
   if (!riche) return [];
@@ -148,8 +159,183 @@ export function decouperHtmlRiche(html: string | null | undefined): string[] {
         }
       }
     }
-    /* paragraphe, div, liste imbriquée : bloc entier */
-    fragments.push(brut);
+    /* paragraphe (éclaté en phrases si long, VOLET 21), div, liste
+     *  imbriquée : blocs entiers */
+    fragments.push(...decouperParagraphe(brut));
   }
   return fragments;
+}
+
+/* ------------------------------------------------------------------
+ * VOLET 21 (27/11/2026) — ÉCLATEMENT PHRASE PAR PHRASE DES
+ * PARAGRAPHES LONGS (voir decouperHtmlRiche).
+ * ------------------------------------------------------------------ */
+
+/** Seuil (caractères de texte) au-delà duquel un paragraphe est
+ *  éclaté en phrases paginables. */
+const SEUIL_PHRASES = 120;
+
+/** Abréviations courantes : le point qui les suit ne TERMINE PAS
+ *  une phrase (p. ex., etc., M., Dr.…). */
+const ABREVIATIONS = new Set([
+  "etc", "ex", "exx", "cf", "p", "av", "art", "vol", "chap", "fig",
+  "no", "n", "nr", "mr", "mme", "dr", "pr", "st", "ste", "bd",
+  "janv", "févr", "fevr", "avr", "juil", "sept", "oct", "nov", "déc", "dec",
+]);
+
+/** Balises EN LIGNE qui peuvent enjamber une coupure de phrase —
+ *  elles sont refermées / rouvertes proprement de part et d'autre
+ *  (attributs d'origine conservés, p. ex. <font size="5">). */
+const BALISES_EN_LIGNE = new Set(["b", "strong", "i", "em", "u", "font", "span"]);
+
+/** Coupure de phrase : [. ! ? …] suivi d'espaces — ou de la FIN
+ *  du segment de texte (la phrase suivante peut commencer après
+ *  une balise : « <b>phrase.</b> Suite… ») — et le caractère
+ *  visible suivant COMMENCE une phrase (majuscule, chiffre,
+ *  guillemet, parenthèse…). */
+const RE_BORDURE = /([.!\u2026])(?:(?:\s+|&nbsp;)+|$)/g;
+const RE_DEBUT_PHRASE = /^[A-ZÀ-ÖØ-Þ0-9«"'\u201c\u2018(]/;
+
+/** Découpe un HTML INLINE en PHRASES brutes — coupure uniquement
+ *  HORS des balises, après . ! ? … suivi d'un espace (ou en fin de
+ *  segment si la phrase suivante commence après des balises) ; le
+ *  mot précédant le point n'est pas une abréviation. Les balises
+ *  FERMANTES qui suivent la fin de phrase restent avec la phrase
+ *  terminée ; les balises OUVRANTES partent avec la suivante. */
+function fragmenterPhrase(html: string): string[] {
+  /* 1) Segmenter en balises / texte. */
+  const morceaux: { balise: boolean; valeur: string }[] = [];
+  let dernier = 0;
+  for (const m of html.matchAll(/<[^>]+>/g)) {
+    const debut = m.index ?? 0;
+    if (debut > dernier) morceaux.push({ balise: false, valeur: html.slice(dernier, debut) });
+    morceaux.push({ balise: true, valeur: m[0] });
+    dernier = debut + m[0].length;
+  }
+  if (dernier < html.length) morceaux.push({ balise: false, valeur: html.slice(dernier) });
+
+  /* Premier caractère VISIBLE après le morceau `depuis` (les
+   *  balises ne comptent pas, les espaces de tête sont ignorés) —
+   *  reconnaît le début d'une phrase AU-DELÀ d'une balise. */
+  const premierVisibleApres = (depuis: number): string => {
+    for (let i = depuis; i < morceaux.length; i++) {
+      const mo = morceaux[i];
+      if (mo.balise) continue;
+      const ch = mo.valeur.replace(/^[\s\u00a0]+/, "");
+      if (ch.length > 0) return ch.charAt(0);
+    }
+    return "";
+  };
+
+  /* 2) Passe unique, phrase par phrase. `enAttente` marque une fin
+   *    de phrase au bord d'un segment : la coupure part APRÈS les
+   *    balises fermantes qui suivent (elles ferment la phrase
+   *    terminée) ; une balise OUVRANTE ou un texte démarre la
+   *    phrase suivante. */
+  const phrases: string[] = [];
+  let courante = "";
+  let textePhrase = "";
+  let enAttente = false;
+  const clorePhrase = () => {
+    phrases.push(courante);
+    courante = "";
+    textePhrase = "";
+    enAttente = false;
+  };
+
+  for (let i = 0; i < morceaux.length; i++) {
+    const morceau = morceaux[i];
+    if (morceau.balise) {
+      if (enAttente && !morceau.valeur.startsWith("</")) clorePhrase();
+      courante += morceau.valeur;
+      continue;
+    }
+    if (enAttente) clorePhrase();
+    const segment = morceau.valeur;
+
+    /* Coupures DANS le segment : après [.!?…] + espaces. */
+    const bordures: number[] = [];
+    RE_BORDURE.lastIndex = 0;
+    let mm: RegExpExecArray | null;
+    while ((mm = RE_BORDURE.exec(segment)) !== null) {
+      const fin = mm.index + mm[0].length;
+      const premier =
+        fin < segment.length ? segment.charAt(fin) : premierVisibleApres(i + 1);
+      if (!RE_DEBUT_PHRASE.test(premier)) continue;
+      /* abréviation ? le mot qui précède le point. */
+      const texteAvant = (textePhrase + segment.slice(0, mm.index)).replace(/[\s\u00a0]+$/, "");
+      const mMot = /([A-Za-zÀ-\u017f]+)$/.exec(texteAvant);
+      if (mMot) {
+        const mot = mMot[1].toLowerCase();
+        if (ABREVIATIONS.has(mot) || /^[A-ZÀ-ÖØ-Þ]$/.test(mMot[1])) continue;
+      }
+      if (fin < segment.length) bordures.push(fin);
+      else enAttente = true;
+    }
+    let base = 0;
+    for (const b of bordures) {
+      courante += segment.slice(base, b);
+      clorePhrase();
+      base = b;
+    }
+    const reste = segment.slice(base);
+    courante += reste;
+    textePhrase += reste;
+  }
+  if (courante.trim()) phrases.push(courante);
+  return phrases;
+}
+
+/** Rééquilibre les balises EN LIGNE autour de chaque coupure : les
+ *  balises restées ouvertes en fin de phrase sont refermées puis
+ *  rouvertes (attributs d'origine) en tête de la phrase suivante. */
+function equilibrerPhrases(phrasesBrutes: string[]): string[] {
+  const heritees: { nom: string; brute: string }[] = [];
+  return phrasesBrutes.map((brute) => {
+    const ouverture = heritees.map((b) => b.brute).join("");
+    const locales: { nom: string; brute: string }[] = [];
+    let sortie = "";
+    let dernier = 0;
+    for (const m of brute.matchAll(/<[^>]+>/g)) {
+      sortie += brute.slice(dernier, m.index);
+      sortie += m[0];
+      dernier = (m.index ?? 0) + m[0].length;
+      const mNom = /^<\/?([a-zA-Z][a-zA-Z0-9-]*)/.exec(m[0]);
+      const nom = mNom?.[1]?.toLowerCase();
+      if (!nom || !BALISES_EN_LIGNE.has(nom)) continue;
+      if (m[0].startsWith("</")) {
+        const idxLocal = [...locales].reverse().findIndex((b) => b.nom === nom);
+        if (idxLocal !== -1) {
+          locales.splice(locales.length - 1 - idxLocal, 1);
+        } else {
+          const idxH = [...heritees].reverse().findIndex((b) => b.nom === nom);
+          if (idxH !== -1) heritees.splice(heritees.length - 1 - idxH, 1);
+        }
+      } else {
+        locales.push({ nom, brute: m[0] });
+      }
+    }
+    sortie += brute.slice(dernier);
+    for (let i = locales.length - 1; i >= 0; i--) sortie += `</${locales[i].nom}>`;
+    heritees.push(...locales);
+    return ouverture + sortie;
+  });
+}
+
+/** Éclate un fragment <p> en phrases paginables (p-suite) quand il
+ *  est LONG ; les paragraphes courts, les <div>, <font> et listes
+ *  imbriquées restent DES BLOCS ENTIERS (rendu inchangé). */
+function decouperParagraphe(brut: string): string[] {
+  const m = /^<p\b[^>]*>([\s\S]*)<\/p\s*>$/i.exec(brut);
+  if (!m) return [brut];
+  const interieur = m[1];
+  if (/<(p|div|ul|ol|li|table|h[1-6])\b/i.test(interieur)) return [brut];
+  const texte = interieur.replace(/<[^>]+>/g, "");
+  if (texte.length <= SEUIL_PHRASES) return [brut];
+  const phrases = equilibrerPhrases(fragmenterPhrase(interieur).filter((p) => p.trim()));
+  if (phrases.length <= 1) return [brut];
+  return phrases.map(
+    (ph, i) =>
+      `<p class="p-suite${i === 0 ? " p-suite--debut" : ""}${i === phrases.length - 1 ? " p-suite--fin" : ""}">${ph}</p>`,
+  );
 }

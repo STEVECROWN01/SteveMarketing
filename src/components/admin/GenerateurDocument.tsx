@@ -464,9 +464,15 @@ export function GenerateurDocument({
                 </Champ>
                 {/* Description rédigée — ÉDITEUR RICHE, seule sur sa
                     ligne pour rédiger à l'aise (gras, italique, taille
-                    supérieure, listes). */}
+                    supérieure, listes). VOLET 21 — `blocLibre` : le
+                    conteneur n'est PAS un <label> : un label
+                    transmet le clic au premier bouton de la barre
+                    d'outils et volait le curseur de la zone de
+                    rédaction — le clic positionne désormais le
+                    curseur et la barre d'outils ne s'active plus
+                    qu'en la cliquant directement. */}
                 <div className="mt-3">
-                  <Champ label="Description (texte riche)" indicatif="imprimée sous la désignation">
+                  <Champ label="Description (texte riche)" indicatif="imprimée sous la désignation" blocLibre>
                     <EditeurTexteRiche
                       valeur={item.description ?? ""}
                       onChange={(html) => majItem(item.id, { description: html })}
@@ -495,20 +501,10 @@ export function GenerateurDocument({
           </div>
         </Carte>
 
-        {/* 3 — Validité & notes (avant les CGV imprimées) */}
-        <Carte className="p-5 sm:p-6">
-          <TitreSection note="conditions générales imprimées automatiquement">Validité & notes</TitreSection>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Champ label="Validité (jours)">
-              <input className={styleInput} type="number" min={1} value={form.validiteJours} onChange={(e) => maj("validiteJours", Number(e.target.value) || 15)} />
-            </Champ>
-            <Champ label="Notes" className="sm:col-span-2">
-              <textarea className={`${styleInput} min-h-[72px] resize-y`} value={form.notes} onChange={(e) => maj("notes", e.target.value)} />
-            </Champ>
-          </div>
-        </Carte>
-
-        {/* 4 — Règlement & coordonnées bancaires (IBAN, BIC, titulaire) */}
+        {/* 3 — Règlement & coordonnées bancaires (IBAN, BIC, titulaire) —
+            VOLET 21 : la carte passe AVANT « Validité & notes » (le
+            formulaire suit l'ordre du document imprimé : validité et
+            notes suivent désormais les coordonnées bancaires). */}
         <Carte className="p-5 sm:p-6">
           <TitreSection note="règlement toujours à réception">Règlement & coordonnées bancaires</TitreSection>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -539,6 +535,20 @@ export function GenerateurDocument({
             </Champ>
             <Champ label="Lien de paiement en ligne (optionnel)" className="sm:col-span-2">
               <input className={styleInput} value={form.lienPaiement ?? ""} onChange={(e) => maj("lienPaiement", e.target.value)} placeholder="https://…" />
+            </Champ>
+          </div>
+        </Carte>
+
+        {/* 4 — Validité & notes (APRÈS les coordonnées bancaires,
+            comme sur le document imprimé — VOLET 21) */}
+        <Carte className="p-5 sm:p-6">
+          <TitreSection note="conditions générales imprimées automatiquement">Validité & notes</TitreSection>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Champ label="Validité (jours)">
+              <input className={styleInput} type="number" min={1} value={form.validiteJours} onChange={(e) => maj("validiteJours", Number(e.target.value) || 15)} />
+            </Champ>
+            <Champ label="Notes" className="sm:col-span-2">
+              <textarea className={`${styleInput} min-h-[72px] resize-y`} value={form.notes} onChange={(e) => maj("notes", e.target.value)} />
             </Champ>
           </div>
         </Carte>

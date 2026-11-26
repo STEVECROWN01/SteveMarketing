@@ -464,7 +464,9 @@ export function renderDocumentHtml(
    * sur les FACTURES l'espace entre le tableau et le total est
    * AUGMENTÉ (10 mm) et le CACHET (PAYÉ / EN ATTENTE) se pose SUR
    * les deux lignes à pointillés, centré verticalement et
-   * horizontalement. */
+   * horizontalement. VOLET 21 (27/11/2026) : le cachet passe
+   * AU-DESSUS des pointillés (z-index) — son encre et sa date
+   * restent ENTIÈREMENT lisibles (demande de l'éditeur). */
   const blocTotal = `
   <div class="total-sous-tableau${estFacture ? " total-sous-tableau--facture" : ""}" data-bloc>
     <div class="total-ligne">
@@ -508,7 +510,11 @@ export function renderDocumentHtml(
   /* Validité + notes — VOLET 18 : libellés traduits.
    * VOLET 20 — FACTURE : la ligne « Validité du document : … » est
    * SUPPRIMÉE (demande de l'éditeur) ; seules les NOTES éventuelles
-   * restent imprimées. */
+   * restent imprimées.
+   * VOLET 21 (27/11/2026) — ORDRE : ce bloc passe APRÈS les
+   * coordonnées bancaires (demande de l'éditeur) — « Validité du
+   * document : 15 jours » et « Notes » suivent le bloc «
+   * Coordonnées bancaires », sans déplacer ce dernier. */
   const blocValiditeNotes = estFacture
     ? d.notes
       ? `
@@ -807,17 +813,27 @@ export function renderDocumentHtml(
   .desc-riche ul.li-suite, .desc-riche ol.li-suite { margin: 0; }
   .desc-riche ul.li-suite--debut, .desc-riche ol.li-suite--debut { margin-top: 2px; }
   .desc-riche ul.li-suite--fin, .desc-riche ol.li-suite--fin { margin-bottom: 4px; }
+  /* VOLET 21 (27/11/2026) — phrases éclatées (paragraphes LONGS
+     découpés pour la pagination fine, voir texte-riche.ts) : les
+     phrases d'un même paragraphe se suivent SANS marge — même
+     rendu qu'un paragraphe unique ; la dernière phrase garde la
+     marge basse d'origine. Le tableau se remplit jusqu'en bas de
+     page et se poursuit en page suivante (en-tête repris). */
+  .desc-riche p.p-suite { margin: 0; }
+  .desc-riche p.p-suite--fin { margin-bottom: 3px; }
 
   /* ---- Total SOUS le tableau — VOLET 19 : lignes à POINTILLÉS.
      « Total » et « TVA » en GRAS ET GROS à gauche, la valeur
      totalement à droite, pointillés entre les deux (demande de
      l'éditeur). VOLET 20 : le montant en lettres disparaît ; sur
      les FACTURES l'espace tableau → total est AUGMENTÉ (10 mm) et
-     le CACHET se pose sur les deux lignes à pointillés. ---- */
+     le CACHET se pose sur les deux lignes à pointillés.
+     VOLET 21 : le CACHET couvre les pointillés (z-index supérieur)
+     — l'encre et la date du cachet restent lisibles. ---- */
   .total-sous-tableau { margin-top: 5mm; position: relative; }
   .total-sous-tableau--facture { margin-top: 10mm; }
   .total-sous-tableau .total-ligne,
-  .total-sous-tableau .total-ligne + .total-ligne { position: relative; z-index: 2; }
+  .total-sous-tableau .total-ligne + .total-ligne { position: relative; z-index: 1; }
   .total-ligne { display: flex; align-items: baseline; margin: 0; }
   .total-ligne + .total-ligne { margin-top: 2.5mm; }
   .total-libelle {
@@ -849,14 +865,14 @@ export function renderDocumentHtml(
      DOUBLE filet (extérieur 3,2 pt, écart 2,2 pt, intérieur
      1,8 pt), rotation −17° (oblique ASCENDANT), encre PLEINE —
      VERT #008000 pour « PAYÉ » (avec « le JJ/MM/AAAA » dessous,
-     gras serif ~36 pt + sans-serif 10 pt), GRIS #6b7280 pour
+     gras serif ~36 pt + sans-serif 10 pt), GRIS FONCÉ pour
      « EN ATTENTE » (sans date). Le cachet est posé SUR les deux
      lignes à pointillés du bloc Total : centré VERTICALEMENT et
      HORIZONTALEMENT sur l'ensemble des deux lignes. ---- */
   .cachet-overlay {
     position: absolute;
     inset: 0;
-    z-index: 1;
+    z-index: 3;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -871,7 +887,12 @@ export function renderDocumentHtml(
     justify-content: center;
     transform: rotate(-17deg);
   }
-  .cachet-overlay--attente .cachet-paye { width: 172pt; }
+  /* VOLET 21 (27/11/2026) — cachet EN ATTENTE : PLUS D'ESPACE à
+     gauche et à droite du texte (boîte élargie 172 → 200 pt) et
+     encre GRIS FONCÉ (#4b5563 / #374151 — l'ancien #6b7280 était
+     presque invisible sur le document imprimé, demande de
+     l'éditeur). */
+  .cachet-overlay--attente .cachet-paye { width: 200pt; }
   .cachet-paye::before {
     content: "";
     position: absolute;
@@ -914,11 +935,12 @@ export function renderDocumentHtml(
     font-size: 10pt;
     color: #008000;
   }
-  /* Cachet EN ATTENTE : la même matrice, encre GRISE. */
+  /* Cachet EN ATTENTE : la même matrice, encre GRISE FONCÉE
+     (VOLET 21 — lisible à l'impression). */
   .cachet-overlay--attente .cachet-paye::before,
-  .cachet-overlay--attente .cachet-paye::after { border-color: #6b7280; }
-  .cachet-overlay--attente .cachet-paye .cp-paye,
-  .cachet-overlay--attente .cachet-paye .cp-date { color: #6b7280; }
+  .cachet-overlay--attente .cachet-paye::after { border-color: #4b5563; }
+  .cachet-overlay--attente .cachet-paye .cp-paye { color: #374151; }
+  .cachet-overlay--attente .cachet-paye .cp-date { color: #4b5563; }
 
   /* ---- Conditions / Bon pour accord ---- */
   .conditions-block {
@@ -1165,9 +1187,9 @@ export function renderDocumentHtml(
 
   ${blocPaiement}
   ${blocConditions}
-  ${blocValiditeNotes}
   ${blocPhases}
   ${blocBanque}
+  ${blocValiditeNotes}
 </div>
 
 <!-- Gabarits clonés par le script de pagination -->

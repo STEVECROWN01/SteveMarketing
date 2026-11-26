@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Maximize2, Minimize2, Search, X, ZoomIn, ZoomOut } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2, X, ZoomIn, ZoomOut } from "lucide-react";
 import type { DocumentRecord } from "@/lib/documents/types";
 import { LABELS_DOC } from "@/lib/documents/types";
 import { renderDocumentHtml } from "@/lib/documents/document-html";
@@ -42,8 +42,10 @@ import { renderPropositionHtml } from "@/lib/documents/proposition-html";
 const A4_L = 794;
 const A4_H = 1123;
 
-/** VOLET 20 — paliers de zoom (pourcentages), 100 % = taille normale. */
-const PALIERS_ZOOM = [50, 75, 100, 125, 150];
+/** VOLET 20 — paliers de zoom (pourcentages), 100 % = taille normale.
+ *  VOLET 21 (27/11/2026) — paliers ÉTENDUS au-delà de 200 %
+ *  (demande de l'éditeur) : jusqu'à 300 %. */
+const PALIERS_ZOOM = [50, 75, 100, 125, 150, 175, 200, 250, 300];
 
 export function ApercuDocument({
   document,
@@ -270,17 +272,17 @@ export function ApercuDocument({
         <div className="flex shrink-0 items-center gap-2">
           {/* VOLET 20 — ZOOM DU DOCUMENT (plein écran uniquement, à
               GAUCHE du bouton plein écran — demande de l'éditeur) :
-              groupe LOUPE « − / % / + », paliers 50 / 75 / 100 / 125 /
-              150 %. 100 % = taille d'aperçu normale (ajustée à
-              l'écran) ; en dessous le document se réduit ; au-dessus
-              il s'agrandit et la zone défile. */}
+              groupe « − / % / + ». VOLET 21 : l'icône LOUPE (non
+              cliquable, purement décorative) est SUPPRIMÉE ; paliers
+              étendus 50 → 300 %. 100 % = taille d'aperçu normale
+              (ajustée à l'écran) ; en dessous le document se réduit ;
+              au-dessus il s'agrandit et la zone défile. */}
           {pleinEcran ? (
             <div
               className="flex items-center gap-1 rounded-full border border-[#e4e4e4]/25 bg-[#232323] px-2 py-1"
               role="group"
               aria-label="Zoom de l'aperçu"
             >
-              <Search className="ml-1 h-3.5 w-3.5 text-[#c8c8c8]" aria-hidden="true" />
               <button
                 type="button"
                 onClick={() => setZoomIndex((i) => Math.max(0, i - 1))}
@@ -358,7 +360,10 @@ export function ApercuDocument({
       {/* Zone d'aperçu : la page remplit la hauteur disponible
           (plein écran : tout l'écran, même iframe, temps réel).
           VOLET 20 — au-delà de 100 % de zoom, la zone DÉFILE
-          (document agrandi ancré en haut à gauche). */}
+          (document agrandi). VOLET 21 : le document agrandi qui
+          TIENT ENCORE en largeur reste CENTRÉ horizontalement (marge
+          auto) — il ne se colle plus à gauche ; trop grand, il
+          s'ancre à gauche et la zone défile (comportement inchangé). */}
       <div
         ref={conteneurRef}
         className={`relative flex-1 bg-[#141414] ${depasse ? "overflow-auto" : "overflow-hidden"}`}
@@ -369,6 +374,7 @@ export function ApercuDocument({
               width: `${Math.round(A4_L * echelleEffective) + 32}px`,
               height: `${Math.round(A4_H * echelleEffective) + 32}px`,
               position: "relative",
+              margin: "0 auto",
             }}
           >
             <div style={feuilleAgrandie}>

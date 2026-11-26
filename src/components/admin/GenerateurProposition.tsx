@@ -229,8 +229,20 @@ export function GenerateurProposition({
             <Champ label="Votre projet">
               <input className={styleInput} value={form.projet} onChange={(e) => maj("projet", e.target.value)} placeholder="Site web professionnel, éditorial et évolutif" />
             </Champ>
-            <Champ label="Prestataire">
-              <input className={styleInput} value={form.prestataire} onChange={(e) => maj("prestataire", e.target.value)} placeholder="Stevens AKPOVI" />
+            {/* VOLET 21 (27/11/2026) — DISPOSITION demandée par
+                l'éditeur : le « Numéro client » prend la place de
+                l'ancien champ « Prestataire » (à droite de « Votre
+                projet »), et le « Nom complet du destinataire »
+                partage SA ligne avec le « Prestataire ». */}
+            <Champ label="Numéro client" indicatif={enEdition ? "conservé en édition" : "relie les documents du client"}>
+              <input
+                className={styleInput}
+                type="number"
+                min={1}
+                value={form.numeroClient}
+                readOnly={enEdition}
+                onChange={(e) => maj("numeroClient", Number(e.target.value) || 1)}
+              />
             </Champ>
             {/* VOLET 20 — DESTINATAIRE (demande de l'éditeur) : « sur la
                 première page, dans le bloc où il y a le budget, mon
@@ -243,7 +255,6 @@ export function GenerateurProposition({
             <Champ
               label="Nom complet du destinataire"
               indicatif="la personne à qui la proposition est adressée"
-              className="sm:col-span-2"
             >
               <input
                 className={styleInput}
@@ -251,6 +262,9 @@ export function GenerateurProposition({
                 onChange={(e) => maj("destinataire", { ...form.destinataire, nomComplet: e.target.value })}
                 placeholder="Ex. Aïcha Dossou"
               />
+            </Champ>
+            <Champ label="Prestataire">
+              <input className={styleInput} value={form.prestataire} onChange={(e) => maj("prestataire", e.target.value)} placeholder="Stevens AKPOVI" />
             </Champ>
             <Champ
               label="Nom d'entreprise du destinataire"
@@ -281,16 +295,6 @@ export function GenerateurProposition({
               {/* VOLET 20 — pictogramme calendrier natif BLANC
                   ([color-scheme:dark]). */}
               <input className={styleInputDate} type="date" value={form.date} onChange={(e) => maj("date", e.target.value)} />
-            </Champ>
-            <Champ label="Numéro client" indicatif={enEdition ? "conservé en édition" : "relie les documents du client"}>
-              <input
-                className={styleInput}
-                type="number"
-                min={1}
-                value={form.numeroClient}
-                readOnly={enEdition}
-                onChange={(e) => maj("numeroClient", Number(e.target.value) || 1)}
-              />
             </Champ>
           </div>
         </Carte>

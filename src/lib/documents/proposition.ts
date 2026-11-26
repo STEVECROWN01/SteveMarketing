@@ -93,6 +93,13 @@ export type PropositionRecord = {
    *  NOM du client lors de la génération du devis depuis la
    *  proposition — demande de l'éditeur). */
   destinataire?: { nomComplet?: string; entreprise?: string };
+  /** VOLET 21 (27/11/2026) — STATUT D'ENVOI : une proposition
+   *  naît « non envoyée » ; l'éditeur la marque « envoyée » en un
+   *  clic sur sa pastille de statut (demande de l'éditeur :
+   *  « après la génération, elle est non envoyée par défaut ; on
+   *  clique sur le statut pour choisir envoyée / non envoyée »). */
+  envoyee?: boolean;
+
   /** Bloc « MONTANT TOTAL ». */
   montant: number;
   devise: string;
@@ -151,6 +158,9 @@ export function propositionV2ParDefaut(): Omit<
     titre: "Conception et développement de votre site web professionnel",
     projet: "Site web professionnel, éditorial et évolutif",
     prestataire: "Stevens AKPOVI",
+    /* VOLET 21 — naît « non envoyée » (statut cliquable dans la
+     * liste). */
+    envoyee: false,
     montant: 2000,
     devise: "EUR",
     delai: "02 à 03 semaines",

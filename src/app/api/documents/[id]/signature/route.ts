@@ -8,6 +8,7 @@ import {
   supprimerFichier,
   isStorageConfigured,
 } from "@/lib/documents/github";
+import { extraireTextePdf, pdfCorrespondAuDevis } from "@/lib/documents/pdf-texte";
 import type { DocumentRecord } from "@/lib/documents/types";
 
 export const runtime = "nodejs";
@@ -68,12 +69,42 @@ export async function POST(
     );
   }
 
+  /* VOLET 21 (27/11/2026) — VALIDATION DU CONTENU (demande de
+   * l'éditeur : « lors du téléversement du devis signé, il faut
+   * vérifier que le document téléversé correspond bien au devis
+   * généré — et refuser tout autre document ») : le PDF doit être
+   * un vrai PDF dont la couche texte (quand elle existe — un
+   * devis scanné n'en a pas) porte le NUMÉRO du devis. Un PDF
+   * avec du texte mais SANS le numéro = document étranger →
+   * REFUS. */
+  const buffer = Buffer.from(dataBase64, "base64");
+  if (buffer.subarray(0, 5).toString("latin1") !== "%PDF-") {
+    return NextResponse.json(
+      { ok: false, error: "Fichier PDF invalide — le document téléversé doit être le devis signé (PDF)." },
+      { status: 422 },
+    );
+  }
+
   try {
     const document = await getDocument(id);
     if (!document || document.docType !== "devis") {
       return NextResponse.json(
         { ok: false, error: "Devis introuvable." },
         { status: 404 },
+      );
+    }
+
+    const textePdf = await extraireTextePdf(buffer);
+    if (!pdfCorrespondAuDevis(textePdf, document.numero)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            `Ce PDF ne correspond pas au devis ${document.numero} : son numéro n'y figure pas. ` +
+            "Téléversez le PDF de CE devis (imprimé puis signé, ou signé numériquement). " +
+            "Un devis scanné (sans texte) reste accepté.",
+        },
+        { status: 422 },
       );
     }
 
