@@ -32,6 +32,7 @@
 import type { PropositionRecord } from "./proposition";
 import type { PreRemplissage } from "@/components/admin/GenerateurDocument";
 import type { LigneDocument } from "./types";
+import { TEXTES_DEFAUT } from "./defaults";
 
 function esc(v: string | null | undefined): string {
   if (v === null || v === undefined) return "";
@@ -360,9 +361,14 @@ export function preRemplissageDevisDepuisProposition(
     numeroClient: Number(p.numeroClient) || undefined,
     champs: {
       objet: (p.titre ?? "").trim() || "Création d'un site web professionnel",
-      intro:
-        (p.sections.presentation ?? []).find((par) => par && par.trim()) ??
-        "Le présent devis fait suite à la proposition commerciale qui vous a été adressée ; il en reprend exactement le périmètre, le montant et le calendrier.",
+      /* VOLET 24 (27/11/2026) — INTRO : LA PHRASE STANDARD DES DEVIS
+       * DIRECTS (demande de l'éditeur : « sous le texte “merci pour
+       * votre confiance”, la phrase n'est pas appropriée — ça devrait
+       * être la phrase des autres devis générés directement »). Le
+       * périmètre rédigé vit dans la DESCRIPTION du tableau ; la
+       * présentation de la proposition ne s'invite plus ici, et la
+       * formule « fait suite à la proposition commerciale… » disparaît. */
+      intro: TEXTES_DEFAUT.fr.intro,
       delaiEstime: (p.delai ?? "").trim() || undefined,
       devise: p.devise,
       items: description ? [ligne] : [{ ...ligne, description: "" }],

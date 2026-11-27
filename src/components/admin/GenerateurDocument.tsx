@@ -517,15 +517,15 @@ export function GenerateurDocument({
           </div>
         </Carte>
 
-        {/* 3 — Modalité de paiement (IBAN, BIC, titulaire) —
+        {/* 3 — Paiement (IBAN, BIC, titulaire) —
             VOLET 21 : la carte passe AVANT « Validité & notes » (le
             formulaire suit l'ordre du document imprimé : validité et
             notes suivent désormais les coordonnées bancaires).
-            VOLET 23 : le bloc s'appelle désormais « MODALITÉ DE
-            PAIEMENT » sur le document imprimé — la carte du
-            formulaire suit le même nom (demande de l'éditeur). */}
+            VOLET 24 : le bloc s'appelle désormais « PAIEMENT » sur le
+            document imprimé — la carte du formulaire suit le même nom
+            (demande de l'éditeur). */}
         <Carte className="p-5 sm:p-6">
-          <TitreSection note="règlement toujours à réception">Modalité de paiement</TitreSection>
+          <TitreSection note="règlement toujours à réception">Paiement</TitreSection>
           <div className="grid gap-4 sm:grid-cols-2">
             <Champ label="Devise">
               <select className={styleInput} value={form.devise} onChange={(e) => maj("devise", e.target.value)}>

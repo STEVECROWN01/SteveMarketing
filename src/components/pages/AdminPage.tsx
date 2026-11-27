@@ -24,10 +24,11 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LEAD_STATUSES } from "@/lib/validation";
-import { ASSETS } from "@/lib/site";
+import { ASSETS, PROJECTS as PROJETS_SITE } from "@/lib/site";
 import { GenerateurDocument, type PreRemplissage } from "@/components/admin/GenerateurDocument";
 import { GenerateurProposition } from "@/components/admin/GenerateurProposition";
 import { ListeDocuments } from "@/components/admin/ListeDocuments";
+import { ApercuDocument } from "@/components/admin/ApercuDocument";
 import { EspaceFacture } from "@/components/admin/EspaceFacture";
 import { GestionPortfolio } from "@/components/admin/GestionPortfolio";
 import { BoutonAction, Carte, Pastille } from "@/components/admin/elements";
@@ -615,9 +616,12 @@ function SelectionDevis({
   documents,
   onChoisir,
   onCreerDevis,
-  /* VOLET 22 — clic sur le statut « Facturée (n°) » d'un devis déjà
-     facturé : amène directement à l'espace des factures, la facture
-     ouverte dans son espace dédié (demande de l'éditeur). */
+  /* VOLET 24 — clic sur le statut « Facturée (n°) » d'un devis déjà
+     facturé : la facture s'ouvre en APERÇU PLEIN ÉCRAN SUR PLACE —
+     fermé, on RETROUVE la page de sélection des devis (plus de
+     bascule vers la liste des factures — demande de l'éditeur : «
+     quand on ferme l'aperçu, on devrait se retrouver sur la page où
+     on était, c'est-à-dire la page de sélection des devis »). */
   onVoirFacture,
 }: {
   documents: ToutDocument[];
@@ -725,16 +729,16 @@ function SelectionDevis({
                   </td>
                   <td className="px-5 py-4">
                     {facture ? (
-                      /* VOLET 22 — statut CLIQUABLE : amène à l'espace
-                         des factures avec cette facture ouverte dans
-                         son espace dédié. */
+                      /* VOLET 22 — statut CLIQUABLE : la facture
+                         s'ouvre en APERÇU plein écran (VOLET 24 : sur
+                         place, sans quitter la sélection). */
                       <button
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           onVoirFacture(facture as DocumentRecord);
                         }}
-                        title={`Voir la facture ${facture.numero} dans l'espace des factures`}
+                        title={`Voir la facture ${facture.numero}`}
                         className="cursor-pointer rounded-full transition-transform hover:scale-[1.03] focus:outline-none"
                       >
                         <Pastille ton="valide">Facturée ({facture.numero})</Pastille>
@@ -781,6 +785,13 @@ export function AdminPage() {
   const [docsChargement, setDocsChargement] = useState(false);
   const [stockageConfigure, setStockageConfigure] = useState(false);
   const [emailConfigure, setEmailConfigure] = useState(false);
+  /* VOLET 24 — PROJETS DU PORTFOLIO (pour le COMPTEUR de l'option
+   *  « Portfolio du site » du tableau de bord — demande de
+   *  l'éditeur : « à droite du nom de l'option, le nombre total de
+   *  projets réalisés présentés sur le site, comme les rubriques
+   *  de documents affichent leur nombre »). */
+  const [projetsPortfolio, setProjetsPortfolio] = useState<{ id: string; statut: string }[]>([]);
+  const [portfolioSiteSupprimes, setPortfolioSiteSupprimes] = useState<string[]>([]);
   const { toast } = useToast();
 
   /* VOLET 15 — vues des rubriques documents. */
@@ -788,11 +799,12 @@ export function AdminPage() {
   const [docEnEdition, setDocEnEdition] = useState<ToutDocument | null>(null);
   const [vueFactures, setVueFactures] = useState<VueFactures>("liste");
   const [factureCible, setFactureCible] = useState<DocumentRecord | null>(null);
-  /* VOLET 23 — facture à OUVRIR EN APERÇU depuis le statut « Facturée
-   *  (n°) » de la sélection de devis : la rubrique Factures s'ouvre
-   *  sur sa LISTE, la facture s'affiche en PLEIN ÉCRAN (plus de modale
-   *  de modification — demande de l'éditeur). */
-  const [voirFacture, setVoirFacture] = useState<DocumentRecord | null>(null);
+  /* VOLET 24 — facture ouverte en APERÇU PLEIN ÉCRAN depuis le statut
+   *  « Facturée (n°) » de la SÉLECTION de devis : l'aperçu vit SUR
+   *  PLACE dans la vue de sélection — fermé (croix ou Échap), on
+   *  RETROUVE la sélection des devis (plus de bascule vers la liste
+   *  des factures — demande de l'éditeur). */
+  const [apercuFacture, setApercuFacture] = useState<DocumentRecord | null>(null);
   /* VOLET 16 — pré-remplissage d'un nouveau devis depuis une demande. */
   const [preRemplissage, setPreRemplissage] = useState<PreRemplissage | null>(null);
 
@@ -811,6 +823,28 @@ export function AdminPage() {
       /* silencieux : le bandeau du tableau de bord informe */
     } finally {
       setDocsChargement(false);
+    }
+  }, []);
+
+  /* VOLET 24 — PROJETS DU PORTFOLIO : projets administrés (avec leur
+   *  statut) + identifiants des réalisations du site supprimées —
+   *  sert UNIQUEMENT au COMPTEUR de l'option « Portfolio du site ». */
+  const chargerProjets = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/projects", { cache: "no-store" });
+      if (res.status === 401) return;
+      const data = await res.json();
+      if (data?.ok) {
+        setProjetsPortfolio(
+          (data.projets ?? []).map((p: { id?: string; statut?: string }) => ({
+            id: String(p.id ?? ""),
+            statut: String(p.statut ?? "brouillon"),
+          })),
+        );
+        setPortfolioSiteSupprimes(Array.isArray(data.siteSupprimes) ? (data.siteSupprimes as string[]) : []);
+      }
+    } catch {
+      /* silencieux : le compteur reste à sa dernière valeur */
     }
   }, []);
 
@@ -843,11 +877,12 @@ export function AdminPage() {
         setAuthed(true);
         if (data?.ok) setLeads(data.leads as Lead[]);
         chargerDocuments();
+        chargerProjets();
       } catch {
         setAuthed(false);
       }
     })();
-  }, [chargerDocuments]);
+  }, [chargerDocuments, chargerProjets]);
 
   async function majStatut(id: string, status: string) {
     const prev = leads;
@@ -874,7 +909,7 @@ export function AdminPage() {
     setDocEnEdition(null);
     setVueFactures("liste");
     setFactureCible(null);
-    setVoirFacture(null);
+    setApercuFacture(null);
     setPreRemplissage(null);
     /* VOLET 17 : icône verte sur le toast de déconnexion. */
     toast({
@@ -973,6 +1008,16 @@ export function AdminPage() {
     devis: documents.filter((d) => d.docType === "devis").length,
     factures: documents.filter((d) => d.docType === "facture").length,
     propositions: documents.filter((d) => d.docType === "proposition").length,
+    /* VOLET 24 — PORTFOLIO : nombre TOTAL de projets PRÉSENTÉS SUR LE
+     *  SITE = projets administrés PUBLIÉS + réalisations du site
+     *  encore en place (mêmes règles que l'espace Portfolio). */
+    portfolio:
+      projetsPortfolio.filter((p) => p.statut === "publie").length +
+      (PROJETS_SITE as readonly { id: string }[]).filter(
+        (p) =>
+          !projetsPortfolio.some((x) => x.id === p.id) &&
+          !portfolioSiteSupprimes.includes(p.id),
+      ).length,
   };
 
   const prochainNumero = useMemo(
@@ -1017,6 +1062,9 @@ export function AdminPage() {
           setAuthed(true);
           chargerDemandes();
           chargerDocuments();
+          /* VOLET 24 — le compteur de l'option « Portfolio du site » se
+           *  remplit dès la connexion (comme les documents). */
+          chargerProjets();
         }}
       />
     );
@@ -1033,7 +1081,7 @@ export function AdminPage() {
     { key: "propositions", label: "Propositions commerciales", icone: <Handshake className="h-4 w-4" aria-hidden="true" />, compteur: nb.propositions },
     { key: "devis", label: "Devis", icone: <FileText className="h-4 w-4" aria-hidden="true" />, compteur: nb.devis },
     { key: "factures", label: "Factures", icone: <Receipt className="h-4 w-4" aria-hidden="true" />, compteur: nb.factures },
-    { key: "portfolio", label: "Portfolio du site", icone: <Briefcase className="h-4 w-4" aria-hidden="true" /> },
+    { key: "portfolio", label: "Portfolio du site", icone: <Briefcase className="h-4 w-4" aria-hidden="true" />, compteur: nb.portfolio },
   ];
 
   /* En-tête commun des rubriques de liste (titre + bouton créer). */
@@ -1120,6 +1168,7 @@ export function AdminPage() {
               onClick={() => {
                 chargerDemandes();
                 chargerDocuments();
+                chargerProjets();
               }}
               disabled={loading || docsChargement}
               titre="Tout actualiser"
@@ -1423,17 +1472,21 @@ export function AdminPage() {
               documents={documents}
               onChoisir={(d) => setFactureCible(d)}
               onCreerDevis={() => ouvrirCreation("devis")}
-              /* VOLET 23 — clic sur le statut « Facturée (n°) » : la
-                  rubrique Factures s'ouvre sur sa LISTE et la facture
-                  s'affiche en APERÇU PLEIN ÉCRAN (la modale de
-                  modification ne s'ouvre PLUS — l'action respecte sa
-                  promesse : VOIR la facture dans l'espace des
-                  factures). */
-              onVoirFacture={(f) => {
-                setVueFactures("liste");
-                setVoirFacture(f);
-              }}
+              /* VOLET 24 — clic sur le statut « Facturée (n°) » : la
+                  facture s'ouvre en APERÇU SUR PLACE — la vue de
+                  sélection ne bouge PAS ; fermé, on la retrouve. */
+              onVoirFacture={(f) => setApercuFacture(f)}
             />
+            {/* VOLET 24 — APERÇU PLEIN ÉCRAN de la facture, OUVERT SUR
+                PLACE dans la vue de sélection des devis : fermé (croix
+                ou Échap), on RETROUVE la sélection des devis. */}
+            {apercuFacture ? (
+              <ApercuDocument
+                document={apercuFacture}
+                initialPleinEcran
+                onFermer={() => setApercuFacture(null)}
+              />
+            ) : null}
           </>
         )}
         {section === "factures" && vueFactures === "liste" && (
@@ -1452,10 +1505,6 @@ export function AdminPage() {
               onRafraichir={chargerDocuments}
               toast={toast}
               onModifier={(f) => setFactureCible(f as DocumentRecord)}
-              /* VOLET 23 — facture reçue du statut « Facturée (n°) » :
-                  elle s'ouvre en aperçu plein écran dès l'arrivée. */
-              apercuAutomatique={voirFacture}
-              onApercuOuvert={() => setVoirFacture(null)}
             />
           </>
         )}

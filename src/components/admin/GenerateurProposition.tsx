@@ -13,6 +13,19 @@ import {
   type PropositionRecord,
 } from "@/lib/documents/proposition";
 import { buildNumero, fmtMontantSimple } from "@/lib/documents/format";
+/* VOLET 24 — BUDGETS DE CARACTÈRES (demande de l'éditeur : « il faut
+ * calculer le nombre de caractères que chaque espace réservé du
+ * gabarit supporte et le MENTIONNER au niveau des champs, pour que
+ * le contenu ne dépasse jamais — même quantité de texte que le
+ * modèle, même nombre de pages, sections à leur place ») : chaque
+ * champ affiche son maximum et la saisie s'y arrête. */
+import {
+  BUDGETS_PROPOSITION,
+  bornerLignes,
+  bornerPresentation,
+  lignesEstimeesPresentation,
+  sommeLignes,
+} from "@/lib/documents/budgets-proposition";
 
 /**
  * GÉNÉRATEUR DE PROPOSITION COMMERCIALE — VOLET 16 (25/11/2026).
@@ -215,24 +228,43 @@ export function GenerateurProposition({
 
   const zonesTexte = (v: string) => v;
 
+  /* VOLET 24 — budgets + compteurs : « x/N car. » au niveau de chaque
+   * champ (capacité de son espace réservé, calée sur le modèle par
+   * défaut) ; les listes montrent aussi leurs lignes ; la
+   * présentation (page 1) montre ses paragraphes ET ses lignes. */
+  const B = BUDGETS_PROPOSITION;
+  const compteur = (v: number, max: number) => `${v}/${max} car.`;
+  const compteurListe = (lignes: string[], budget: { maxLignes: number; maxParLigne: number }) =>
+    `${sommeLignes(lignes)}/${budget.maxLignes * budget.maxParLigne} car. · ${lignes.length}/${budget.maxLignes} lignes`;
+  const compteurPresentation = (lignes: string[]) =>
+    `${sommeLignes(lignes)}/${B.presentation.maxTotal} car. · ${lignes.length}/${B.presentation.maxLignes} paragraphes · ${lignesEstimeesPresentation(lignes)}/10 lignes`;
+
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_470px]">
       {/* ---------------- Formulaire ---------------- */}
       <div className="space-y-6">
+        {/* VOLET 24 — note des budgets : chaque champ porte son maximum. */}
+        <p className="rounded-xl border border-[#e4e4e4]/10 bg-[#1c1c1c] px-4 py-3 text-xs leading-relaxed text-[#c8c8c8]/85">
+          Chaque champ affiche son maximum de caractères — la capacité de son espace
+          réservé dans le document, calée sur le modèle par défaut. La saisie s'arrête au
+          maximum&nbsp;: la présentation reste sur la première page et le document garde la
+          mise en page du modèle (même nombre de pages, sections à leur place).
+        </p>
         {/* En-tête du document */}
         <Carte className="p-5 sm:p-6">
           <TitreSection note={`Numéro : ${numero}`}>En-tête du document</TitreSection>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Champ label="Titre de la proposition *" indicatif="sous « Proposition commerciale »" className="sm:col-span-2">
+            <Champ label="Titre de la proposition *" indicatif={compteur(form.titre.length, B.titre)} className="sm:col-span-2">
               <input
                 className={styleInput}
                 value={form.titre}
+                maxLength={B.titre}
                 onChange={(e) => maj("titre", e.target.value)}
                 placeholder="Conception et développement de votre site web professionnel"
               />
             </Champ>
-            <Champ label="Votre projet">
-              <input className={styleInput} value={form.projet} onChange={(e) => maj("projet", e.target.value)} placeholder="Site web professionnel, éditorial et évolutif" />
+            <Champ label="Votre projet" indicatif={compteur(form.projet.length, B.projet)}>
+              <input className={styleInput} value={form.projet} maxLength={B.projet} onChange={(e) => maj("projet", e.target.value)} placeholder="Site web professionnel, éditorial et évolutif" />
             </Champ>
             {/* VOLET 21 (27/11/2026) — DISPOSITION demandée par
                 l'éditeur : le « Numéro client » prend la place de
@@ -259,26 +291,28 @@ export function GenerateurProposition({
                 nom sera utilisé pour le devis. » */}
             <Champ
               label="Nom complet du destinataire"
-              indicatif="la personne à qui la proposition est adressée"
+              indicatif={compteur((form.destinataire?.nomComplet ?? "").length, B.destinataireNom)}
             >
               <input
                 className={styleInput}
                 value={form.destinataire?.nomComplet ?? ""}
+                maxLength={B.destinataireNom}
                 onChange={(e) => maj("destinataire", { ...form.destinataire, nomComplet: e.target.value })}
                 placeholder="Ex. Aïcha Dossou"
               />
             </Champ>
-            <Champ label="Prestataire">
-              <input className={styleInput} value={form.prestataire} onChange={(e) => maj("prestataire", e.target.value)} placeholder="Stevens AKPOVI" />
+            <Champ label="Prestataire" indicatif={compteur(form.prestataire.length, B.prestataire)}>
+              <input className={styleInput} value={form.prestataire} maxLength={B.prestataire} onChange={(e) => maj("prestataire", e.target.value)} placeholder="Stevens AKPOVI" />
             </Champ>
             <Champ
               label="Nom d'entreprise du destinataire"
-              indicatif="si la proposition s'adresse à une entreprise"
+              indicatif={compteur((form.destinataire?.entreprise ?? "").length, B.destinataireEntreprise)}
               className="sm:col-span-2"
             >
               <input
                 className={styleInput}
                 value={form.destinataire?.entreprise ?? ""}
+                maxLength={B.destinataireEntreprise}
                 onChange={(e) => maj("destinataire", { ...form.destinataire, entreprise: e.target.value })}
                 placeholder="Ex. Cabinet Essentiel & Stratégie (laisser vide pour un professionnel indépendant)"
               />
@@ -293,8 +327,8 @@ export function GenerateurProposition({
                 ))}
               </select>
             </Champ>
-            <Champ label="Délai estimé">
-              <input className={styleInput} value={form.delai} onChange={(e) => maj("delai", e.target.value)} placeholder="02 à 03 semaines" />
+            <Champ label="Délai estimé" indicatif={compteur(form.delai.length, B.delai)}>
+              <input className={styleInput} value={form.delai} maxLength={B.delai} onChange={(e) => maj("delai", e.target.value)} placeholder="02 à 03 semaines" />
             </Champ>
             <Champ label="Date d'émission">
               {/* VOLET 20 — pictogramme calendrier natif BLANC
@@ -306,28 +340,39 @@ export function GenerateurProposition({
 
         {/* 01 Présentation */}
         <Carte className="p-5 sm:p-6">
-          <TitreSection note="section 01">Présentation du projet</TitreSection>
-          <Champ label="Paragraphes (une ligne = un paragraphe)">
+          <TitreSection note="section 01 — première page">Présentation du projet</TitreSection>
+          <Champ
+            label="Paragraphes (une ligne = un paragraphe)"
+            indicatif={compteurPresentation(form.sections.presentation)}
+          >
             <textarea
               className={`${styleInput} min-h-[150px] resize-y`}
               value={zonesTexte(form.sections.presentation.join("\n"))}
-              onChange={(e) => majSection("presentation", e.target.value.split("\n"))}
+              onChange={(e) => majSection("presentation", bornerPresentation(e.target.value.split("\n")))}
             />
           </Champ>
+          {/* VOLET 24 — la présentation ne DÉPASSE JAMAIS la première
+              page (budget mesuré) : 4 paragraphes, 215 car./paragraphe,
+              750 au total, 10 lignes. */}
+          <p className="mt-3 text-xs leading-relaxed text-[#c8c8c8]/80">
+            La présentation peut remplir la première page jusqu'au pied — sans jamais la
+            dépasser&nbsp;: la saisie s'arrête au maximum affiché (4 paragraphes, 750
+            caractères, 10 lignes — la quantité du modèle par défaut).
+          </p>
         </Carte>
 
         {/* 02 Objectifs */}
         <Carte className="p-5 sm:p-6">
           <TitreSection note="section 02">Objectifs</TitreSection>
           <div className="space-y-4">
-            <Champ label="Phrase d'introduction">
-              <input className={styleInput} value={form.sections.objectifsIntro} onChange={(e) => majSection("objectifsIntro", e.target.value)} placeholder="Votre site aura pour objectifs de :" />
+            <Champ label="Phrase d'introduction" indicatif={compteur(form.sections.objectifsIntro.length, B.objectifsIntro)}>
+              <input className={styleInput} value={form.sections.objectifsIntro} maxLength={B.objectifsIntro} onChange={(e) => majSection("objectifsIntro", e.target.value)} placeholder="Votre site aura pour objectifs de :" />
             </Champ>
-            <Champ label="Objectifs (une ligne = un objectif, numérotés 01, 02…)">
+            <Champ label="Objectifs (une ligne = un objectif, numérotés 01, 02…)" indicatif={compteurListe(form.sections.objectifs, B.objectifs)}>
               <textarea
                 className={`${styleInput} min-h-[130px] resize-y`}
                 value={zonesTexte(form.sections.objectifs.join("\n"))}
-                onChange={(e) => majSection("objectifs", e.target.value.split("\n"))}
+                onChange={(e) => majSection("objectifs", bornerLignes(e.target.value.split("\n"), B.objectifs))}
               />
             </Champ>
           </div>
@@ -354,30 +399,36 @@ export function GenerateurProposition({
                   </button>
                 </div>
                 <div className="grid gap-3">
-                  <Champ label="Titre du bloc">
-                    <input className={styleInput} value={bloc.titre} onChange={(e) => majPerimetre(bloc.id, { titre: e.target.value })} placeholder="Conception et développement sur mesure" />
+                  <Champ label="Titre du bloc" indicatif={compteur(bloc.titre.length, B.perimetre.titre)}>
+                    <input className={styleInput} value={bloc.titre} maxLength={B.perimetre.titre} onChange={(e) => majPerimetre(bloc.id, { titre: e.target.value })} placeholder="Conception et développement sur mesure" />
                   </Champ>
-                  <Champ label="Paragraphe d'introduction">
-                    <textarea className={`${styleInput} min-h-[64px] resize-y`} value={bloc.intro} onChange={(e) => majPerimetre(bloc.id, { intro: e.target.value })} placeholder="Création d'un site web professionnel adapté à votre activité…" />
+                  <Champ label="Paragraphe d'introduction" indicatif={compteur(bloc.intro.length, B.perimetre.intro)}>
+                    <textarea className={`${styleInput} min-h-[64px] resize-y`} value={bloc.intro} maxLength={B.perimetre.intro} onChange={(e) => majPerimetre(bloc.id, { intro: e.target.value })} placeholder="Création d'un site web professionnel adapté à votre activité…" />
                   </Champ>
-                  <Champ label="Phrase d'appel (avant la liste)">
-                    <input className={styleInput} value={bloc.lead} onChange={(e) => majPerimetre(bloc.id, { lead: e.target.value })} placeholder="La prestation comprend :" />
+                  <Champ label="Phrase d'appel (avant la liste)" indicatif={compteur(bloc.lead.length, B.perimetre.lead)}>
+                    <input className={styleInput} value={bloc.lead} maxLength={B.perimetre.lead} onChange={(e) => majPerimetre(bloc.id, { lead: e.target.value })} placeholder="La prestation comprend :" />
                   </Champ>
-                  <Champ label="Points (une ligne = un tiret « – »)">
-                    <textarea className={`${styleInput} min-h-[96px] resize-y`} value={bloc.points.join("\n")} onChange={(e) => majPerimetre(bloc.id, { points: e.target.value.split("\n") })} placeholder={"La conception et le développement sur mesure.\nL'intégration du design validé."} />
+                  <Champ label="Points (une ligne = un tiret « – »)" indicatif={compteurListe(bloc.points, B.perimetre.points)}>
+                    <textarea className={`${styleInput} min-h-[96px] resize-y`} value={bloc.points.join("\n")} onChange={(e) => majPerimetre(bloc.id, { points: bornerLignes(e.target.value.split("\n"), B.perimetre.points) })} placeholder={"La conception et le développement sur mesure.\nL'intégration du design validé."} />
                   </Champ>
-                  <Champ label="Paragraphe de clôture (optionnel)">
-                    <input className={styleInput} value={bloc.post} onChange={(e) => majPerimetre(bloc.id, { post: e.target.value })} placeholder="Les contenus seront soumis à votre validation…" />
+                  <Champ label="Paragraphe de clôture (optionnel)" indicatif={compteur(bloc.post.length, B.perimetre.post)}>
+                    <input className={styleInput} value={bloc.post} maxLength={B.perimetre.post} onChange={(e) => majPerimetre(bloc.id, { post: e.target.value })} placeholder="Les contenus seront soumis à votre validation…" />
                   </Champ>
                 </div>
               </div>
             ))}
             <BoutonAction
               onClick={() => majSection("perimetre", [...form.sections.perimetre, blocVide()])}
+              disabled={form.sections.perimetre.length >= B.perimetre.maxBlocs}
+              titre={
+                form.sections.perimetre.length >= B.perimetre.maxBlocs
+                  ? `Maximum atteint — ${B.perimetre.maxBlocs} blocs (la quantité du modèle, pour que le document garde son nombre de pages)`
+                  : undefined
+              }
               className="w-full"
             >
               <Plus className="h-4 w-4" aria-hidden="true" />
-              Ajouter un bloc
+              Ajouter un bloc{form.sections.perimetre.length >= B.perimetre.maxBlocs ? ` (max. ${B.perimetre.maxBlocs})` : ""}
             </BoutonAction>
           </div>
         </Carte>
@@ -386,11 +437,11 @@ export function GenerateurProposition({
         <Carte className="p-5 sm:p-6">
           <TitreSection note={`section 04 — montant : ${fmtMontantSimple(form.montant, form.devise)}`}>Investissement</TitreSection>
           <div className="space-y-4">
-            <Champ label="Texte d'accompagnement (à droite du montant)">
-              <textarea className={`${styleInput} min-h-[64px] resize-y`} value={form.sections.investissementTexte} onChange={(e) => majSection("investissementTexte", e.target.value)} />
+            <Champ label="Texte d'accompagnement (à droite du montant)" indicatif={compteur(form.sections.investissementTexte.length, B.investissementTexte)}>
+              <textarea className={`${styleInput} min-h-[64px] resize-y`} value={form.sections.investissementTexte} maxLength={B.investissementTexte} onChange={(e) => majSection("investissementTexte", e.target.value)} />
             </Champ>
-            <Champ label="Mentions en petits caractères (une ligne = une mention)">
-              <textarea className={`${styleInput} min-h-[76px] resize-y`} value={form.sections.investissementNotes.join("\n")} onChange={(e) => majSection("investissementNotes", e.target.value.split("\n"))} />
+            <Champ label="Mentions en petits caractères (une ligne = une mention)" indicatif={compteurListe(form.sections.investissementNotes, B.investissementNotes)}>
+              <textarea className={`${styleInput} min-h-[76px] resize-y`} value={form.sections.investissementNotes.join("\n")} onChange={(e) => majSection("investissementNotes", bornerLignes(e.target.value.split("\n"), B.investissementNotes))} />
             </Champ>
           </div>
         </Carte>
@@ -399,17 +450,17 @@ export function GenerateurProposition({
         <Carte className="p-5 sm:p-6">
           <TitreSection note={`section 05 — délai : ${form.delai || "—"}`}>Calendrier de réalisation</TitreSection>
           <div className="space-y-4">
-            <Champ label="Paragraphe d'introduction">
-              <textarea className={`${styleInput} min-h-[64px] resize-y`} value={form.sections.calendrierIntro} onChange={(e) => majSection("calendrierIntro", e.target.value)} />
+            <Champ label="Paragraphe d'introduction" indicatif={compteur(form.sections.calendrierIntro.length, B.calendrierIntro)}>
+              <textarea className={`${styleInput} min-h-[64px] resize-y`} value={form.sections.calendrierIntro} maxLength={B.calendrierIntro} onChange={(e) => majSection("calendrierIntro", e.target.value)} />
             </Champ>
-            <Champ label="Phrase d'appel des étapes">
-              <input className={styleInput} value={form.sections.calendrierEtapesIntro} onChange={(e) => majSection("calendrierEtapesIntro", e.target.value)} placeholder="Les principales étapes seront :" />
+            <Champ label="Phrase d'appel des étapes" indicatif={compteur(form.sections.calendrierEtapesIntro.length, B.calendrierEtapesIntro)}>
+              <input className={styleInput} value={form.sections.calendrierEtapesIntro} maxLength={B.calendrierEtapesIntro} onChange={(e) => majSection("calendrierEtapesIntro", e.target.value)} placeholder="Les principales étapes seront :" />
             </Champ>
-            <Champ label="Étapes (une ligne = une étape, numérotées 1, 2, 3…)">
-              <textarea className={`${styleInput} min-h-[120px] resize-y`} value={form.sections.calendrierEtapes.join("\n")} onChange={(e) => majSection("calendrierEtapes", e.target.value.split("\n"))} />
+            <Champ label="Étapes (une ligne = une étape, numérotées 1, 2, 3…)" indicatif={compteurListe(form.sections.calendrierEtapes, B.calendrierEtapes)}>
+              <textarea className={`${styleInput} min-h-[120px] resize-y`} value={form.sections.calendrierEtapes.join("\n")} onChange={(e) => majSection("calendrierEtapes", bornerLignes(e.target.value.split("\n"), B.calendrierEtapes))} />
             </Champ>
-            <Champ label="Mention en petits caractères (optionnelle)">
-              <input className={styleInput} value={form.sections.calendrierNote} onChange={(e) => majSection("calendrierNote", e.target.value)} />
+            <Champ label="Mention en petits caractères (optionnelle)" indicatif={compteur(form.sections.calendrierNote.length, B.calendrierNote)}>
+              <input className={styleInput} value={form.sections.calendrierNote} maxLength={B.calendrierNote} onChange={(e) => majSection("calendrierNote", e.target.value)} />
             </Champ>
           </div>
         </Carte>
@@ -420,8 +471,8 @@ export function GenerateurProposition({
             Modalités de paiement
           </TitreSection>
           <div className="space-y-4">
-            <Champ label="Phrase d'introduction">
-              <input className={styleInput} value={form.sections.paiementsIntro} onChange={(e) => majSection("paiementsIntro", e.target.value)} placeholder="Le règlement sera effectué en deux étapes :" />
+            <Champ label="Phrase d'introduction" indicatif={compteur(form.sections.paiementsIntro.length, B.paiementsIntro)}>
+              <input className={styleInput} value={form.sections.paiementsIntro} maxLength={B.paiementsIntro} onChange={(e) => majSection("paiementsIntro", e.target.value)} placeholder="Le règlement sera effectué en deux étapes :" />
             </Champ>
             {form.sections.paiements.map((e) => (
               <div key={e.id} className="rounded-xl border border-[#e4e4e4]/10 bg-[#1c1c1c] p-4">
@@ -443,22 +494,28 @@ export function GenerateurProposition({
                     <Champ label="Pourcentage (%)">
                       <input className={styleInput} type="number" min={0} max={100} value={e.pourcentage} onChange={(ev) => majEcheance(e.id, { pourcentage: Number(ev.target.value) || 0 })} />
                     </Champ>
-                    <Champ label="Libellé">
-                      <input className={styleInput} value={e.libelle} onChange={(ev) => majEcheance(e.id, { libelle: ev.target.value })} placeholder="Avant le démarrage du projet" />
+                    <Champ label="Libellé" indicatif={compteur(e.libelle.length, B.echeance.libelle)}>
+                      <input className={styleInput} value={e.libelle} maxLength={B.echeance.libelle} onChange={(ev) => majEcheance(e.id, { libelle: ev.target.value })} placeholder="Avant le démarrage du projet" />
                     </Champ>
                   </div>
-                  <Champ label="Description">
-                    <textarea className={`${styleInput} min-h-[64px] resize-y`} value={e.description} onChange={(ev) => majEcheance(e.id, { description: ev.target.value })} />
+                  <Champ label="Description" indicatif={compteur(e.description.length, B.echeance.description)}>
+                    <textarea className={`${styleInput} min-h-[64px] resize-y`} value={e.description} maxLength={B.echeance.description} onChange={(ev) => majEcheance(e.id, { description: ev.target.value })} />
                   </Champ>
                 </div>
               </div>
             ))}
             <BoutonAction
               onClick={() => majSection("paiements", [...form.sections.paiements, echeanceVide()])}
+              disabled={form.sections.paiements.length >= B.echeance.max}
+              titre={
+                form.sections.paiements.length >= B.echeance.max
+                  ? `Maximum atteint — ${B.echeance.max} échéances (le gabarit les dispose par rangées de 2 ou 3)`
+                  : undefined
+              }
               className="w-full"
             >
               <Plus className="h-4 w-4" aria-hidden="true" />
-              Ajouter une échéance
+              Ajouter une échéance{form.sections.paiements.length >= B.echeance.max ? ` (max. ${B.echeance.max})` : ""}
             </BoutonAction>
             <p className="text-xs leading-relaxed text-[#c8c8c8]/80">
               Conseil&nbsp;: structurez le règlement en échéances cohérentes avec
@@ -471,16 +528,16 @@ export function GenerateurProposition({
         {/* 07 Validation */}
         <Carte className="p-5 sm:p-6">
           <TitreSection note="section 07">Validation et démarrage</TitreSection>
-          <Champ label="Paragraphes (une ligne = un paragraphe)">
-            <textarea className={`${styleInput} min-h-[120px] resize-y`} value={zonesTexte(form.sections.validation.join("\n"))} onChange={(e) => majSection("validation", e.target.value.split("\n"))} />
+          <Champ label="Paragraphes (une ligne = un paragraphe)" indicatif={compteurListe(form.sections.validation, B.validation)}>
+            <textarea className={`${styleInput} min-h-[120px] resize-y`} value={zonesTexte(form.sections.validation.join("\n"))} onChange={(e) => majSection("validation", bornerLignes(e.target.value.split("\n"), B.validation))} />
           </Champ>
         </Carte>
 
         {/* 08 Conclusion */}
         <Carte className="p-5 sm:p-6">
           <TitreSection note="section 08">Conclusion</TitreSection>
-          <Champ label="Paragraphes (une ligne = un paragraphe)">
-            <textarea className={`${styleInput} min-h-[140px] resize-y`} value={zonesTexte(form.sections.conclusion.join("\n"))} onChange={(e) => majSection("conclusion", e.target.value.split("\n"))} />
+          <Champ label="Paragraphes (une ligne = un paragraphe)" indicatif={compteurListe(form.sections.conclusion, B.conclusion)}>
+            <textarea className={`${styleInput} min-h-[140px] resize-y`} value={zonesTexte(form.sections.conclusion.join("\n"))} onChange={(e) => majSection("conclusion", bornerLignes(e.target.value.split("\n"), B.conclusion))} />
           </Champ>
         </Carte>
 
@@ -488,14 +545,14 @@ export function GenerateurProposition({
         <Carte className="p-5 sm:p-6">
           <TitreSection note="fin de la conclusion">Signature</TitreSection>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Champ label="Nom">
-              <input className={styleInput} value={form.signature.nom} onChange={(e) => maj("signature", { ...form.signature, nom: e.target.value })} />
+            <Champ label="Nom" indicatif={compteur(form.signature.nom.length, B.signature.nom)}>
+              <input className={styleInput} value={form.signature.nom} maxLength={B.signature.nom} onChange={(e) => maj("signature", { ...form.signature, nom: e.target.value })} />
             </Champ>
-            <Champ label="Titrage">
-              <input className={styleInput} value={form.signature.titre} onChange={(e) => maj("signature", { ...form.signature, titre: e.target.value })} placeholder="Conception et développement web" />
+            <Champ label="Titrage" indicatif={compteur(form.signature.titre.length, B.signature.titre)}>
+              <input className={styleInput} value={form.signature.titre} maxLength={B.signature.titre} onChange={(e) => maj("signature", { ...form.signature, titre: e.target.value })} placeholder="Conception et développement web" />
             </Champ>
-            <Champ label="Site web (affiché et cliquable)" className="sm:col-span-2">
-              <input className={styleInput} value={form.signature.site} onChange={(e) => maj("signature", { ...form.signature, site: e.target.value })} placeholder="stevensakpovi.vercel.app" />
+            <Champ label="Site web (affiché et cliquable)" indicatif={compteur(form.signature.site.length, B.signature.site)} className="sm:col-span-2">
+              <input className={styleInput} value={form.signature.site} maxLength={B.signature.site} onChange={(e) => maj("signature", { ...form.signature, site: e.target.value })} placeholder="stevensakpovi.vercel.app" />
             </Champ>
           </div>
         </Carte>

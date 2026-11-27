@@ -903,16 +903,26 @@ export function GestionPortfolio({
   const statiquesRestants = (PROJETS_SITE as readonly unknown[] as readonly ProjetStatique[]).filter(
     (p) => !idsAdmin.has(p.id) && !siteSupprimes.includes(p.id),
   );
+  /* VOLET 24 — COMPTEUR DU TITRE : SEULEMENT DEUX nombres (demande de
+   *  l'éditeur : « affiche seulement et uniquement le nombre total de
+   *  projets disponibles en ligne sur le site et le nombre total de
+   *  projets brouillons — c'est tout ; plus d'histoire de
+   *  “réalisations du site”, “publiés”, “brouillon” en trois
+   *  catégories ») :
+   *  - PROJETS EN LIGNE = projets administrés PUBLIÉS + réalisations
+   *    du site encore en place (tout ce que le site présente) ;
+   *  - BROUILLONS = projets administrés non publiés. */
   const publies = projets.filter((p) => p.statut === "publie").length;
+  const enLigne = publies + statiquesRestants.length;
+  const brouillons = projets.length - publies;
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">
           Portfolio du site
           <span className="ml-2 align-middle text-sm font-normal text-[#c8c8c8]">
-            ({publies} publié{publies > 1 ? "s" : ""} · {projets.length - publies} brouillon
-            {projets.length - publies > 1 ? "s" : ""} · {statiquesRestants.length} réalisation
-            {statiquesRestants.length > 1 ? "s" : ""} du site)
+            ({enLigne} projet{enLigne > 1 ? "s" : ""} en ligne · {brouillons} brouillon
+            {brouillons > 1 ? "s" : ""})
           </span>
         </h2>
         <div className="flex flex-wrap items-center gap-3">

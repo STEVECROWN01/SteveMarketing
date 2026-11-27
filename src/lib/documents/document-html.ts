@@ -43,7 +43,7 @@
  * seuls les TEXTES suivent la langue.
  */
 
-import { getPaymentMethodLogo } from "./payment-logos";
+import { getPaymentMethodLogo, HAUTEUR_BADGE_PAIEMENT } from "./payment-logos";
 import { formatDate, formatDateCourte, formatCurrency } from "./format";
 import { descriptionOuPoints, decouperHtmlRiche } from "./texte-riche";
 import { fabriquerScriptPagination } from "./pagination-flux";
@@ -124,10 +124,12 @@ const LIBELLES: Record<"fr" | "en", Record<string, string>> = {
     notes: "Notes&nbsp;:",
     /* Coordonnées bancaires */
     coordonneesBancaires: "Coordonnées bancaires",
-    /* VOLET 23 — titre du bloc de paiement des DEVIS (le bloc
-       « Coordonnées bancaires » est renommé « Modalité de paiement »
-       — demande de l'éditeur). */
-    modalitePaiement: "Modalité de paiement",
+    /* VOLET 24 — titre du bloc de paiement des DEVIS (demande de
+       l'éditeur : « renomme ce bloc modalité de paiement en
+       PAIEMENT ») : le libellé devient « Paiement » — la feuille de
+       style du bloc l'affiche EN MAJUSCULES (« PAIEMENT »), exactement
+       comme le bloc Paiement des factures. */
+    modalitePaiement: "Paiement",
     iban: "IBAN&nbsp;:",
     bic: "BIC&nbsp;:",
     titulaireCompte: "Titulaire du compte&nbsp;:",
@@ -193,7 +195,7 @@ const LIBELLES: Record<"fr" | "en", Record<string, string>> = {
     notes: "Notes:",
     /* Bank details */
     coordonneesBancaires: "Bank details",
-    /* VOLET 23 — devis payment block title (renamed). */
+    /* VOLET 24 — devis payment block title (renamed « Paiement »). */
     modalitePaiement: "Payment",
     iban: "IBAN:",
     bic: "BIC:",
@@ -242,14 +244,17 @@ function traduireValeur(valeur: string, langue: "fr" | "en"): string {
  * factures) : le LOGO vit sous les clés FRANÇAISES de
  * payment-logos.ts — si la valeur enregistrée est déjà la
  * traduction anglaise, on cherche la clé d'origine ; le LIBELLÉ
- * affiché suit la langue du document. */
+ * affiché suit la langue du document.
+ * VOLET 24 — le badge est affiché à 22 px de HAUT (16 px avant) :
+ * le texte « Bank Transfer » y est enfin LISIBLE (demande de
+ * l'éditeur), sur les devis comme sur les factures. */
 function badgeModePaiement(mode: string, langue: "fr" | "en"): string {
   const libelle = traduireValeur(mode, langue);
   const logoUri =
     getPaymentMethodLogo(mode) ??
     getPaymentMethodLogo(TRADUCTIONS_INVERSEES[mode] ?? mode);
   if (!logoUri) return esc(libelle);
-  return `<img src="${logoUri}" alt="${esc(libelle)}" style="height:16px; vertical-align:middle; margin-right:6px;" />${esc(libelle)}`;
+  return `<img src="${logoUri}" alt="${esc(libelle)}" style="height:${HAUTEUR_BADGE_PAIEMENT}px; vertical-align:middle; margin-right:7px;" />${esc(libelle)}`;
 }
 
 /* VOLET 18 — PIED DE PAGE ANGLAIS : le moteur de pagination
