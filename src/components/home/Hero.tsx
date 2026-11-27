@@ -207,23 +207,28 @@ export function Hero() {
      (description, CTA, réassurance) est plus haute que la zone
      haute (étoiles, titre), l'image reste au-dessus de l'axe — la
      géométrie d'un empilement ne permet pas de centrer l'image et
-     le bloc texte à la fois. Un ajustement MESURÉ (même mécanique
-     que descriptionEquilibree ci-dessus) déplace la marge haute du
-     bloc visuel pour poser le CENTRE DE L'IMAGE sur le centre de
+     le bloc texte à la fois. Un ajustement MESURÉ déplace le bloc
+     visuel pour poser le CENTRE DE L'IMAGE sur le centre de
      l'espace [bas du header → fin du hero] :
+     - RÉ-OPTIMISATION 28/11/2026 : le déplacement passe par un
+       TRANSFORM COMPOSITÉ (translateY) et non plus par la MARGE
+       haute — l'ancienne version relançait la distribution flex de
+       tout le hero APRÈS le premier rendu (passes à ~0,7 s,
+       ~1,7 s — polices prêtes — et 2,4 s) : le texte montait de
+       25 à 50 px sous les yeux du visiteur, CLS 0,30 mesuré en
+       conditions réelles (seuil « mauvais » de Google : 0,25).
+       Le transform ne touche PAS la mise en page : l'image arrive
+       au même endroit, le texte ne bouge plus d'un pixel ;
      - il s'exécute dès que les polices sont prêtes, AVANT que
        l'image n'apparaisse (son animation d'arrivée court de 1 à
-       2 s : elle se pose directement centrée, sans décalage
-       visible au chargement) puis se re-vérifie à 2,4 s, au
-       redimensionnement et au changement de langue ;
-     - il est PLAFONNÉ par l'air disponible : le hero ne grandit
-       JAMAIS (garde-fou : si la marge fait grandir le hero, elle
-       est réduite d'autant) — sur les écrans courts où la pile
-       remplit déjà l'espace, l'image reste aussi haute que la
-       géométrie l'autorise, exactement comme avant ;
+       2 s : elle se pose directement centrée) puis se re-vérifie
+       à 2,4 s, au redimensionnement et au changement de langue ;
+     - le hero ne peut plus GRANDIR : le transform n'affecte pas
+       la mise en page (l'ancien garde-fou de hauteur devient
+       inutile) ;
      - sur BUREAU (≥ 1024 px) il s'efface : la grille lg:items-center
-       + le conteneur justify-center centrent déjà tout, l'ancienne
-       marge des classes est restaurée. */
+       + le conteneur justify-center centrent déjà tout, le
+       transform est retiré. */
   const visualRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const visual = visualRef.current;
@@ -235,7 +240,7 @@ export function Hero() {
     const ajuste = () => {
       raf = requestAnimationFrame(() => {
         if (window.matchMedia("(min-width: 1024px)").matches) {
-          if (visual.style.marginTop) visual.style.marginTop = "";
+          if (visual.style.transform) visual.style.transform = "";
           return;
         }
         const container = visual.closest(".container-site");
@@ -249,25 +254,29 @@ export function Hero() {
         const ri = img.getBoundingClientRect();
         const ecart = ri.top + ri.height / 2 - centreEspace; // < 0 : image trop haute
         if (Math.abs(ecart) < 1.5) return;
-        // Marge haute actuelle (l'override inline, s'il existe, sinon la classe).
-        const margeActuelle = visual.style.marginTop
-          ? parseFloat(visual.style.marginTop)
-          : parseFloat(getComputedStyle(visual).marginTop);
-        if (!Number.isFinite(margeActuelle)) return;
-        // La marge se déplace à mi-chemin (les zones flexibles
-        // réabsorbent la moitié de l'ajout) : doubler l'écart.
-        const hero = visual.closest("section");
-        const hauteurAvant = hero ? hero.getBoundingClientRect().height : 0;
-        const cible = Math.max(0, margeActuelle - 2 * ecart);
-        visual.style.marginTop = `${cible}px`;
-        // Garde-fou : si le hero a grandi (air insuffisant), réduire d'autant.
-        raf2 = requestAnimationFrame(() => {
-          const hauteurApres = hero ? hero.getBoundingClientRect().height : 0;
-          const exces = hauteurApres - hauteurAvant;
-          if (exces > 0.5) {
-            visual.style.marginTop = `${Math.max(0, cible - exces)}px`;
-          }
-        });
+        /* RÉ-OPTIMISATION 28/11/2026 — CLS 0,301 MESURÉ : l'ajustement
+           posait la marge haute du bloc visuel APRÈS le premier rendu
+           (polices prêtes ~1,7 s puis re-vérification) : chaque passe
+           RELANÇAIT la distribution flex de tout le hero — le texte
+           montait de 25 à 50 px SOUS LES YEUX du visiteur (deux
+           décalages de mise en page : +0,256 et +0,046, soit CLS 0,30
+           en conditions réelles — seuil « mauvais » de Google : 0,25).
+           Désormais l'ajustement passe par un TRANSFORM COMPOSITÉ :
+           le centre de l'image arrive à la même place (même mesure,
+           même cible), mais le déplacement n'est PLUS un changement
+           de mise en page — l'API layout-shift l'ignore, le texte ne
+           bouge plus d'un pixel. Le transform se re-mesure à partir
+           de la position RÉELLE (rects incluant le transform courant)
+           : une seule passe suffit, pas de doublement de l'écart. */
+        const transformActuel = visual.style.transform
+          ? parseFloat(visual.style.transform.replace(/[^-\d.]/g, "")) || 0
+          : 0;
+        const cible = transformActuel - ecart;
+        visual.style.transform = `translateY(${cible}px)`;
+        /* garde-fou : le hero ne peut pas grandir (le transform ne
+           touche pas la mise en page) — rien à compenser ; on garde
+           simplement la mesure au prochain passage. */
+        raf2 = requestAnimationFrame(() => {});
       });
     };
     const planifie = (delai: number) => {
@@ -410,7 +419,7 @@ export function Hero() {
                 voir le commentaire d'en-tête (volet 7 — LCP). */}
             <Reveal direction="up" aboveFold>
               <p
-                className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] font-medium tracking-[0.02em] text-[#c8c8c8] sm:text-sm"
+                className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] font-medium leading-[1.5] tracking-[0.02em] text-[#c8c8c8] sm:text-sm"
                 aria-label={t("Note moyenne de 4,9 sur 5")}
               >
                 <span className="flex items-center gap-1" aria-hidden="true">

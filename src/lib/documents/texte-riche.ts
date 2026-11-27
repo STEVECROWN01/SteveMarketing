@@ -154,7 +154,22 @@ export function decouperHtmlRiche(html: string | null | undefined): string[] {
 
   const fragments: string[] = [];
   /* VOLET 23 — pré-passe : extraire chaque <div>…</div> COMPLET comme
-   * fragment unique, puis découper ce qui l'entoure comme avant. */
+   * fragment unique, puis découper ce qui l'entoure comme avant.
+   * CORRECTIF M29 (28/11/2026) : un <div> à contenu de BLOC (titre de
+   * périmètre + description, générés par le devis depuis proposition)
+   * était UN SEUL bloc paginable de ~110-140 px — quand il ne tenait
+   * plus, il partait ENTIER sur la page suivante en laissant jusqu'à
+   * cinq lignes de vide sous le tableau (retour de l'éditeur : « le
+   * tableau ne finit pas la première page totalement avant de
+   * poursuivre sur la page suivante — il ne doit rester qu'une ligne
+   * d'espace proche du footer »). Désormais l'intérieur d'un tel
+   * <div> est ÉCLATÉ : chaque <p> devient sa propre rangée (éclatée
+   * en phrases s'il est long), les listes élément par élément — un
+   * titre en bas de page dont la description poursuit en page
+   * suivante est le comportement NORMAL d'un tableau coupé (comme
+   * dans Word : rangée de continuation). Rendu visuel IDENTIQUE
+   * (margins et marges intérieures conservées par les classes
+   * p-suite / li-suite / suite-avant / suite-apres). */
   let reste = riche;
   while (reste) {
     const debutDiv = reste.search(/<div\b/i);
@@ -173,13 +188,13 @@ export function decouperHtmlRiche(html: string | null | undefined): string[] {
       reste = "";
     } else {
       const finDiv = fermeture.index + fermeture[0].length;
+      const divHtml = apresDiv.slice(0, finDiv);
       /* CORRECTIF 28/11 (M21) : le <div> EXTRAIT passe lui aussi par
        * decouperParagraphe — un <div> LONG au contenu INLINE (un
        * paragraphe tapé à l'éditeur, Entrée = <div>) est éclaté en
-       * PHRASES paginables ; un <div> à contenu de BLOC (titre +
-       * description d'un périmètre de proposition, VOLET 23) reste
-       * ENTIER (rendu inchangé). */
-      fragments.push(...decouperParagraphe(apresDiv.slice(0, finDiv)));
+       * PHRASES paginables. */
+      const eclates = eclaterInterieurDiv(divHtml);
+      fragments.push(...(eclates ?? decouperParagraphe(divHtml)));
       reste = apresDiv.slice(finDiv);
     }
   }
@@ -193,6 +208,127 @@ export function decouperHtmlRiche(html: string | null | undefined): string[] {
   return fragments.filter(
     (f) => f.replace(/<[^>]+>/g, "").replace(/&nbsp;/gi, " ").trim() !== "",
   );
+}
+
+/* ------------------------------------------------------------------
+ * CORRECTIF M29 (28/11/2026) — ÉCLATEMENT FIN DES <div> DE PÉRIMÈTRE
+ * ET DES <li> LONGS : le tableau doit REMPLIR la page (il ne reste
+ * qu'UNE LIGNE d'espace proche du footer avant de poursuivre sur la
+ * page suivante) — voir decouperHtmlRiche.
+ * ------------------------------------------------------------------ */
+
+/** Éclate une LISTE pure (sans liste imbriquée) en fragments paginables
+ *  : un fragment par <li>, et un <li> LONG (> SEUIL_PHRASES de texte)
+ *  est lui-même éclaté PHRASE PAR PHRASE — la première phrase garde la
+ *  puce (ou le numéro), les phrases qui suivent portent « sans-puce »
+ *  (M29 : un <li> de 2-3 lignes formait un bloc qui laissait 2-3
+ *  lignes de vide sous le tableau en page coupée). Retourne null si la
+ *  liste ne se laisse pas découper proprement (imbriquée, vide). */
+function eclaterListe(brut: string): string[] | null {
+  const m = /^<(ul|ol)\b[^>]*>([\s\S]*)<\/\1\s*>$/i.exec(brut);
+  if (!m) return null;
+  if (/<(ul|ol)\b/gi.test(m[2])) return null; /* liste imbriquée : bloc entier */
+  const items = m[2]
+    .split(/(?=<li\b)/i)
+    .map((s) => s.trim())
+    .filter((s) => /^<li\b/i.test(s));
+  if (!items.length) return null;
+  const balise = m[1].toLowerCase();
+
+  /* Éclatement éventuel de chaque <li> en phrases (li sans-puce pour
+   *  les continuations — la puce ne se répète pas sur les phrases
+   *  qui poursuivent le même élément de liste). */
+  const eclats: { li: string; itemIndex: number; premier: boolean }[] = [];
+  items.forEach((item, itemIndex) => {
+    const mLi = /^<li\b[^>]*>([\s\S]*)<\/li\s*>$/i.exec(item);
+    const contenu = mLi ? mLi[1] : item;
+    const texte = contenu.replace(/<[^>]+>/g, "");
+    if (!mLi || texte.length <= SEUIL_PHRASES || /<(p|div|ul|ol|li|table|h[1-6])\b/i.test(contenu)) {
+      eclats.push({ li: item, itemIndex, premier: true });
+      return;
+    }
+    const phrases = equilibrerPhrases(fragmenterPhrase(contenu).filter((p) => p.trim()));
+    if (phrases.length <= 1) {
+      eclats.push({ li: item, itemIndex, premier: true });
+      return;
+    }
+    phrases.forEach((ph, k) => {
+      eclats.push({
+        li: `<li${k === 0 ? "" : ` class="sans-puce"`}>${ph}</li>`,
+        itemIndex,
+        premier: k === 0,
+      });
+    });
+  });
+
+  /* Chaque fragment = SA liste d'un seul <li> (marges annulées entre
+   *  elles par li-suite, cf. gabarit) ; --debut / --fin reprennent les
+   *  marges d'origine de la liste complète ; <ol> reprend son numéro
+   *  (start) sur le PREMIER fragment de chaque élément. */
+  return eclats.map((e, i) => {
+    const classes =
+      "li-suite" +
+      (i === 0 ? " li-suite--debut" : "") +
+      (i === eclats.length - 1 ? " li-suite--fin" : "");
+    if (balise === "ol") {
+      return `<ol class="${classes}"${e.premier ? ` start="${e.itemIndex + 1}"` : ""}>${e.li}</ol>`;
+    }
+    return `<ul class="${classes}">${e.li}</ul>`;
+  });
+}
+
+/** Éclate l'INTÉRIEUR d'un <div> de premier niveau (format des
+ *  périmètres du devis depuis proposition : <p>titre</p><p>description
+ *  </p>) en fragments paginables — chaque <p> devient sa propre rangée
+ *  (éclaté en phrases s'il est long), chaque liste élément par
+ *  élément. Retourne null si l'intérieur ne se laisse pas découper
+ *  proprement (contenu hors <p>/<ul>/<ol>, fermetures déséquilibrées) —
+ *  le <div> reste alors UN bloc entier (comportement d'avant). */
+function eclaterInterieurDiv(divHtml: string): string[] | null {
+  const m = /^<div\b[^>]*>([\s\S]*)<\/div\s*>$/i.exec(divHtml);
+  if (!m) return null;
+  const interieur = m[1];
+  /* intérieur sans balise de bloc : découpé en phrases par
+   * decouperParagraphe (CORRECTIF 28/11 — pas ici). */
+  if (!/<(p|ul|ol)\b/i.test(interieur)) return null;
+  const bruts = interieur
+    .split(/(?=<p\b|<ul\b|<ol\b)/i)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  if (!bruts.length) return null;
+
+  const fragments: string[] = [];
+  for (const brut of bruts) {
+    if (/^<p\b/i.test(brut)) {
+      /* un <p> ÉQUILIBRÉ (une seule ouverture/fermeture) : rangée à
+       * part entière, éclatée en phrases s'il est long. */
+      if (!/^<p\b[^>]*>[\s\S]*<\/p\s*>$/i.test(brut)) return null;
+      fragments.push(...decouperParagraphe(brut));
+      continue;
+    }
+    if (/^<(ul|ol)\b/i.test(brut)) {
+      if (!/^<(ul|ol)\b[^>]*>[\s\S]*<\/\1\s*>$/i.test(brut)) return null;
+      const eclats = eclaterListe(brut);
+      if (!eclats) return null;
+      fragments.push(...eclats);
+      continue;
+    }
+    /* contenu inattendu : le <div> reste UN bloc entier. */
+    return null;
+  }
+  if (!fragments.length) return null;
+
+  /* CORRECTIF M29 (complément) — le PREMIER <p> (TITRE du périmètre)
+   *  reste bien sa PROPRE rangée (PAS de soudure avec la première
+   *  phrase) : un fragment « titre + phrase » de ~80 px laissait
+   *  jusqu'à 4-5 lignes de vide sous le tableau quand il ne tenait
+   *  plus sur la page (retour de l'éditeur : il ne doit rester qu'UNE
+   *  LIGNE d'espace proche du footer). Un titre en bas de page dont
+   *  la description poursuit en page suivante est le comportement
+   *  NORMAL d'un tableau qui se coupe — comme dans Word : rangée de
+   *  continuation, cellules vides à droite, le tableau remplit la
+   *  page au plus près avant de poursuivre. */
+  return fragments;
 }
 
 /** Découpe un segment SANS <div> de premier niveau en fragments de
@@ -221,27 +357,10 @@ function decouperSegments(segment: string): string[] {
     /* Fragment = UNE liste pure (sans liste imbriquée) → éclater. */
     const m = brut.match(/^<(ul|ol)\b[^>]*>([\s\S]*)<\/\1\s*>$/i);
     if (m) {
-      const balise = m[1].toLowerCase();
-      const nbListes = (m[2].match(/<(ul|ol)\b/gi) || []).length;
-      if (nbListes === 0) {
-        const items = m[2]
-          .split(/(?=<li\b)/i)
-          .map((s) => s.trim())
-          .filter((s) => /^<li\b/i.test(s));
-        if (items.length > 0) {
-          items.forEach((item, i) => {
-            const classes =
-              "li-suite" +
-              (i === 0 ? " li-suite--debut" : "") +
-              (i === items.length - 1 ? " li-suite--fin" : "");
-            fragments.push(
-              balise === "ol"
-                ? `<ol class="${classes}" start="${i + 1}">${item}</ol>`
-                : `<ul class="${classes}">${item}</ul>`,
-            );
-          });
-          continue;
-        }
+      const eclats = eclaterListe(brut);
+      if (eclats) {
+        fragments.push(...eclats);
+        continue;
       }
     }
     /* paragraphe (éclaté en phrases si long, VOLET 21), div, liste

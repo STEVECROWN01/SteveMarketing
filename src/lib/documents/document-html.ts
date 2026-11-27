@@ -915,6 +915,14 @@ export function renderDocumentHtml(
   .desc-riche li { font-size: 9pt; line-height: 1.5; color: #374151; margin-bottom: 1px; }
   .desc-riche ul li { list-style-type: disc; }
   .desc-riche ol li { list-style-type: decimal; }
+  /* CORRECTIF M29 (28/11/2026) — <li> ÉCLATÉ EN PHRASES PAGINABLES :
+     les phrases qui POURSUIVENT un même élément de liste ne
+     répètent NI la puce NI le numéro (elles continuent l'élément,
+     comme une phrase qui s'enveloppe à la ligne dans Word) — sans
+     cela le tableau ne pourrait pas remplir la page au plus près
+     (demande de l'éditeur : il ne doit rester qu'UNE LIGNE d'espace
+     sous le tableau avant de poursuivre sur la page suivante). */
+  .desc-riche li.sans-puce { list-style: none; }
   /* VOLET 19 — fragments de liste éclatés (pagination fine, voir
      texte-riche.ts) : une suite de <ul class="li-suite"> d'un seul
      <li> ressemble à UNE liste unique — marges annulées sauf aux
@@ -1360,10 +1368,23 @@ export function renderDocumentHtml(
     formatPage: "simple",
     /* VOLET 22 — réserve basse : espace minimal garanti entre le bas
        du tableau (quand il remplit la page, PREMIÈRE page comme les
-       suivantes) et le pied de page (demande de l'éditeur) — la
-       proposition commerciale garde sa pagination calée sur
-       l'exemple (aucune réserve). */
-    reserveBasPx: Math.round(10 * 96 / 25.4),
+       suivantes) et le pied de page — la proposition commerciale
+       garde sa pagination calée sur l'exemple (aucune réserve).
+       CORRECTIF M29 (28/11/2026 — retour de l'éditeur : « l'espace à
+       laisser en dessous, qui sépare le footer et le contenu de la
+       page, doit être JUSTE UN ESPACE D'UNE LIGNE — pour toutes les
+       pages, peu importe la page où le tableau s'arrête avant de
+       poursuivre sur la suivante ») : la réserve passe de 10 mm à
+       UNE LIGNE de texte du tableau (9 pt × interligne 1,5 = 18 px) —
+       le tableau remplit la page jusqu'à une ligne du pied avant de
+       se poursuivre (devis des propositions, devis directs, factures). */
+    reserveBasPx: Math.round((9 * 1.5) * 96 / 72),
+    /* CORRECTIF M29 — éclatement au niveau LIGNE activé pour les
+       devis (des propositions comme directs) et les factures : la
+       rangée qui ne tient pas est coupée au mot près, la page est
+       remplie jusqu'à une ligne du pied, le reste poursuit en tête de
+       page suivante (comme dans Word). */
+    eclatementLigne: true,
   })}</script>
 ${langue === "en" ? `<script>${SCRIPT_PIED_PAGE_EN}</script>` : ""}
 </body>

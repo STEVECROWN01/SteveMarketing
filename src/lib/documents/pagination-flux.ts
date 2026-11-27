@@ -41,6 +41,20 @@ export type ConfPagination = {
    *  pages suivantes »). 0 = comportement inchangé (propositions :
    *  pagination calée sur l'exemple, ne pas toucher). */
   reserveBasPx?: number;
+  /** CORRECTIF M29 (28/11/2026) — ÉCLATEMENT AU NIVEAU LIGNE : quand
+   *  une rangée du tableau ne tient plus sur la page, son dernier
+   *  paragraphe (ou élément de liste à texte simple) est COUPÉ AU MOT
+   *  PRÈS pour remplir la page EXACTEMENT — il ne reste qu'UNE LIGNE
+   *  d'espace entre le bas du tableau et le pied avant de poursuivre
+   *  sur la page suivante (retour de l'éditeur, demandé à trois
+   *  reprises : « le tableau doit arriver jusqu'à un niveau où il ne
+   *  reste qu'une ligne d'espace proche du footer avant de poursuivre
+   *  sur la page suivante — pour toutes les pages, devis des
+   *  propositions comme devis directs et factures »). Le reste
+   *  poursuit en tête de page suivante (rangée de continuation,
+   *  cellules vides à droite — comme dans Word). FALSE (propositions)
+   *  : pagination calée sur l'exemple, ne pas toucher. */
+  eclatementLigne?: boolean;
 };
 
 /** Construit le script de pagination (chaîne littérale, aucune
@@ -56,6 +70,7 @@ export function fabriquerScriptPagination(conf: ConfPagination): string {
   var ENTETE_COMPACTE = ${conf.enteteCompacte ? "true" : "false"};
   var FORMAT_SIMPLE = ${conf.formatPage === "simple" ? "true" : "false"};
   var RESERVE_BAS = ${Math.max(0, Math.round(conf.reserveBasPx ?? 0))};
+  var ECLATEMENT = ${conf.eclatementLigne ? "true" : "false"};
   var pages = [];
   var pagine = false;
   var pageDemandee = 0;
@@ -93,6 +108,69 @@ export function fabriquerScriptPagination(conf: ConfPagination): string {
     if (!blocs.length) return;
     for (var i = 0; i < pages.length; i++) pages[i].remove();
     pages = [];
+
+    /* CORRECTIF M29 — FUSION DES ÉCLATEMENTS D'UNE PASSE PRÉCÉDENTE :
+       la pagination est RELANCÉE quand les polices web arrivent (les
+       métriques changent) ; les coupures au niveau ligne calculées
+       pendant une passe antérieure (avec les mauvaises métriques de la
+       police de repli) doivent être ANNULÉES avant de repaginer : la
+       rangée d'ORIGINE est reconstituée (texte et classes d'origine),
+       la rangée de continuation est retirée — la passe courante
+       recalcule TOUTES les coupures avec les métriques finales. Sans
+       cela, les points de coupure restaient figés sur les mesures
+       d'avant les polices (écart mesuré sur le PDF réel : une ligne
+       de trop sous le tableau). */
+    for (var fm = blocs.length - 1; fm >= 0; fm--) {
+      var pf = blocs[fm];
+      if (!pf.getAttribute || !pf.getAttribute('data-split-suite')) continue;
+      var po = fm > 0 ? blocs[fm - 1] : null;
+      if (!po || !po.getAttribute || !po.getAttribute('data-split')) continue;
+      try {
+        var richePo = null;
+        var cellPo = null;
+        for (var cp = 0; cp < po.children.length; cp++) {
+          if (po.children[cp].classList && po.children[cp].classList.contains('desc-cell')) {
+            cellPo = po.children[cp];
+          }
+        }
+        if (cellPo) {
+          for (var rp = 0; rp < cellPo.children.length; rp++) {
+            if (
+              cellPo.children[rp].classList &&
+              cellPo.children[rp].classList.contains('desc-riche')
+            ) {
+              richePo = cellPo.children[rp];
+            }
+          }
+        }
+        if (richePo) {
+          var dernierPo = richePo.lastElementChild;
+          var ciblePo = dernierPo;
+          if (
+            dernierPo &&
+            (dernierPo.tagName === 'UL' || dernierPo.tagName === 'OL') &&
+            dernierPo.children.length === 1
+          ) {
+            ciblePo = dernierPo.children[0];
+          }
+          if (ciblePo && ciblePo.childNodes.length === 1 && ciblePo.childNodes[0].nodeType === 3) {
+            ciblePo.childNodes[0].nodeValue = po.getAttribute('data-split-txt');
+          }
+          if (dernierPo) {
+            dernierPo.setAttribute('class', po.getAttribute('data-split-cls') || '');
+          }
+        }
+        po.classList.remove('suite-apres');
+        if (po.getAttribute('data-split-fin')) po.classList.add('svc-fin');
+        po.removeAttribute('data-split');
+        po.removeAttribute('data-split-txt');
+        po.removeAttribute('data-split-cls');
+        po.removeAttribute('data-split-fin');
+        pf.remove();
+        blocs.splice(fm, 1);
+      } catch (em) {}
+    }
+
     for (var r = 0; r < blocs.length; r++) {
       blocs[r].style.marginTop = '';
       blocs[r].classList.remove('debut-page');
@@ -118,6 +196,156 @@ export function fabriquerScriptPagination(conf: ConfPagination): string {
     var hEnteteTableau = enteteTableau ? enteteTableau.offsetHeight : 0;
 
     var hauteurs = blocs.map(hPx);
+
+    /* CORRECTIF M29 (28/11/2026) — ÉCLATEMENT AU NIVEAU LIGNE (activé
+       pour les DEVIS et FACTURES via conf.eclatementLigne) : quand une
+       rangée du tableau ne tient plus dans l'espace restant de la
+       page, son DERNIER élément à TEXTE SIMPLE (le <p> d'une phrase,
+       ou l'<ul>/<ol> d'un seul <li> à texte simple) est COUPÉ AU MOT
+       PRÈS (recherche binaire) : la partie haute REMPLIT la page
+       jusqu'à la réserve basse, le reste devient une RANGÉE DE
+       CONTINUATION en tête de la page suivante (cellules vides à
+       droite — comme dans Word). Le tableau arrive ainsi à UNE LIGNE
+       du pied de page avant de poursuivre (demande de l'éditeur,
+       répétée trois fois). Échec silencieux = comportement d'avant
+       (bloc entier sur la page suivante). */
+    function tenterEclatement(j, disponible) {
+      var b = blocs[j];
+      var noeud = null;
+      var texte = null;
+      try {
+        if (!ECLATEMENT || disponible <= 24) return false;
+        if (!b.classList || !b.classList.contains('svc-part')) return false;
+        if (b.getAttribute('data-split')) return false;
+        var cellule = null;
+        for (var ci = 0; ci < b.children.length; ci++) {
+          if (b.children[ci].classList && b.children[ci].classList.contains('desc-cell')) {
+            cellule = b.children[ci];
+          }
+        }
+        if (!cellule) return false;
+        var riche = null;
+        for (var ri = 0; ri < cellule.children.length; ri++) {
+          if (
+            cellule.children[ri].classList &&
+            cellule.children[ri].classList.contains('desc-riche')
+          ) {
+            riche = cellule.children[ri];
+          }
+        }
+        if (!riche) return false;
+        var dernier = riche.lastElementChild;
+        if (!dernier) return false;
+        var conteneur = dernier;
+        var dansListe = false;
+        if (dernier.tagName === 'UL' || dernier.tagName === 'OL') {
+          if (dernier.children.length !== 1) return false;
+          conteneur = dernier.children[0];
+          if (conteneur.tagName !== 'LI') return false;
+          dansListe = true;
+        }
+        if (conteneur.tagName !== 'P' && conteneur.tagName !== 'LI') return false;
+        if (conteneur.childNodes.length !== 1 || conteneur.childNodes[0].nodeType !== 3) {
+          return false;
+        }
+        noeud = conteneur.childNodes[0];
+        texte = noeud.nodeValue;
+        if (!texte || !texte.trim()) return false;
+        var mots = texte.split(/\s+/);
+        if (mots.length < 3) return false;
+
+        /* recherche binaire : le plus grand nombre de mots (au moins
+           deux) dont la rangée tienne encore dans l'espace restant. */
+        var bas = 2;
+        var haut = mots.length - 1;
+        var retenu = -1;
+        while (bas <= haut) {
+          var milieu = (bas + haut) >> 1;
+          noeud.nodeValue = mots.slice(0, milieu).join(' ');
+          if (hPx(b) <= disponible) {
+            retenu = milieu;
+            bas = milieu + 1;
+          } else {
+            haut = milieu - 1;
+          }
+        }
+        if (retenu < 2) {
+          noeud.nodeValue = texte;
+          return false;
+        }
+        var texte2 = mots.slice(retenu).join(' ');
+        if (!texte2.trim()) {
+          noeud.nodeValue = texte;
+          return false;
+        }
+
+        /* PARTIE 1 — le texte coupé : la rangée se POURSUIT (marge
+           intérieure basse annulée, le tableau ne se ferme pas ici).
+           Attributs data-split-* : la FUSION en tête de la passe
+           suivante reconstituera la rangée d'ORIGINE (texte et classes)
+           si les polices arrivent après coup (métriques différentes). */
+        noeud.nodeValue = mots.slice(0, retenu).join(' ');
+        var classesP = conteneur.getAttribute('class') || '';
+        var classesOrigine = dansListe ? dernier.getAttribute('class') || '' : classesP;
+        conteneur.setAttribute('class', classesP.replace(/\s*--fin/g, ''));
+        var classesBloc = b.getAttribute('class') || '';
+        var fermeBloc = /svc-fin/.test(classesBloc);
+        if (fermeBloc) b.classList.remove('svc-fin');
+        b.classList.add('suite-apres');
+        b.setAttribute('data-split', '1');
+        b.setAttribute('data-split-txt', texte);
+        b.setAttribute('data-split-cls', classesOrigine);
+        if (fermeBloc) b.setAttribute('data-split-fin', '1');
+
+        /* PARTIE 2 — le reste du texte : RANGÉE DE CONTINUATION en
+           tête de la page suivante (cellules vides à droite). */
+        var suite2 = document.createElement(dansListe ? dernier.tagName : 'P');
+        if (dansListe) {
+          suite2.setAttribute(
+            'class',
+            (dernier.getAttribute('class') || '').replace(/\s*--debut/g, ''),
+          );
+          var li2 = document.createElement('LI');
+          li2.setAttribute('class', 'sans-puce');
+          li2.appendChild(document.createTextNode(texte2));
+          suite2.appendChild(li2);
+        } else {
+          suite2.setAttribute('class', classesP.replace(/\s*--debut/g, ''));
+          suite2.appendChild(document.createTextNode(texte2));
+        }
+        var r2 = document.createElement('DIV');
+        r2.setAttribute('data-bloc', '');
+        r2.setAttribute('data-split', '1');
+        r2.setAttribute('data-split-suite', '1');
+        r2.setAttribute('class', 'svc-part suite-avant' + (fermeBloc ? ' svc-fin' : ''));
+        for (var c2 = 0; c2 < b.children.length; c2++) {
+          var orig = b.children[c2];
+          if (orig.classList && orig.classList.contains('desc-cell')) {
+            var dCell = document.createElement('DIV');
+            dCell.setAttribute('class', 'cell desc-cell');
+            var dRiche = document.createElement('DIV');
+            dRiche.setAttribute('class', 'desc-riche');
+            dRiche.appendChild(suite2);
+            dCell.appendChild(dRiche);
+            r2.appendChild(dCell);
+          } else {
+            var vide = document.createElement('DIV');
+            vide.setAttribute('class', 'cell cell-vide');
+            r2.appendChild(vide);
+          }
+        }
+        flux.insertBefore(r2, b.nextSibling);
+        blocs.splice(j + 1, 0, r2);
+        hauteurs.splice(j + 1, 0, hPx(r2));
+        hauteurs[j] = hPx(b);
+        return true;
+      } catch (e) {
+        try {
+          if (noeud && texte !== null) noeud.nodeValue = texte;
+        } catch (e2) {}
+        return false;
+      }
+    }
 
     /* Répartition : la page 1 démarre à DEBUT_P1, les suivantes à
        DEBUT_N ; un titre de section (data-heading) ne reste jamais
@@ -173,6 +401,16 @@ export function fabriquerScriptPagination(conf: ConfPagination): string {
         var suite = hauteurs[j + 1];
         if (j + 2 < blocs.length) suite += Math.min(hauteurs[j + 2], 48);
         garder = Math.min(suite + 12, hauteurs[j + 1] + 112);
+      }
+      /* CORRECTIF M29 — la rangée ne tient pas : tenter l'ÉCLATEMENT
+         AU NIVEAU LIGNE d'abord (le texte coupé REMPLIT la page, le
+         reste poursuit en page suivante) ; en cas d'échec, la rangée
+         part entière sur la page suivante (comportement d'avant). */
+      if (reste < 0 && estBlocTableau && !(premierDePage && repartis.length === 1)) {
+        if (tenterEclatement(j, capBloc - h)) {
+          bh = hauteurs[j];
+          reste = capBloc - (h + bh);
+        }
       }
       if (premierDePage && repartis.length === 1) {
         /* blocs fixes d'en-tête de la page 1 : jamais déplacés */

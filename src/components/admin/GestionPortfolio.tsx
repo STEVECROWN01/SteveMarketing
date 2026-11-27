@@ -607,6 +607,24 @@ export function GestionPortfolio({
   stockageConfigure,
   toast,
   sessionExpiree,
+  /* CORRECTIF M26 (28/11/2026) — remontée de CHANGEMENT au tableau de
+   * bord : après CHAQUE action (publication, dépublication,
+   * suppression, enregistrement), le COMPTEUR de l'option « Portfolio
+   * du site » de la navigation se met à jour IMMÉDIATEMENT (retour de
+   * l'éditeur : « quand on publie ou qu'on supprime, le chiffre doit
+   * se mettre à jour — il doit correspondre au nombre réel de
+   * projets de l'espace »).
+   * MESURE du 28/11 : une RELECTURE immédiate du stockage GitHub
+   * après une écriture peut être PÉRIMÉE (lecture-après-écriture non
+   * garantie — jusqu'à ~4 s mesurées) : le compteur restait figé
+   * puis sautait tard. Les actions mettent donc à jour la liste ET le
+   * compteur D'APRÈS LA RÉPONSE du serveur (le projet complet
+   * enregistré — la source la plus fraîche possible), et le
+   * rechargement naturel (montage, « Actualiser », nouvelle entrée
+   * dans la rubrique) réconcilie ensuite avec le stockage. */
+  onProjetsChangent,
+  onMajProjet,
+  onSupprimeProjet,
 }: {
   stockageConfigure: boolean;
   toast: TypeToast;
@@ -615,6 +633,9 @@ export function GestionPortfolio({
    * plus JAMAIS de toast rouge « Non autorisé » (retour de
    * l'éditeur). */
   sessionExpiree: () => void;
+  onProjetsChangent?: () => void;
+  onMajProjet?: (projet: ProjetAdmin) => void;
+  onSupprimeProjet?: (id: string, site?: boolean) => void;
 }) {
   const [projets, setProjets] = useState<ProjetAdmin[]>([]);
   /* VOLET 22 — identifiants des réalisations STATIQUES du site
@@ -636,6 +657,12 @@ export function GestionPortfolio({
   const [depublication, setDepublication] = useState<ProjetAdmin | null>(null);
   const [depublicationSite, setDepublicationSite] = useState<ProjetStatique | null>(null);
   const router = useRouter();
+  /* CORRECTIF M28 (28/11/2026) — le compteur du titre devient un
+   * FILTRE : « X projets publiés » / « Y brouillons » filtrent la
+   * liste ; recliquer sur le filtre actif revient à TOUT afficher
+   * (demande de l'éditeur : « transforme ça en un filtre pour qu'on
+   * puisse filtrer par projet publié ou par projet en brouillon »). */
+  const [filtreStatut, setFiltreStatut] = useState<"tous" | "publie" | "brouillon">("tous");
 
   const charger = useCallback(async () => {
     setChargement(true);
@@ -651,6 +678,11 @@ export function GestionPortfolio({
       if (res.ok && data?.ok) {
         setProjets((data.projets ?? []) as ProjetAdmin[]);
         setSiteSupprimes(Array.isArray(data.siteSupprimes) ? (data.siteSupprimes as string[]) : []);
+        /* CORRECTIF M26 — le compteur du tableau de bord suit TOUJOURS
+         * la liste réelle : chaque chargement (entrée dans l'espace,
+         * actualisation, action) resynchronise l'option « Portfolio du
+         * site ». */
+        onProjetsChangent?.();
       } else if (data?.error) {
         toast({ title: "Portfolio", description: data.error, variant: "destructive" });
       }
@@ -659,11 +691,40 @@ export function GestionPortfolio({
     } finally {
       setChargement(false);
     }
-  }, [toast, sessionExpiree]);
+  }, [toast, sessionExpiree, onProjetsChangent]);
 
   useEffect(() => {
     charger();
   }, [charger]);
+
+  /* CORRECTIF M26 — application locale d'une MUTATION RÉUSSIE, à
+   * partir de la RÉPONSE du serveur (le projet complet enregistré) :
+   * la liste de l'espace ET le compteur du tableau de bord se
+   * mettent à jour AU MÊME INSTANT, sans attendre une relecture du
+   * stockage (qui peut être périmée juste après l'écriture). */
+  const appliquerProjet = useCallback(
+    (projet: ProjetAdmin | null | undefined) => {
+      if (!projet?.id) return;
+      setProjets((anciens) =>
+        [projet, ...anciens.filter((p) => p.id !== projet.id)].sort((a, b) =>
+          (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""),
+        ),
+      );
+      onMajProjet?.(projet);
+    },
+    [onMajProjet],
+  );
+
+  const appliquerSuppression = useCallback(
+    (id: string, site?: boolean) => {
+      setProjets((anciens) => anciens.filter((p) => p.id !== id));
+      if (site) {
+        setSiteSupprimes((anciens) => (anciens.includes(id) ? anciens : [...anciens, id]));
+      }
+      onSupprimeProjet?.(id, site);
+    },
+    [onSupprimeProjet],
+  );
 
   async function enregistrer(projet: ProjetAdmin, statut: "brouillon" | "publie") {
     const corps = {
@@ -709,7 +770,9 @@ export function GestionPortfolio({
     });
     setEnCreation(false);
     setEnEdition(null);
-    await charger();
+    /* CORRECTIF M26 — mise à jour IMMÉDIATE depuis la RÉPONSE (le
+     * rechargement serait périmé juste après l'écriture GitHub). */
+    appliquerProjet(data.projet as ProjetAdmin | undefined);
   }
 
   /* VOLET 22 — DÉPUBLICATION d'un projet ADMIN (confirmation d'abord) :
@@ -741,7 +804,8 @@ export function GestionPortfolio({
           description: `« ${projet.nom} » a été retiré du site — il reste dans cet espace comme brouillon.`,
         });
       }
-      await charger();
+      /* CORRECTIF M26 — mise à jour immédiate depuis la réponse. */
+      appliquerProjet(data.projet as ProjetAdmin | undefined);
     } finally {
       setActionRapide(null);
       setDepublication(null);
@@ -780,7 +844,9 @@ export function GestionPortfolio({
           description: `« ${projet.name} » a été retirée du site — elle reste dans cet espace comme brouillon.`,
         });
       }
-      await charger();
+      /* CORRECTIF M26 — mise à jour immédiate depuis la réponse (la
+       * réalisation convertie rejoint la liste administrée). */
+      appliquerProjet(data.projet as ProjetAdmin | undefined);
     } finally {
       setActionRapide(null);
       setDepublicationSite(null);
@@ -809,7 +875,8 @@ export function GestionPortfolio({
       } else {
         toast({ title: "Projet supprimé", description: `« ${projet.nom} » a été retiré.` });
       }
-      await charger();
+      /* CORRECTIF M26 — mise à jour immédiate depuis la réponse. */
+      appliquerSuppression(projet.id);
     } finally {
       setActionRapide(null);
       setSuppression(null);
@@ -842,7 +909,9 @@ export function GestionPortfolio({
           description: `« ${projet.name} » a été retirée du site et de cet espace — définitivement.`,
         });
       }
-      await charger();
+      /* CORRECTIF M26 — mise à jour immédiate depuis la réponse (la
+       * réalisation statique est masquée du site et de l'espace). */
+      appliquerSuppression(projet.id, true);
     } finally {
       setActionRapide(null);
       setSuppressionSite(null);
@@ -941,22 +1010,70 @@ export function GestionPortfolio({
    *  projets brouillons — c'est tout ; plus d'histoire de
    *  “réalisations du site”, “publiés”, “brouillon” en trois
    *  catégories ») :
-   *  - PROJETS EN LIGNE = projets administrés PUBLIÉS + réalisations
+   *  - PROJETS PUBLIÉS = projets administrés PUBLIÉS + réalisations
    *    du site encore en place (tout ce que le site présente) ;
-   *  - BROUILLONS = projets administrés non publiés. */
-  const publies = projets.filter((p) => p.statut === "publie").length;
-  const enLigne = publies + statiquesRestants.length;
-  const brouillons = projets.length - publies;
+   *  - BROUILLONS = projets administrés non publiés.
+   *  CORRECTIF M25 (28/11/2026) — VOCABULAIRE : « projets publiés » au
+   *  lieu de « projets en ligne » (« publié » au singulier, « publiés »
+   *  au pluriel — retour de l'éditeur : « le "(4 projets en ligne ·
+   *  0 brouillon)" devrait utiliser le terme "projets publiés" »).
+   *  CORRECTIF M28 (28/11/2026) — les deux nombres deviennent des
+   *  FILTRES : « X projets publiés » affiche les publiés, « Y
+   *  brouillons » les brouillons ; recliquer sur le filtre actif
+   *  revient à TOUT afficher (demande de l'éditeur : « transforme ça
+   *  en un filtre pour qu'on puisse filtrer par projet publié ou par
+   *  projet en brouillon »). */
+  const publiesAdmin = projets.filter((p) => p.statut === "publie");
+  const publiesCount = publiesAdmin.length + statiquesRestants.length;
+  const brouillonsCount = projets.length - publiesAdmin.length;
+  const projetsFiltres = projets.filter(
+    (p) => filtreStatut === "tous" || p.statut === filtreStatut,
+  );
+  /* le filtre « publiés » montre AUSSI les réalisations du site (tout
+   *  ce qui est publié) ; « brouillons » les masque (elles sont
+   *  publiées d'origine). */
+  const statiquesVisibles = filtreStatut !== "brouillon";
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">
-          Portfolio du site
-          <span className="ml-2 align-middle text-sm font-normal text-[#c8c8c8]">
-            ({enLigne} projet{enLigne > 1 ? "s" : ""} en ligne · {brouillons} brouillon
-            {brouillons > 1 ? "s" : ""})
-          </span>
-        </h2>
+        <div className="flex flex-wrap items-center gap-3">
+          <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">
+            Portfolio du site
+          </h2>
+          {/* CORRECTIF M28 — les compteurs entre parenthèses deviennent
+              des FILTRES cliquables (basculer = filtrer ; recliquer =
+              tout afficher). */}
+          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filtrer les projets par statut">
+            {(
+              [
+                {
+                  cle: "publie" as const,
+                  actif: filtreStatut === "publie",
+                  libelle: `${publiesCount} projet${publiesCount > 1 ? "s" : ""} publié${publiesCount > 1 ? "s" : ""}`,
+                },
+                {
+                  cle: "brouillon" as const,
+                  actif: filtreStatut === "brouillon",
+                  libelle: `${brouillonsCount} brouillon${brouillonsCount > 1 ? "s" : ""}`,
+                },
+              ] satisfies { cle: "publie" | "brouillon"; actif: boolean; libelle: string }[]
+            ).map((f) => (
+              <button
+                key={f.cle}
+                type="button"
+                aria-pressed={f.actif}
+                onClick={() => setFiltreStatut(f.actif ? "tous" : f.cle)}
+                className={`min-h-[32px] rounded-full border px-3 py-1 text-xs transition-colors ${
+                  f.actif
+                    ? "border-[#e4e4e4] bg-white font-medium text-[#1c1c1c]"
+                    : "border-[#e4e4e4]/25 text-[#c8c8c8] hover:border-[#e4e4e4]/60 hover:text-white"
+                }`}
+              >
+                {f.libelle}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="flex flex-wrap items-center gap-3">
           <BoutonAction onClick={charger} disabled={chargement} titre="Actualiser la liste">
             <RefreshCw className={`h-4 w-4 ${chargement ? "animate-spin" : ""}`} aria-hidden="true" />
@@ -990,8 +1107,9 @@ export function GestionPortfolio({
         </div>
       ) : (
         <div className="space-y-3">
-          {/* VOLET 20 — PROJETS ADMINISTRÉS (brouillons et publiés). */}
-          {projets.map((projet) => (
+          {/* VOLET 20 — PROJETS ADMINISTRÉS (brouillons et publiés),
+              filtrés par statut (CORRECTIF M28). */}
+          {projetsFiltres.map((projet) => (
             <Carte key={projet.id} className="flex flex-wrap items-center gap-4 p-4 sm:p-5">
               <div className="h-[64px] w-[104px] shrink-0 overflow-hidden rounded-lg border border-[#e4e4e4]/12 bg-[#1c1c1c]">
                 {projet.desktop ? (
@@ -1011,12 +1129,19 @@ export function GestionPortfolio({
               <div className="min-w-[180px] flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-medium text-white">{projet.nom || "— sans nom —"}</p>
+                  {/* CORRECTIF M27 (28/11/2026) — UN SEUL badge de
+                      statut pour TOUS les projets, administrés comme
+                      réalisations du site : « Publié » quand c'est
+                      publié, « Brouillon » sinon (retour de l'éditeur :
+                      « tout ce qui est projet doit avoir simplement le
+                      badge publié quand c'est publié — même les
+                      projets existants ; c'est tout pour tous les
+                      projets, peu importe existants ou qui viennent
+                      d'être publiés »). Plus de badge distinct «
+                      Réalisation du site ». */}
                   <Pastille ton={projet.statut === "publie" ? "valide" : "neutre"}>
                     {projet.statut === "publie" ? "Publié" : "Brouillon"}
                   </Pastille>
-                  {projet.origine === "site" ? (
-                    <Pastille ton="valide">Réalisation du site</Pastille>
-                  ) : null}
                 </div>
                 <p className="mt-1 text-xs text-[#c8c8c8]">
                   {projet.categorie || "sans titre"} · maj {formatDateCourte(projet.updatedAt)}
@@ -1094,9 +1219,9 @@ export function GestionPortfolio({
                         if (!res.ok || !data?.ok) {
                           toast({ title: "Action impossible", description: data?.error ?? "Réessayez.", variant: "destructive" });
                         } else {
-                          toast({ title: "Projet publié", description: `« ${projet.nom} » est en ligne sur le site.` });
+                          toast({ title: "Projet publié", description: `« ${projet.nom} » est publié.` });
                         }
-                        await charger();
+                        appliquerProjet(data.projet as ProjetAdmin | undefined);
                       } finally {
                         setActionRapide(null);
                       }
@@ -1132,21 +1257,29 @@ export function GestionPortfolio({
               l'éditeur). « Modifier » convertit l'original en projet
               administré (même identifiant) ; « Dépublier » le retire
               du site (brouillon dans cet espace) ; « Supprimer »
-              l'efface définitivement du site ET de l'espace. */}
-          {statiquesRestants.map((projet) => (
-            <Carte key={projet.id} className="flex flex-wrap items-center gap-4 border-[#e4e4e4]/12 bg-[#1c1c1c] p-4 sm:p-5">
-              <div className="h-[64px] w-[104px] shrink-0 overflow-hidden rounded-lg border border-[#e4e4e4]/12 bg-[#070707]">
-                <img
-                  src={projet.desktopSmall ?? projet.desktop}
-                  alt=""
-                  loading="lazy"
-                  className="h-full w-full object-cover"
-                />
-              </div>
+              l'efface définitivement du site ET de l'espace.
+              CORRECTIF M27 — même badge unique « Publié » que les
+              autres projets (plus de « En ligne sur le site »).
+              CORRECTIF M28 — masquées par le filtre « brouillons ». */}
+          {statiquesVisibles
+            ? statiquesRestants.map((projet) => (
+                <Carte key={projet.id} className="flex flex-wrap items-center gap-4 border-[#e4e4e4]/12 bg-[#1c1c1c] p-4 sm:p-5">
+                  <div className="h-[64px] w-[104px] shrink-0 overflow-hidden rounded-lg border border-[#e4e4e4]/12 bg-[#070707]">
+                    <img
+                      src={projet.desktopSmall ?? projet.desktop}
+                      alt=""
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
               <div className="min-w-[180px] flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="font-medium text-white">{projet.name}</p>
-                  <Pastille ton="valide">En ligne sur le site</Pastille>
+                  {/* CORRECTIF M27 — le badge « En ligne sur le site »
+                      devient « Publié » : UN SEUL badge pour tous les
+                      projets, peu importe leur origine (retour de
+                      l'éditeur). */}
+                  <Pastille ton="valide">Publié</Pastille>
                 </div>
                 <p className="mt-1 text-xs text-[#c8c8c8]">{projet.category}</p>
                 {projet.url ? (
@@ -1206,7 +1339,8 @@ export function GestionPortfolio({
                 </BoutonIcone>
               </div>
             </Carte>
-          ))}
+          ))
+            : null}
         </div>
       )}
 

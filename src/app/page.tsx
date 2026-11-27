@@ -202,8 +202,16 @@ function PageSwitch() {
 function Shell() {
   const { page } = useRouter();
 
-  // Préchargement des pages secondaires une fois le navigateur inactif
-  // (après le rendu initial) — sans bloquer le chargement en cours.
+  /* Préchargement des pages secondaires une fois le navigateur inactif
+     — RÉ-OPTIMISATION 28/11/2026 : APRÈS LE LCP. Le préchargement
+     partait dès la première inactivité (~2,5 s), en pleine concurrence
+     avec l'image du hero (l'élément LCP) sur une connexion lente :
+     11 morceaux (~700 Ko) partageaient la bande passante du plus grand
+     visuel, qui ne se peignait qu'à 7,0 s en Slow 4G (Lighthouse :
+     performance 64-65). Désormais on attend que le LCP soit PEINT
+     (PerformanceObserver — déclenché 800 ms après la DERNIÈRE entrée
+     LCP), avec un filet de 6 s ; le préchargement garde son rôle —
+     navigations instantanées — sans peser sur le premier rendu. */
   useEffect(() => {
     const idle =
       (window as unknown as { requestIdleCallback?: (cb: () => void) => number }).requestIdleCallback ??
@@ -211,12 +219,53 @@ function Shell() {
     const cancel =
       (window as unknown as { cancelIdleCallback?: (id: number) => void }).cancelIdleCallback ??
       ((id: number) => window.clearTimeout(id));
-    const id = idle(() => {
-      PREFETCH_PAGES.forEach((load) => {
-        load().catch(() => undefined);
+
+    let idleId: number | undefined;
+    let minuteurLcp: ReturnType<typeof setTimeout> | undefined;
+    let minuteurFilet: ReturnType<typeof setTimeout> | undefined;
+    let observeur: PerformanceObserver | undefined;
+    let lance = false;
+    const lancer = () => {
+      if (lance) return;
+      lance = true;
+      try {
+        observeur?.disconnect();
+      } catch {}
+      idleId = idle(() => {
+        PREFETCH_PAGES.forEach((load) => {
+          load().catch(() => undefined);
+        });
       });
-    });
-    return () => cancel(id);
+    };
+
+    const apresChargement = () => {
+      /* LCP peint ? (les entrées se succèdent quand un visuel plus
+         grand apparaît : on relance le minuteur à chaque nouvelle
+         entrée, et l'on part 800 ms après la dernière.) */
+      try {
+        observeur = new PerformanceObserver(() => {
+          if (minuteurLcp) clearTimeout(minuteurLcp);
+          minuteurLcp = setTimeout(lancer, 800);
+        });
+        observeur.observe({ type: "largest-contentful-paint", buffered: true });
+      } catch {
+        /* observateur indisponible : filet seul */
+      }
+      /* filet : au plus tard 6 s après load. */
+      minuteurFilet = setTimeout(lancer, 6000);
+    };
+
+    if (document.readyState === "complete") apresChargement();
+    else window.addEventListener("load", apresChargement, { once: true });
+
+    return () => {
+      try {
+        observeur?.disconnect();
+      } catch {}
+      if (minuteurLcp) clearTimeout(minuteurLcp);
+      if (minuteurFilet) clearTimeout(minuteurFilet);
+      if (idleId !== undefined) cancel(idleId);
+    };
   }, []);
 
   // L'espace administrateur se présente sans navigation publique

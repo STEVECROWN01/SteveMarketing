@@ -873,7 +873,7 @@ export function AdminPage() {
 
   /* VOLET 24 — PROJETS DU PORTFOLIO : projets administrés (avec leur
    *  statut) + identifiants des réalisations du site supprimées —
-   *  sert UNIQUEMENT au COMPTEUR de l'option « Portfolio du site ». */
+   *  sert au COMPTEUR de l'option « Portfolio du site ». */
   const chargerProjets = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/projects", { cache: "no-store" });
@@ -895,6 +895,27 @@ export function AdminPage() {
       /* silencieux : le compteur reste à sa dernière valeur */
     }
   }, [sessionExpiree]);
+
+  /* CORRECTIF M26 (28/11/2026) — COMPTEUR TOUJOURS JUSTE, À L'INSTANT :
+   *  la relecture du stockage GitHub juste après une écriture peut
+   *  être PÉRIMÉE (lecture-après-écriture non garantie — mesuré :
+   *  jusqu'à ~4 s) : le compteur restait figé après une publication
+   *  puis sautait tard. Chaque action du portfolio met donc à jour
+   *  l'état D'APRÈS LA RÉPONSE du serveur (le projet complet
+   *  enregistré) — le compteur bouge AU MÊME INSTANT que l'action. */
+  const majProjetPortfolio = useCallback((projet: { id: string; statut: string }) => {
+    setProjetsPortfolio((anciens) => [
+      ...anciens.filter((p) => p.id !== projet.id),
+      { id: projet.id, statut: projet.statut },
+    ]);
+  }, []);
+
+  const supprimerProjetPortfolio = useCallback((id: string, site?: boolean) => {
+    setProjetsPortfolio((anciens) => anciens.filter((p) => p.id !== id));
+    if (site) {
+      setPortfolioSiteSupprimes((anciens) => (anciens.includes(id) ? anciens : [...anciens, id]));
+    }
+  }, []);
 
   const chargerDemandes = useCallback(async () => {
     setLoading(true);
@@ -1574,7 +1595,22 @@ export function AdminPage() {
             brouillon ou publication directe, images compressées,
             traduction anglaise optionnelle. */}
         {section === "portfolio" && (
-          <GestionPortfolio stockageConfigure={stockageConfigure} toast={toast} sessionExpiree={sessionExpiree} />
+          <GestionPortfolio
+            stockageConfigure={stockageConfigure}
+            toast={toast}
+            sessionExpiree={sessionExpiree}
+            /* CORRECTIF M26 (28/11/2026) — le COMPTEUR de l'option
+               « Portfolio du site » se met à jour IMMÉDIATEMENT après
+               chaque action de l'espace (publication, dépublication,
+               suppression, enregistrement), d'après la RÉPONSE du
+               serveur — et à chaque chargement de la liste (retour de
+               l'éditeur : « quand on publie ou qu'on supprime, le
+               chiffre doit se mettre à jour — il doit correspondre au
+               nombre réel de projets »). */
+            onProjetsChangent={chargerProjets}
+            onMajProjet={majProjetPortfolio}
+            onSupprimeProjet={supprimerProjetPortfolio}
+          />
         )}
 
         {/* Note de bas d'espace — VOLET 15 : message court et

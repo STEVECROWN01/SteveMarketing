@@ -4,20 +4,35 @@ import { Inter, Sora } from "next/font/google";
 import "./globals.css";
 import { ASSETS, PAGES, SITE } from "@/lib/site";
 
-/* Polices : Sora (titres) + Inter (texte / interface), chargement optimisé */
+/* Polices : Sora (titres) + Inter (texte / interface).
+ * RÉ-OPTIMISATION 28/11/2026 — PLUS DE TABLEAU `fallback` :
+ * fournir une liste de polices de repli DÉSACTIVE la police de
+ * repli À MÉTRIQUES AJUSTÉES que next/font génère sinon (une
+ * @font-face de secours avec size-adjust + ascent-override
+ * calibrés sur la vraie police). Mesuré : sans cet ajustement, le
+ * texte rendu en police système pendant le téléchargement était
+ * plus LARGE — la description du hero passait de 5 à 6 lignes,
+ * puis RE-BOUCLAIT à l'arrivée d'Inter (~1,8 s en Slow 4G) :
+ * tout le hero se réorganisait sous les yeux du visiteur (CLS
+ * 0,256 mesuré en conditions réelles — seuil « mauvais » de
+ * Google : 0,25). Avec la police de repli ajustée, les métriques
+ * du secours épousent celles d'Inter/Sora : même largeur de
+ * texte, même hauteur de ligne — le contenu ne re-boucle plus.
+ * font-display: swap inchangé (la vraie police remplace le
+ * secours ajusté dès qu'elle arrive, sans déplacement). */
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin", "latin-ext"],
-  display: "swap",
-  fallback: ["ui-sans-serif", "system-ui", "Arial", "sans-serif"],
+  display: "block",
+  adjustFontFallback: true,
 });
 
 const sora = Sora({
   variable: "--font-sora",
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600", "700", "800"],
-  display: "swap",
-  fallback: ["ui-sans-serif", "system-ui", "Arial", "sans-serif"],
+  display: "block",
+  adjustFontFallback: true,
 });
 
 /* Mesure d'audience Google Analytics 4 (volet 8 de l'audit,
@@ -117,8 +132,8 @@ export const metadata: Metadata = {
     // servir l'ancienne version transparente (2026-11-14-2) en
     // cache. L'ancien favicon.png (fond supprimé le 14/11) reste
     // dans le dépôt pour les caches déjà distribués.
-    icon: "/assets/favicon-fond-noir-2026-11-24.png?v=volet14",
-    apple: "/assets/favicon-fond-noir-2026-11-24.png?v=volet14",
+    icon: "/assets/favicon-fond-noir-256.png?v=2026-11-28",
+    apple: "/assets/favicon-fond-noir-256.png?v=2026-11-28",
   },
 };
 
@@ -201,6 +216,36 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <body className={`${inter.variable} ${sora.variable} antialiased`}>
+        {/* RÉ-OPTIMISATION 28/11/2026 (retour de l'éditeur : « repasse
+            sur l'optimisation entière — performance, rapidité,
+            fluidité ») — PRÉCHARGEMENT DES DEUX IMAGES DU HERO,
+            chacune pour SON écran seul (media query) : le portrait
+            VERTICAL (bureau, lg:block) et la photo HORIZONTALE
+            (mobile/tablette, lg:hidden) se partagent la même place ;
+            les <img> du hero restent loading="lazy" (la variante
+            masquée par display:none n'est jamais téléchargée) — mais
+            l'image VISIBLE, ÉLÉMENT LCP de l'accueil, se disputait la
+            bande passante des scripts au point de ne se peindre
+            qu'à 7,0 s en émulation mobile Slow 4G (Lighthouse 13 :
+            performance 64-65, contre 97 avant le volet 14). Le
+            <link rel="preload"> est découvert AU PARSE du HTML, AVANT
+            les scripts : l'image LCP part EN TÊTE de la file et se
+            peint dès la première mise en page ; la requête du <img>
+            est fusionnée avec le préchargement (même URL). */}
+        <link
+          rel="preload"
+          as="image"
+          href="/assets/stevens-akpovi-portrait-long.webp"
+          media="(max-width: 1023px)"
+          fetchPriority="high"
+        />
+        <link
+          rel="preload"
+          as="image"
+          href="/assets/stevens-akpovi-portrait.webp"
+          media="(min-width: 1024px)"
+          fetchPriority="high"
+        />
         {/* ÉCRAN D'AMORÇAGE DES LIENS PROFONDS (volet 7 de l'audit,
             19/11/2026 — LCP ≤ 1 s). Le routage par fragment ne donne
             au serveur AUCUNE indication de page : un chargement direct
