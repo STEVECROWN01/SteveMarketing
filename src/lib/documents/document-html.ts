@@ -332,16 +332,14 @@ export function renderDocumentHtml(
 
   /* VOLET 18 — remerciement de facture traduit (l'intro est rédigée
    * par l'éditeur : elle reste telle quelle).
-   * VOLET 20 (26/11/2026) — FACTURE : le bloc d'introduction
-   * (« Merci pour votre confiance. » + intro + « Nous remercions
-   * notre client pour sa confiance. ») est SUPPRIMÉ de la facture
-   * (demande de l'éditeur) — il reste sur les devis. */
-  const remerciement = estFacture
-    ? ""
-    : `${esc(d.intro)}`;
-  const blocRemerciement = estFacture
-    ? ""
-    : `
+   * VOLET 22 (27/11/2026) — FACTURE : le bloc d'introduction
+   * (« Merci pour votre confiance. » + intro rédigée) REVIENT sur la
+   * facture (demande de l'éditeur : « le contenu texte qui est entre
+   * le bloc émetteur/destinataire et le tableau détail — le texte
+   * qui dit "merci pour…" — je veux que tu mettes ce contenu texte
+   * sur la facture également ») — même emplacement que sur un devis. */
+  const remerciement = `${esc(d.intro)}`;
+  const blocRemerciement = `
   <div class="thank-you" data-bloc>
     <div class="thank-you-prefix">${L.merci}</div>
     <div class="thank-you-body">${remerciement}</div>
@@ -380,7 +378,7 @@ export function renderDocumentHtml(
      de paiement affiché dans la langue (badge conservé). */
   const blocPaiement = estFacture
     ? `
-      <div class="invoice-payment-block">
+      <div class="invoice-payment-block" data-bloc>
         <div class="ipb-title">${L.paiement}</div>
         <div class="ipb-row">
           <span class="ipb-label">${L.statutPaiement}</span>
@@ -457,6 +455,21 @@ export function renderDocumentHtml(
     })
     .join("");
 
+  /* VOLET 22 (27/11/2026) — PIED NOIR DU TABLEAU : la rangée noire
+   *  supprimée avec l'ancien total REVIENT, mais elle porte
+   *  désormais le DÉLAI ESTIMÉ — « Délai estimé : » à gauche dans la
+   *  rangée, la valeur TOTALEMENT à droite (demande de l'éditeur :
+   *  « on ramène le footer des tableaux mais pas avec le contenu
+   *  total — on affiche “Délai estimé :” et totalement à droite le
+   *  délai estimé sera affiché, un peu comme le total était affiché
+   *  dans le footer du tableau »). Dernière rangée du tableau, même
+   *  habillage noir que l'en-tête. */
+  const piedTableau = `
+  <div class="svc-foot" data-bloc>
+    <span class="svc-foot-libelle">${L.delaiEstime}</span>
+    <span class="svc-foot-valeur">${delaiEstime ? esc(delaiEstime) : "—"}</span>
+  </div>`;
+
   /* Total SOUS le tableau — VOLET 19 : « Total » et « TVA » EN GRAS
    * ET GROS à gauche, pointillés jusqu'au prix à droite. VOLET 20
    * (26/11/2026) : le montant en LETTRES (parenthèses) est
@@ -482,10 +495,12 @@ export function renderDocumentHtml(
     ${cachet}
   </div>`;
 
-  /* Conditions + Bon pour accord (devis et propositions) — le délai
-   * estimé suit IMMÉDIATEMENT la liste des CGV (« sans espace de
-   * décalage ») ; l'espace de signature est agrandi. VOLET 18 :
-   * CGV, libellés et lignes de signature traduits. */
+  /* Conditions + Bon pour accord (devis et propositions) — VOLET
+   * 22 : le DÉLAI ESTIMÉ ne suit plus les CGV (il vit désormais
+   * dans le PIED NOIR DU TABLEAU, comme l'ancien total) ; l'espace
+   * de signature est RÉDUIT pour s'aligner avec la dernière ligne de
+   * la colonne des CGV (demande de l'éditeur). VOLET 18 : CGV,
+   * libellés et lignes de signature traduits. */
   const cgv = langue === "en" ? CONDITIONS_GENERALES_EN : CONDITIONS_GENERALES;
   const blocConditions = !estFacture
     ? `
@@ -495,7 +510,6 @@ export function renderDocumentHtml(
         <ul class="cb-conditions-list">
           ${cgv.map((cond) => `<li>${esc(cond)}</li>`).join("")}
         </ul>
-        ${delaiEstime ? `<p class="delai-apres-cgv"><strong>${L.delaiEstime}</strong> ${esc(delaiEstime)}</p>` : ""}
       </div>
       <div class="cb-right">
         <div class="cb-title">${L.bonPourAccord}</div>
@@ -780,6 +794,32 @@ export function renderDocumentHtml(
     color: #000000;
     text-align: center;
   }
+  /* VOLET 22 — PIED NOIR DU TABLEAU (délai estimé) : rangée noire
+     finale du tableau, même habillage que l'en-tête (fond noir,
+     texte blanc) — « Délai estimé : » à gauche, valeur TOTALEMENT à
+     droite (comme l'ancien total dans le footer du tableau). */
+  .svc-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background: #000000;
+    border: 1px solid #000000;
+    padding: 6px 8px;
+  }
+  .svc-foot .svc-foot-libelle {
+    color: #ffffff;
+    font-size: 10pt;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    line-height: 1.35;
+  }
+  .svc-foot .svc-foot-valeur {
+    color: #ffffff;
+    font-size: 10.5pt;
+    font-weight: 700;
+    line-height: 1.35;
+  }
   .svc-part .cell.price-cell { text-align: right; font-variant-numeric: tabular-nums; }
   .svc-part .cell.qty-cell { text-align: center; }
   .svc-part .cell.total-cell { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
@@ -830,8 +870,14 @@ export function renderDocumentHtml(
      le CACHET se pose sur les deux lignes à pointillés.
      VOLET 21 : le CACHET couvre les pointillés (z-index supérieur)
      — l'encre et la date du cachet restent lisibles. ---- */
-  .total-sous-tableau { margin-top: 5mm; position: relative; }
-  .total-sous-tableau--facture { margin-top: 10mm; }
+  .total-sous-tableau { margin-top: 4mm; position: relative; }
+  /* VOLET 22 — FACTURE : le bloc total est dégagé du tableau
+     (12 mm au-dessus) ET du bloc suivant (9 mm au-dessous) : le
+     CACHET (PAYÉ / EN ATTENTE — posé sur les lignes à pointillés,
+     boîte ~36 mm de haut une fois inclinée) ne touche plus le
+     contenu qui suit (demande de l'éditeur : « pousse ça un peu
+     vers le bas pour que le cachet ne le touche pas »). */
+  .total-sous-tableau--facture { margin-top: 12mm; margin-bottom: 9mm; }
   .total-sous-tableau .total-ligne,
   .total-sous-tableau .total-ligne + .total-ligne { position: relative; z-index: 1; }
   .total-ligne { display: flex; align-items: baseline; margin: 0; }
@@ -947,7 +993,7 @@ export function renderDocumentHtml(
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8mm;
-    margin-top: 12mm;
+    margin-top: 9mm;
   }
   .cb-left .cb-title, .cb-right .cb-title {
     font-size: 10.5pt;
@@ -973,13 +1019,8 @@ export function renderDocumentHtml(
     font-size: 7pt;
     line-height: 1.8;
   }
-  /* Délai estimé : À LA SUITE des CGV, sans décalage. */
-  .delai-apres-cgv {
-    margin: 2px 0 0 0;
-    font-size: 9pt;
-    color: #1f2937;
-    line-height: 1.5;
-  }
+  /* Délai estimé : retiré des CGV au VOLET 22 — il vit désormais
+     dans le PIED NOIR DU TABLEAU (.svc-foot). */
   .cb-right { padding-left: 0; border-left: none; }
   .cb-right .cb-title { margin-bottom: 8mm; }
   .cb-right .cb-date-line {
@@ -987,9 +1028,14 @@ export function renderDocumentHtml(
     color: #6b7280;
     margin-bottom: 10mm;
   }
-  /* VOLET 17 : espace de signature AGRANDI (18 mm → 30 mm). */
+  /* VOLET 22 — espace de signature RÉDUIT (30 mm → 12 mm) : la ligne
+     « Signature et cachet » s'aligne désormais avec la DERNIÈRE
+     ligne du contenu de la colonne des CGV (demande de l'éditeur :
+     « réduis un peu l'espace réservé à la signature pour
+     s'aligner avec la dernière ligne du contenu de la colonne
+     conditions générales de vente »). */
   .signature-line {
-    margin-top: 30mm;
+    margin-top: 23mm;
     border-top: 1px solid #000000;
     padding-top: 3px;
     font-size: 8.5pt;
@@ -1000,7 +1046,7 @@ export function renderDocumentHtml(
   .signature-line .sig-quality-inline { color: #6b7280; font-weight: 400; font-style: italic; }
 
   /* ---- Validité + notes ---- */
-  .validite-notes { margin-top: 10mm; }
+  .validite-notes { margin-top: 6mm; }
   .validite-notes p { margin: 0 0 3px 0; font-size: 9pt; line-height: 1.5; color: #1f2937; }
   .validite-notes .vn-lbl { color: #000000; font-weight: 600; }
 
@@ -1050,16 +1096,16 @@ export function renderDocumentHtml(
     font-size: 14pt;
     font-weight: 700;
     color: #000000;
-    margin: 14mm 0 4mm 0;
+    margin: 8mm 0 3mm 0;
     padding-bottom: 4px;
     border-bottom: 1px solid #d1d5db;
   }
-  .bank-block { margin-top: 4mm; }
+  .bank-block { margin-top: 3mm; }
   .bank-row {
     display: flex;
     font-size: 10.5pt;
-    padding: 3px 0;
-    line-height: 1.5;
+    padding: 2.5px 0;
+    line-height: 1.45;
   }
   .bank-row .lbl {
     color: #000000;
@@ -1183,6 +1229,7 @@ export function renderDocumentHtml(
     <div class="cell num">${L.colTotal}</div>
   </div>
   ${lignesTableau}
+  ${piedTableau}
   ${blocTotal}
 
   ${blocPaiement}
@@ -1224,6 +1271,12 @@ export function renderDocumentHtml(
     debutNPx: DEBUT_N_PX,
     enteteCompacte: true,
     formatPage: "simple",
+    /* VOLET 22 — réserve basse : espace minimal garanti entre le bas
+       du tableau (quand il remplit la page, PREMIÈRE page comme les
+       suivantes) et le pied de page (demande de l'éditeur) — la
+       proposition commerciale garde sa pagination calée sur
+       l'exemple (aucune réserve). */
+    reserveBasPx: Math.round(10 * 96 / 25.4),
   })}</script>
 ${langue === "en" ? `<script>${SCRIPT_PIED_PAGE_EN}</script>` : ""}
 </body>

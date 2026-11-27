@@ -163,7 +163,15 @@ export function decouperHtmlRiche(html: string | null | undefined): string[] {
      *  imbriquée : blocs entiers */
     fragments.push(...decouperParagraphe(brut));
   }
-  return fragments;
+  /* VOLET 22 (27/11/2026) — fragments VIDES retirés : l'éclatement
+   *  phrase par phrase pouvait laisser un fragment sans texte visible
+   *  (balises seules) — il s'imprimait comme une RANGÉE VIDE de ~10 px
+   *  dans le tableau (une par paragraphe : ~80 px perdus sur un devis
+   *  de huit paragraphes) et repoussait la fin du document à une
+   *  page supplémentaire. */
+  return fragments.filter(
+    (f) => f.replace(/<[^>]+>/g, "").replace(/&nbsp;/gi, " ").trim() !== "",
+  );
 }
 
 /* ------------------------------------------------------------------

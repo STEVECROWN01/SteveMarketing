@@ -6,6 +6,8 @@ import {
   supprimerProjet,
   lireProjet,
   isStorageConfigured,
+  lireSupprimesSite,
+  ajouterSupprimesSite,
 } from "@/lib/portfolio/stockage";
 import { manquesPublication, slugifier, TAILLE_IMAGE_MAX, type ProjetAdmin } from "@/lib/portfolio/types";
 
@@ -41,7 +43,13 @@ export async function GET(req: NextRequest) {
     });
   }
   try {
-    return NextResponse.json({ ok: true, projets: await listerProjetsAdmin(), stockageConfigure: true });
+    /* VOLET 22 — `siteSupprimes` : identifiants des projets STATIQUES
+     * supprimés définitivement (l'espace admin ne les affiche plus). */
+    const [projets, siteSupprimes] = await Promise.all([
+      listerProjetsAdmin(),
+      lireSupprimesSite().catch(() => [] as string[]),
+    ]);
+    return NextResponse.json({ ok: true, projets, siteSupprimes, stockageConfigure: true });
   } catch (e) {
     return NextResponse.json(
       { ok: false, error: e instanceof Error ? e.message : "Lecture impossible." },
@@ -136,6 +144,11 @@ export async function POST(req: NextRequest) {
       desktop: projetPartiel.desktop,
       mobile: (brut.mobile ?? existant?.mobile ?? null) as ProjetAdmin["mobile"],
       traductions: (brut.traductions ?? existant?.traductions ?? null) as ProjetAdmin["traductions"],
+      /* VOLET 22 — `origine` : un projet converti depuis une
+       * réalisation STATIQUE du site garde la trace de son origine
+       * (sa suppression est définitive : l'original ne réapparaît pas). */
+      origine:
+        brut.origine === "site" || existant?.origine === "site" ? "site" : null,
       createdAt: existant?.createdAt ?? maintenant,
       updatedAt: maintenant,
     };
@@ -158,11 +171,22 @@ export async function DELETE(req: NextRequest) {
   }
   const body = await req.json().catch(() => null);
   const id = typeof body?.id === "string" ? body.id.trim() : "";
+  /* VOLET 22 — `site: true` : suppression DÉFINITIVE d'une réalisation
+   * STATIQUE du site (l'identifiant est enregistré dans le stockage :
+   * le site public et l'espace admin ne l'affichent plus jamais). */
+  const depuisSite = body?.site === true;
   if (!id || !/^[\w-]+$/.test(id)) {
     return NextResponse.json({ ok: false, error: "Identifiant invalide." }, { status: 422 });
   }
   try {
+    const existant = await lireProjet(id).catch(() => null);
     await supprimerProjet(id);
+    /* Cascade : la suppression d'un projet CONVERTI d'une réalisation
+     * statique (origine "site") est définitive — l'original statique ne
+     * doit pas réapparaître sur le site. */
+    if (depuisSite || existant?.origine === "site") {
+      await ajouterSupprimesSite([id]);
+    }
     return NextResponse.json({ ok: true });
   } catch (e) {
     return NextResponse.json(

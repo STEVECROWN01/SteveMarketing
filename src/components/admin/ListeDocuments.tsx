@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   CheckCircle2,
   Download,
@@ -14,10 +14,11 @@ import {
   Trash2,
   Undo2,
   X,
+  XCircle,
 } from "lucide-react";
 import { ApercuDocument } from "./ApercuDocument";
 import { ApercuDevisSigne } from "./ApercuDevisSigne";
-import { BoutonAction, BoutonIcone, Carte, ModaleConfirmation, Pastille } from "./elements";
+import { AnneauProgression, BoutonAction, BoutonIcone, Carte, ModaleConfirmation, Pastille } from "./elements";
 import type { DocumentRecord, DocType } from "@/lib/documents/types";
 import { LABELS_DOC } from "@/lib/documents/types";
 import { estPropositionV2, type PropositionRecord } from "@/lib/documents/proposition";
@@ -115,6 +116,16 @@ export function ListeDocuments({
   const [signature, setSignature] = useState<DocumentRecord | null>(null);
   const [fichierSignature, setFichierSignature] = useState<File | null>(null);
   const signatureInputRef = useRef<HTMLInputElement>(null);
+  /* VOLET 22 — ANALYSE DU PDF SIGNÉ À L'UPLOAD : « attente » (aucun
+   * fichier) → « encours » (anneau circulaire vert 0 → 100 %) →
+   * « valide » (coche verte) | « invalide » (croix rouge + raisons).
+   * Le bouton d'enregistrement reste GRISÉ tant que l'analyse n'a
+   * pas confirmé que le document correspond bien au devis. */
+  const [analyseSigne, setAnalyseSigne] = useState<{
+    phase: "attente" | "encours" | "valide" | "invalide";
+    manques: string[];
+  }>({ phase: "attente", manques: [] });
+  const [progressionAnalyse, setProgressionAnalyse] = useState(0);
 
   /* ORDRE DE CRÉATION : du premier au dernier document créé. */
   const visibles = useMemo(
@@ -245,6 +256,14 @@ export function ListeDocuments({
       });
       return;
     }
+    if (analyseSigne.phase !== "valide") {
+      toast({
+        title: "Document non vérifié",
+        description: "Téléversez le PDF du devis signé — l'analyse doit d'abord confirmer qu'il correspond à ce devis.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (fichierSignature.type && fichierSignature.type !== "application/pdf") {
       toast({
         title: "PDF attendu",
@@ -278,12 +297,71 @@ export function ListeDocuments({
       });
       setSignature(null);
       setFichierSignature(null);
+      setAnalyseSigne({ phase: "attente", manques: [] });
+      setProgressionAnalyse(0);
       onRafraichir();
       onSigne?.(record);
     } catch (e) {
       toast({ title: "Signature impossible", description: e instanceof Error ? e.message : undefined, variant: "destructive" });
     } finally {
       setEnCours(null);
+    }
+  }
+
+  /* VOLET 22 (27/11/2026) — ANALYSE STRICTE DU PDF SIGNÉ À L'UPLOAD
+   * (demande de l'éditeur : « c'est lors de l'upload que le système
+   * doit vérifier strictement le document — numéro du devis, nom,
+   * signatures, date d'émission, tableau de détails. Pendant
+   * l'analyse, un chargement circulaire vert monte de 0 à 100 % ;
+   * si le document ne correspond pas, ça le mentionne en rouge ;
+   * si ça correspond, une coche verte. Le bouton d'enregistrement
+   * est grisé tant que le document ne correspond pas »). L'anneau
+   * monte par impulsions jusqu'à ~95 % pendant l'analyse côté
+   * serveur, atteint 100 % à la réponse, puis le verdict s'affiche. */
+  async function analyserSignature(fichier: File, record: DocumentRecord) {
+    setAnalyseSigne({ phase: "encours", manques: [] });
+    setProgressionAnalyse(0);
+    const minuteur = window.setInterval(() => {
+      setProgressionAnalyse((p) => (p < 95 ? p + Math.max(0.7, (95 - p) / 16) : 95));
+    }, 110);
+    try {
+      const data = await new Promise<string>((resoudre, rejeter) => {
+        const lecteur = new FileReader();
+        lecteur.onload = () => {
+          const contenu = String(lecteur.result ?? "");
+          resoudre(contenu.slice(contenu.indexOf(",") + 1));
+        };
+        lecteur.onerror = () => rejeter(new Error("Lecture du fichier impossible."));
+        lecteur.readAsDataURL(fichier);
+      });
+      const res = await fetch(`/api/documents/${encodeURIComponent(record.id)}/verifier-signature`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data }),
+      });
+      const json = await res.json().catch(() => null);
+      if (!res.ok || !json?.ok) throw new Error(json?.error ?? "Analyse impossible.");
+      setProgressionAnalyse(100);
+      /* petit temps d'arrêt : l'anneau termine son tour avant le verdict */
+      await new Promise((r) => setTimeout(r, 320));
+      if (json.valide) {
+        setAnalyseSigne({ phase: "valide", manques: [] });
+      } else {
+        setAnalyseSigne({
+          phase: "invalide",
+          manques: (json.manques as string[] | undefined)?.length
+            ? (json.manques as string[])
+            : [`Ce document ne correspond pas au devis ${record.numero}.`],
+        });
+      }
+    } catch (e) {
+      setProgressionAnalyse(100);
+      setAnalyseSigne({
+        phase: "invalide",
+        manques: [e instanceof Error ? e.message : "Analyse impossible."],
+      });
+    } finally {
+      window.clearInterval(minuteur);
     }
   }
 
@@ -360,9 +438,17 @@ export function ListeDocuments({
         </Carte>
       ) : (
         <Carte className="scroll-slim overflow-x-auto">
-          <table
-            className={`w-full text-left text-sm ${docType === "devis" ? "min-w-[1040px]" : "min-w-[880px]"}`}
-          >
+          {/* VOLET 22 — PLUS DE LARGEUR MINIMALE : la barre de
+              défilement HORIZONTALE de la liste des documents (devis
+              en tête) disparaît (demande de l'éditeur : « il y a une
+              barre horizontale de scroll alors que le tableau est
+              terminé sur la colonne Action — quand on défile à
+              droite, il n'y a qu'un petit espace qui apparaît ; il
+              faut enlever la barre de scroll horizontale »). Le
+              tableau s'aligne sur la largeur disponible ; le
+              défilement horizontal ne revient que si l'écran est
+              réellement trop étroit. */}
+          <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-[#e4e4e4]/10 text-[11px] tracking-widest text-[#c8c8c8] uppercase">
                 <th className="px-5 py-4">Numéro</th>
@@ -505,6 +591,8 @@ export function ListeDocuments({
                             onClick={() => {
                               setSignature(doc);
                               setFichierSignature(null);
+                              setAnalyseSigne({ phase: "attente", manques: [] });
+                              setProgressionAnalyse(0);
                             }}
                           >
                             <FileSignature className="h-4 w-4" />
@@ -668,49 +756,107 @@ export function ListeDocuments({
               </button>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-[#c8c8c8]">
-              Téléversez le PDF du devis signé par le client : il sera enregistré dans la partie des
-              devis signés, le devis sera marqué signé, puis la génération de sa facture s&apos;ouvrira.
+              Téléversez le PDF du devis signé par le client : le système vérifie
+              <strong className="text-white"> à l&apos;upload</strong> que le document correspond bien à
+              ce devis (numéro, nom du client, signature, date d&apos;émission, tableau de détails) —
+              l&apos;enregistrement ne se dégrise qu&apos;après la coche verte.
             </p>
             <input
               ref={signatureInputRef}
               type="file"
               accept="application/pdf,.pdf"
               className="sr-only"
-              onChange={(e) => setFichierSignature(e.target.files?.[0] ?? null)}
+              onChange={(e) => {
+                const f = e.target.files?.[0] ?? null;
+                setFichierSignature(f);
+                if (f) void analyserSignature(f, signature);
+              }}
               aria-label="Choisir le PDF du devis signé"
             />
-            <button
-              type="button"
-              onClick={() => signatureInputRef.current?.click()}
-              className="mt-4 flex w-full items-center justify-center gap-3 rounded-xl border border-dashed border-[#e4e4e4]/30 bg-[#1c1c1c] px-4 py-5 text-left transition-colors hover:border-[#e4e4e4]/60"
-            >
-              <FileSignature className="h-6 w-6 shrink-0 text-[#c8c8c8]" aria-hidden="true" />
-              <span className="min-w-0">
-                {fichierSignature ? (
-                  <>
-                    <span className="block truncate text-sm font-medium text-white">{fichierSignature.name}</span>
-                    <span className="block text-xs text-[#86efac]">
-                      {(fichierSignature.size / 1024).toFixed(0)} Ko — prêt à enregistrer
+            {/* ---------- Zone d'upload + ANALYSE (VOLET 22) ---------- */}
+            {!fichierSignature ? (
+              <button
+                type="button"
+                onClick={() => signatureInputRef.current?.click()}
+                className="mt-4 flex w-full items-center justify-center gap-3 rounded-xl border border-dashed border-[#e4e4e4]/30 bg-[#1c1c1c] px-4 py-5 text-left transition-colors hover:border-[#e4e4e4]/60"
+              >
+                <FileSignature className="h-6 w-6 shrink-0 text-[#c8c8c8]" aria-hidden="true" />
+                <span className="min-w-0">
+                  <span className="block text-sm font-medium text-white">Choisir le PDF signé</span>
+                  <span className="block text-xs text-[#c8c8c8]">
+                    Fichier PDF du devis signé par le client (~6 Mo maximum)
+                  </span>
+                </span>
+              </button>
+            ) : (
+              <div className="mt-4 rounded-xl border border-[#e4e4e4]/15 bg-[#1c1c1c] p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    <FileSignature className="h-5 w-5 shrink-0 text-[#c8c8c8]" aria-hidden="true" />
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-medium text-white">{fichierSignature.name}</span>
+                      <span className="block text-xs text-[#c8c8c8]">
+                        {(fichierSignature.size / 1024).toFixed(0)} Ko
+                      </span>
                     </span>
-                  </>
-                ) : (
-                  <>
-                    <span className="block text-sm font-medium text-white">Choisir le PDF signé</span>
-                    <span className="block text-xs text-[#c8c8c8]">
-                      Fichier PDF du devis signé par le client (~6 Mo maximum)
-                    </span>
-                  </>
-                )}
-              </span>
-            </button>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => signatureInputRef.current?.click()}
+                    className="shrink-0 rounded-full border border-[#e4e4e4]/25 px-3.5 py-2 text-xs font-medium text-white transition-colors hover:border-[#e4e4e4]"
+                  >
+                    Changer de fichier
+                  </button>
+                </div>
+                {/* Analyse : anneau circulaire vert 0 → 100 %, puis verdict */}
+                <div className="mt-4 flex flex-col items-center gap-3 border-t border-[#e4e4e4]/10 pt-4">
+                  {analyseSigne.phase === "encours" ? (
+                    <>
+                      <AnneauProgression pourcentage={progressionAnalyse} />
+                      <p className="text-sm text-[#c8c8c8]">Analyse du document…</p>
+                    </>
+                  ) : analyseSigne.phase === "valide" ? (
+                    <>
+                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#22c55e]/15">
+                        <CheckCircle2 className="h-8 w-8 text-[#22c55e]" aria-hidden="true" />
+                      </span>
+                      <p className="text-center text-sm font-medium text-[#86efac]">
+                        Le document correspond bien au devis {signature.numero} — prêt à enregistrer.
+                      </p>
+                    </>
+                  ) : analyseSigne.phase === "invalide" ? (
+                    <>
+                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#ea384c]/15">
+                        <XCircle className="h-8 w-8 text-[#ea384c]" aria-hidden="true" />
+                      </span>
+                      <div className="w-full text-center">
+                        <p className="text-sm font-medium text-[#ff8080]">
+                          Ce document ne correspond pas au devis {signature.numero}.
+                        </p>
+                        <ul className="mx-auto mt-2 max-w-sm space-y-1 text-left">
+                          {analyseSigne.manques.map((m) => (
+                            <li key={m} className="flex items-start gap-2 text-[13px] text-[#ffdede]">
+                              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#ea384c]" aria-hidden="true" />
+                              <span>{m}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+            )}
             <div className="mt-6 flex flex-wrap justify-end gap-3">
               <BoutonAction onClick={() => setSignature(null)} disabled={enCours === `${signature.numero}-signature`}>
                 Annuler
               </BoutonAction>
+              {/* VOLET 22 — bouton GRISÉ tant que l'analyse n'a pas validé
+                  le document ; dégrisé dès la coche verte. */}
               <BoutonAction
                 variant="principal"
                 onClick={() => void confirmerSignature()}
-                disabled={enCours === `${signature.numero}-signature`}
+                disabled={enCours === `${signature.numero}-signature` || analyseSigne.phase !== "valide"}
               >
                 {enCours === `${signature.numero}-signature` ? (
                   <>
@@ -750,17 +896,18 @@ export function ListeDocuments({
 }
 
 /* ------------------------------------------------------------------
- * VOLET 21 (27/11/2026) — STATUT D'ENVOI D'UNE PROPOSITION
- * COMMERCIALE, CLIQUABLE.
+ * VOLET 22 (27/11/2026) — STATUT D'ENVOI D'UNE PROPOSITION
+ * COMMERCIALE, CLIQUABLE : MODAL PERSONNALISÉE.
  *
- * Demande de l'éditeur : « au niveau des propositions commerciales,
- * le statut doit être cliquable : après la génération, la
- * proposition est NON ENVOYÉE par défaut ; quand on clique sur le
- * statut, une petite liste d'options permet de la marquer ENVOYÉE
- * (ou de la ramener à non envoyée). » La pastille ouvre un petit
- * menu (Marquer comme envoyée / Marquer comme non envoyée) — le
- * choix est ENREGISTRÉ avec la proposition (champ `envoyee`,
- * stockage privé) et la liste se rafraîchit.
+ * Demande de l'éditeur (volet 21) : « le statut est cliquable : non
+ * envoyée par défaut, on peut la marquer envoyée » ; puis (volet 22)
+ * : « le dropdown et l'option à choisir se cachent à l'intérieur de
+ * la bande, on ne voit même pas l'option — corrige, OU carrément
+ * affiche un MODAL personnalisé à l'écran pour choisir ». Le petit
+ * menu déroulant (clippé par la bande de la liste) est donc remplacé
+ * par une MODALE CENTRÉE : le statut actuel, les deux options, et
+ * Annuler. Le choix est ENREGISTRÉ avec la proposition (champ
+ * `envoyee`, stockage privé) et la liste se rafraîchit.
  * ------------------------------------------------------------------ */
 function MenuStatutProposition({
   doc,
@@ -812,10 +959,8 @@ function MenuStatutProposition({
     <div className="relative inline-flex">
       <button
         type="button"
-        onClick={() => setOuvert((o) => !o)}
+        onClick={() => setOuvert(true)}
         disabled={enCours}
-        aria-haspopup="menu"
-        aria-expanded={ouvert}
         title="Cliquer pour changer le statut d'envoi"
         className="cursor-pointer rounded-full transition-transform hover:scale-[1.03] focus:outline-none"
       >
@@ -830,40 +975,63 @@ function MenuStatutProposition({
           <Pastille>Non envoyée</Pastille>
         )}
       </button>
+      {/* VOLET 22 — MODAL PERSONNALISÉE centrée à l'écran (le dropdown
+          se cachait dans la bande de la liste). */}
       {ouvert ? (
-        <>
-          {/* clic hors du menu : referme */}
-          <button
-            type="button"
-            aria-label="Fermer le menu de statut"
-            className="fixed inset-0 z-40 cursor-default"
-            onClick={() => setOuvert(false)}
-          />
-          <div
-            role="menu"
-            aria-label={`Statut d'envoi — ${doc.numero}`}
-            className="absolute left-0 top-full z-50 mt-2 w-60 overflow-hidden rounded-xl border border-[#e4e4e4]/15 bg-[#232323] p-1.5 shadow-[0_18px_50px_rgba(0,0,0,0.55)]"
-          >
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => void basculer(true)}
-              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm text-white transition-colors hover:bg-[#e4e4e4]/10"
-            >
-              <Send className="h-4 w-4 shrink-0 text-[#86efac]" aria-hidden="true" />
-              Marquer comme envoyée
-            </button>
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => void basculer(false)}
-              className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm text-[#c8c8c8] transition-colors hover:bg-[#e4e4e4]/10"
-            >
-              <Undo2 className="h-4 w-4 shrink-0" aria-hidden="true" />
-              Marquer comme non envoyée
-            </button>
+        <div
+          className="fixed inset-0 z-[90] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Statut d'envoi — ${doc.numero}`}
+          onClick={(e) => e.target === e.currentTarget && setOuvert(false)}
+        >
+          <div className="w-full max-w-sm rounded-2xl border border-[#e4e4e4]/15 bg-[#232323] p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-eyebrow">Proposition commerciale</p>
+                <h3 className="mt-1 font-display text-xl font-semibold text-white">
+                  Statut d&apos;envoi — {doc.numero}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOuvert(false)}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-white"
+                aria-label="Fermer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="mt-2 text-sm text-[#c8c8c8]">
+              Statut actuel :{" "}
+              <span className="font-medium text-white">
+                {envoyee ? "Envoyée" : "Non envoyée"}
+              </span>
+              . Choisissez le nouveau statut de la proposition :
+            </p>
+            <div className="mt-5 space-y-3">
+              <BoutonAction
+                className="w-full"
+                variant={envoyee ? "secondaire" : "principal"}
+                onClick={() => void basculer(true)}
+              >
+                <Send className="h-4 w-4" aria-hidden="true" />
+                Marquer comme envoyée
+              </BoutonAction>
+              <BoutonAction
+                className="w-full"
+                variant={!envoyee ? "secondaire" : "principal"}
+                onClick={() => void basculer(false)}
+              >
+                <Undo2 className="h-4 w-4" aria-hidden="true" />
+                Marquer comme non envoyée
+              </BoutonAction>
+            </div>
+            <div className="mt-5 flex justify-end">
+              <BoutonAction onClick={() => setOuvert(false)}>Annuler</BoutonAction>
+            </div>
           </div>
-        </>
+        </div>
       ) : null}
     </div>
   );

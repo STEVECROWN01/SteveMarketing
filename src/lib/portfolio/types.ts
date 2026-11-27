@@ -56,6 +56,12 @@ export type ProjetAdmin = {
   desktop: ImageProjet | null;
   mobile: ImageProjet | null;
   traductions?: TraductionProjet | null;
+  /** VOLET 22 (27/11/2026) — « site » : projet ORIGINELMENT STATIQUE
+   *  (les réalisations du code du site) converti en projet ADMIN :
+   *  il REMPLACE le projet statique de même identifiant sur le
+   *  site (même position, hero préservé) et sa suppression est
+   *  DÉFINITIVE (l'original statique ne réapparaît pas). */
+  origine?: "site" | null;
   createdAt: string;
   updatedAt: string;
 };

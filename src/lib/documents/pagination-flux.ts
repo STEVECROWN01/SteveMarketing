@@ -32,6 +32,15 @@ export type ConfPagination = {
   /** Format de numérotation du pied : « belle » (01 / 06, en gras
    *  sur le numéro courant) ou « simple » (Page 1 sur 2). */
   formatPage?: "belle" | "simple";
+  /** VOLET 22 (27/11/2026) — RÉSERVE BASSE (px) : espace minimal
+   *  garanti entre le BAS du dernier bloc de la page (le tableau
+   *  quand il remplit la page) et le PIED DE PAGE. Sans réserve,
+   * un tableau qui remplit la PREMIÈRE page venait coller le pied
+   * (demande de l'éditeur : « sur la première page, ça coince le
+   *  footer ; l'espace tableau-footer doit être comme celui des
+   *  pages suivantes »). 0 = comportement inchangé (propositions :
+   *  pagination calée sur l'exemple, ne pas toucher). */
+  reserveBasPx?: number;
 };
 
 /** Construit le script de pagination (chaîne littérale, aucune
@@ -46,6 +55,7 @@ export function fabriquerScriptPagination(conf: ConfPagination): string {
   var DEBUT_N = ${conf.debutNPx};
   var ENTETE_COMPACTE = ${conf.enteteCompacte ? "true" : "false"};
   var FORMAT_SIMPLE = ${conf.formatPage === "simple" ? "true" : "false"};
+  var RESERVE_BAS = ${Math.max(0, Math.round(conf.reserveBasPx ?? 0))};
   var pages = [];
   var pagine = false;
   var pageDemandee = 0;
@@ -121,7 +131,7 @@ export function fabriquerScriptPagination(conf: ConfPagination): string {
     var repartis = [[]];
     var avecEntete = [false];
     var h = 0;
-    var cap = LIMITE - DEBUT_P1;
+    var cap = LIMITE - DEBUT_P1 - RESERVE_BAS;
     for (var j = 0; j < blocs.length; j++) {
       var b = blocs[j];
       var bh = hauteurs[j];
@@ -139,7 +149,7 @@ export function fabriquerScriptPagination(conf: ConfPagination): string {
       var garder = 0;
       if (heading && j + 1 < blocs.length) {
         var suite = hauteurs[j + 1];
-        if (j + 2 < blocs.length) suite += Math.min(hauteurs[j + 2], 100);
+        if (j + 2 < blocs.length) suite += Math.min(hauteurs[j + 2], 48);
         garder = Math.min(suite + 12, hauteurs[j + 1] + 112);
       }
       if (premierDePage && repartis.length === 1) {
@@ -157,10 +167,10 @@ export function fabriquerScriptPagination(conf: ConfPagination): string {
           b.classList.contains('svc-part')
         ) {
           avecEntete.push(true);
-          cap = LIMITE - DEBUT_N - hEnteteTableau;
+          cap = LIMITE - DEBUT_N - hEnteteTableau - RESERVE_BAS;
         } else {
           avecEntete.push(false);
-          cap = LIMITE - DEBUT_N;
+          cap = LIMITE - DEBUT_N - RESERVE_BAS;
         }
         bh = b.offsetHeight; /* premier de la nouvelle page */
       }

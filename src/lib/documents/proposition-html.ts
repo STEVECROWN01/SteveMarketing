@@ -281,7 +281,10 @@ ${suite}`;
 
   /* ---- Bloc d'informations (pas de 32,5 pt) ---- */
   .infos { margin-top: 47pt; }
-  .paire + .paire { margin-top: 7.9pt; }
+  /* VOLET 22 — .paire-duo + .paire : la rangée MONTANT TOTAL garde
+     son pas de 7,9 pt même quand la rangée précédente est le duo
+     DESTINATAIRE | PRESTATAIRE. */
+  .paire + .paire, .paire-duo + .paire { margin-top: 7.9pt; }
   .paire .lbl {
     margin: 0 0 2.7pt 0;
     font-size: 6.8pt; font-weight: 500;
@@ -291,6 +294,18 @@ ${suite}`;
   }
   .paire .val { margin: 0; font-size: 11pt; font-weight: 500; line-height: 1.2; color: #111111; }
   .paire .val.montant { font-size: 15pt; font-weight: 700; }
+  /* VOLET 22 — rangée DESTINATAIRE | PRESTATAIRE (deux colonnes) :
+     même HAUTEUR qu'une rangée simple (le nom du destinataire ne
+     décale plus rien). La colonne destinataire, plus large, porte
+     les noms longs sans passer à la ligne. */
+  .paire-duo {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 16pt;
+    margin-top: 7.9pt;
+  }
+  .paire-duo .paire.duo-col { margin: 0; }
+  .paire-duo .paire.duo-col .val { font-size: 10.5pt; }
   .filet-clair { margin: 16.5pt 0 0 0; border-top: 0.6pt solid #e6e6e6; }
   /* VOLET 20 (26/11/2026) — DATE D'ÉMISSION sous le trait de
      séparation : l'espace qui sépare le trait et la date (ci-dessous)
@@ -462,26 +477,40 @@ ${suite}`;
       <p class="lbl">VOTRE PROJET</p>
       <p class="val">${esc(p.projet)}</p>
     </div>
-    <!-- VOLET 20 — DESTINATAIRE : nom complet de celui à qui la
-         proposition est adressée (et son entreprise le cas échéant)
-         — c'est ce nom qui pré-remplit le client du devis généré
-         depuis la proposition. -->
+    <!-- VOLET 22 (27/11/2026) — DESTINATAIRE & PRESTATAIRE SUR LA MÊME
+         LIGNE : l'ajout du nom du destinataire ne décale PLUS aucun
+         texte du document (demande de l'éditeur : « l'ajout du nom du
+         destinataire ne peut pas modifier la position des textes —
+         on maintient intactes les positions, il y a suffisamment
+         d'espace »). Quand un destinataire est renseigné, il partage
+         SA RANGÉE avec le prestataire (deux colonnes) : le bloc
+         d'informations garde EXACTEMENT la même hauteur avec ou sans
+         nom — les sections suivantes démarrent au même endroit et le
+         nombre de pages ne change pas. Sans destinataire, la rangée
+         pleine largeur d'origine est conservée. C'est aussi ce nom
+         qui pré-remplit le client du devis généré depuis la
+         proposition. -->
     ${
       (p.destinataire?.nomComplet || "").trim() || (p.destinataire?.entreprise || "").trim()
-        ? `<div class="paire">
+        ? `<div class="paire-duo">
+      <div class="paire duo-col">
       <p class="lbl">DESTINATAIRE</p>
       <p class="val">${esc(
         [(p.destinataire?.nomComplet || "").trim(), (p.destinataire?.entreprise || "").trim()]
           .filter(Boolean)
           .join(" — "),
       )}</p>
-    </div>`
-        : ""
-    }
-    <div class="paire">
+    </div>
+    <div class="paire duo-col">
       <p class="lbl">PRESTATAIRE</p>
       <p class="val">${esc(p.prestataire)}</p>
     </div>
+    </div>`
+        : `<div class="paire">
+      <p class="lbl">PRESTATAIRE</p>
+      <p class="val">${esc(p.prestataire)}</p>
+    </div>`
+    }
     <div class="paire">
       <p class="lbl">MONTANT TOTAL</p>
       <p class="val montant">${esc(montantF)}</p>
@@ -559,7 +588,10 @@ ${blocsPaiements}`, " t06")}
   <div class="pied">
     <div class="pied-filet"></div>
     <div class="pied-ligne">
-      <p class="p-gauche">${esc(p.signature.nom)}&nbsp;&nbsp;·&nbsp;&nbsp;Proposition commerciale&nbsp;&nbsp;·&nbsp;&nbsp;<a href="${esc(siteUrl)}">${esc(p.signature.site)}</a></p>
+      <!-- VOLET 22 — la mention « Proposition commerciale » est
+           SUPPRIMÉE du pied (demande de l'éditeur) : il ne reste que
+           le nom et le site. -->
+      <p class="p-gauche">${esc(p.signature.nom)}&nbsp;&nbsp;·&nbsp;&nbsp;<a href="${esc(siteUrl)}">${esc(p.signature.site)}</a></p>
       <p class="p-num"><b>01</b> / 01</p>
     </div>
   </div>

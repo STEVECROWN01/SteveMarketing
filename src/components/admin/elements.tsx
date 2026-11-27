@@ -194,17 +194,13 @@ export function BoutonIcone({
 }
 
 /* ------------------------------------------------------------------
- * VOLET 20 (26/11/2026) — MODALE DE CONFIRMATION PERSONNALISÉE.
- *
- * Demande de l'éditeur : « lorsqu'on clique sur le bouton de
- * suppression de document (devis, facture, proposition) pour la
- * supprimer, un modal de confirmation personnalisé devrait
- * s'ouvrir, et non modal browser par défaut » — même exigence pour
- * la suppression d'un projet du portfolio. Cette modale remplace
- * window.confirm partout dans le back-office : design du site
- * (fond #232323, bordures #e4e4e4), icône d'alerte, message libre
- * (peut avertir d'effets en cascade), actions Annuler / Confirmer
- * (variante « danger » sur la confirmation).
+ * VOLET 22 (27/11/2026) — ICÔNE DE LA MODALE DE CONFIRMATION : ROUGE
+ * et CENTRÉE horizontalement (demande de l'éditeur : « l'icône
+ * d'alerte devrait être en rouge et centrée horizontalement, et non
+ * à gauche du contenu du modal »). L'icône d'alerte (rouge pleine)
+ * occupe sa propre ligne AU-DESSUS du titre, centrée ; le titre est
+ * centré lui aussi, le message reste aligné à gauche (lisibilité des
+ * avertissements en cascade).
  * ------------------------------------------------------------------ */
 export function ModaleConfirmation({
   ouvert,
@@ -237,15 +233,14 @@ export function ModaleConfirmation({
       onClick={(e) => e.target === e.currentTarget && !enCours && onAnnuler()}
     >
       <div className="w-full max-w-md rounded-2xl border border-[#e4e4e4]/15 bg-[#232323] p-6 sm:p-7">
-        <div className="flex items-start gap-4">
-          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#ea384c]/30 bg-[#ea384c]/10">
-            <AlertTriangle className="h-5 w-5 text-[#ff8080]" aria-hidden="true" />
+        {/* Icône d'alerte — ROUGE, CENTRÉE horizontalement (VOLET 22). */}
+        <div className="flex justify-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#ea384c]/12">
+            <AlertTriangle className="h-7 w-7 text-[#ea384c]" aria-hidden="true" />
           </span>
-          <div className="min-w-0">
-            <h3 className="font-display text-lg font-semibold text-white">{titre}</h3>
-            <div className="mt-2 text-sm leading-relaxed text-[#c8c8c8]">{message}</div>
-          </div>
         </div>
+        <h3 className="mt-4 text-center font-display text-lg font-semibold text-white">{titre}</h3>
+        <div className="mt-2 text-sm leading-relaxed text-[#c8c8c8]">{message}</div>
         <div className="mt-6 flex flex-wrap justify-end gap-3">
           <BoutonAction onClick={onAnnuler} disabled={enCours}>
             {libelleAnnuler}
@@ -256,6 +251,67 @@ export function ModaleConfirmation({
           </BoutonAction>
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------
+ * VOLET 22 (27/11/2026) — ANNEAU DE CHARGEMENT CIRCULAIRE 0 → 100 %.
+ *
+ * Demandé pour l'analyse du devis signé téléversé (« lors de
+ * l'upload il doit y avoir un chargement de 0 à 100, un symbole
+ * circulaire qui montre un chargement de 0 à 100 qui remplit de
+ * façon verte, avec le pourcentage affiché au centre ») puis pour
+ * le scraping d'un projet du portfolio. L'anneau se remplit en
+ * VERT ; le pourcentage est affiché AU CENTRE.
+ * ------------------------------------------------------------------ */
+export function AnneauProgression({
+  pourcentage,
+  taille = 88,
+}: {
+  pourcentage: number;
+  taille?: number;
+}) {
+  const pct = Math.max(0, Math.min(100, Math.round(pourcentage)));
+  const rayon = 42;
+  const circonference = 2 * Math.PI * rayon;
+  const rempli = (pct / 100) * circonference;
+  return (
+    <div
+      className="relative"
+      style={{ width: `${taille}px`, height: `${taille}px` }}
+      role="progressbar"
+      aria-valuenow={pct}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label="Analyse en cours"
+    >
+      <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
+        {/* piste de fond */}
+        <circle
+          cx="50"
+          cy="50"
+          r={rayon}
+          fill="none"
+          stroke="#2f2f2f"
+          strokeWidth="7"
+        />
+        {/* remplissage VERT, proportionnel au pourcentage */}
+        <circle
+          cx="50"
+          cy="50"
+          r={rayon}
+          fill="none"
+          stroke="#22c55e"
+          strokeWidth="7"
+          strokeLinecap="round"
+          strokeDasharray={`${rempli} ${circonference - rempli}`}
+          style={{ transition: "stroke-dasharray 260ms linear" }}
+        />
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center font-mono text-base font-semibold text-white">
+        {pct}&nbsp;%
+      </span>
     </div>
   );
 }

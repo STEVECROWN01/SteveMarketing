@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Proposition commerciale PC2600001 — Site web professionnel, éditorial et évolutif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #525252;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #111111;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* ---- Pages : marges mesurées (62,4 pt = 22 mm) ---- */
+  .ppage {
+    position: relative;
+    width: 210mm; height: 297mm;
+    margin: 0 auto 8mm;
+    background: #ffffff;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.28);
+    padding: 0 62.4pt;
+    break-after: page;
+    page-break-after: always;
+  }
+  .ppage1 { padding-top: 56.3pt; }
+  .ppage-n { padding-top: 88pt; }
+  .ppage.ppage-fin { break-after: auto; page-break-after: auto; }
+  @media print {
+    body { background: #ffffff; }
+    .ppage { margin: 0; box-shadow: none; }
+  }
+  .corps { position: relative; z-index: 1; }
+
+  /* ---- Filigrane : hauteur 353,4 pt, centré, haut à 258,4 pt ---- */
+  .wm {
+    position: absolute;
+    top: 258.4pt;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 353.4pt;
+    opacity: 0.06;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .wm img { height: 353.4pt; width: auto; display: block; }
+
+  /* ---- En-tête page 1 ---- */
+  /* VOLET 19 (26/11/2026) — LOGO À DROITE : sa HAUTEUR s'aligne sur
+   * la hauteur qu'occupe le TITRE à gauche (demande de l'éditeur :
+   * « sa taille est augmentée afin que sa hauteur s'aligne avec la
+   * hauteur qu'occupe le titre du document qui est sur la même
+   * horizontale que lui à gauche »). Le petit script ALIGNEMENT
+   * LOGO TITRE (fin de gabarit) mesure le titre et cale la hauteur
+   * du logo — 78,8 pt au minimum (la valeur de l'exemple, pour un
+   * titre de 3 lignes) : un titre plus court garde le logo de
+   * l'exemple, un titre plus long l'agrandit. */
+  .entete1 { position: relative; min-height: 78.8pt; }
+  .e1-surtitre {
+    margin: 0;
+    font-size: 8pt; font-weight: 500;
+    letter-spacing: 0.02em;
+    color: #6b6b6b;
+  }
+  .e1-titre {
+    margin: 12.5pt 0 0 0;
+    max-width: 300pt;
+    font-size: 22pt; font-weight: 700;
+    line-height: 27pt;
+    color: #111111;
+  }
+  .e1-logo { position: absolute; right: 0; top: 26.8pt; }
+  .e1-logo img { height: 78.8pt; width: auto; display: block; }
+
+  /* ---- Bloc d'informations (pas de 32,5 pt) ---- */
+  .infos { margin-top: 47pt; }
+  /* VOLET 22 — .paire-duo + .paire : la rangée MONTANT TOTAL garde
+     son pas de 7,9 pt même quand la rangée précédente est le duo
+     DESTINATAIRE | PRESTATAIRE. */
+  .paire + .paire, .paire-duo + .paire { margin-top: 7.9pt; }
+  .paire .lbl {
+    margin: 0 0 2.7pt 0;
+    font-size: 6.8pt; font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    color: #6b6b6b;
+  }
+  .paire .val { margin: 0; font-size: 11pt; font-weight: 500; line-height: 1.2; color: #111111; }
+  .paire .val.montant { font-size: 15pt; font-weight: 700; }
+  /* VOLET 22 — rangée DESTINATAIRE | PRESTATAIRE (deux colonnes) :
+     même HAUTEUR qu'une rangée simple (le nom du destinataire ne
+     décale plus rien). La colonne destinataire, plus large, porte
+     les noms longs sans passer à la ligne. */
+  .paire-duo {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 16pt;
+    margin-top: 7.9pt;
+  }
+  .paire-duo .paire.duo-col { margin: 0; }
+  .paire-duo .paire.duo-col .val { font-size: 10.5pt; }
+  .filet-clair { margin: 16.5pt 0 0 0; border-top: 0.6pt solid #e6e6e6; }
+  /* VOLET 20 (26/11/2026) — DATE D'ÉMISSION sous le trait de
+     séparation : l'espace qui sépare le trait et la date (ci-dessous)
+     ÉGALE l'espace qui sépare le trait et le délai estimé ci-dessus
+     (16,5 pt — demande de l'éditeur). */
+  .paire-date { margin: 16.5pt 0 0 0; }
+
+  /* ---- En-tête compact (pages suivantes) ---- */
+  .entete-n { position: absolute; top: 0; left: 62.4pt; right: 62.4pt; z-index: 1; }
+  .en-textes { position: relative; padding-right: 48pt; }
+  .en-surtitre {
+    margin: 36.4pt 0 0 0;
+    font-size: 7pt; font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+    color: #6b6b6b;
+  }
+  .en-sous { margin: 0; font-size: 7pt; font-weight: 400; line-height: 1.4; color: #6b6b6b; }
+  .en-filet { margin-top: 11pt; border-top: 0.5pt solid #e6e6e6; }
+  .en-logo { position: absolute; right: 0; top: 31.2pt; }
+  .en-logo img { height: 32.6pt; width: auto; display: block; }
+
+  /* ---- Pied de page (filet à 795,1 pt) ---- */
+  .pied { position: absolute; left: 62.4pt; right: 62.4pt; bottom: 29.5pt; z-index: 1; }
+  .pied .pied-filet { border-top: 0.5pt solid #e6e6e6; margin-bottom: 6.8pt; }
+  .pied .pied-ligne { display: flex; align-items: baseline; justify-content: space-between; }
+  .pied .p-gauche { margin: 0; font-size: 7pt; font-weight: 400; line-height: 1.5; color: #6b6b6b; }
+  .pied .p-gauche a { color: #111111; text-decoration: none; }
+  .pied .p-num { margin: 0; font-size: 7pt; font-weight: 500; color: #111111; }
+  .pied .p-num b { font-weight: 500; }
+
+  /* ---- Titres de section ---- */
+  .s-head { margin-top: 29.6pt; }
+  .s-head.t01 { margin-top: 69.75pt; }
+  .s-head.t03 { margin-top: 32.9pt; }
+  .s-head.t04 { margin-top: 27.85pt; }
+  .s-head.t06 { margin-top: 29.6pt; }
+  .s-head.t08 { margin-top: 29.6pt; }
+  .s-head .s-ligne { display: flex; align-items: flex-start; }
+  .s-num {
+    display: block;
+    width: 62.3pt; flex: 0 0 62.3pt;
+    font-size: 34pt; font-weight: 700; line-height: 48.1pt;
+    color: #e6e6e6;
+  }
+  .s-titre { margin: 0; padding-top: 17.8pt; font-size: 15pt; line-height: 1.25; font-weight: 700; color: #111111; }
+  .s-filet { margin-top: 0; border-top: 1.2pt solid #111111; }
+
+  /* ---- Corps de texte (9,4 pt / 15,2 pt) ---- */
+  .chapeau { margin: 12.3pt 0 3.2pt 0; font-size: 10.4pt; font-weight: 300; line-height: 17pt; color: #111111; }
+  .para { margin: 6pt 0 0 0; font-size: 9.4pt; font-weight: 400; line-height: 15.2pt; color: #111111; }
+  .para.apres-filet { margin-top: 9.4pt; }
+  .para.apres-filet-95 { margin-top: 8.5pt; }
+
+  /* ---- 02 Objectifs ---- */
+  .obj-ligne { display: flex; align-items: flex-start; margin-top: 6.3pt; padding-bottom: 8pt; border-bottom: 0.5pt solid #e6e6e6; }
+  .obj-ligne.premiere { margin-top: 11.4pt; }
+  .obj-ligne.derniere { border-bottom: none; padding-bottom: 0; }
+  .obj-num { flex: 0 0 36.8pt; margin-top: 2.4pt; font-size: 13pt; font-weight: 700; line-height: 12.5pt; color: #b5b5b5; }
+  .obj-texte { margin: 0; font-size: 9.4pt; line-height: 15.2pt; color: #111111; }
+
+  /* ---- 03 Périmètre ---- */
+  .perim-tete { display: flex; align-items: center; margin-top: 16.2pt; }
+  .perim-tete.apres-poste { margin-top: 19.4pt; }
+  .perim-tete.premier { margin-top: 16pt; }
+  .pt-carre {
+    flex: 0 0 21.2pt; width: 21.2pt; height: 21.2pt;
+    margin-right: 10pt;
+    display: flex; align-items: center; justify-content: center;
+    background: #111111; color: #ffffff;
+    font-size: 10pt; font-weight: 700;
+  }
+  .pt-titre { margin: 0; font-size: 11.2pt; line-height: 1.25; font-weight: 700; color: #111111; }
+  .pt-intro { margin-top: 5.5pt; }
+  .pt-lead { margin: 5.2pt 0 0 0; font-size: 9.2pt; font-weight: 500; line-height: 14.4pt; color: #6b6b6b; }
+  .tiret {
+    margin: 0;
+    padding-left: 14pt; text-indent: -14pt;
+    font-size: 9.2pt; font-weight: 400; line-height: 14.4pt;
+    color: #111111;
+  }
+  .tiret.premier { margin-top: 3.6pt; }
+  .pt-post { margin-top: 4.8pt; }
+
+  /* ---- 04 Investissement ---- */
+  .invest {
+    margin-top: 12.8pt;
+    background: #111111; color: #ffffff;
+    padding: 18.35pt 20pt 14.5pt;
+    display: flex; align-items: center;
+  }
+  .invest-g { flex: 0 0 204pt; }
+  .invest-lbl {
+    margin: 0;
+    font-size: 7.5pt; font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    color: #b5b5b5;
+  }
+  .invest-montant { margin: 6.15pt 0 0 0; font-size: 30pt; font-weight: 700; line-height: 1.2; color: #ffffff; }
+  .invest-d { margin: 0 0 0 22pt; flex: 1 1 auto; font-size: 9.6pt; font-weight: 300; line-height: 15pt; color: #ffffff; }
+  .fines { margin-top: 13.5pt; border-left: 2pt solid #e6e6e6; padding-left: 12pt; }
+  .fine { margin: 0; font-size: 8.2pt; font-weight: 400; line-height: 12.5pt; color: #6b6b6b; }
+  .fine + .fine { margin-top: 6.1pt; }
+
+  /* ---- 05 Calendrier ---- */
+  .delai-ligne { display: flex; align-items: baseline; margin-top: 14.2pt; }
+  .delai-valeur { flex: 0 0 147.4pt; margin: 0; font-size: 15pt; line-height: 1.25; font-weight: 700; color: #111111; }
+  .delai-libelle { margin: 0; font-size: 8.2pt; line-height: 1.2; color: #6b6b6b; }
+  .cal-intro { margin-top: 9.45pt; }
+  .cal-lead { margin: 5.25pt 0 0 0; font-size: 9.2pt; font-weight: 500; line-height: 14.4pt; color: #6b6b6b; }
+  .etape { display: flex; align-items: center; height: 28.3pt; }
+  .etape.premiere { margin-top: 6.85pt; }
+  .etape-carre {
+    flex: 0 0 22.6pt; width: 22.6pt; height: 28.3pt;
+    margin-right: 14pt;
+    display: flex; align-items: center; justify-content: center;
+    background: #111111; color: #ffffff;
+    font-size: 9.5pt; font-weight: 700;
+  }
+  .etape-texte {
+    margin: 0 0 0 -14pt; padding-left: 14pt;
+    flex: 1 1 auto; height: 100%;
+    display: flex; align-items: center;
+    font-size: 9.6pt; font-weight: 500; line-height: 1.2;
+    color: #111111;
+  }
+  .etape:not(.derniere) .etape-texte { border-bottom: 0.5pt solid #e6e6e6; }
+  .etape:not(.derniere) .etape-carre { border-bottom: 4pt solid #ffffff; }
+  .cal-note { margin: 6.5pt 0 0 0; font-size: 8.2pt; font-weight: 400; line-height: 12.5pt; color: #6b6b6b; }
+
+  /* ---- 06 Modalités de paiement ---- */
+  .paiements-rangee { display: grid; grid-template-columns: 1fr 1fr; gap: 11.3pt; margin-top: 9.4pt; }
+  .paiements-rangee.trois { grid-template-columns: 1fr 1fr 1fr; }
+  .paie-bloc { background: #f4f4f2; border-top: 2pt solid #111111; padding: 16pt 16pt 12pt; }
+  .paie-pct { margin: 0; font-size: 26pt; font-weight: 700; line-height: 1.05; color: #111111; }
+  .paie-montant { margin: 4pt 0 0 0; font-size: 11pt; font-weight: 500; line-height: 1.25; color: #6b6b6b; }
+  .paie-filet { border-top: 0.6pt solid #b5b5b5; margin: 11.3pt 0 7.6pt; }
+  .paie-libelle { margin: 0; font-size: 9.4pt; font-weight: 700; line-height: 1.25; color: #111111; }
+  .paie-desc { margin: 3.2pt 0 0 0; font-size: 8.2pt; font-weight: 400; line-height: 12.5pt; color: #6b6b6b; }
+
+  /* ---- 08 Conclusion / signature ---- */
+  .cordialement { margin: 13pt 0 0 0; font-size: 9.4pt; font-weight: 400; line-height: 15.2pt; color: #111111; }
+  .signature { margin-top: 5pt; }
+  .signature .sig-nom { margin: 0; font-size: 11pt; font-weight: 700; line-height: 1; color: #111111; }
+  .signature .sig-titre { margin: 1.9pt 0 0 0; font-size: 8.2pt; font-weight: 400; line-height: 1.2; color: #6b6b6b; }
+  .signature .sig-site { margin: 2.7pt 0 0 0; font-size: 8.2pt; font-weight: 400; line-height: 1.2; color: #111111; }
+  .signature .sig-site a { color: #111111; text-decoration: none; }
+  .signature .sig-filet { margin-top: 1pt; width: 103.6pt; border-top: 1pt solid #111111; }
+
+  /* ---- Flux continu (repli sans script) ---- */
+  #pc-flux { width: 470.5pt; margin: 0 auto; }
+  #pc-gabarits { display: none; }
+</style>
+</head>
+<body>
+
+<div id="pc-flux">
+  <!-- En-tête page 1 : sur-titre + titre + logo -->
+  <div class="entete1" data-bloc>
+    <p class="e1-surtitre">PROPOSITION COMMERCIALE</p>
+    <h1 class="e1-titre">Conception et développement de votre site web professionnel</h1>
+    <div class="e1-logo"><img src="/assets/logo-noir-doc.png" alt="Stevens AKPOVI"></div>
+  </div>
+
+  <!-- Bloc d'informations -->
+  <div class="infos" data-bloc>
+    <div class="paire">
+      <p class="lbl">VOTRE PROJET</p>
+      <p class="val">Site web professionnel, éditorial et évolutif</p>
+    </div>
+    <!-- VOLET 22 (27/11/2026) — DESTINATAIRE & PRESTATAIRE SUR LA MÊME
+         LIGNE : l'ajout du nom du destinataire ne décale PLUS aucun
+         texte du document (demande de l'éditeur : « l'ajout du nom du
+         destinataire ne peut pas modifier la position des textes —
+         on maintient intactes les positions, il y a suffisamment
+         d'espace »). Quand un destinataire est renseigné, il partage
+         SA RANGÉE avec le prestataire (deux colonnes) : le bloc
+         d'informations garde EXACTEMENT la même hauteur avec ou sans
+         nom — les sections suivantes démarrent au même endroit et le
+         nombre de pages ne change pas. Sans destinataire, la rangée
+         pleine largeur d'origine est conservée. C'est aussi ce nom
+         qui pré-remplit le client du devis généré depuis la
+         proposition. -->
+    <div class="paire-duo">
+      <div class="paire duo-col">
+      <p class="lbl">DESTINATAIRE</p>
+      <p class="val">Aïcha DOSSOU — Cabinet Essentiel &amp; Stratégie</p>
+    </div>
+    <div class="paire duo-col">
+      <p class="lbl">PRESTATAIRE</p>
+      <p class="val">Stevens AKPOVI</p>
+    </div>
+    </div>
+    <div class="paire">
+      <p class="lbl">MONTANT TOTAL</p>
+      <p class="val montant">2 000 €</p>
+    </div>
+    <div class="paire">
+      <p class="lbl">DÉLAI ESTIMÉ</p>
+      <p class="val">02 à 03 semaines</p>
+    </div>
+  </div>
+  <div class="filet-clair" data-bloc></div>
+  <!-- VOLET 20 — DATE D'ÉMISSION sous le trait de séparation :
+       l'espace trait → date égale l'espace délai estimé → trait
+       (16,5 pt de part et d'autre — demande de l'éditeur). -->
+  <div class="paire paire-date" data-bloc>
+    <p class="lbl">DATE D'ÉMISSION</p>
+    <p class="val">27 novembre 2026</p>
+  </div>
+
+  
+<div class="s-head t01" data-bloc data-heading>
+  <div class="s-ligne">
+    <span class="s-num">01</span>
+    <p class="s-titre">Présentation de votre projet</p>
+  </div>
+  <div class="s-filet"></div>
+</div>
+<p class="chapeau" data-bloc>Dans un environnement professionnel où la visibilité, la crédibilité et la qualité de présentation jouent un rôle déterminant, disposer d’un espace numérique personnel constitue un véritable levier de développement.</p>
+<p class="para" data-bloc>Je vous propose la conception et le développement d’un site web professionnel sur mesure, destiné à valoriser votre expertise, vos activités et vos réalisations.</p>
+<p class="para" data-bloc>Pensé comme un véritable espace de présentation et de communication professionnelle, votre site offrira à vos interlocuteurs une vision claire de votre positionnement et de vos domaines d’intervention.</p>
+<p class="para" data-bloc>Il sera conçu pour accompagner l’évolution de vos activités et faciliter vos échanges avec les partenaires, clients et organisations susceptibles de collaborer avec vous.</p>
+
+  
+<div class="s-head" data-bloc data-heading>
+  <div class="s-ligne">
+    <span class="s-num">02</span>
+    <p class="s-titre">Objectifs de votre site</p>
+  </div>
+  <div class="s-filet"></div>
+</div>
+<p class="para apres-filet-95" data-bloc>Votre site aura pour objectifs de :</p>
+<div class="obj-ligne premiere" data-bloc>
+  <span class="obj-num">01</span>
+  <p class="obj-texte">Renforcer votre présence et votre visibilité professionnelles.</p>
+</div>
+<div class="obj-ligne" data-bloc>
+  <span class="obj-num">02</span>
+  <p class="obj-texte">Présenter clairement vos activités et vos domaines d’expertise.</p>
+</div>
+<div class="obj-ligne" data-bloc>
+  <span class="obj-num">03</span>
+  <p class="obj-texte">Valoriser vos réalisations et vos productions.</p>
+</div>
+<div class="obj-ligne" data-bloc>
+  <span class="obj-num">04</span>
+  <p class="obj-texte">Faciliter la découverte de votre travail par de nouveaux interlocuteurs.</p>
+</div>
+<div class="obj-ligne" data-bloc>
+  <span class="obj-num">05</span>
+  <p class="obj-texte">Centraliser vos contenus professionnels dans un espace qui vous appartient.</p>
+</div>
+<div class="obj-ligne" data-bloc>
+  <span class="obj-num">06</span>
+  <p class="obj-texte">Simplifier les prises de contact et les demandes de collaboration.</p>
+</div>
+<div class="obj-ligne derniere" data-bloc>
+  <span class="obj-num">07</span>
+  <p class="obj-texte">Vous permettre de faire évoluer vos contenus de manière autonome.</p>
+</div>
+
+  
+<div class="s-head t03" data-bloc data-heading>
+  <div class="s-ligne">
+    <span class="s-num">03</span>
+    <p class="s-titre">Périmètre de la prestation</p>
+  </div>
+  <div class="s-filet"></div>
+</div>
+<div class="perim-tete premier" data-bloc data-heading>
+  <div class="pt-carre">A</div>
+  <p class="pt-titre">Conception et développement sur mesure</p>
+</div>
+<p class="para pt-intro" data-bloc>Création d’un site web professionnel adapté à votre activité et à votre positionnement.</p>
+<p class="pt-lead" data-bloc>La prestation comprend :</p>
+<p class="tiret premier" data-bloc>–&emsp;La conception et le développement sur mesure.</p>
+<p class="tiret" data-bloc>–&emsp;L’intégration du design validé.</p>
+<p class="tiret" data-bloc>–&emsp;Une interface responsive adaptée aux ordinateurs, tablettes et smartphones.</p>
+<p class="tiret" data-bloc>–&emsp;Une navigation claire et cohérente.</p>
+<p class="tiret" data-bloc>–&emsp;L’intégration des animations et interactions prévues dans le projet.</p>
+<p class="tiret" data-bloc>–&emsp;L’intégration des contenus et des éléments visuels validés.</p>
+
+<div class="perim-tete" data-bloc data-heading>
+  <div class="pt-carre">B</div>
+  <p class="pt-titre">Site bilingue français / anglais</p>
+</div>
+<p class="para pt-intro" data-bloc>Votre site sera disponible en français et en anglais.</p>
+<p class="pt-lead" data-bloc>La prestation comprend l’intégration des contenus validés dans les deux langues et la mise en place d’un système de navigation entre les versions linguistiques.</p>
+
+
+<div class="perim-tete" data-bloc data-heading>
+  <div class="pt-carre">C</div>
+  <p class="pt-titre">Copywriting professionnel</p>
+</div>
+<p class="para pt-intro" data-bloc>La rédaction et l’optimisation des contenus des pages de votre site sont incluses.</p>
+<p class="pt-lead" data-bloc>Le copywriting sera conçu pour :</p>
+<p class="tiret premier" data-bloc>–&emsp;Présenter clairement votre activité.</p>
+<p class="tiret" data-bloc>–&emsp;Valoriser votre expertise et votre positionnement.</p>
+<p class="tiret" data-bloc>–&emsp;Mettre en évidence vos domaines d’intervention.</p>
+<p class="tiret" data-bloc>–&emsp;Faciliter la compréhension de votre offre professionnelle.</p>
+<p class="tiret" data-bloc>–&emsp;Encourager les prises de contact et les demandes de collaboration.</p>
+<p class="para pt-post" data-bloc>Les contenus seront soumis à votre validation avant leur publication.</p>
+<div class="perim-tete apres-poste" data-bloc data-heading>
+  <div class="pt-carre">D</div>
+  <p class="pt-titre">Espace éditorial et publications</p>
+</div>
+<p class="para pt-intro" data-bloc>Votre site comprendra un espace éditorial permettant de présenter vos articles, analyses et publications.</p>
+<p class="pt-lead" data-bloc>Cet espace comprendra notamment :</p>
+<p class="tiret premier" data-bloc>–&emsp;Une page regroupant vos publications.</p>
+<p class="tiret" data-bloc>–&emsp;Des pages individuelles pour vos articles.</p>
+<p class="tiret" data-bloc>–&emsp;Une organisation des contenus par catégories.</p>
+<p class="tiret" data-bloc>–&emsp;Une navigation entre les publications.</p>
+<p class="tiret" data-bloc>–&emsp;Des éléments permettant de présenter vos contenus de manière claire et professionnelle.</p>
+
+<div class="perim-tete" data-bloc data-heading>
+  <div class="pt-carre">E</div>
+  <p class="pt-titre">Back-office personnalisé</p>
+</div>
+<p class="para pt-intro" data-bloc>Un espace d’administration personnalisé sera développé afin de vous permettre de gérer vos contenus sans intervention technique pour chaque modification.</p>
+<p class="pt-lead" data-bloc>Le back-office vous permettra notamment de :</p>
+<p class="tiret premier" data-bloc>–&emsp;Créer de nouveaux contenus.</p>
+<p class="tiret" data-bloc>–&emsp;Modifier les contenus existants.</p>
+<p class="tiret" data-bloc>–&emsp;Supprimer des publications.</p>
+<p class="tiret" data-bloc>–&emsp;Enregistrer des brouillons.</p>
+<p class="tiret" data-bloc>–&emsp;Publier ou dépublier des contenus.</p>
+<p class="tiret" data-bloc>–&emsp;Gérer les titres, résumés, catégories et contenus.</p>
+<p class="tiret" data-bloc>–&emsp;Ajouter et modifier les images de couverture.</p>
+<p class="para pt-post" data-bloc>Une prise en main du back-office sera prévue à la livraison.</p>
+<div class="perim-tete apres-poste" data-bloc data-heading>
+  <div class="pt-carre">F</div>
+  <p class="pt-titre">Optimisation SEO de base</p>
+</div>
+<p class="para pt-intro" data-bloc>Une optimisation SEO de base sera intégrée à votre site afin de faciliter sa compréhension par les moteurs de recherche.</p>
+<p class="pt-lead" data-bloc>Elle comprendra notamment :</p>
+<p class="tiret premier" data-bloc>–&emsp;La structuration des titres et des contenus.</p>
+<p class="tiret" data-bloc>–&emsp;L’intégration des métadonnées SEO des pages principales.</p>
+<p class="tiret" data-bloc>–&emsp;L’optimisation des titres et descriptions.</p>
+<p class="tiret" data-bloc>–&emsp;La mise en place d’URLs lisibles.</p>
+<p class="tiret" data-bloc>–&emsp;Les optimisations techniques de base prévues dans le projet.</p>
+<p class="para pt-post" data-bloc>Cette prestation ne constitue pas une garantie de positionnement dans les résultats des moteurs de recherche.</p>
+<div class="perim-tete apres-poste" data-bloc data-heading>
+  <div class="pt-carre">G</div>
+  <p class="pt-titre">Tests et mise en ligne</p>
+</div>
+<p class="para pt-intro" data-bloc>Avant la livraison, votre site fera l’objet de vérifications portant notamment sur :</p>
+
+<p class="tiret premier" data-bloc>–&emsp;Le fonctionnement des pages et des liens.</p>
+<p class="tiret" data-bloc>–&emsp;La navigation entre les langues.</p>
+<p class="tiret" data-bloc>–&emsp;L’affichage sur les différents formats d’écran.</p>
+<p class="tiret" data-bloc>–&emsp;Le fonctionnement des formulaires et du back-office.</p>
+<p class="tiret" data-bloc>–&emsp;La cohérence des contenus intégrés.</p>
+<p class="para pt-post" data-bloc>La mise en ligne sera réalisée après votre validation du site et la réception des éléments nécessaires au déploiement.</p>
+
+  
+<div class="s-head" data-bloc data-heading>
+  <div class="s-ligne">
+    <span class="s-num">04</span>
+    <p class="s-titre">Investissement</p>
+  </div>
+  <div class="s-filet"></div>
+</div>
+<div class="invest" data-bloc>
+  <div class="invest-g">
+    <p class="invest-lbl">MONTANT TOTAL DE LA PRESTATION</p>
+    <p class="invest-montant">2 000 €</p>
+  </div>
+  <p class="invest-d">Ce montant couvre l’ensemble des prestations décrites dans le présent document.</p>
+</div>
+<div class="fines" data-bloc>
+  <p class="fine">Les frais éventuels de nom de domaine, d’hébergement, de services tiers payants et de maintenance après livraison ne sont pas inclus, sauf accord écrit contraire.</p>
+  <p class="fine">Aucun coût supplémentaire lié aux prestations incluses ne sera engagé sans votre accord préalable.</p>
+</div>
+
+  
+<div class="s-head t05" data-bloc data-heading>
+  <div class="s-ligne">
+    <span class="s-num">05</span>
+    <p class="s-titre">Calendrier de réalisation</p>
+  </div>
+  <div class="s-filet"></div>
+</div>
+<div class="delai-ligne" data-bloc>
+  <p class="delai-valeur">02 à 03 semaines</p>
+  <p class="delai-libelle">Délai estimé de réalisation</p>
+</div>
+<p class="para cal-intro" data-bloc>Le calendrier définitif sera confirmé après validation du devis, réception du premier règlement et mise à disposition des éléments nécessaires au projet.</p>
+<p class="cal-lead" data-bloc>Les principales étapes seront :</p>
+<div class="etape premiere" data-bloc>
+  <div class="etape-carre">1</div>
+  <p class="etape-texte">Cadrage et validation des contenus.</p>
+</div>
+<div class="etape" data-bloc>
+  <div class="etape-carre">2</div>
+  <p class="etape-texte">Conception et développement du site.</p>
+</div>
+<div class="etape" data-bloc>
+  <div class="etape-carre">3</div>
+  <p class="etape-texte">Intégration des contenus français et anglais.</p>
+</div>
+<div class="etape" data-bloc>
+  <div class="etape-carre">4</div>
+  <p class="etape-texte">Développement et intégration du back-office.</p>
+</div>
+<div class="etape" data-bloc>
+  <div class="etape-carre">5</div>
+  <p class="etape-texte">Tests, corrections et validation.</p>
+</div>
+<div class="etape derniere" data-bloc>
+  <div class="etape-carre">6</div>
+  <p class="etape-texte">Mise en ligne et prise en main.</p>
+</div>
+<p class="cal-note" data-bloc>Les délais de validation et de transmission des contenus de votre part peuvent avoir une incidence sur le calendrier.</p>
+
+  
+<div class="s-head t06" data-bloc data-heading>
+  <div class="s-ligne">
+    <span class="s-num">06</span>
+    <p class="s-titre">Modalités de paiement</p>
+  </div>
+  <div class="s-filet"></div>
+</div>
+<p class="para apres-filet" data-bloc>Le règlement sera effectué en deux étapes :</p>
+<div class="paiements-rangee" data-bloc>
+  <div class="paie-bloc">
+    <p class="paie-pct">50&nbsp;%</p>
+    <p class="paie-montant">1 000 €</p>
+    <div class="paie-filet"></div>
+    <p class="paie-libelle">Avant le démarrage du projet</p>
+    <p class="paie-desc">Le démarrage effectif intervient après réception du premier règlement et des éléments nécessaires à la réalisation.</p>
+  </div>
+  <div class="paie-bloc">
+    <p class="paie-pct">50&nbsp;%</p>
+    <p class="paie-montant">1 000 €</p>
+    <div class="paie-filet"></div>
+    <p class="paie-libelle">Avant la mise en ligne définitive</p>
+    <p class="paie-desc">Le solde est réglé après validation de la version complète du site et avant sa mise en ligne définitive.</p>
+  </div>
+</div>
+
+  
+<div class="s-head" data-bloc data-heading>
+  <div class="s-ligne">
+    <span class="s-num">07</span>
+    <p class="s-titre">Validation et démarrage</p>
+  </div>
+  <div class="s-filet"></div>
+</div>
+<p class="para apres-filet" data-bloc>La validation de cette proposition permettra de formaliser le devis et de confirmer le calendrier de réalisation.</p>
+<p class="para" data-bloc>Les éléments nécessaires au démarrage vous seront communiqués après validation.</p>
+<p class="para" data-bloc>Le projet sera réalisé sur la base du périmètre défini dans la présente proposition.</p>
+<p class="para" data-bloc>Toute demande supplémentaire ou modification importante du périmètre initial fera l’objet d’une évaluation préalable et, si nécessaire, d’un accord complémentaire.</p>
+
+  
+<div class="s-head t08" data-bloc data-heading>
+  <div class="s-ligne">
+    <span class="s-num">08</span>
+    <p class="s-titre">Conclusion</p>
+  </div>
+  <div class="s-filet"></div>
+</div>
+<p class="chapeau" data-bloc>Cette proposition vise à vous fournir un espace professionnel qui vous appartient, conçu pour valoriser votre expertise, centraliser vos activités et accompagner l’évolution de votre parcours.</p>
+<p class="para" data-bloc>L’objectif est de vous livrer une solution professionnelle, évolutive et simple à administrer, qui puisse soutenir durablement votre visibilité et vos collaborations.</p>
+<p class="para" data-bloc>Je reste à votre disposition pour toute précision complémentaire et serai ravi de vous accompagner dans la réalisation de ce projet.</p>
+<p class="cordialement" data-bloc>Bien cordialement,</p>
+<div class="signature" data-bloc>
+  <p class="sig-nom">Stevens AKPOVI</p>
+  <p class="sig-titre">Conception et développement web</p>
+  <p class="sig-site"><a href="https://stevensakpovi.vercel.app">stevensakpovi.vercel.app</a></p>
+  <div class="sig-filet"></div>
+</div>
+</div>
+
+<!-- Gabarits clonés par le script de pagination -->
+<div id="pc-gabarits" aria-hidden="true">
+  <div class="entete-n">
+    <div class="en-textes">
+      <p class="en-surtitre">PROPOSITION COMMERCIALE</p>
+      <p class="en-sous">Site web professionnel, éditorial et évolutif</p>
+    </div>
+    <div class="en-filet"></div>
+    <div class="en-logo"><img src="/assets/logo-noir-doc.png" alt="Stevens AKPOVI"></div>
+  </div>
+  <div class="pied">
+    <div class="pied-filet"></div>
+    <div class="pied-ligne">
+      <!-- VOLET 22 — la mention « Proposition commerciale » est
+           SUPPRIMÉE du pied (demande de l'éditeur) : il ne reste que
+           le nom et le site. -->
+      <p class="p-gauche">Stevens AKPOVI&nbsp;&nbsp;·&nbsp;&nbsp;<a href="https://stevensakpovi.vercel.app">stevensakpovi.vercel.app</a></p>
+      <p class="p-num"><b>01</b> / 01</p>
+    </div>
+  </div>
+  <div class="wm"><img src="/assets/logo-noir-doc.png" alt=""></div>
+</div>
+
+<script>
+(function () {
+  var FLUX_ID = 'pc-flux';
+  var LIMITE = 960;
+  var DEBUT_P1 = 75;
+  var DEBUT_N = 117;
+  var ENTETE_COMPACTE = true;
+  var FORMAT_SIMPLE = false;
+  var RESERVE_BAS = 0;
+  var pages = [];
+  var pagine = false;
+  var pageDemandee = 0;
+
+  function hPx(el) {
+    var cs = getComputedStyle(el);
+    return el.offsetHeight + (parseFloat(cs.marginTop) || 0);
+  }
+
+  function envoyerPages() {
+    try {
+      window.parent.postMessage({ source: 'apercu-document', type: 'pages', total: pages.length }, '*');
+    } catch (e) {}
+  }
+
+  function montrerPage(n) {
+    if (!pages.length) return;
+    if (!n) {
+      for (var i = 0; i < pages.length; i++) pages[i].style.display = '';
+      pageDemandee = 0;
+      return;
+    }
+    pageDemandee = Math.min(Math.max(1, n || 1), pages.length);
+    for (var i2 = 0; i2 < pages.length; i2++) {
+      pages[i2].style.display = i2 === pageDemandee - 1 ? '' : 'none';
+    }
+  }
+
+  function paginer() {
+    var flux = document.getElementById(FLUX_ID);
+    if (!flux) return;
+    var blocs = Array.prototype.slice.call(
+      document.querySelectorAll('#pc-flux [data-bloc], .ppage [data-bloc]'),
+    );
+    if (!blocs.length) return;
+    for (var i = 0; i < pages.length; i++) pages[i].remove();
+    pages = [];
+    for (var r = 0; r < blocs.length; r++) {
+      blocs[r].style.marginTop = '';
+      blocs[r].classList.remove('debut-page');
+      flux.appendChild(blocs[r]);
+    }
+
+    /* VOLET 20 (26/11/2026) — EN-TÊTE DU TABLEAU « Détail » : quand
+       le tableau se POURSUIT sur une page suivante (une ligne-bloc
+       svc-part ouvre la page), l'en-tête du tableau (svc-head) est
+       REPRIS en tête de cette page (demande de l'éditeur : « sur la
+       page où ça continue, l'entête du tableau doit être repris sur
+       cette page suivante-là aussi pour qu'on reconnaisse les
+       colonnes »). Sans svc-head (proposition commerciale), tout
+       reste inchangé. */
+    var enteteTableau = null;
+    for (var e = 0; e < blocs.length; e++) {
+      if (blocs[e].classList && blocs[e].classList.contains('svc-head')) {
+        enteteTableau = blocs[e];
+        break;
+      }
+    }
+    var hEnteteTableau = enteteTableau ? enteteTableau.offsetHeight : 0;
+
+    var hauteurs = blocs.map(hPx);
+
+    /* Répartition : la page 1 démarre à DEBUT_P1, les suivantes à
+       DEBUT_N ; un titre de section (data-heading) ne reste jamais
+       orphelin en bas de page — il exige de la place pour lui et
+       le début du bloc qui suit.
+       NOTE : le PREMIER bloc d'une page de suite voit sa marge
+       haute ANNULÉE au montage (marginTop = 0) — elle ne doit donc
+       pas compter dans la capacité (bug mesuré : pages sur-numéraires).
+       VOLET 20 : une page qui OUVRIRA avec une ligne du tableau
+       (continuation) voit sa capacité réduite de la hauteur de
+       l'en-tête du tableau qui y est REPRIS. */
+    var repartis = [[]];
+    var avecEntete = [false];
+    var h = 0;
+    var cap = LIMITE - DEBUT_P1 - RESERVE_BAS;
+    for (var j = 0; j < blocs.length; j++) {
+      var b = blocs[j];
+      var bh = hauteurs[j];
+      var premierDePage = repartis[repartis.length - 1].length === 0;
+      if (premierDePage && repartis.length > 1) {
+        bh = b.offsetHeight; /* marge haute annulée → hors capacité */
+      }
+      var heading = b.hasAttribute('data-heading');
+      var reste = cap - (h + bh);
+      /* Garantie anti-orphelin (calée sur l'exemple de l'éditeur) :
+         un titre ne reste en bas de page que si lui-même + les DEUX
+         blocs suivants tiennent (pastille + intro + appel de liste).
+         La contribution du 2e bloc est plafonnée (blocs très hauts
+         comme une rangée d'échéances). */
+      var garder = 0;
+      if (heading && j + 1 < blocs.length) {
+        var suite = hauteurs[j + 1];
+        if (j + 2 < blocs.length) suite += Math.min(hauteurs[j + 2], 48);
+        garder = Math.min(suite + 12, hauteurs[j + 1] + 112);
+      }
+      if (premierDePage && repartis.length === 1) {
+        /* blocs fixes d'en-tête de la page 1 : jamais déplacés */
+      } else if (reste < 0 || (heading && reste < garder)) {
+        repartis.push([]);
+        h = 0;
+        /* VOLET 20 — la page qui s'ouvre sur une LIGNE DU TABLEAU
+           (svc-part) est une page de CONTINUATION : l'en-tête du
+           tableau y est repris — sa hauteur est retranchée de la
+           capacité pour ne rien déborder. */
+        if (
+          enteteTableau &&
+          b.classList &&
+          b.classList.contains('svc-part')
+        ) {
+          avecEntete.push(true);
+          cap = LIMITE - DEBUT_N - hEnteteTableau - RESERVE_BAS;
+        } else {
+          avecEntete.push(false);
+          cap = LIMITE - DEBUT_N - RESERVE_BAS;
+        }
+        bh = b.offsetHeight; /* premier de la nouvelle page */
+      }
+      repartis[repartis.length - 1].push(b);
+      h += bh;
+    }
+
+    var gabarit = document.getElementById('pc-gabarits');
+    var enteteN = gabarit ? gabarit.querySelector('.entete-n') : null;
+    var piedN = gabarit ? gabarit.querySelector('.pied') : null;
+    var wm = gabarit ? gabarit.querySelector('.wm') : null;
+    var total = repartis.length;
+    for (var p = 0; p < total; p++) {
+      var page = document.createElement('div');
+      page.className = 'ppage' + (p === 0 ? ' ppage1' : ' ppage-n') + (p === total - 1 ? ' ppage-fin' : '');
+      page.setAttribute('data-page', String(p + 1));
+      if (wm) page.appendChild(wm.cloneNode(true));
+      if (p > 0 && ENTETE_COMPACTE && enteteN) {
+        page.appendChild(enteteN.cloneNode(true));
+      }
+      var corps = document.createElement('div');
+      corps.className = 'corps';
+      /* VOLET 20 — page de CONTINUATION du tableau : l'en-tête du
+         tableau (svc-head) est REPRIS en tête de page (clone sans
+         data-bloc — jamais re-collecté lors d'une re-pagination). */
+      if (p > 0 && avecEntete[p] && enteteTableau) {
+        var cloneEntete = enteteTableau.cloneNode(true);
+        cloneEntete.removeAttribute('data-bloc');
+        cloneEntete.removeAttribute('data-heading');
+        corps.appendChild(cloneEntete);
+      }
+      for (var k = 0; k < repartis[p].length; k++) {
+        var bloc = repartis[p][k];
+        if (k === 0 && p > 0) {
+          bloc.style.marginTop = '0';
+          /* marque le premier bloc d'une page de suite (filet
+             supérieur du tableau qui reprend, par exemple) */
+          bloc.classList.add('debut-page');
+        }
+        corps.appendChild(bloc);
+      }
+      page.appendChild(corps);
+      if (piedN) {
+        var pd = piedN.cloneNode(true);
+        var numEl = pd.querySelector('.p-num');
+        if (numEl) {
+          if (FORMAT_SIMPLE) {
+            numEl.innerHTML = 'Page ' + (p + 1) + ' sur ' + total;
+          } else {
+            numEl.innerHTML = '<b>' + (p + 1 < 10 ? '0' + (p + 1) : p + 1) + '</b> / ' + (total < 10 ? '0' + total : total);
+          }
+        }
+        page.appendChild(pd);
+      }
+      flux.parentNode.insertBefore(page, flux);
+      pages.push(page);
+    }
+    pagine = true;
+    window.__pagesPc = total;
+    window.__paginePc = true;
+    window.__paginePcAt = Date.now();
+    montrerPage(pageDemandee);
+    envoyerPages();
+  }
+
+  window.addEventListener('message', function (ev) {
+    var m = ev.data || {};
+    if (m && m.type === 'aller-page') {
+      if (pagine) montrerPage(m.page);
+      else pageDemandee = m.page || 1;
+    } else if (m && m.type === 'demander-pages') {
+      envoyerPages();
+    }
+  });
+
+  function lancer() {
+    var prets = Promise.resolve();
+    if (document.fonts && document.fonts.load) {
+      prets = Promise.all([
+        document.fonts.load('300 10pt Poppins'),
+        document.fonts.load('400 10pt Poppins'),
+        document.fonts.load('500 10pt Poppins'),
+        document.fonts.load('600 10pt Poppins'),
+        document.fonts.load('700 10pt Poppins'),
+        document.fonts.load('400 10pt Inter'),
+        document.fonts.load('600 10pt Inter'),
+        document.fonts.load('700 10pt Inter'),
+      ]).catch(function () {});
+    }
+    Promise.race([prets, new Promise(function (r) { setTimeout(r, 4000); })]).then(function () {
+      try { paginer(); } catch (e) { /* repli : flux continu */ }
+      setTimeout(function () { try { paginer(); } catch (e) {} }, 600);
+      setTimeout(function () { try { paginer(); } catch (e) {} }, 1600);
+      setTimeout(function () { try { paginer(); } catch (e) {} }, 3200);
+    });
+  }
+  if (document.fonts && document.fonts.addEventListener) {
+    document.fonts.addEventListener('loadingdone', function () {
+      setTimeout(function () { if (pagine) { try { paginer(); } catch (e) {} } }, 80);
+    });
+  }
+  lancer();
+})();
+</script>
+<script>
+/* VOLET 19 — ALIGNEMENT LOGO ↔ TITRE (page 1) : la hauteur du logo
+   suit la hauteur du TITRE (min. 78,8 pt = valeur de l'exemple).
+   Rejoué quand les polices web arrivent (le titre peut se
+   re-calculer) ; l'élément étant positionné en absolu, ce
+   recaliblage n'a AUCUN effet sur la pagination. */
+(function () {
+  function alignerLogoTitre() {
+    var t = document.querySelector('.e1-titre');
+    var img = document.querySelector('.e1-logo img');
+    if (!t || !img) return;
+    var hTitre = t.getBoundingClientRect().height;
+    var cible = Math.max(hTitre - 2.2 * 4 / 3, 78.8 * 4 / 3);
+    img.style.height = cible + 'px';
+    img.style.width = 'auto';
+  }
+  alignerLogoTitre();
+  window.addEventListener('load', alignerLogoTitre);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(alignerLogoTitre).catch(function () {});
+  }
+})();
+</script>
+</body>
+</html>

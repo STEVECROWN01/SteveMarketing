@@ -11,6 +11,15 @@
  * Tolérance de pannes : échec réseau ou stockage non configuré →
  * liste VIDE silencieuse — le site retombe sur ses projets statiques
  * (src/lib/site.ts), jamais de page cassée.
+ *
+ * VOLET 22 (27/11/2026) — PILOTAGE DES RÉALISATIONS STATIQUES :
+ * l'API renvoie aussi `statiquesMasques` (identifiants des
+ * réalisations du code du site supprimées définitivement ou
+ * converties en brouillon depuis l'espace admin). Dans la liste
+ * combinée, un projet statique masqué disparaît ; un projet statique
+ * administré (même identifiant) est REMPLACÉ par sa version admin à
+ * sa position d'origine (le hero, qui référence PROJECTS[2] par
+ * index, reste stable).
  */
 
 import { useEffect, useMemo, useState } from "react";
@@ -44,6 +53,9 @@ export type ProjetSite = {
 type Etat = "vide" | "chargement" | "pret" | "erreur";
 
 let projets: ProjetPublic[] = [];
+/* VOLET 22 — identifiants des réalisations STATIQUES masquées
+ * (supprimées définitivement ou converties en brouillon). */
+let masques: string[] = [];
 let etat: Etat = "vide";
 const abonnes = new Set<(projets: ProjetPublic[]) => void>();
 
@@ -57,9 +69,12 @@ async function charger() {
     const res = await fetch("/api/projects", { cache: "no-store" });
     const data = await res.json().catch(() => null);
     projets = res.ok && data?.ok ? ((data.projets ?? []) as ProjetPublic[]) : [];
+    masques =
+      res.ok && Array.isArray(data?.statiquesMasques) ? (data.statiquesMasques as string[]) : [];
     etat = "pret";
   } catch {
     projets = [];
+    masques = [];
     etat = "erreur";
   }
   notifier();
@@ -74,9 +89,16 @@ export function rafraichirProjetsAdmin() {
 /** Projets publiés depuis l'admin + état de chargement.
  *  (L'état initial capture le magasin AU MONTAGE ; les mises à
  *  jour arrivent par l'abonnement — jamais de setState direct dans
- *  l'effet.) */
-export function useProjetsAdmin(): { projets: ProjetPublic[]; chargement: boolean } {
+ *  l'effet.) VOLET 22 — expose AUSSI les identifiants des projets
+ *  statiques masqués (l'espace admin pilote les réalisations du
+ *  code du site : modification, dépublication, suppression). */
+export function useProjetsAdmin(): {
+  projets: ProjetPublic[];
+  masques: string[];
+  chargement: boolean;
+} {
   const [liste, setListe] = useState<ProjetPublic[]>(projets);
+  const [masquesCourants, setMasquesCourants] = useState<string[]>(masques);
   useEffect(() => {
     const abonne = (nouvelles: ProjetPublic[]) => setListe(nouvelles);
     abonnes.add(abonne);
@@ -85,7 +107,7 @@ export function useProjetsAdmin(): { projets: ProjetPublic[]; chargement: boolea
       abonnes.delete(abonne);
     };
   }, []);
-  return { projets: liste, chargement: etat !== "pret" };
+  return { projets: liste, masques: masquesCourants, chargement: etat !== "pret" };
 }
 
 /* ------------------------------------------------------------------ */
@@ -112,41 +134,68 @@ function tradAdmin<T extends keyof TraductionProjet>(
   return traduit(texte, langue === "en" ? "en" : "fr");
 }
 
+/** Un projet ADMIN au format du site (ProjetSite). */
+function versProjetSite(p: ProjetPublic, lang: string): ProjetSite {
+  return {
+    id: p.id,
+    name: tradAdmin(p, "nom", lang),
+    category: tradAdmin(p, "categorie", lang),
+    description: tradAdmin(p, "description", lang),
+    cta: tradAdmin(p, "cta", lang) || "Voir Le Site",
+    url: p.url,
+    desktop: p.desktop,
+    mobile: p.mobile ?? undefined,
+    largeurDesktop: p.largeurDesktop,
+    hauteurDesktop: p.hauteurDesktop,
+    largeurMobile: p.largeurMobile,
+    hauteurMobile: p.hauteurMobile,
+  };
+}
+
 /** TOUS les projets du site : les QUATRE projets statiques (ordre et
  *  indices préservés — le hero référence PROJECTS[2]) suivis des
  *  projets publiés depuis l'admin, dans l'ordre chronologique. Les
  *  textes suivent la langue courante (traduction pour les statiques,
- *  champs anglais optionnels pour les admin). */
+ *  champs anglais optionnels pour les admin).
+ *
+ *  VOLET 22 — PILOTAGE DES RÉALISATIONS STATIQUES DEPUIS L'ADMIN :
+ *  - un projet statique SUPPRIMÉ ou DÉPUBLIÉ (converti en brouillon)
+ *    n'apparaît plus (statiquesMasques) ;
+ *  - un projet statique MODIFIÉ depuis l'admin est REMPLACÉ, à SA
+ *    POSITION D'ORIGINE, par sa version administrée (même
+ *    identifiant) — l'ordre des réalisations ne bouge pas ;
+ *  - les autres projets admin s'ajoutent à la suite. */
 export function useTousLesProjets(): {
   projets: ProjetSite[];
   chargement: boolean;
 } {
   const { lang } = useLang();
   const { PROJECTS } = useSite();
-  const { projets: admin, chargement } = useProjetsAdmin();
+  const { projets: admin, masques, chargement } = useProjetsAdmin();
 
   const tous = useMemo<ProjetSite[]>(() => {
-    const statiques: ProjetSite[] = (PROJECTS as unknown as ProjetSite[]).map((p) => ({
-      ...p,
-      desktop: String(p.desktop),
-      mobile: p.mobile ? String(p.mobile) : undefined,
-    }));
-    const dynamiques: ProjetSite[] = admin.map((p) => ({
-      id: p.id,
-      name: tradAdmin(p, "nom", lang),
-      category: tradAdmin(p, "categorie", lang),
-      description: tradAdmin(p, "description", lang),
-      cta: tradAdmin(p, "cta", lang) || "Voir Le Site",
-      url: p.url,
-      desktop: p.desktop,
-      mobile: p.mobile ?? undefined,
-      largeurDesktop: p.largeurDesktop,
-      hauteurDesktop: p.hauteurDesktop,
-      largeurMobile: p.largeurMobile,
-      hauteurMobile: p.hauteurMobile,
-    }));
+    const statiques: ProjetSite[] = (PROJECTS as unknown as ProjetSite[])
+      /* réalisations statiques masquées (supprimées / dépubliées) : hors site */
+      .filter((p) => !masques.includes(p.id))
+      .map((p) => {
+        /* réalisation statique administrée : la version admin la
+           remplace (même position, textes mis à jour, nouvelles
+           captures éventuelles) */
+        const remplacement = admin.find((a) => a.id === p.id);
+        if (remplacement) return versProjetSite(remplacement, lang);
+        return {
+          ...p,
+          desktop: String(p.desktop),
+          mobile: p.mobile ? String(p.mobile) : undefined,
+        } as ProjetSite;
+      });
+    const dynamiques: ProjetSite[] = admin
+      /* les projets admin qui remplacent une réalisation statique sont
+         déjà affichés à la position de l'original — pas de doublon */
+      .filter((p) => !(PROJECTS as unknown as { id: string }[]).some((st) => st.id === p.id))
+      .map((p) => versProjetSite(p, lang));
     return [...statiques, ...dynamiques];
-  }, [PROJECTS, admin, lang]);
+  }, [PROJECTS, admin, masques, lang]);
 
   return { projets: tous, chargement };
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { listerProjetsAdmin, versPublic, isStorageConfigured } from "@/lib/portfolio/stockage";
+import { listerProjetsAdmin, versPublic, isStorageConfigured, lireSupprimesSite } from "@/lib/portfolio/stockage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -21,12 +21,20 @@ export async function GET() {
   }
   try {
     const projets = await listerProjetsAdmin();
+    /* VOLET 22 — `statiquesMasques` : identifiants des réalisations
+     * STATIQUES retirées du site (supprimées définitivement, ou
+     * converties en brouillon) : le site public ne les affiche plus. */
+    const supprimes = await lireSupprimesSite().catch(() => [] as string[]);
+    const convertisBrouillons = projets
+      .filter((p) => p.origine === "site" && p.statut !== "publie")
+      .map((p) => p.id);
     return NextResponse.json({
       ok: true,
       projets: projets.filter((p) => p.statut === "publie").map(versPublic),
+      statiquesMasques: Array.from(new Set([...supprimes, ...convertisBrouillons])),
     });
   } catch (e) {
     console.warn("[projects] liste impossible :", e instanceof Error ? e.message : e);
-    return NextResponse.json({ ok: true, projets: [] });
+    return NextResponse.json({ ok: true, projets: [], statiquesMasques: [] });
   }
 }

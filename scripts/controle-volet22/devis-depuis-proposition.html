@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<title>Devis D2600002 — Éric De Lavarene</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #000000;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  /* ---- Pages : A4, flux de blocs, marge 16 mm ---- */
+  .ppage {
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    margin: 0 auto 8mm;
+    background: #ffffff;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.28);
+    padding: 15.875mm 16mm 0 16mm;
+    break-after: page;
+    page-break-after: always;
+  }
+  .ppage.ppage-fin { break-after: auto; page-break-after: auto; }
+  /* VOLET 19 — pages de SUITE : contenu à 88 pt du haut, SOUS
+     l'en-tête compact (comme la proposition commerciale). */
+  .ppage-n { padding-top: 88pt; }
+  @media print {
+    body { background: #ffffff; }
+    .ppage { margin: 0; box-shadow: none; }
+  }
+  .corps { position: relative; z-index: 1; }
+
+  /* ---- En-tête compact des pages de suite — VOLET 19 ----
+     Calqué sur celui de la proposition commerciale (mêmes mesures
+     que l'exemple : logo à droite, 32,6 pt de haut, POSÉ à 31,2 pt
+     du haut de page — taille et position verticale réelle de
+     l'exemple ; sur-titre + numéro/client à gauche, filet clair). */
+  .entete-n { position: absolute; top: 0; left: 16mm; right: 16mm; z-index: 1; }
+  .en-textes { position: relative; padding-right: 56pt; }
+  .en-surtitre {
+    margin: 36.4pt 0 0 0;
+    font-size: 7pt; font-weight: 600;
+    letter-spacing: 0.05em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: #374151;
+  }
+  .en-sous { margin: 0; font-size: 7pt; font-weight: 400; line-height: 1.4; color: #6b7280; }
+  .en-filet { margin-top: 11pt; border-top: 0.5pt solid #d1d5db; }
+  .en-logo { position: absolute; right: 0; top: 31.2pt; }
+  .en-logo img { height: 32.6pt; width: auto; display: block; }
+
+  /* ---- Filigrane — VOLET 19 : DIMENSIONS DE L'EXEMPLE de la
+     proposition commerciale (demande de l'éditeur : le filigrane
+     des devis et factures doit correspondre à celui du document de
+     référence) : hauteur 353,4 pt, haut à 258,4 pt, centré
+     horizontalement, opacité 6 %. ---- */
+  .wm {
+    position: absolute; top: 258.4pt; left: 50%;
+    transform: translateX(-50%);
+    height: 353.4pt;
+    opacity: 0.06;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .wm img { height: 353.4pt; width: auto; display: block; }
+
+  /* ---- Entête ---- */
+  .doc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    margin-bottom: 2mm;
+    min-height: 17mm;
+  }
+  .doc-header-left { display: flex; flex-direction: column; justify-content: center; }
+  .doc-title {
+    font-size: 26pt;
+    font-weight: 800;
+    color: #000000;
+    line-height: 1.1;
+    letter-spacing: -0.5px;
+  }
+  .doc-title.doc-title--long { font-size: 19pt; }
+  .doc-title .doc-num { color: #000000; margin-left: 4px; }
+  .doc-date {
+    margin-top: 4px;
+    font-size: 11pt;
+    color: #6b7280;
+    font-weight: 400;
+  }
+  /* VOLET 17 : le wordmark sous le logo est SUPPRIMÉ ; la hauteur
+     du logo s'aligne sur le bloc « numéro + date » (17 mm). */
+  .doc-header-right { display: flex; align-items: center; }
+  .doc-logo { height: 17mm; width: auto; }
+
+  .hr { border: 0; border-top: 1px solid #d1d5db; margin: 2mm 0; }
+
+  /* ---- Émetteur / Destinataire ---- */
+  .parties {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8mm;
+    margin: 4mm 0;
+  }
+  .party-block .party-label {
+    font-size: 9pt;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+    font-weight: 600;
+  }
+  .party-block .party-row {
+    display: flex;
+    font-size: 10pt;
+    line-height: 1.6;
+    margin-bottom: 0;
+  }
+  .party-block .party-row .lbl {
+    color: #000000;
+    min-width: 30mm;
+    font-weight: 600;
+  }
+  .party-block .party-row .val {
+    color: #000000;
+    font-weight: 400;
+  }
+  .party-subtext {
+    font-size: 9pt;
+    color: #9ca3af;
+    font-style: italic;
+    margin: 0 0 1px 0;
+    padding-left: 30mm;
+    line-height: 1.4;
+  }
+
+  /* ---- Bloc remerciement (plus de ligne « Objet : ») ---- */
+  .thank-you { margin: 2mm 0 4mm 0; }
+  .thank-you-prefix {
+    font-weight: 700;
+    font-size: 11pt;
+    color: #000000;
+    margin-bottom: 2px;
+  }
+  .thank-you-body {
+    font-size: 10pt;
+    color: #1f2937;
+    line-height: 1.4;
+    max-width: 100%;
+  }
+
+  /* ---- Titre « Détail » ---- */
+  .detail-heading {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #000000;
+    margin: 4mm 0 3mm 0;
+  }
+
+  /* ---- Tableau des prestations : lignes-blocs paginables ---- */
+  .svc-head, .svc-part {
+    display: grid;
+    grid-template-columns: 10% 49% 18% 7% 16%;
+    width: 100%;
+  }
+  .svc-head {
+    background: #000000;
+    border: 1px solid #000000;
+  }
+  .svc-head .cell {
+    color: #ffffff;
+    font-size: 9.5pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 6px 8px;
+    line-height: 1.35;
+  }
+  .svc-head .cell.num { text-align: right; }
+  .svc-head .cell.center { text-align: center; }
+  .svc-head .cell:first-child { text-align: center; }
+  .svc-part {
+    border-left: 1px solid #000000;
+    border-right: 1px solid #000000;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  /* Dernier fragment d'une ligne : ferme le bas du tableau. */
+  .svc-part.svc-fin { border-bottom: 1px solid #000000; }
+  /* Fragment qui OUVRE une page : le tableau reprend avec un filet
+     supérieur (posé par le moteur de pagination). */
+  .svc-part.debut-page { border-top: 1px solid #000000; }
+  .svc-part .cell {
+    padding: 5px 8px;
+    font-size: 9pt;
+    line-height: 1.35;
+    color: #1f2937;
+    border-right: 1px solid #000000;
+    vertical-align: top;
+  }
+  .svc-part .cell:last-child { border-right: 1px solid #000000; }
+  .svc-part .cell.type-cell {
+    font-weight: 600;
+    color: #000000;
+    text-align: center;
+  }
+  /* VOLET 22 — PIED NOIR DU TABLEAU (délai estimé) : rangée noire
+     finale du tableau, même habillage que l'en-tête (fond noir,
+     texte blanc) — « Délai estimé : » à gauche, valeur TOTALEMENT à
+     droite (comme l'ancien total dans le footer du tableau). */
+  .svc-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background: #000000;
+    border: 1px solid #000000;
+    padding: 6px 8px;
+  }
+  .svc-foot .svc-foot-libelle {
+    color: #ffffff;
+    font-size: 10pt;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    line-height: 1.35;
+  }
+  .svc-foot .svc-foot-valeur {
+    color: #ffffff;
+    font-size: 10.5pt;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  .svc-part .cell.price-cell { text-align: right; font-variant-numeric: tabular-nums; }
+  .svc-part .cell.qty-cell { text-align: center; }
+  .svc-part .cell.total-cell { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .service-name {
+    font-weight: 700;
+    color: #000000;
+    margin-bottom: 3px;
+    font-size: 10pt;
+  }
+  /* Description RÉDIGÉE (texte riche, mise en forme Word-like) —
+     plus de puces carrées. */
+  .desc-riche p { margin: 0 0 3px 0; font-size: 9pt; line-height: 1.5; color: #374151; }
+  .desc-riche p:last-child { margin-bottom: 0; }
+  .desc-riche b, .desc-riche strong { font-weight: 700; color: #111111; }
+  .desc-riche i, .desc-riche em { font-style: italic; }
+  .desc-riche u { text-decoration: underline; }
+  /* « taille supérieure » (font size 5) : sous-titre */
+  .desc-riche font[size="5"], .desc-riche .txt-sup {
+    font-size: 10.5pt;
+    font-weight: 600;
+    color: #000000;
+  }
+  .desc-riche ul, .desc-riche ol { margin: 2px 0 4px 0; padding-left: 16px; }
+  .desc-riche li { font-size: 9pt; line-height: 1.5; color: #374151; margin-bottom: 1px; }
+  .desc-riche ul li { list-style-type: disc; }
+  .desc-riche ol li { list-style-type: decimal; }
+  /* VOLET 19 — fragments de liste éclatés (pagination fine, voir
+     texte-riche.ts) : une suite de <ul class="li-suite"> d'un seul
+     <li> ressemble à UNE liste unique — marges annulées sauf aux
+     extrémités (--debut / --fin reprennent les 2 px / 4 px d'origine). */
+  .desc-riche ul.li-suite, .desc-riche ol.li-suite { margin: 0; }
+  .desc-riche ul.li-suite--debut, .desc-riche ol.li-suite--debut { margin-top: 2px; }
+  .desc-riche ul.li-suite--fin, .desc-riche ol.li-suite--fin { margin-bottom: 4px; }
+  /* VOLET 21 (27/11/2026) — phrases éclatées (paragraphes LONGS
+     découpés pour la pagination fine, voir texte-riche.ts) : les
+     phrases d'un même paragraphe se suivent SANS marge — même
+     rendu qu'un paragraphe unique ; la dernière phrase garde la
+     marge basse d'origine. Le tableau se remplit jusqu'en bas de
+     page et se poursuit en page suivante (en-tête repris). */
+  .desc-riche p.p-suite { margin: 0; }
+  .desc-riche p.p-suite--fin { margin-bottom: 3px; }
+
+  /* ---- Total SOUS le tableau — VOLET 19 : lignes à POINTILLÉS.
+     « Total » et « TVA » en GRAS ET GROS à gauche, la valeur
+     totalement à droite, pointillés entre les deux (demande de
+     l'éditeur). VOLET 20 : le montant en lettres disparaît ; sur
+     les FACTURES l'espace tableau → total est AUGMENTÉ (10 mm) et
+     le CACHET se pose sur les deux lignes à pointillés.
+     VOLET 21 : le CACHET couvre les pointillés (z-index supérieur)
+     — l'encre et la date du cachet restent lisibles. ---- */
+  .total-sous-tableau { margin-top: 4mm; position: relative; }
+  /* VOLET 22 — FACTURE : le bloc total est dégagé du tableau
+     (12 mm au-dessus) ET du bloc suivant (9 mm au-dessous) : le
+     CACHET (PAYÉ / EN ATTENTE — posé sur les lignes à pointillés,
+     boîte ~36 mm de haut une fois inclinée) ne touche plus le
+     contenu qui suit (demande de l'éditeur : « pousse ça un peu
+     vers le bas pour que le cachet ne le touche pas »). */
+  .total-sous-tableau--facture { margin-top: 12mm; margin-bottom: 9mm; }
+  .total-sous-tableau .total-ligne,
+  .total-sous-tableau .total-ligne + .total-ligne { position: relative; z-index: 1; }
+  .total-ligne { display: flex; align-items: baseline; margin: 0; }
+  .total-ligne + .total-ligne { margin-top: 2.5mm; }
+  .total-libelle {
+    font-size: 15pt;
+    font-weight: 800;
+    color: #000000;
+    letter-spacing: -0.2px;
+    line-height: 1.25;
+  }
+  .total-valeur {
+    font-size: 15pt;
+    font-weight: 700;
+    color: #000000;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    line-height: 1.25;
+  }
+  .total-ligne--tva .total-libelle { font-size: 13pt; }
+  .total-ligne--tva .total-valeur { font-size: 13pt; font-weight: 600; }
+  .total-pointilles {
+    flex: 1 1 auto;
+    min-width: 24px;
+    border-bottom: 1.1mm dotted #000000;
+    margin: 0 8px 2.5px;
+  }
+
+  /* ---- CACHET (VOLET 20, 26/11/2026) — reproduction EXACTE du
+     reçu d'exemple : rectangle 153 × 61 pt (2,5 : 1) à angles vifs,
+     DOUBLE filet (extérieur 3,2 pt, écart 2,2 pt, intérieur
+     1,8 pt), rotation −17° (oblique ASCENDANT), encre PLEINE —
+     VERT #008000 pour « PAYÉ » (avec « le JJ/MM/AAAA » dessous,
+     gras serif ~36 pt + sans-serif 10 pt), GRIS FONCÉ pour
+     « EN ATTENTE » (sans date). Le cachet est posé SUR les deux
+     lignes à pointillés du bloc Total : centré VERTICALEMENT et
+     HORIZONTALEMENT sur l'ensemble des deux lignes. ---- */
+  .cachet-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .cachet-paye {
+    position: relative;
+    width: 153pt;
+    height: 61pt;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(-17deg);
+  }
+  /* VOLET 21 (27/11/2026) — cachet EN ATTENTE : PLUS D'ESPACE à
+     gauche et à droite du texte (boîte élargie 172 → 200 pt) et
+     encre GRIS FONCÉ (#4b5563 / #374151 — l'ancien #6b7280 était
+     presque invisible sur le document imprimé, demande de
+     l'éditeur). */
+  .cachet-overlay--attente .cachet-paye { width: 200pt; }
+  .cachet-paye::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 3.2pt solid #008000;
+    border-radius: 2pt;
+  }
+  .cachet-paye::after {
+    content: "";
+    position: absolute;
+    inset: 5.4pt;
+    border: 1.8pt solid #008000;
+    border-radius: 1pt;
+  }
+  .cachet-paye .cp-texte {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: -3pt;
+  }
+  .cachet-paye .cp-paye {
+    font-family: 'Times New Roman', Times, serif;
+    font-weight: 700;
+    font-size: 36pt;
+    line-height: 0.95;
+    color: #008000;
+    letter-spacing: 0;
+  }
+  .cachet-overlay--attente .cachet-paye .cp-paye {
+    font-size: 23pt;
+    letter-spacing: 2pt;
+  }
+  .cachet-paye .cp-date {
+    margin-top: 2.5pt;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 10pt;
+    color: #008000;
+  }
+  /* Cachet EN ATTENTE : la même matrice, encre GRISE FONCÉE
+     (VOLET 21 — lisible à l'impression). */
+  .cachet-overlay--attente .cachet-paye::before,
+  .cachet-overlay--attente .cachet-paye::after { border-color: #4b5563; }
+  .cachet-overlay--attente .cachet-paye .cp-paye { color: #374151; }
+  .cachet-overlay--attente .cachet-paye .cp-date { color: #4b5563; }
+
+  /* ---- Conditions / Bon pour accord ---- */
+  .conditions-block {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8mm;
+    margin-top: 9mm;
+  }
+  .cb-left .cb-title, .cb-right .cb-title {
+    font-size: 10.5pt;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #000000;
+  }
+  .cb-conditions-list { margin: 0; padding: 0; list-style: none; }
+  .cb-conditions-list li {
+    position: relative;
+    padding-left: 14px;
+    margin-bottom: 4px;
+    font-size: 9pt;
+    color: #1f2937;
+    line-height: 1.5;
+  }
+  .cb-conditions-list li::before {
+    content: "■";
+    color: #000000;
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 7pt;
+    line-height: 1.8;
+  }
+  /* Délai estimé : retiré des CGV au VOLET 22 — il vit désormais
+     dans le PIED NOIR DU TABLEAU (.svc-foot). */
+  .cb-right { padding-left: 0; border-left: none; }
+  .cb-right .cb-title { margin-bottom: 8mm; }
+  .cb-right .cb-date-line {
+    font-size: 9pt;
+    color: #6b7280;
+    margin-bottom: 10mm;
+  }
+  /* VOLET 22 — espace de signature RÉDUIT (30 mm → 12 mm) : la ligne
+     « Signature et cachet » s'aligne désormais avec la DERNIÈRE
+     ligne du contenu de la colonne des CGV (demande de l'éditeur :
+     « réduis un peu l'espace réservé à la signature pour
+     s'aligner avec la dernière ligne du contenu de la colonne
+     conditions générales de vente »). */
+  .signature-line {
+    margin-top: 23mm;
+    border-top: 1px solid #000000;
+    padding-top: 3px;
+    font-size: 8.5pt;
+    color: #6b7280;
+  }
+  .signature-line .sig-label { font-weight: 600; color: #000000; }
+  .signature-line .sig-separator { color: #6b7280; margin: 0 4px; font-weight: 400; }
+  .signature-line .sig-quality-inline { color: #6b7280; font-weight: 400; font-style: italic; }
+
+  /* ---- Validité + notes ---- */
+  .validite-notes { margin-top: 6mm; }
+  .validite-notes p { margin: 0 0 3px 0; font-size: 9pt; line-height: 1.5; color: #1f2937; }
+  .validite-notes .vn-lbl { color: #000000; font-weight: 600; }
+
+  /* ---- Bloc Paiement (factures) ---- */
+  .invoice-payment-block {
+    background: rgba(75, 138, 107, 0.08);
+    border: 1px solid rgba(75, 138, 107, 0.3);
+    padding: 5px 12px;
+    margin-top: 4mm;
+    border-radius: 2px;
+  }
+  .ipb-title {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #000000;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .ipb-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10pt;
+    padding: 3px 0;
+  }
+  .ipb-label { color: #6b7280; font-weight: 500; }
+  .ipb-value { color: #000000; font-weight: 600; }
+  .ipb-value.paid { color: #2E7D32; font-weight: 700; }
+
+  /* ---- Signature manuscrite ---- */
+  .signature-steve { margin-top: 8mm; }
+  .signature-steve .sig-cursive {
+    font-family: 'Great Vibes', cursive;
+    font-size: 21pt;
+    line-height: 1.05;
+    color: #1f2937;
+  }
+  .signature-steve .sig-caption {
+    margin-top: 1pt;
+    font-size: 8pt;
+    color: #6b7280;
+    line-height: 1.3;
+  }
+
+  /* ---- Coordonnées bancaires ---- */
+  .section-heading {
+    font-size: 14pt;
+    font-weight: 700;
+    color: #000000;
+    margin: 8mm 0 3mm 0;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #d1d5db;
+  }
+  .bank-block { margin-top: 3mm; }
+  .bank-row {
+    display: flex;
+    font-size: 10.5pt;
+    padding: 2.5px 0;
+    line-height: 1.45;
+  }
+  .bank-row .lbl {
+    color: #000000;
+    font-weight: 600;
+    min-width: 50mm;
+  }
+  .bank-row .val {
+    color: #000000;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+  }
+  .payment-link-section { margin-top: 12mm; }
+  .payment-link-block { margin-top: 3mm; padding: 4mm 0; }
+  .payment-link-url {
+    color: #2563eb;
+    font-weight: 500;
+    text-decoration: underline;
+    word-break: break-all;
+    font-size: 10.5pt;
+  }
+
+  .conditions-list { margin: 4mm 0 0 0; padding: 0; list-style: none; }
+  .conditions-list li {
+    position: relative;
+    padding-left: 16px;
+    margin-bottom: 6px;
+    font-size: 10.5pt;
+    color: #1f2937;
+    line-height: 1.5;
+  }
+  .conditions-list li::before {
+    content: "■";
+    color: #000000;
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 8pt;
+    line-height: 1.8;
+  }
+  .phases-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 8mm;
+  }
+  .phases-list .phase-titre { font-weight: 600; color: #000000; }
+  .phases-list .phase-delai { color: #6b7280; font-size: 10pt; white-space: nowrap; }
+
+  /* ---- Pied de page ---- */
+  .pied {
+    position: absolute;
+    left: 16mm;
+    right: 16mm;
+    bottom: 6mm;
+    z-index: 2;
+  }
+  .pied .footer-hr {
+    border: 0;
+    border-top: 1px solid #e5e7eb;
+    margin-bottom: 4px;
+  }
+  .pied .footer-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 8.5pt;
+    color: #6b7280;
+  }
+  .pied .footer-left .line-1 { font-weight: 400; color: #9ca3af; }
+  .pied .footer-left .line-2 { color: #bcbcbc; }
+  .pied .p-num { font-size: 8.5pt; color: #6b7280; }
+
+  /* ---- Flux continu (repli sans script) ---- */
+  #pc-flux { width: 178mm; margin: 0 auto; }
+  #pc-gabarits { display: none; }
+</style>
+</head>
+<body>
+
+<div id="pc-flux">
+  <!-- Entête : numéro + date à gauche, LOGO SEUL à droite -->
+  <div class="doc-header" data-bloc>
+    <div class="doc-header-left">
+      <div class="doc-title ">Devis <span class="doc-num">D2600002</span></div>
+      <div class="doc-date">27 novembre 2026</div>
+    </div>
+    <div class="doc-header-right">
+      <img class="doc-logo" src="/assets/logo-noir-doc.png" alt="Stevens Akpovi" />
+    </div>
+  </div>
+
+  <div class="hr" data-bloc></div>
+
+  <div class="parties" data-bloc>
+    <div class="party-block">
+      <div class="party-label">Emetteur</div>
+      <div class="party-row"><span class="lbl">Professionnel :</span><span class="val"><strong>Stevens AKPOVI</strong></span></div><div class="party-subtext">Concepteur de sites web professionnels</div><div class="party-row"><span class="lbl">IFU :</span><span class="val">0 2022 7071 1767</span></div><div class="party-row"><span class="lbl">Adresse :</span><span class="val">Parakou, Borgou, Bénin</span></div><div class="party-row"><span class="lbl">Pays :</span><span class="val">Bénin</span></div>
+    </div>
+    <div class="party-block">
+      <div class="party-label">Destinataire</div>
+      <div class="party-row"><span class="lbl">Nom :</span><span class="val"><strong>Éric De Lavarene</strong></span></div><div class="party-row"><span class="lbl">Ville :</span><span class="val">Cotonou</span></div><div class="party-row"><span class="lbl">Pays :</span><span class="val">Bénin</span></div><div class="party-row"><span class="lbl">Téléphone :</span><span class="val">+229 97 00 00 00</span></div><div class="party-row"><span class="lbl">Email :</span><span class="val"><a href="mailto:eric@exemple.fr" style="color:#2563eb;text-decoration:none;font-weight:500;">eric@exemple.fr</a></span></div>
+    </div>
+  </div>
+
+  <div class="hr" data-bloc></div>
+
+  
+  <div class="thank-you" data-bloc>
+    <div class="thank-you-prefix">Merci pour votre confiance.</div>
+    <div class="thank-you-body">Dans un environnement professionnel où la visibilité, la crédibilité et la qualité de présentation jouent un rôle déterminant, disposer d’un espace numérique personnel constitue un véritable levier de développement.</div>
+  </div>
+
+  <div class="detail-heading" data-bloc data-heading>Détail</div>
+
+  <div class="svc-head" data-bloc data-heading>
+    <div class="cell">Type</div>
+    <div class="cell">Description</div>
+    <div class="cell num">Prix unitaire</div>
+    <div class="cell center">Qté</div>
+    <div class="cell num">Total</div>
+  </div>
+  
+  <div class="svc-part svc-debut" data-bloc>
+    <div class="cell type-cell">Service</div>
+    <div class="cell desc-cell"><div class="service-name">Conception et développement de votre site web professionnel</div><div class="desc-riche"><font size="5">A. Conception et développement sur mesure</font></p></div></div>
+    <div class="cell price-cell">2 000,00 €</div>
+    <div class="cell qty-cell">1</div>
+    <div class="cell total-cell">2 000,00 €</div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><p>Ce périmètre couvre : maquettes et arborescence validées avec vous ; intégration au code pur (HTML, CSS, JS).</p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><font size="5">B. Site bilingue français / anglais</font></p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><p>Ce périmètre couvre : structure multilingue prête ; bascule de langue fluide.</p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><font size="5">C. Copywriting professionnel</font></p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><p class="p-suite p-suite--debut">Les textes sont rédigés pour convaincre. </p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><p class="p-suite p-suite--fin">Le périmètre couvre : rédaction des pages clés ; ton professionnel adapté à votre clientèle.</p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><font size="5">D. Espace éditorial et publications</font></p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><p>Vous publiez seul vos contenus. Le périmètre couvre : back-office simple ; formulaires de publication.</p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><font size="5">E. Back-office personnalisé</font></p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><p>Pilotage des demandes et documents. Le périmètre couvre : suivi des demandes clients ; génération de devis et factures.</p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><font size="5">F. Optimisation SEO de base</font></p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><p>Ce périmètre couvre : balises et titres optimisés ; soumission Google.</p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><font size="5">G. Tests et mise en ligne</font></p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><p class="p-suite p-suite--debut">Livraison contrôlée sur tous les écrans. </p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><p class="p-suite p-suite--fin">Le périmètre couvre : tests multi-navigateurs ; mise en ligne et remise des accès.</p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><font size="5">Calendrier de réalisation</font></p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><p class="p-suite p-suite--debut">Le calendrier définitif sera confirmé après validation du devis. </p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><p class="p-suite">Déroulé : écoute stratégique et cadrage du projet — Jours 1 à 2. </p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  <div class="svc-part svc-fin" data-bloc>
+    <div class="cell cell-vide"></div>
+    <div class="cell desc-cell"><div class="desc-riche"><p class="p-suite p-suite--fin">Délai estimé de réalisation : 02 à 03 se</p></div></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+    <div class="cell cell-vide"></div>
+  </div>
+  
+  <div class="svc-foot" data-bloc>
+    <span class="svc-foot-libelle">Délai estimé&nbsp;:</span>
+    <span class="svc-foot-valeur">02 à 03 semaines</span>
+  </div>
+  
+  <div class="total-sous-tableau" data-bloc>
+    <div class="total-ligne">
+      <span class="total-libelle">Total</span>
+      <span class="total-pointilles" aria-hidden="true"></span>
+      <span class="total-valeur">2 000,00 €</span>
+    </div>
+    <div class="total-ligne total-ligne--tva">
+      <span class="total-libelle">TVA</span>
+      <span class="total-pointilles" aria-hidden="true"></span>
+      <span class="total-valeur">Non applicable</span>
+    </div>
+    
+  </div>
+
+  
+  
+    <div class="conditions-block" data-bloc>
+      <div class="cb-left">
+        <div class="cb-title">Conditions générales de vente</div>
+        <ul class="cb-conditions-list">
+          <li>Mission réalisée à distance.</li><li>Livraison des livrables au format numérique.</li><li>Démarrage du travail après réception du règlement.</li><li>Une série d'ajustements mineurs est incluse après livraison.</li><li>Les informations transmises par le client restent strictement confidentielles.</li>
+        </ul>
+      </div>
+      <div class="cb-right">
+        <div class="cb-title">Bon pour accord</div>
+        <div class="cb-date-line">À _________________________ , le ____ / ____ / ______</div>
+        <div class="signature-line">
+          <div class="sig-label">Signature et cachet <span class="sig-separator">|</span> <span class="sig-quality-inline">Qualité de signataire</span></div>
+        </div>
+      </div>
+    </div>
+  
+  
+  <div class="section-heading" data-bloc data-heading>Coordonnées bancaires</div>
+  <div class="bank-block" data-bloc>
+    <div class="bank-row"><span class="lbl">IBAN&nbsp;:</span> <span class="val">MT33CFTE28904000000000006119777</span></div>
+    <div class="bank-row"><span class="lbl">BIC&nbsp;:</span> <span class="val">CFTEMTM1XXX</span></div>
+    <div class="bank-row"><span class="lbl">Titulaire du compte&nbsp;:</span> <span class="val">TCHOGNON STEVENS AKPOVI</span></div>
+    <div class="bank-row"><span class="lbl">Mode de paiement&nbsp;:</span> <span class="val"></span></div>
+    <div class="bank-row"><span class="lbl">Conditions de règlement&nbsp;:</span> <span class="val"></span></div>
+  </div>
+  
+  
+  <div class="validite-notes" data-bloc>
+    <p><span class="vn-lbl">Validité du document&nbsp;:</span> 5 jours</p>
+    <p><span class="vn-lbl">Notes&nbsp;:</span> Modalités issues de la proposition : règlement en 2 étapes — 50 % — avant le démarrage du projet ; 50 % — avant la mise en ligne définitive.</p>
+  </div>
+</div>
+
+<!-- Gabarits clonés par le script de pagination -->
+<div id="pc-gabarits" aria-hidden="true">
+  <!-- VOLET 19 — EN-TÊTE COMPACT des pages de suite (comme la
+       proposition commerciale) : type + numéro/client à gauche,
+       logo 32,6 pt à droite, filet clair. -->
+  <div class="entete-n">
+    <div class="en-textes">
+      <p class="en-surtitre">Devis</p>
+      <p class="en-sous">D2600002 · Éric De Lavarene</p>
+    </div>
+    <div class="en-filet"></div>
+    <div class="en-logo"><img src="/assets/logo-noir-doc.png" alt="Stevens Akpovi"></div>
+  </div>
+  <div class="pied">
+    <hr class="footer-hr" />
+    <div class="footer-row">
+      <div class="footer-left">
+        <div class="line-1">Devis D2600002</div>
+        <div class="line-2">Document confidentiel — Stevens AKPOVI</div>
+      </div>
+      <div class="p-num">Page 1 sur 1</div>
+    </div>
+  </div>
+  <div class="wm"><img src="/assets/logo-noir-doc.png" alt="Filigrane Stevens Akpovi" /></div>
+</div>
+
+<script>
+(function () {
+  var FLUX_ID = 'pc-flux';
+  var LIMITE = 1054;
+  var DEBUT_P1 = 60;
+  var DEBUT_N = 117;
+  var ENTETE_COMPACTE = true;
+  var FORMAT_SIMPLE = true;
+  var RESERVE_BAS = 38;
+  var pages = [];
+  var pagine = false;
+  var pageDemandee = 0;
+
+  function hPx(el) {
+    var cs = getComputedStyle(el);
+    return el.offsetHeight + (parseFloat(cs.marginTop) || 0);
+  }
+
+  function envoyerPages() {
+    try {
+      window.parent.postMessage({ source: 'apercu-document', type: 'pages', total: pages.length }, '*');
+    } catch (e) {}
+  }
+
+  function montrerPage(n) {
+    if (!pages.length) return;
+    if (!n) {
+      for (var i = 0; i < pages.length; i++) pages[i].style.display = '';
+      pageDemandee = 0;
+      return;
+    }
+    pageDemandee = Math.min(Math.max(1, n || 1), pages.length);
+    for (var i2 = 0; i2 < pages.length; i2++) {
+      pages[i2].style.display = i2 === pageDemandee - 1 ? '' : 'none';
+    }
+  }
+
+  function paginer() {
+    var flux = document.getElementById(FLUX_ID);
+    if (!flux) return;
+    var blocs = Array.prototype.slice.call(
+      document.querySelectorAll('#pc-flux [data-bloc], .ppage [data-bloc]'),
+    );
+    if (!blocs.length) return;
+    for (var i = 0; i < pages.length; i++) pages[i].remove();
+    pages = [];
+    for (var r = 0; r < blocs.length; r++) {
+      blocs[r].style.marginTop = '';
+      blocs[r].classList.remove('debut-page');
+      flux.appendChild(blocs[r]);
+    }
+
+    /* VOLET 20 (26/11/2026) — EN-TÊTE DU TABLEAU « Détail » : quand
+       le tableau se POURSUIT sur une page suivante (une ligne-bloc
+       svc-part ouvre la page), l'en-tête du tableau (svc-head) est
+       REPRIS en tête de cette page (demande de l'éditeur : « sur la
+       page où ça continue, l'entête du tableau doit être repris sur
+       cette page suivante-là aussi pour qu'on reconnaisse les
+       colonnes »). Sans svc-head (proposition commerciale), tout
+       reste inchangé. */
+    var enteteTableau = null;
+    for (var e = 0; e < blocs.length; e++) {
+      if (blocs[e].classList && blocs[e].classList.contains('svc-head')) {
+        enteteTableau = blocs[e];
+        break;
+      }
+    }
+    var hEnteteTableau = enteteTableau ? enteteTableau.offsetHeight : 0;
+
+    var hauteurs = blocs.map(hPx);
+
+    /* Répartition : la page 1 démarre à DEBUT_P1, les suivantes à
+       DEBUT_N ; un titre de section (data-heading) ne reste jamais
+       orphelin en bas de page — il exige de la place pour lui et
+       le début du bloc qui suit.
+       NOTE : le PREMIER bloc d'une page de suite voit sa marge
+       haute ANNULÉE au montage (marginTop = 0) — elle ne doit donc
+       pas compter dans la capacité (bug mesuré : pages sur-numéraires).
+       VOLET 20 : une page qui OUVRIRA avec une ligne du tableau
+       (continuation) voit sa capacité réduite de la hauteur de
+       l'en-tête du tableau qui y est REPRIS. */
+    var repartis = [[]];
+    var avecEntete = [false];
+    var h = 0;
+    var cap = LIMITE - DEBUT_P1 - RESERVE_BAS;
+    for (var j = 0; j < blocs.length; j++) {
+      var b = blocs[j];
+      var bh = hauteurs[j];
+      var premierDePage = repartis[repartis.length - 1].length === 0;
+      if (premierDePage && repartis.length > 1) {
+        bh = b.offsetHeight; /* marge haute annulée → hors capacité */
+      }
+      var heading = b.hasAttribute('data-heading');
+      var reste = cap - (h + bh);
+      /* Garantie anti-orphelin (calée sur l'exemple de l'éditeur) :
+         un titre ne reste en bas de page que si lui-même + les DEUX
+         blocs suivants tiennent (pastille + intro + appel de liste).
+         La contribution du 2e bloc est plafonnée (blocs très hauts
+         comme une rangée d'échéances). */
+      var garder = 0;
+      if (heading && j + 1 < blocs.length) {
+        var suite = hauteurs[j + 1];
+        if (j + 2 < blocs.length) suite += Math.min(hauteurs[j + 2], 48);
+        garder = Math.min(suite + 12, hauteurs[j + 1] + 112);
+      }
+      if (premierDePage && repartis.length === 1) {
+        /* blocs fixes d'en-tête de la page 1 : jamais déplacés */
+      } else if (reste < 0 || (heading && reste < garder)) {
+        repartis.push([]);
+        h = 0;
+        /* VOLET 20 — la page qui s'ouvre sur une LIGNE DU TABLEAU
+           (svc-part) est une page de CONTINUATION : l'en-tête du
+           tableau y est repris — sa hauteur est retranchée de la
+           capacité pour ne rien déborder. */
+        if (
+          enteteTableau &&
+          b.classList &&
+          b.classList.contains('svc-part')
+        ) {
+          avecEntete.push(true);
+          cap = LIMITE - DEBUT_N - hEnteteTableau - RESERVE_BAS;
+        } else {
+          avecEntete.push(false);
+          cap = LIMITE - DEBUT_N - RESERVE_BAS;
+        }
+        bh = b.offsetHeight; /* premier de la nouvelle page */
+      }
+      repartis[repartis.length - 1].push(b);
+      h += bh;
+    }
+
+    var gabarit = document.getElementById('pc-gabarits');
+    var enteteN = gabarit ? gabarit.querySelector('.entete-n') : null;
+    var piedN = gabarit ? gabarit.querySelector('.pied') : null;
+    var wm = gabarit ? gabarit.querySelector('.wm') : null;
+    var total = repartis.length;
+    for (var p = 0; p < total; p++) {
+      var page = document.createElement('div');
+      page.className = 'ppage' + (p === 0 ? ' ppage1' : ' ppage-n') + (p === total - 1 ? ' ppage-fin' : '');
+      page.setAttribute('data-page', String(p + 1));
+      if (wm) page.appendChild(wm.cloneNode(true));
+      if (p > 0 && ENTETE_COMPACTE && enteteN) {
+        page.appendChild(enteteN.cloneNode(true));
+      }
+      var corps = document.createElement('div');
+      corps.className = 'corps';
+      /* VOLET 20 — page de CONTINUATION du tableau : l'en-tête du
+         tableau (svc-head) est REPRIS en tête de page (clone sans
+         data-bloc — jamais re-collecté lors d'une re-pagination). */
+      if (p > 0 && avecEntete[p] && enteteTableau) {
+        var cloneEntete = enteteTableau.cloneNode(true);
+        cloneEntete.removeAttribute('data-bloc');
+        cloneEntete.removeAttribute('data-heading');
+        corps.appendChild(cloneEntete);
+      }
+      for (var k = 0; k < repartis[p].length; k++) {
+        var bloc = repartis[p][k];
+        if (k === 0 && p > 0) {
+          bloc.style.marginTop = '0';
+          /* marque le premier bloc d'une page de suite (filet
+             supérieur du tableau qui reprend, par exemple) */
+          bloc.classList.add('debut-page');
+        }
+        corps.appendChild(bloc);
+      }
+      page.appendChild(corps);
+      if (piedN) {
+        var pd = piedN.cloneNode(true);
+        var numEl = pd.querySelector('.p-num');
+        if (numEl) {
+          if (FORMAT_SIMPLE) {
+            numEl.innerHTML = 'Page ' + (p + 1) + ' sur ' + total;
+          } else {
+            numEl.innerHTML = '<b>' + (p + 1 < 10 ? '0' + (p + 1) : p + 1) + '</b> / ' + (total < 10 ? '0' + total : total);
+          }
+        }
+        page.appendChild(pd);
+      }
+      flux.parentNode.insertBefore(page, flux);
+      pages.push(page);
+    }
+    pagine = true;
+    window.__pagesPc = total;
+    window.__paginePc = true;
+    window.__paginePcAt = Date.now();
+    montrerPage(pageDemandee);
+    envoyerPages();
+  }
+
+  window.addEventListener('message', function (ev) {
+    var m = ev.data || {};
+    if (m && m.type === 'aller-page') {
+      if (pagine) montrerPage(m.page);
+      else pageDemandee = m.page || 1;
+    } else if (m && m.type === 'demander-pages') {
+      envoyerPages();
+    }
+  });
+
+  function lancer() {
+    var prets = Promise.resolve();
+    if (document.fonts && document.fonts.load) {
+      prets = Promise.all([
+        document.fonts.load('300 10pt Poppins'),
+        document.fonts.load('400 10pt Poppins'),
+        document.fonts.load('500 10pt Poppins'),
+        document.fonts.load('600 10pt Poppins'),
+        document.fonts.load('700 10pt Poppins'),
+        document.fonts.load('400 10pt Inter'),
+        document.fonts.load('600 10pt Inter'),
+        document.fonts.load('700 10pt Inter'),
+      ]).catch(function () {});
+    }
+    Promise.race([prets, new Promise(function (r) { setTimeout(r, 4000); })]).then(function () {
+      try { paginer(); } catch (e) { /* repli : flux continu */ }
+      setTimeout(function () { try { paginer(); } catch (e) {} }, 600);
+      setTimeout(function () { try { paginer(); } catch (e) {} }, 1600);
+      setTimeout(function () { try { paginer(); } catch (e) {} }, 3200);
+    });
+  }
+  if (document.fonts && document.fonts.addEventListener) {
+    document.fonts.addEventListener('loadingdone', function () {
+      setTimeout(function () { if (pagine) { try { paginer(); } catch (e) {} } }, 80);
+    });
+  }
+  lancer();
+})();
+</script>
+
+</body>
+</html>

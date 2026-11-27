@@ -615,12 +615,17 @@ function SelectionDevis({
   documents,
   onChoisir,
   onCreerDevis,
+  /* VOLET 22 — clic sur le statut « Facturée (n°) » d'un devis déjà
+     facturé : amène directement à l'espace des factures, la facture
+     ouverte dans son espace dédié (demande de l'éditeur). */
+  onVoirFacture,
 }: {
   documents: ToutDocument[];
   onChoisir: (devis: DocumentRecord) => void;
   /** VOLET 16 : depuis l'état « aucun devis », un bouton « Créer un
       devis » ouvre directement l'espace de création de devis. */
   onCreerDevis: () => void;
+  onVoirFacture: (facture: DocumentRecord) => void;
 }) {
   const devis = useMemo(
     () =>
@@ -666,13 +671,21 @@ function SelectionDevis({
             {devis.map((d) => {
               const facture = documents.find((f) => f.docType === "facture" && f.devisSource === d.numero);
               const selectionne = choisi === d.id;
+              /* VOLET 22 — un devis DÉJÀ FACTURÉ ne peut pas être
+                 sélectionné (grisé) : sa facture existe déjà
+                 (demande de l'éditeur) — mais son statut « Facturée
+                 (n°) » reste CLIQUABLE et amène à la facture. */
+              const dejaFacture = Boolean(facture);
               return (
                 <tr
                   key={d.id}
-                  onClick={() => setChoisi(d.id)}
-                  className={`cursor-pointer border-b border-[#e4e4e4]/8 transition-colors ${
-                    selectionne ? "bg-[#2f2f2f]" : "hover:bg-[#2f2f2f]/40"
-                  }`}
+                  onClick={() => !dejaFacture && setChoisi(d.id)}
+                  aria-disabled={dejaFacture || undefined}
+                  className={`border-b border-[#e4e4e4]/8 transition-colors ${
+                    dejaFacture
+                      ? "cursor-not-allowed opacity-45"
+                      : "cursor-pointer hover:bg-[#2f2f2f]/40"
+                  } ${selectionne ? "bg-[#2f2f2f]" : ""}`}
                 >
                   <td className="px-5 py-4">
                     <input
@@ -680,8 +693,16 @@ function SelectionDevis({
                       name="devis-a-facturer"
                       checked={selectionne}
                       onChange={() => setChoisi(d.id)}
-                      onClick={(e) => e.stopPropagation()}
-                      aria-label={`Sélectionner le devis ${d.numero} de ${d.client.nom}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (dejaFacture) e.preventDefault();
+                      }}
+                      disabled={dejaFacture}
+                      aria-label={
+                        dejaFacture
+                          ? `Devis ${d.numero} déjà facturé (${facture!.numero}) — non sélectionnable`
+                          : `Sélectionner le devis ${d.numero} de ${d.client.nom}`
+                      }
                       className="h-4 w-4 accent-[#e4e4e4]"
                     />
                   </td>
@@ -696,7 +717,20 @@ function SelectionDevis({
                   </td>
                   <td className="px-5 py-4">
                     {facture ? (
-                      <Pastille ton="valide">Facturée ({facture.numero})</Pastille>
+                      /* VOLET 22 — statut CLIQUABLE : amène à l'espace
+                         des factures avec cette facture ouverte dans
+                         son espace dédié. */
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onVoirFacture(facture as DocumentRecord);
+                        }}
+                        title={`Voir la facture ${facture.numero} dans l'espace des factures`}
+                        className="cursor-pointer rounded-full transition-transform hover:scale-[1.03] focus:outline-none"
+                      >
+                        <Pastille ton="valide">Facturée ({facture.numero})</Pastille>
+                      </button>
                     ) : (
                       <Pastille>À facturer</Pastille>
                     )}
@@ -1037,7 +1071,10 @@ export function AdminPage() {
           CENTRÉE VERTICALEMENT par rapport au logo (demande de
           l'éditeur), plus calée vers le bas. */}
       <div className="border-b border-[#e4e4e4]/10 bg-[#070707]">
-        <div className="container-site flex flex-wrap items-center justify-between gap-4 py-4">
+        {/* VOLET 22 — ESPACES INTERNES du header RÉDUITS DE MOITIÉ
+            (py-4 → py-2) : le header du back-office était trop haut
+            verticalement (demande de l'éditeur). */}
+        <div className="container-site flex flex-wrap items-center justify-between gap-4 py-2">
           <div className="flex items-center gap-4">
             <img
               src={ASSETS.logoLight}
@@ -1351,6 +1388,12 @@ export function AdminPage() {
               documents={documents}
               onChoisir={(d) => setFactureCible(d)}
               onCreerDevis={() => ouvrirCreation("devis")}
+              /* VOLET 22 — statut « Facturée (n°) » cliquable : ouvre
+                  l'espace des factures avec cette facture. */
+              onVoirFacture={(f) => {
+                setVueFactures("liste");
+                setFactureCible(f);
+              }}
             />
           </>
         )}

@@ -110,3 +110,102 @@ export function pdfCorrespondAuDevis(texte: string, numero: string): boolean {
   if (plat.length < 40) return true;
   return plat.includes(normaliser(numero));
 }
+
+/* ------------------------------------------------------------------
+ * VOLET 22 (27/11/2026) — ANALYSE STRICTE À L'UPLOAD (devis signé).
+ *
+ * Demande de l'éditeur : « c'est lors de l'upload que le système
+ * doit vérifier STRICTEMENT le document, lire les informations et
+ * voir si le numéro du devis figure sur le document uploadé, si le
+ * NOM figure sur le document, s'il y a des SIGNATURES sur le
+ * document, si la DATE D'ÉMISSION du devis figure sur le document
+ * uploadé, si le TABLEAU DE DÉTAILS du devis figure sur le document
+ * uploadé. »
+ *
+ * L'analyse (côté serveur, avant l'enregistrement) vérifie donc
+ * CINQ points sur la couche texte du PDF et répond la liste précise
+ * des éléments manquants (affichés en rouge dans la modale).
+ * ------------------------------------------------------------------ */
+
+/** Résultat de l'analyse stricte d'un devis signé téléversé. */
+export type AnalyseDevisSigne = {
+  /** true = le PDF correspond bien à CE devis signé. */
+  valide: boolean;
+  /** Éléments manquants (libellés courts, affichés en rouge). */
+  manques: string[];
+};
+
+/** Analyse STRICTE du PDF téléversé : le numéro du devis, le nom du
+ *  client, la zone de signature (« Bon pour accord » / « Signature
+ *  et cachet »), la date d'émission (formatée comme sur le devis)
+ *  et le tableau de détails (en-tête « Détail » + colonnes) doivent
+ *  tous figurer dans le texte du PDF. Un PDF SANS couche texte
+ *  (scan image) est refusé : impossible de vérifier strictement. */
+export function analyserDevisSigne(
+  texte: string,
+  devis: { numero: string; clientNom: string; date: string },
+): AnalyseDevisSigne {
+  const plat = normaliser(texte);
+  const manques: string[] = [];
+
+  /* PDF sans vraie couche texte → vérification stricte impossible :
+   * refusé (l'éditeur doit téléverser le PDF du devis signé, pas un
+   * scan image). */
+  if (plat.length < 40) {
+    return {
+      valide: false,
+      manques: [
+        "Aucun texte lisible dans ce PDF (document scanné en image) — impossible de vérifier qu'il s'agit bien du devis signé.",
+      ],
+    };
+  }
+
+  if (!plat.includes(normaliser(devis.numero))) {
+    manques.push(`le numéro du devis (${devis.numero}) n'y figure pas`);
+  }
+  if (devis.clientNom.trim() && !plat.includes(normaliser(devis.clientNom))) {
+    manques.push(`le nom du client (${devis.clientNom}) n'y figure pas`);
+  }
+  const zoneSignature =
+    plat.includes(normaliser("Bon pour accord")) ||
+    plat.includes(normaliser("Signature et cachet")) ||
+    plat.includes(normaliser("Signature et cachet | Qualité de signataire"));
+  if (!zoneSignature) {
+    manques.push("la zone de signature (« Bon pour accord ») n'y figure pas");
+  }
+  /* Date d'émission : formats imprimés par le gabarit (« 26 novembre
+   * 2026 », « 26 Nov 2026 », « 26/11/2026 »). */
+  const d = new Date(`${devis.date}T00:00:00`);
+  let datePresente = false;
+  if (!isNaN(d.getTime())) {
+    const moisFr = [
+      "janvier", "février", "mars", "avril", "mai", "juin",
+      "juillet", "août", "septembre", "octobre", "novembre", "décembre",
+    ];
+    const moisEn = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const jj = String(d.getDate()).padStart(2, "0");
+    const annee = String(d.getFullYear());
+    for (const variante of [
+      `${jj} ${moisFr[d.getMonth()]} ${annee}`,
+      `${jj} ${moisEn[d.getMonth()]} ${annee}`,
+      `${jj}/${String(d.getMonth() + 1).padStart(2, "0")}/${annee}`,
+    ]) {
+      if (plat.includes(normaliser(variante))) {
+        datePresente = true;
+        break;
+      }
+    }
+  }
+  if (!datePresente) {
+    manques.push("la date d'émission du devis n'y figure pas");
+  }
+  /* Tableau de détails : en-tête « Détail » + colonnes du tableau. */
+  const tableauDetail =
+    plat.includes(normaliser("Détail")) &&
+    (plat.includes(normaliser("Description")) || plat.includes(normaliser("Prix unitaire")));
+  if (!tableauDetail) {
+    manques.push("le tableau de détails du devis n'y figure pas");
+  }
+
+  return { valide: manques.length === 0, manques };
+}
