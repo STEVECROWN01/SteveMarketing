@@ -102,6 +102,24 @@ export function renderPropositionHtml(
     : "";
   const montantF = fmtMontant(p.montant, p.devise);
 
+  /* VOLET 23 (27/11/2026) — DESTINATAIRE SOUS LE PRESTATAIRE : la
+   *  rangée DESTINATAIRE s'ajoute SOUS « Votre projet », pleine
+   * largeur, exactement comme les autres rangées du bloc (plus de
+   * duo à deux colonnes qui plaçait le prestataire À DROITE du nom
+   * du destinataire — demande de l'éditeur : « ça devait être l'un
+   * sous l'autre, dans la même position que les éléments présentés
+   * à ce niveau dans le bloc »). La rangée ajoutée (~32 pt) est
+   * COMPENSÉE par les espaces du bloc (marge haute réduite) et de la
+   * première section (marge réduite) : rien ne bouge au-dessus, rien
+   * ne bouge en dessous, le nombre de pages reste identique. */
+  const nomDestinataire = [
+    (p.destinataire?.nomComplet ?? "").trim(),
+    (p.destinataire?.entreprise ?? "").trim(),
+  ]
+    .filter(Boolean)
+    .join(" — ");
+  const avecDestinataire = Boolean(nomDestinataire);
+
   /* Échéances : 2 → une rangée de 2 ; 3 → une rangée de 3 ;
    * 4 → deux rangées de 2 (règle de l'éditeur). */
   const echs = (s.paiements ?? []).map((e) => ({
@@ -281,10 +299,7 @@ ${suite}`;
 
   /* ---- Bloc d'informations (pas de 32,5 pt) ---- */
   .infos { margin-top: 47pt; }
-  /* VOLET 22 — .paire-duo + .paire : la rangée MONTANT TOTAL garde
-     son pas de 7,9 pt même quand la rangée précédente est le duo
-     DESTINATAIRE | PRESTATAIRE. */
-  .paire + .paire, .paire-duo + .paire { margin-top: 7.9pt; }
+  .paire + .paire { margin-top: 7.9pt; }
   .paire .lbl {
     margin: 0 0 2.7pt 0;
     font-size: 6.8pt; font-weight: 500;
@@ -294,18 +309,12 @@ ${suite}`;
   }
   .paire .val { margin: 0; font-size: 11pt; font-weight: 500; line-height: 1.2; color: #111111; }
   .paire .val.montant { font-size: 15pt; font-weight: 700; }
-  /* VOLET 22 — rangée DESTINATAIRE | PRESTATAIRE (deux colonnes) :
-     même HAUTEUR qu'une rangée simple (le nom du destinataire ne
-     décale plus rien). La colonne destinataire, plus large, porte
-     les noms longs sans passer à la ligne. */
-  .paire-duo {
-    display: grid;
-    grid-template-columns: 1.15fr 1fr;
-    gap: 16pt;
-    margin-top: 7.9pt;
-  }
-  .paire-duo .paire.duo-col { margin: 0; }
-  .paire-duo .paire.duo-col .val { font-size: 10.5pt; }
+  /* VOLET 23 — rangée DESTINATAIRE ajoutée (sous « Votre projet ») :
+     marge haute du bloc réduite de 19 pt (47 → 28) — la moitié de la
+     compensation ; l'autre moitié vit sur la première section
+     (.s-head.t01-dest). Le bloc garde ainsi SA hauteur totale et
+     tout ce qui suit démarre AU MÊME ENDROIT qu'avant la rangée. */
+  .infos--dest { margin-top: 28pt; }
   .filet-clair { margin: 16.5pt 0 0 0; border-top: 0.6pt solid #e6e6e6; }
   /* VOLET 20 (26/11/2026) — DATE D'ÉMISSION sous le trait de
      séparation : l'espace qui sépare le trait et la date (ci-dessous)
@@ -340,6 +349,11 @@ ${suite}`;
   /* ---- Titres de section ---- */
   .s-head { margin-top: 29.6pt; }
   .s-head.t01 { margin-top: 69.75pt; }
+  /* VOLET 23 — compensation de la rangée DESTINATAIRE : l'espace
+     avant la section 01 est réduit de 13 pt (69,75 → 56,75) quand le
+     destinataire est renseigné — avec les 19 pt de la marge du bloc
+     d'informations, la rangée ajoutée est entièrement absorbée. */
+  .s-head.t01.t01-dest { margin-top: 56.75pt; }
   .s-head.t03 { margin-top: 32.9pt; }
   .s-head.t04 { margin-top: 27.85pt; }
   .s-head.t06 { margin-top: 29.6pt; }
@@ -472,45 +486,28 @@ ${suite}`;
   </div>
 
   <!-- Bloc d'informations -->
-  <div class="infos" data-bloc>
+  <div class="infos${avecDestinataire ? " infos--dest" : ""}" data-bloc>
     <div class="paire">
       <p class="lbl">VOTRE PROJET</p>
       <p class="val">${esc(p.projet)}</p>
     </div>
-    <!-- VOLET 22 (27/11/2026) — DESTINATAIRE & PRESTATAIRE SUR LA MÊME
-         LIGNE : l'ajout du nom du destinataire ne décale PLUS aucun
-         texte du document (demande de l'éditeur : « l'ajout du nom du
-         destinataire ne peut pas modifier la position des textes —
-         on maintient intactes les positions, il y a suffisamment
-         d'espace »). Quand un destinataire est renseigné, il partage
-         SA RANGÉE avec le prestataire (deux colonnes) : le bloc
-         d'informations garde EXACTEMENT la même hauteur avec ou sans
-         nom — les sections suivantes démarrent au même endroit et le
-         nombre de pages ne change pas. Sans destinataire, la rangée
-         pleine largeur d'origine est conservée. C'est aussi ce nom
-         qui pré-remplit le client du devis généré depuis la
-         proposition. -->
+    <!-- VOLET 23 — DESTINATAIRE SOUS LE PRESTATAIRE, l'un sous
+         l'autre, pleines largeurs, mêmes rangées que le reste du
+         bloc (plus de duo à deux colonnes). La rangée est compensée
+         par les espaces du bloc et de la section 01 : le contenu au
+         dessus et celui qui commence en dessous ne bougent PAS. -->
     ${
-      (p.destinataire?.nomComplet || "").trim() || (p.destinataire?.entreprise || "").trim()
-        ? `<div class="paire-duo">
-      <div class="paire duo-col">
+      avecDestinataire
+        ? `<div class="paire paire-destinataire">
       <p class="lbl">DESTINATAIRE</p>
-      <p class="val">${esc(
-        [(p.destinataire?.nomComplet || "").trim(), (p.destinataire?.entreprise || "").trim()]
-          .filter(Boolean)
-          .join(" — "),
-      )}</p>
-    </div>
-    <div class="paire duo-col">
-      <p class="lbl">PRESTATAIRE</p>
-      <p class="val">${esc(p.prestataire)}</p>
-    </div>
+      <p class="val">${esc(nomDestinataire)}</p>
     </div>`
-        : `<div class="paire">
-      <p class="lbl">PRESTATAIRE</p>
-      <p class="val">${esc(p.prestataire)}</p>
-    </div>`
+        : ""
     }
+    <div class="paire">
+      <p class="lbl">PRESTATAIRE</p>
+      <p class="val">${esc(p.prestataire)}</p>
+    </div>
     <div class="paire">
       <p class="lbl">MONTANT TOTAL</p>
       <p class="val montant">${esc(montantF)}</p>
@@ -529,7 +526,7 @@ ${suite}`;
     <p class="val">${esc(fmtDateLongue(p.date))}</p>
   </div>
 
-  ${section("01", "Présentation de votre projet", chapeauEtParas(s.presentation ?? []), " t01")}
+  ${section("01", "Présentation de votre projet", chapeauEtParas(s.presentation ?? []), ` t01${avecDestinataire ? " t01-dest" : ""}`)}
 
   ${section(
     "02",

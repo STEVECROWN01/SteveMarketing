@@ -133,6 +133,10 @@ export function GenerateurDocument({
   toast,
   initial = null,
   preRemplissage = null,
+  /* VOLET 23 — ANTI-DOUBLON : numéros des devis déjà générés —
+   *  générer une seconde fois le même numéro est REFUSÉ par un
+   *  toast (l'édition d'un devis existant reste libre). */
+  numerosExistants = [],
 }: {
   docType: "devis" | "proposition";
   prochainNumero: number;
@@ -143,6 +147,7 @@ export function GenerateurDocument({
   initial?: DocumentRecord | null;
   /** VOLET 16 : pré-remplissage depuis une demande reçue. */
   preRemplissage?: PreRemplissage | null;
+  numerosExistants?: string[];
 }) {
   const [form, setForm] = useState<Formulaire>(() =>
     etatInitial(docType, prochainNumero, initial, preRemplissage),
@@ -229,6 +234,17 @@ export function GenerateurDocument({
     if (generation) return;
     if (!form.client.nom.trim()) {
       toast({ title: "Nom du client requis", description: "Renseignez au moins le nom du client.", variant: "destructive" });
+      return;
+    }
+    /* VOLET 23 — ANTI-DOUBLON (demande de l'éditeur : « pareil pour
+     * la génération de devis — générer deux fois le même document
+     * doit être refusé par un toast : le document existe déjà »). */
+    if (!enEdition && numerosExistants.includes(numero)) {
+      toast({
+        title: `${libelle} déjà généré`,
+        description: `Le devis ${numero} existe déjà — il est disponible dans la liste (ouvrez-le ou modifiez-le depuis la liste).`,
+        variant: "destructive",
+      });
       return;
     }
     setGeneration(true);
@@ -501,12 +517,15 @@ export function GenerateurDocument({
           </div>
         </Carte>
 
-        {/* 3 — Règlement & coordonnées bancaires (IBAN, BIC, titulaire) —
+        {/* 3 — Modalité de paiement (IBAN, BIC, titulaire) —
             VOLET 21 : la carte passe AVANT « Validité & notes » (le
             formulaire suit l'ordre du document imprimé : validité et
-            notes suivent désormais les coordonnées bancaires). */}
+            notes suivent désormais les coordonnées bancaires).
+            VOLET 23 : le bloc s'appelle désormais « MODALITÉ DE
+            PAIEMENT » sur le document imprimé — la carte du
+            formulaire suit le même nom (demande de l'éditeur). */}
         <Carte className="p-5 sm:p-6">
-          <TitreSection note="règlement toujours à réception">Règlement & coordonnées bancaires</TitreSection>
+          <TitreSection note="règlement toujours à réception">Modalité de paiement</TitreSection>
           <div className="grid gap-4 sm:grid-cols-2">
             <Champ label="Devise">
               <select className={styleInput} value={form.devise} onChange={(e) => maj("devise", e.target.value)}>

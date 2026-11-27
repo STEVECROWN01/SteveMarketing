@@ -1,0 +1,23 @@
+VOLET 23 — LES 12 DEMANDES DU 27/11/2026 (SUIVI), SANS EXCEPTION :
+
+PORTFOLIO : tous les boutons d'action des projets deviennent des ICÔNES SEULES (« sans texte, juste les icônes. Simplement. ») et chaque projet PUBLIÉ porte désormais son bouton « Voir le projet » vers sa page sur le site (les réalisations du site comme les projets administrés publiés).
+
+LISTES DE DOCUMENTS (propositions, devis, factures) : plus AUCUNE barre de défilement horizontal — cause racine trouvée : les INFO-BULLES des derniers boutons d'action (ancrées au centre) débordaient de la carte ; elles sont désormais ANCRÉES À DROITE (elles s'étendent vers la gauche) ; la carte est en plus clippée et les boutons d'action passent à la ligne ; même correctif sur le tableau de sélection du devis à facturer (plus de largeur minimale).
+
+MODALE DU DEVIS SIGNÉ : le texte explicatif « Téléversez le PDF du devis signé… l'enregistrement ne se dégrise qu'après la coche verte » est SUPPRIMÉ (la zone d'upload et l'analyse parlent d'elles-mêmes).
+
+PROPOSITION COMMERCIALE : le nom du destinataire s'ajoute SOUS « Votre projet », le prestataire reste SOUS le destinataire — l'un sous l'autre, pleines largeurs, mêmes rangées que le reste du bloc (plus de duo à deux colonnes qui plaçait le prestataire à droite du destinataire) ; la rangée ajoutée est COMPENSÉE par les espaces du bloc et de la section 01 (marges réduites) : rien ne bouge au-dessus ni en dessous, nombre de pages identique (vérifié : mêmes positions à 1 px près).
+
+FACTURE : la ligne « Devis d'origine » est SUPPRIMÉE du bloc Paiement ; le design et l'organisation de ce bloc sont APPLIQUÉS au bloc bancaire de TOUS les devis, renommé « MODALITÉ DE PAIEMENT » (mention « Mode de paiement : Virement bancaire » en tête, puis IBAN, BIC, titulaire, conditions) ; la note des factures est TOUJOURS la note des devis (« Notes : Je reste à votre disposition pour toute question complémentaire et vous remercie pour votre confiance. » — les modalités de la proposition ne s'invitent plus).
+
+GÉNÉRATION DE LA PROPOSITION : le bouton « Enregistrer seulement » est REMPLACÉ par « Charger le modèle par défaut » (comme sur les devis) ; « Générer la proposition » reste LE bouton d'action (stockage privé + copie email) ; ANTI-DOUBLON : générer un numéro déjà existant est REFUSÉ par un toast « existe déjà » AVANT tout envoi — pareil pour la génération de devis, avec en plus une garde SERVEUR (409) sur les créations de numéros déjà enregistrés (aucun doublon, aucun double email).
+
+DESCRIPTION DU DEVIS DEPUIS PROPOSITION : rédaction professionnelle revisitée — le système S'INSPIRE du contenu de chaque périmètre (points, introduction, condition de clôture) pour écrire AU CLIENT, sans mentionner la lettre du périmètre, avec des formules VARIEES (jamais deux paragraphes pareils) ; chaque périmètre = UN titre en GRAS + sa description dans la MÊME rangée du tableau (espaces titre↔description et entre paragraphes réduits au strict minimum) ; plafond respecté : ≤ 10 paragraphes de QUATRE lignes MESURÉES à l'écran, devis en deux pages.
+
+DEVIS SIMPLE : la description pré-remplie reste UN SEUL paragraphe coulant sur le document, exactement comme dans le champ de rédaction (plus un paragraphe espacé par phrase).
+
+TABLEAU COUPÉ EN BAS DE PAGE : la portion de la page en cours se TERMINE par un trait horizontal fin, comme les bords du tableau, et la page suivante reprend avec l'EN-TÊTE du tableau — le tableau ne reste jamais « ouvert » en bas de page.
+
+CRÉER UNE FACTURE : dans la sélection du devis, SEUL le statut « Facturée (n°) » est dégrisé (clairement cliquable) sur les rangées grisées ; le clic sur ce statut ouvre l'ESPACE DES FACTURES avec la facture en APERÇU PLEIN ÉCRAN — plus AUCUNE modale de modification (l'action respecte sa promesse).
+
+Vérifications locales : rendu HTML + pagination mesurés dans Chromium (23/23 contrôles), back-office vérifié dans le navigateur contre le vrai stockage (15/15 contrôles UI, aucune écriture, aucun email), captures visuelles validées.

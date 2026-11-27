@@ -3,10 +3,12 @@ import { verifySessionToken, SESSION_COOKIE } from "@/lib/admin-auth";
 import {
   listDocuments,
   saveDocument,
+  getDocument,
   completerDocument,
   isStorageConfigured,
   type ToutDocument,
 } from "@/lib/documents/github";
+import { buildIdDocument } from "@/lib/documents/format";
 import { isEmailServiceConfigured } from "@/lib/email";
 
 export const runtime = "nodejs";
@@ -73,6 +75,24 @@ export async function POST(req: NextRequest) {
   }
   try {
     const document = completerDocument(d as Parameters<typeof completerDocument>[0]) as ToutDocument;
+    /* VOLET 23 — ANTI-DOUBLON (garde serveur) : une CRÉATION (aucun
+     * identifiant fourni) d'un numéro DÉJÀ ENREGISTRÉ est REFUSÉE
+     * (demande de l'éditeur : « on ne peut pas générer deux fois le
+     * même document — il faut le dire : le document existe déjà »).
+     * La MISE À JOUR d'un document existant (identifiant fourni)
+     * reste libre. */
+    if (!d.id && isStorageConfigured()) {
+      const existant = await getDocument(buildIdDocument(document.docType, document.numero)).catch(() => null);
+      if (existant) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: `Le document ${document.numero} existe déjà — il est disponible dans la liste (ouvrez-le ou modifiez-le depuis la liste).`,
+          },
+          { status: 409 },
+        );
+      }
+    }
     await saveDocument(document);
     return NextResponse.json({ ok: true, document });
   } catch (e) {

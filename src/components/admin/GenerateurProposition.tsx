@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { FileCheck2, Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { FileCheck2, Loader2, Plus, Sparkles, Trash2 } from "lucide-react";
 import { ApercuDocument } from "./ApercuDocument";
 import type { FonctionToast } from "./GenerateurDocument";
 import { BoutonAction, Carte, Champ, Pastille, TitreSection, styleInput, styleInputDate } from "./elements";
@@ -77,16 +77,21 @@ export function GenerateurProposition({
   onEnregistre,
   toast,
   initial = null,
+  /* VOLET 23 — ANTI-DOUBLON : numéros des propositions déjà
+   *  générées — générer une seconde fois le même numéro est REFUSÉ
+   *  par un toast (l'édition d'une proposition existante reste
+   *  libre). */
+  numerosExistants = [],
 }: {
   prochainNumero: number;
   stockageConfigure: boolean;
   onEnregistre: () => void;
   toast: FonctionToast;
   initial?: PropositionRecord | null;
+  numerosExistants?: string[];
 }) {
   const [form, setForm] = useState<Formulaire>(() => etatInitial(prochainNumero, initial));
   const [generation, setGeneration] = useState(false);
-  const [enregistrement, setEnregistrement] = useState(false);
 
   const enEdition = Boolean(initial);
   const numero = initial?.numero ?? buildNumero(Number(form.numeroClient) || 1, "proposition");
@@ -130,11 +135,24 @@ export function GenerateurProposition({
   /* VOLET 20 — GÉNÉRATION SANS TÉLÉCHARGEMENT AUTOMATIQUE (demande de
    * l'éditeur) : la génération ENREGISTRE la proposition (stockage
    * privé + copie email) — le téléchargement passe UNIQUEMENT par le
-   * bouton dédié de la liste. */
+   * bouton dédié de la liste.
+   * VOLET 23 — ANTI-DOUBLON (demande de l'éditeur : « une fois que
+   * c'est enregistré, si on clique encore sur générer, ça doit
+   * REFUSER par un toast et dire que le document existe déjà ») : le
+   * numéro de la proposition est comparé aux numéros DÉJÀ générés
+   * AVANT tout envoi. */
   async function genererProposition() {
     if (generation) return;
     if (!form.titre.trim()) {
       toast({ title: "Titre requis", description: "Renseignez le titre de la proposition.", variant: "destructive" });
+      return;
+    }
+    if (!enEdition && numerosExistants.includes(numero)) {
+      toast({
+        title: "Proposition déjà générée",
+        description: `La proposition ${numero} existe déjà — elle est disponible dans la liste (ouvrez-la ou modifiez-la depuis la liste).`,
+        variant: "destructive",
+      });
       return;
     }
     setGeneration(true);
@@ -177,35 +195,22 @@ export function GenerateurProposition({
     }
   }
 
-  async function enregistrerSeul() {
-    if (enregistrement) return;
-    setEnregistrement(true);
-    try {
-      const res = await fetch("/api/documents", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          document: { ...form, docType: "proposition", numero, ...(initial ? { id: initial.id, createdAt: initial.createdAt } : {}) },
-        }),
-      });
-      const data = await res.json().catch(() => null);
-      if (!res.ok || !data?.ok) {
-        throw new Error(data?.error ?? "Enregistrement impossible.");
-      }
-      toast({
-        title: `${enEdition ? "Mise à jour" : "Enregistrée"} : ${numero}`,
-        description: "La proposition est disponible dans la liste.",
-      });
-      onEnregistre();
-    } catch (e) {
-      toast({
-        title: "Enregistrement impossible",
-        description: e instanceof Error ? e.message : undefined,
-        variant: "destructive",
-      });
-    } finally {
-      setEnregistrement(false);
-    }
+  /* VOLET 23 — CHARGER LE MODÈLE PAR DÉFAUT (demande de l'éditeur :
+   * « remplace le bouton “enregistrer seulement” par le bouton
+   * “charger le modèle par défaut” comme sur les devis ») : le
+   * gabarit personnel complet de la proposition revient dans le
+   * formulaire — le numéro client et la date sont conservés, tout
+   * reste modifiable. */
+  function chargerModeleParDefaut() {
+    setForm((f) => ({
+      ...propositionV2ParDefaut(),
+      numeroClient: f.numeroClient,
+      date: f.date,
+    }));
+    toast({
+      title: "Modèle par défaut chargé",
+      description: "Le gabarit de votre proposition commerciale est de retour dans le formulaire — tout reste modifiable.",
+    });
   }
 
   const zonesTexte = (v: string) => v;
@@ -512,9 +517,9 @@ export function GenerateurProposition({
               </>
             )}
           </BoutonAction>
-          <BoutonAction onClick={enregistrerSeul} disabled={enregistrement || !stockageConfigure} titre={stockageConfigure ? undefined : "Stockage non configuré (GITHUB_DOCS_TOKEN)"}>
-            {enregistrement ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="h-4 w-4" aria-hidden="true" />}
-            Enregistrer seulement
+          <BoutonAction onClick={chargerModeleParDefaut}>
+            <Sparkles className="h-4 w-4" aria-hidden="true" />
+            Charger le modèle par défaut
           </BoutonAction>
           <Pastille ton={stockageConfigure ? "valide" : "alerte"}>
             {stockageConfigure ? "Stockage actif" : "Stockage non configuré"}

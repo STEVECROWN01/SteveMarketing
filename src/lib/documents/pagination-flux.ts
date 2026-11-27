@@ -96,6 +96,7 @@ export function fabriquerScriptPagination(conf: ConfPagination): string {
     for (var r = 0; r < blocs.length; r++) {
       blocs[r].style.marginTop = '';
       blocs[r].classList.remove('debut-page');
+      blocs[r].classList.remove('fin-page');
       flux.appendChild(blocs[r]);
     }
 
@@ -176,6 +177,33 @@ export function fabriquerScriptPagination(conf: ConfPagination): string {
       }
       repartis[repartis.length - 1].push(b);
       h += bh;
+    }
+
+    /* VOLET 23 — TRAIT DE FERMETURE EN BAS DE PAGE COUPÉE : quand le
+       tableau se POURSUIT sur la page suivante (le premier bloc de
+       la page suivante est une ligne du tableau ou son pied noir),
+       la portion laissée sur la page en cours se TERMINE par un
+       filet FIN (.fin-page — trait horizontal comme les bords du
+       tableau, demande de l'éditeur : « en bas, là où le tableau
+       s'est arrêté, il doit avoir la fin du tableau — un trait
+       horizontal fin — puis continuer sur la page suivante avec
+       l'entête »). Le tableau ne reste JAMAIS « ouvert » en bas de
+       page. */
+    for (var fp = 0; fp < repartis.length - 1; fp++) {
+      var blocsPage = repartis[fp];
+      var blocsPageSuivante = repartis[fp + 1];
+      if (!blocsPage.length || !blocsPageSuivante.length) continue;
+      var dernierBloc = blocsPage[blocsPage.length - 1];
+      var premierBlocSuivant = blocsPageSuivante[0];
+      if (
+        dernierBloc.classList &&
+        dernierBloc.classList.contains('svc-part') &&
+        premierBlocSuivant.classList &&
+        (premierBlocSuivant.classList.contains('svc-part') ||
+          premierBlocSuivant.classList.contains('svc-foot'))
+      ) {
+        dernierBloc.classList.add('fin-page');
+      }
     }
 
     var gabarit = document.getElementById('pc-gabarits');

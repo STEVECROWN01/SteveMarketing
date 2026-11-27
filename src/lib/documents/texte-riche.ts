@@ -71,20 +71,33 @@ function escapeHtml(v: string): string {
 }
 
 /** Le texte riche est-il VRAIMENT du HTML (balises) ? Sinon, on
- *  l'affiche tel quel ligne par ligne (texte brut multi-lignes). */
+ *  l'affiche tel quel en UN SEUL paragraphe coulant.
+ *
+ *  VOLET 23 (27/11/2026) — UN SEUL PARAGRAPHE, comme dans le champ
+ *  (demande de l'éditeur : « le contenu de la colonne description
+ *  pré-remplie est en paragraphe dans le champ, mais dans le tableau
+ *  ce n'est pas en paragraphe — ça considère une phrase comme un
+ *  paragraphe et c'est espacé. Quand dans le champ c'est en
+ *  paragraphe, sur le document ça doit être également en
+ *  paragraphe ») : le champ de rédaction affiche les lignes d'un
+ *  texte brut comme UN bloc coulant (les retours à la ligne
+ *  s'effacent à l'affichage) — le document rend désormais la MÊME
+ *  chose : les lignes se rejoignent par des espaces dans UN SEUL
+ *  paragraphe (plus un paragraphe espacé par phrase). */
 export function htmlRicheOuTexteBrut(html: string | null | undefined): string {
   const riche = assainirHtmlRiche(html);
   if (!riche) return "";
   if (/<(p|br|b|strong|i|em|u|font|span|ul|ol|li|div)\b/i.test(riche)) {
     return riche;
   }
-  /* texte brut : chaque ligne devient un paragraphe */
-  return riche
+  /* texte brut : UN SEUL paragraphe coulant (comme dans le champ). */
+  const lignes = riche
     .split(/\n/)
     .map((l) => l.trim())
     .filter(Boolean)
-    .map((l) => `<p>${escapeHtml(l)}</p>`)
-    .join("");
+    .map((l) => escapeHtml(l));
+  if (!lignes.length) return "";
+  return `<p>${lignes.join(" ")}</p>`;
 }
 
 /** Découpe une description riche en FRAGMENTS de bloc (un
@@ -115,7 +128,15 @@ export function htmlRicheOuTexteBrut(html: string | null | undefined): string {
  *  tableau se coupe en bas de page (près du pied) et se poursuit
  *  sur la page suivante, l'en-tête du tableau y est repris.
  *  Rendu visuel IDENTIQUE : les phrases se suivent sans marge,
- *  comme un paragraphe unique. */
+ *  comme un paragraphe unique.
+ *
+ *  VOLET 23 (27/11/2026) — BLOCS <div> ENTIERS : un <div> complet
+ *  (titre de périmètre + sa description, générés par le devis depuis
+ *  proposition) reste UN SEUL fragment — le titre et sa description
+ *  partagent la MÊME rangée du tableau, l'espace entre eux se réduisant
+ *  au strict minimum (demande de l'éditeur : « l'espace entre les
+ *  titres des périmètres et les descriptions est trop — réduis ça »).
+ *  Le contenu qui suit la fermeture du <div> est découpé à son tour. */
 export function decouperHtmlRiche(html: string | null | undefined): string[] {
   const riche = htmlRicheOuTexteBrut(html);
   if (!riche) return [];
@@ -126,7 +147,48 @@ export function decouperHtmlRiche(html: string | null | undefined): string[] {
       .map((l) => l.trim())
       .filter(Boolean);
   }
-  const bruts = riche
+
+  const fragments: string[] = [];
+  /* VOLET 23 — pré-passe : extraire chaque <div>…</div> COMPLET comme
+   * fragment unique, puis découper ce qui l'entoure comme avant. */
+  let reste = riche;
+  while (reste) {
+    const debutDiv = reste.search(/<div\b/i);
+    if (debutDiv === -1) {
+      fragments.push(...decouperSegments(reste));
+      reste = "";
+      break;
+    }
+    if (debutDiv > 0) fragments.push(...decouperSegments(reste.slice(0, debutDiv)));
+    const apresDiv = reste.slice(debutDiv);
+    const fermeture = apresDiv.match(/<\/div\s*>/i);
+    if (!fermeture || fermeture.index === undefined) {
+      /* div jamais fermé : bloc entier */
+      fragments.push(apresDiv);
+      reste = "";
+    } else {
+      const finDiv = fermeture.index + fermeture[0].length;
+      fragments.push(apresDiv.slice(0, finDiv));
+      reste = apresDiv.slice(finDiv);
+    }
+  }
+
+  /* VOLET 22 (27/11/2026) — fragments VIDES retirés : l'éclatement
+   *  phrase par phrase pouvait laisser un fragment sans texte visible
+   *  (balises seules) — il s'imprimait comme une RANGÉE VIDE de ~10 px
+   *  dans le tableau (une par paragraphe : ~80 px perdus sur un devis
+   *  de huit paragraphes) et repoussait la fin du document à une
+   *  page supplémentaire. */
+  return fragments.filter(
+    (f) => f.replace(/<[^>]+>/g, "").replace(/&nbsp;/gi, " ").trim() !== "",
+  );
+}
+
+/** Découpe un segment SANS <div> de premier niveau en fragments de
+ *  bloc (paragraphe, liste, font) — l'éclatement <li> par <li> et la
+ *  découpe phrase par phrase des longs paragraphes sont conservés. */
+function decouperSegments(segment: string): string[] {
+  const bruts = segment
     .split(/(?=<p\b|<ul\b|<ol\b|<div\b|<font\b)/i)
     .map((m) => m.trim())
     .filter(Boolean);

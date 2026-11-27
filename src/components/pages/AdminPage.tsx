@@ -655,8 +655,11 @@ function SelectionDevis({
 
   return (
     <Carte>
-      <div className="scroll-slim overflow-x-auto">
-        <table className="w-full min-w-[820px] text-left text-sm">
+      {/* VOLET 23 — PLUS DE DÉFILEMENT HORIZONTAL ni de largeur
+          minimale : le tableau s'arrête sur sa dernière colonne,
+          comme les listes de documents. */}
+      <div>
+        <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-[#e4e4e4]/10 text-[11px] tracking-widest text-[#c8c8c8] uppercase">
               <th className="w-12 px-5 py-4" aria-label="Sélection" />
@@ -674,7 +677,12 @@ function SelectionDevis({
               /* VOLET 22 — un devis DÉJÀ FACTURÉ ne peut pas être
                  sélectionné (grisé) : sa facture existe déjà
                  (demande de l'éditeur) — mais son statut « Facturée
-                 (n°) » reste CLIQUABLE et amène à la facture. */
+                 (n°) » reste CLIQUABLE et amène à la facture.
+                 VOLET 23 — SEUL le statut reste AU CLAIR : la rangée
+                 grise chaque cellule SAUF le statut (demande de
+                 l'éditeur : « le statut ne doit pas être grisé — le
+                 statut seul doit être dégrisé pour faire savoir que
+                 c'est cliquable »). */
               const dejaFacture = Boolean(facture);
               return (
                 <tr
@@ -683,11 +691,11 @@ function SelectionDevis({
                   aria-disabled={dejaFacture || undefined}
                   className={`border-b border-[#e4e4e4]/8 transition-colors ${
                     dejaFacture
-                      ? "cursor-not-allowed opacity-45"
+                      ? "cursor-not-allowed"
                       : "cursor-pointer hover:bg-[#2f2f2f]/40"
                   } ${selectionne ? "bg-[#2f2f2f]" : ""}`}
                 >
-                  <td className="px-5 py-4">
+                  <td className={`px-5 py-4 ${dejaFacture ? "opacity-45" : ""}`}>
                     <input
                       type="radio"
                       name="devis-a-facturer"
@@ -706,13 +714,13 @@ function SelectionDevis({
                       className="h-4 w-4 accent-[#e4e4e4]"
                     />
                   </td>
-                  <td className="whitespace-nowrap px-5 py-4 font-medium text-white">{d.numero}</td>
-                  <td className="max-w-[220px] px-5 py-4">
+                  <td className={`whitespace-nowrap px-5 py-4 font-medium text-white ${dejaFacture ? "opacity-45" : ""}`}>{d.numero}</td>
+                  <td className={`max-w-[220px] px-5 py-4 ${dejaFacture ? "opacity-45" : ""}`}>
                     <p className="truncate font-medium text-white">{d.client.nom}</p>
                     {d.client.entreprise ? <p className="truncate text-xs text-[#c8c8c8]">{d.client.entreprise}</p> : null}
                   </td>
-                  <td className="whitespace-nowrap px-5 py-4 text-[#c8c8c8]">{formatDate(d.date)}</td>
-                  <td className="whitespace-nowrap px-5 py-4 font-medium text-white">
+                  <td className={`whitespace-nowrap px-5 py-4 text-[#c8c8c8] ${dejaFacture ? "opacity-45" : ""}`}>{formatDate(d.date)}</td>
+                  <td className={`whitespace-nowrap px-5 py-4 font-medium text-white ${dejaFacture ? "opacity-45" : ""}`}>
                     {formatCurrency(totalDocument(d.items), d.devise)}
                   </td>
                   <td className="px-5 py-4">
@@ -780,6 +788,11 @@ export function AdminPage() {
   const [docEnEdition, setDocEnEdition] = useState<ToutDocument | null>(null);
   const [vueFactures, setVueFactures] = useState<VueFactures>("liste");
   const [factureCible, setFactureCible] = useState<DocumentRecord | null>(null);
+  /* VOLET 23 — facture à OUVRIR EN APERÇU depuis le statut « Facturée
+   *  (n°) » de la sélection de devis : la rubrique Factures s'ouvre
+   *  sur sa LISTE, la facture s'affiche en PLEIN ÉCRAN (plus de modale
+   *  de modification — demande de l'éditeur). */
+  const [voirFacture, setVoirFacture] = useState<DocumentRecord | null>(null);
   /* VOLET 16 — pré-remplissage d'un nouveau devis depuis une demande. */
   const [preRemplissage, setPreRemplissage] = useState<PreRemplissage | null>(null);
 
@@ -861,6 +874,7 @@ export function AdminPage() {
     setDocEnEdition(null);
     setVueFactures("liste");
     setFactureCible(null);
+    setVoirFacture(null);
     setPreRemplissage(null);
     /* VOLET 17 : icône verte sur le toast de déconnexion. */
     toast({
@@ -963,6 +977,20 @@ export function AdminPage() {
 
   const prochainNumero = useMemo(
     () => documents.reduce((max, d) => Math.max(max, Number(d.numeroClient) || 0), 0) + 1,
+    [documents],
+  );
+
+  /* VOLET 23 — ANTI-DOUBLON (demande de l'éditeur : « une fois que
+   *  c'est enregistré, si on clique encore sur générer, ça doit
+   *  REFUSER par un toast et dire que le document existe déjà —
+   *  pareil pour la génération de devis, etc. ») : numéros déjà
+   *  générés par type, transmis aux générateurs. */
+  const numerosPropositions = useMemo(
+    () => documents.filter((d) => d.docType === "proposition").map((d) => d.numero),
+    [documents],
+  );
+  const numerosDevis = useMemo(
+    () => documents.filter((d) => d.docType === "devis").map((d) => d.numero),
     [documents],
   );
 
@@ -1247,6 +1275,9 @@ export function AdminPage() {
               stockageConfigure={stockageConfigure}
               onEnregistre={chargerDocuments}
               toast={toast}
+              /* VOLET 23 — anti-doublon : numéros de propositions déjà
+                  générées. */
+              numerosExistants={numerosPropositions}
             />
           </>
         )}
@@ -1265,6 +1296,7 @@ export function AdminPage() {
               onEnregistre={chargerDocuments}
               toast={toast}
               initial={docEnEdition}
+              numerosExistants={numerosPropositions}
             />
           </>
         )}
@@ -1329,6 +1361,9 @@ export function AdminPage() {
               onEnregistre={chargerDocuments}
               toast={toast}
               preRemplissage={preRemplissage}
+              /* VOLET 23 — anti-doublon : numéros de devis déjà
+                  générés. */
+              numerosExistants={numerosDevis}
             />
           </>
         )}
@@ -1388,11 +1423,15 @@ export function AdminPage() {
               documents={documents}
               onChoisir={(d) => setFactureCible(d)}
               onCreerDevis={() => ouvrirCreation("devis")}
-              /* VOLET 22 — statut « Facturée (n°) » cliquable : ouvre
-                  l'espace des factures avec cette facture. */
+              /* VOLET 23 — clic sur le statut « Facturée (n°) » : la
+                  rubrique Factures s'ouvre sur sa LISTE et la facture
+                  s'affiche en APERÇU PLEIN ÉCRAN (la modale de
+                  modification ne s'ouvre PLUS — l'action respecte sa
+                  promesse : VOIR la facture dans l'espace des
+                  factures). */
               onVoirFacture={(f) => {
                 setVueFactures("liste");
-                setFactureCible(f);
+                setVoirFacture(f);
               }}
             />
           </>
@@ -1413,6 +1452,10 @@ export function AdminPage() {
               onRafraichir={chargerDocuments}
               toast={toast}
               onModifier={(f) => setFactureCible(f as DocumentRecord)}
+              /* VOLET 23 — facture reçue du statut « Facturée (n°) » :
+                  elle s'ouvre en aperçu plein écran dès l'arrivée. */
+              apercuAutomatique={voirFacture}
+              onApercuOuvert={() => setVoirFacture(null)}
             />
           </>
         )}

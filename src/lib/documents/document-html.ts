@@ -48,7 +48,7 @@ import { formatDate, formatDateCourte, formatCurrency } from "./format";
 import { descriptionOuPoints, decouperHtmlRiche } from "./texte-riche";
 import { fabriquerScriptPagination } from "./pagination-flux";
 import { LABELS_DOC, type DocumentRecord } from "./types";
-import { EMETTEUR, CONDITIONS_GENERALES, CONDITIONS_GENERALES_EN, TEXTES_DEFAUT } from "./defaults";
+import { EMETTEUR, CONDITIONS_GENERALES, CONDITIONS_GENERALES_EN, TEXTES_DEFAUT, NOTE_DEFAUT } from "./defaults";
 
 function esc(v: string | null | undefined): string {
   if (v === null || v === undefined) return "";
@@ -124,6 +124,10 @@ const LIBELLES: Record<"fr" | "en", Record<string, string>> = {
     notes: "Notes&nbsp;:",
     /* Coordonnées bancaires */
     coordonneesBancaires: "Coordonnées bancaires",
+    /* VOLET 23 — titre du bloc de paiement des DEVIS (le bloc
+       « Coordonnées bancaires » est renommé « Modalité de paiement »
+       — demande de l'éditeur). */
+    modalitePaiement: "Modalité de paiement",
     iban: "IBAN&nbsp;:",
     bic: "BIC&nbsp;:",
     titulaireCompte: "Titulaire du compte&nbsp;:",
@@ -189,6 +193,8 @@ const LIBELLES: Record<"fr" | "en", Record<string, string>> = {
     notes: "Notes:",
     /* Bank details */
     coordonneesBancaires: "Bank details",
+    /* VOLET 23 — devis payment block title (renamed). */
+    modalitePaiement: "Payment",
     iban: "IBAN:",
     bic: "BIC:",
     titulaireCompte: "Account holder:",
@@ -392,7 +398,6 @@ export function renderDocumentHtml(
           <span class="ipb-label">${L.dateReglement}</span>
           <span class="ipb-value">${estPaye ? `${L.le} ${datePaiementLabel}` : "—"}</span>
         </div>
-        ${d.devisSource ? `<div class="ipb-row"><span class="ipb-label">${L.devisOrigine}</span><span class="ipb-value">${esc(d.devisSource)}</span></div>` : ""}
       </div>`
     : "";
 
@@ -526,38 +531,61 @@ export function renderDocumentHtml(
    * SUPPRIMÉE (demande de l'éditeur) ; seules les NOTES éventuelles
    * restent imprimées.
    * VOLET 21 (27/11/2026) — ORDRE : ce bloc passe APRÈS les
-   * coordonnées bancaires (demande de l'éditeur) — « Validité du
-   * document : 15 jours » et « Notes » suivent le bloc «
-   * Coordonnées bancaires », sans déplacer ce dernier. */
+   * coordonnées bancaires.
+   * VOLET 23 — FACTURE : la note est TOUJOURS la note affichée sur
+   * les devis (demande de l'éditeur : « je veux que cette note soit
+   * la même note affichée sur les devis : “Notes : Je reste à votre
+   * disposition pour toute question complémentaire et vous
+   * remercie pour votre confiance.” ») — les modalités de la
+   * proposition ne s'invitent plus sur les factures. */
   const blocValiditeNotes = estFacture
-    ? d.notes
-      ? `
+    ? `
   <div class="validite-notes" data-bloc>
-    <p><span class="vn-lbl">${L.notes}</span> ${esc(d.notes)}</p>
+    <p><span class="vn-lbl">${L.notes}</span> ${esc(langue === "en" ? TEXTES_DEFAUT.en.notes : NOTE_DEFAUT)}</p>
   </div>`
-      : ""
     : `
   <div class="validite-notes" data-bloc>
     <p><span class="vn-lbl">${L.validite}</span> ${Number(d.validiteJours) || 5} ${L.jours}</p>
     ${d.notes ? `<p><span class="vn-lbl">${L.notes}</span> ${esc(d.notes)}</p>` : ""}
   </div>`;
 
-  /* Coordonnées bancaires — VOLET 17 : IBAN, BIC puis TITULAIRE (la
-   * ligne « Banque » est supprimée). VOLET 18 : libellés traduits,
-   * valeurs système (mode de paiement, condition de règlement par
-   * défaut) affichées dans la langue.
-   * VOLET 20 (26/11/2026) — FACTURE : le bloc « Coordonnées
-   * bancaires » (et le lien de paiement éventuel) est SUPPRIMÉ de
-   * la facture (demande de l'éditeur) — il reste sur les devis. */
+  /* VOLET 23 — BLOC « MODALITÉ DE PAIEMENT » DES DEVIS (et des
+   * propositions à l'ancien gabarit) : le bloc « Coordonnées
+   * bancaires » adopte le DESIGN ET L'ORGANISATION du bloc Paiement
+   * des factures (demande de l'éditeur : « le design ainsi que
+   * l'organisation de ce bloc paiement me plaît beaucoup — applique
+   * ce design au bloc coordonnées bancaires de tous les devis ; le
+   * bloc ne sera plus nommé coordonnées bancaires mais modalité de
+   * paiement, ou simplement paiement. À l'intérieur on aura la
+   * mention mode de paiement virement bancaire et les éléments des
+   * coordonnées en dessous ») : même habillage (fond, filet, rangées
+   * libellé/valeur), « Mode de paiement : Virement bancaire » en
+   * tête, puis IBAN, BIC, titulaire et condition de règlement.
+   * VOLET 20 — FACTURE : ce bloc reste SUPPRIMÉ des factures. */
   const blocBanque = !estFacture
     ? `
-  <div class="section-heading" data-bloc data-heading>${L.coordonneesBancaires}</div>
-  <div class="bank-block" data-bloc>
-    <div class="bank-row"><span class="lbl">${L.iban}</span> <span class="val">${esc(d.banque.iban)}</span></div>
-    <div class="bank-row"><span class="lbl">${L.bic}</span> <span class="val">${esc(d.banque.bic)}</span></div>
-    <div class="bank-row"><span class="lbl">${L.titulaireCompte}</span> <span class="val">${esc(d.banque.titulaire)}</span></div>
-    <div class="bank-row"><span class="lbl">${L.modePaiement}</span> <span class="val">${esc(traduireValeur(d.modePaiement, langue))}</span></div>
-    <div class="bank-row"><span class="lbl">${L.conditionsReglement}</span> <span class="val">${esc(traduireValeur(d.conditionsReglement, langue))}</span></div>
+  <div class="invoice-payment-block invoice-payment-block--devis" data-bloc>
+    <div class="ipb-title">${L.modalitePaiement}</div>
+    <div class="ipb-row">
+      <span class="ipb-label">${L.modePaiement}</span>
+      <span class="ipb-value">${badgeModePaiement(d.modePaiement, langue)}</span>
+    </div>
+    <div class="ipb-row">
+      <span class="ipb-label">${L.iban}</span>
+      <span class="ipb-value">${esc(d.banque.iban)}</span>
+    </div>
+    <div class="ipb-row">
+      <span class="ipb-label">${L.bic}</span>
+      <span class="ipb-value">${esc(d.banque.bic)}</span>
+    </div>
+    <div class="ipb-row">
+      <span class="ipb-label">${L.titulaireCompte}</span>
+      <span class="ipb-value">${esc(d.banque.titulaire)}</span>
+    </div>
+    <div class="ipb-row">
+      <span class="ipb-label">${L.conditionsReglement}</span>
+      <span class="ipb-value">${esc(traduireValeur(d.conditionsReglement, langue))}</span>
+    </div>
   </div>
   ${
     d.lienPaiement
@@ -780,6 +808,15 @@ export function renderDocumentHtml(
   /* Fragment qui OUVRE une page : le tableau reprend avec un filet
      supérieur (posé par le moteur de pagination). */
   .svc-part.debut-page { border-top: 1px solid #000000; }
+  /* VOLET 23 — fragment qui FERME une page coupée : quand le tableau
+     se poursuit sur la page suivante, la portion laissée sur la page
+     en cours se TERMINE par un trait horizontal FIN, comme les bords
+     du tableau (demande de l'éditeur : « en bas, là où le tableau
+     s'est arrêté, il doit avoir la fin du tableau — un trait
+     horizontal fin comme les bords du tableau — puis continuer sur
+     la page suivante avec l'entête du tableau ; ne pas laisser le
+     tableau ouvert en bas »). */
+  .svc-part.fin-page { border-bottom: 1px solid #000000; }
   .svc-part .cell {
     padding: 5px 8px;
     font-size: 9pt;
@@ -830,8 +867,11 @@ export function renderDocumentHtml(
     font-size: 10pt;
   }
   /* Description RÉDIGÉE (texte riche, mise en forme Word-like) —
-     plus de puces carrées. */
-  .desc-riche p { margin: 0 0 3px 0; font-size: 9pt; line-height: 1.5; color: #374151; }
+     plus de puces carrées.
+     VOLET 23 — paragraphes RESSERRÉS (demande de l'éditeur : « l'espace
+     entre les titres des périmètres et leurs descriptions est trop —
+     réduis ça ; l'espace entre les paragraphes aussi ») : 3 px → 1 px. */
+  .desc-riche p { margin: 0 0 1px 0; font-size: 9pt; line-height: 1.5; color: #374151; }
   .desc-riche p:last-child { margin-bottom: 0; }
   .desc-riche b, .desc-riche strong { font-weight: 700; color: #111111; }
   .desc-riche i, .desc-riche em { font-style: italic; }
@@ -860,7 +900,7 @@ export function renderDocumentHtml(
      marge basse d'origine. Le tableau se remplit jusqu'en bas de
      page et se poursuit en page suivante (en-tête repris). */
   .desc-riche p.p-suite { margin: 0; }
-  .desc-riche p.p-suite--fin { margin-bottom: 3px; }
+  .desc-riche p.p-suite--fin { margin-bottom: 1px; }
 
   /* ---- Total SOUS le tableau — VOLET 19 : lignes à POINTILLÉS.
      « Total » et « TVA » en GRAS ET GROS à gauche, la valeur
@@ -1050,7 +1090,12 @@ export function renderDocumentHtml(
   .validite-notes p { margin: 0 0 3px 0; font-size: 9pt; line-height: 1.5; color: #1f2937; }
   .validite-notes .vn-lbl { color: #000000; font-weight: 600; }
 
-  /* ---- Bloc Paiement (factures) ---- */
+  /* ---- Bloc Paiement (factures) — VOLET 23 : le bloc des DEVIS
+     (« Modalité de paiement ») adopte le MÊME habillage (demande de
+     l'éditeur : « le design de ce bloc paiement me plaît beaucoup —
+     applique-le aux coordonnées bancaires des devis ») ; il prend
+     la place de l'ancien titre de section + bloc bancaire, avec la
+     marge haute d'un titre de section. ---- */
   .invoice-payment-block {
     background: rgba(75, 138, 107, 0.08);
     border: 1px solid rgba(75, 138, 107, 0.3);
@@ -1058,6 +1103,7 @@ export function renderDocumentHtml(
     margin-top: 4mm;
     border-radius: 2px;
   }
+  .invoice-payment-block--devis { margin-top: 8mm; }
   .ipb-title {
     font-size: 11pt;
     font-weight: 700;

@@ -88,6 +88,12 @@ export function ListeDocuments({
   onSigne,
   /** VOLET 20 — générer un devis depuis cette proposition. */
   onGenererDevis,
+  /** VOLET 23 — document (facture) à OUVRIR EN APERÇU dès l'arrivée
+   *  dans la rubrique (clic sur le statut « Facturée (n°) » d'un
+   *  devis déjà facturé — la facture s'ouvre dans SON espace, en
+   *  plein écran, sans modale de modification). */
+  apercuAutomatique,
+  onApercuOuvert,
 }: {
   docType: DocType;
   documents: ToutDocument[];
@@ -99,6 +105,8 @@ export function ListeDocuments({
   onFacturer?: (d: DocumentRecord) => void;
   onSigne?: (d: DocumentRecord) => void;
   onGenererDevis?: (p: PropositionRecord) => void;
+  apercuAutomatique?: ToutDocument | null;
+  onApercuOuvert?: () => void;
 }) {
   const [apercu, setApercu] = useState<ToutDocument | null>(null);
   /* VOLET 21 — visionneuse du PDF SIGNÉ d'un devis (téléversé). */
@@ -126,6 +134,16 @@ export function ListeDocuments({
     manques: string[];
   }>({ phase: "attente", manques: [] });
   const [progressionAnalyse, setProgressionAnalyse] = useState(0);
+
+  /* VOLET 23 — APERÇU AUTOMATIQUE : le document reçu (une facture
+   *  depuis le statut « Facturée (n°) » de la sélection de devis)
+   *  s'ouvre EN PLEIN ÉCRAN dès son arrivée dans la rubrique. */
+  useEffect(() => {
+    if (apercuAutomatique) {
+      setApercu(apercuAutomatique);
+      onApercuOuvert?.();
+    }
+  }, [apercuAutomatique, onApercuOuvert]);
 
   /* ORDRE DE CRÉATION : du premier au dernier document créé. */
   const visibles = useMemo(
@@ -437,17 +455,13 @@ export function ListeDocuments({
           </p>
         </Carte>
       ) : (
-        <Carte className="scroll-slim overflow-x-auto">
-          {/* VOLET 22 — PLUS DE LARGEUR MINIMALE : la barre de
-              défilement HORIZONTALE de la liste des documents (devis
-              en tête) disparaît (demande de l'éditeur : « il y a une
-              barre horizontale de scroll alors que le tableau est
-              terminé sur la colonne Action — quand on défile à
-              droite, il n'y a qu'un petit espace qui apparaît ; il
-              faut enlever la barre de scroll horizontale »). Le
-              tableau s'aligne sur la largeur disponible ; le
-              défilement horizontal ne revient que si l'écran est
-              réellement trop étroit. */}
+        <Carte className="overflow-x-clip">
+          {/* VOLET 23 — PLUS DE DÉFILEMENT HORIZONTAL : le tableau
+              s'arrête sur la colonne Action (demande de l'éditeur : « il
+              n'y a pas d'options extra quand on défile — il faut que le
+              tableau soit arrêté sur la colonne action, enlève la barre
+              de scroll horizontal »). Les boutons d'action passent à la
+              ligne si besoin : le tableau ne dépasse JAMAIS sa carte. */}
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-[#e4e4e4]/10 text-[11px] tracking-widest text-[#c8c8c8] uppercase">
@@ -523,7 +537,10 @@ export function ListeDocuments({
                       )}
                     </td>
                     <td className="px-5 py-4">
-                      <div className="flex items-center justify-end gap-2">
+                      {/* VOLET 23 — les boutons d'action passent à la
+                          ligne si nécessaire : aucune colonne ne force
+                          le tableau au-delà de sa carte. */}
+                      <div className="flex flex-wrap items-center justify-end gap-2">
                         {/* VOLET 21 — TOUS les boutons d'action portent
                             une INFO-BULLE au survol (demande de
                             l'éditeur). */}
@@ -755,12 +772,9 @@ export function ListeDocuments({
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-[#c8c8c8]">
-              Téléversez le PDF du devis signé par le client : le système vérifie
-              <strong className="text-white"> à l&apos;upload</strong> que le document correspond bien à
-              ce devis (numéro, nom du client, signature, date d&apos;émission, tableau de détails) —
-              l&apos;enregistrement ne se dégrise qu&apos;après la coche verte.
-            </p>
+            {/* VOLET 23 — le texte explicatif demandé SUPPRIMÉ (demande
+                de l'éditeur : « supprime le texte "Téléversez le PDF…" »)
+                — la zone d'upload et l'analyse parlent d'elles-mêmes. */}
             <input
               ref={signatureInputRef}
               type="file"

@@ -180,14 +180,22 @@ export function BoutonIcone({
       </button>
       {/* Info-bulle : au-dessus de l'icône, flèche discrète vers le
           bas ; survol de la zone (bouton OU info-bulle) — marche
-          aussi sur un bouton désactivé (pointer-events sur le span). */}
+          aussi sur un bouton désactivé (pointer-events sur le span).
+          VOLET 23 — ANCRE À DROITE : l'info-bulle s'étend vers la
+          GAUCHE du bouton. Les boutons d'action des listes vivent
+          ALIGNÉS À DROITE de leur carte : l'ancrage centré faisait
+          déborder la dernière info-bulle HORS de la carte — c'est
+          ELLE qui créait la barre de défilement horizontal (et une
+          fois la carte clippée, l'info-bulle du dernier bouton
+          aurait été coupée). Ancrée à droite, l'info-bulle ne
+          dépasse JAMAIS le bord droit. */}
       <span
         role="tooltip"
         aria-hidden="true"
-        className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md border border-[#e4e4e4]/15 bg-[#0f0f0f] px-2.5 py-1.5 text-[11px] font-medium text-white opacity-0 shadow-[0_6px_20px_rgba(0,0,0,0.5)] transition-opacity duration-150 group-hover/bi:opacity-100 group-focus-within/bi:opacity-100 sm:block"
+        className="pointer-events-none absolute bottom-full right-0 z-50 mb-2 hidden whitespace-nowrap rounded-md border border-[#e4e4e4]/15 bg-[#0f0f0f] px-2.5 py-1.5 text-[11px] font-medium text-white opacity-0 shadow-[0_6px_20px_rgba(0,0,0,0.5)] transition-opacity duration-150 group-hover/bi:opacity-100 group-focus-within/bi:opacity-100 sm:block"
       >
         {titre}
-        <span className="absolute left-1/2 top-full -mt-1 h-2 w-2 -translate-x-1/2 rotate-45 border-b border-r border-[#e4e4e4]/15 bg-[#0f0f0f]" />
+        <span className="absolute right-[14px] top-full -mt-1 h-2 w-2 -translate-x-1/2 rotate-45 border-b border-r border-[#e4e4e4]/15 bg-[#0f0f0f]" />
       </span>
     </span>
   );

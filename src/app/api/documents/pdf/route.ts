@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifySessionToken, SESSION_COOKIE } from "@/lib/admin-auth";
-import { completerDocument, saveDocument, isStorageConfigured, type ToutDocument } from "@/lib/documents/github";
+import { completerDocument, saveDocument, getDocument, isStorageConfigured, type ToutDocument } from "@/lib/documents/github";
 import { generatePdf } from "@/lib/documents/pdf";
-import { buildNomFichier, formatDate, formatCurrency, totalDocument, fmtMontantSimple } from "@/lib/documents/format";
+import { buildIdDocument, buildNomFichier, formatDate, formatCurrency, totalDocument, fmtMontantSimple } from "@/lib/documents/format";
 import { LOGO_DOC_DATA_URI } from "@/lib/documents/logo-base64";
 import { isEmailServiceConfigured, sendDocumentCopy } from "@/lib/email";
 import { LABELS_DOC, type DemandeDocument } from "@/lib/documents/types";
@@ -48,6 +48,27 @@ export async function POST(req: NextRequest) {
 
   try {
     const document = completerDocument(brut) as ToutDocument;
+    /* VOLET 23 — ANTI-DOUBLON (garde serveur, demande de l'éditeur :
+     * « quand on clique encore sur générer une seconde fois, ça doit
+     * refuser par un toast et dire que le document existe déjà ») :
+     * une CRÉATION (aucun identifiant fourni) d'un numéro déjà
+     * enregistré est REFUSÉE ; la mise à jour d'un document existant
+     * (identifiant fourni — c'est le cas des factures régénérées)
+     * reste libre. */
+    if (enregistrer && !brut?.id && isStorageConfigured()) {
+      const existant = await getDocument(
+        buildIdDocument(document.docType, document.numero),
+      ).catch(() => null);
+      if (existant) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: `Le document ${document.numero} existe déjà — il est disponible dans la liste (ouvrez-le ou modifiez-le depuis la liste).`,
+          },
+          { status: 409 },
+        );
+      }
+    }
     /* VOLET 18 — le PDF (et sa copie email) est rendu dans la langue
      * CHOISIE ; le document ENREGISTRÉ garde sa propre langue.
      * Les propositions commerciales ignorent la langue (template

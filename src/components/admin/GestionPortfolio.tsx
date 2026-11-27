@@ -14,7 +14,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import { AnneauProgression, BoutonAction, Carte, Champ, ModaleConfirmation, Pastille, styleInput, TitreSection } from "./elements";
+import { AnneauProgression, BoutonAction, BoutonIcone, Carte, Champ, ModaleConfirmation, Pastille, styleInput, TitreSection } from "./elements";
 import type { ProjetAdmin, ImageProjet } from "@/lib/portfolio/types";
 /* VOLET 20 (26/11/2026) — l'espace portfolio ne doit JAMAIS être
    vide : les projets STATIQUES du site (ceux en ligne actuellement)
@@ -991,34 +991,50 @@ export function GestionPortfolio({
                   </a>
                 ) : null}
               </div>
+              {/* VOLET 23 — TOUS les boutons des projets sont des ICÔNES
+                  SEULES (demande de l'éditeur : « je veux que les
+                  boutons soient sans texte, juste les icônes.
+                  Simplement. ») ; chaque icône garde son INFO-BULLE.
+                  « Voir le projet » apparaît sur TOUS les projets
+                  présentés dans le portfolio du site — y compris les
+                  projets ADMIN publiés (demande de l'éditeur : « tous
+                  les projets qui sont présentés dans le portfolio
+                  doivent avoir tous ces boutons-là »). */}
               <div className="flex flex-wrap items-center gap-2">
-                <BoutonAction
+                {projet.statut === "publie" ? (
+                  <BoutonIcone
+                    titre="Voir la page du projet sur le site"
+                    onClick={() => router.navigate("projet", projet.id)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </BoutonIcone>
+                ) : null}
+                <BoutonIcone
+                  titre="Modifier ce projet"
                   onClick={() => {
                     setEnCreation(false);
                     setEnEdition(projet);
                   }}
-                  titre="Modifier ce projet"
                 >
-                  <Pencil className="h-4 w-4" aria-hidden="true" />
-                  Modifier
-                </BoutonAction>
+                  <Pencil className="h-4 w-4" />
+                </BoutonIcone>
                 {projet.statut === "publie" ? (
                   /* VOLET 22 — DÉPUBLICATION avec confirmation (le
                      projet quitte le site, il reste dans l'espace). */
-                  <BoutonAction
+                  <BoutonIcone
+                    titre="Dépublier (retirer du site)"
                     onClick={() => setDepublication(projet)}
                     disabled={actionRapide === projet.id}
-                    titre="Retirer le projet du site (il reste dans cet espace)"
                   >
                     {actionRapide === projet.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <EyeOff className="h-4 w-4" aria-hidden="true" />
+                      <EyeOff className="h-4 w-4" />
                     )}
-                    Dépublier
-                  </BoutonAction>
+                  </BoutonIcone>
                 ) : (
-                  <BoutonAction
+                  <BoutonIcone
+                    titre="Publier sur le site"
                     onClick={async () => {
                       if (actionRapide) return;
                       setActionRapide(projet.id);
@@ -1040,20 +1056,26 @@ export function GestionPortfolio({
                       }
                     }}
                     disabled={actionRapide === projet.id}
-                    titre="Publier sur le site"
                   >
                     {actionRapide === projet.id ? (
-                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <Eye className="h-4 w-4" aria-hidden="true" />
+                      <Eye className="h-4 w-4" />
                     )}
-                    Publier
-                  </BoutonAction>
+                  </BoutonIcone>
                 )}
-                <BoutonAction variant="danger" onClick={() => setSuppression(projet)} disabled={actionRapide === projet.id} titre="Supprimer">
-                  <Trash2 className="h-4 w-4" aria-hidden="true" />
-                  Supprimer
-                </BoutonAction>
+                <BoutonIcone
+                  titre="Supprimer définitivement"
+                  ton="danger"
+                  onClick={() => setSuppression(projet)}
+                  disabled={actionRapide === projet.id}
+                >
+                  {actionRapide === projet.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </BoutonIcone>
               </div>
             </Carte>
           ))}
@@ -1093,47 +1115,49 @@ export function GestionPortfolio({
                   </a>
                 ) : null}
               </div>
+              {/* VOLET 23 — mêmes ICÔNES SEULES que les projets
+                  administrés : voir, modifier, dépublier, supprimer. */}
               <div className="flex flex-wrap items-center gap-2">
-                <BoutonAction
-                  onClick={() => router.navigate("projet", projet.id)}
+                <BoutonIcone
                   titre="Voir la page projet du site"
+                  onClick={() => router.navigate("projet", projet.id)}
                 >
-                  <Eye className="h-4 w-4" aria-hidden="true" />
-                  Voir le projet
-                </BoutonAction>
-                <BoutonAction
+                  <Eye className="h-4 w-4" />
+                </BoutonIcone>
+                <BoutonIcone
+                  titre="Modifier cette réalisation (elle devient administrée)"
                   onClick={() => void modifierRealisationSite(projet)}
                   disabled={conversionEnCours === projet.id}
-                  titre="Modifier cette réalisation (elle devient administrée)"
                 >
                   {conversionEnCours === projet.id ? (
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    <Pencil className="h-4 w-4" aria-hidden="true" />
+                    <Pencil className="h-4 w-4" />
                   )}
-                  Modifier
-                </BoutonAction>
-                <BoutonAction
+                </BoutonIcone>
+                <BoutonIcone
+                  titre="Dépublier (retirer du site)"
                   onClick={() => setDepublicationSite(projet)}
                   disabled={actionRapide === projet.id}
-                  titre="Retirer la réalisation du site (elle reste dans cet espace)"
                 >
                   {actionRapide === projet.id ? (
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                    <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    <EyeOff className="h-4 w-4" aria-hidden="true" />
+                    <EyeOff className="h-4 w-4" />
                   )}
-                  Dépublier
-                </BoutonAction>
-                <BoutonAction
-                  variant="danger"
+                </BoutonIcone>
+                <BoutonIcone
+                  titre="Supprimer définitivement (site et espace)"
+                  ton="danger"
                   onClick={() => setSuppressionSite(projet)}
                   disabled={actionRapide === projet.id}
-                  titre="Supprimer définitivement (site et espace)"
                 >
-                  <Trash2 className="h-4 w-4" aria-hidden="true" />
-                  Supprimer
-                </BoutonAction>
+                  {actionRapide === projet.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </BoutonIcone>
               </div>
             </Carte>
           ))}
