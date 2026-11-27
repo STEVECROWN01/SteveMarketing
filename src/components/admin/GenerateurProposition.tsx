@@ -95,6 +95,9 @@ export function GenerateurProposition({
    *  par un toast (l'édition d'une proposition existante reste
    *  libre). */
   numerosExistants = [],
+  /* CORRECTIF 28/11 — session expirée : retour propre à l'écran de
+   *  connexion (plus jamais un toast rouge « Non autorisé »). */
+  sessionExpiree,
 }: {
   prochainNumero: number;
   stockageConfigure: boolean;
@@ -102,6 +105,7 @@ export function GenerateurProposition({
   toast: FonctionToast;
   initial?: PropositionRecord | null;
   numerosExistants?: string[];
+  sessionExpiree?: () => void;
 }) {
   const [form, setForm] = useState<Formulaire>(() => etatInitial(prochainNumero, initial));
   const [generation, setGeneration] = useState(false);
@@ -179,6 +183,10 @@ export function GenerateurProposition({
           envoyerEmail: true,
         }),
       });
+      if (res.status === 401) {
+        sessionExpiree?.();
+        return;
+      }
       if (!res.ok) {
         const data = await res.json().catch(() => null);
         throw new Error(data?.error ?? "Génération impossible.");

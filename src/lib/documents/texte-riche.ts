@@ -141,11 +141,15 @@ export function decouperHtmlRiche(html: string | null | undefined): string[] {
   const riche = htmlRicheOuTexteBrut(html);
   if (!riche) return [];
   if (!/<(p|ul|ol|div|font)\b/i.test(riche)) {
-    /* texte brut sans balise : un fragment par ligne */
+    /* texte/inline sans bloc : chaque ligne devient UN PARAGRAPHE —
+     *     long, il est éclaté en phrases paginables (CORRECTIF
+     *     28/11, M21 : un contenu inline volumineux formait UNE RANGÉE
+     *     GÉANTE repoussée en bloc sur la page suivante). */
     return riche
       .split(/\n/)
       .map((l) => l.trim())
-      .filter(Boolean);
+      .filter(Boolean)
+      .flatMap((l) => decouperParagraphe(`<p>${l}</p>`));
   }
 
   const fragments: string[] = [];
@@ -163,12 +167,19 @@ export function decouperHtmlRiche(html: string | null | undefined): string[] {
     const apresDiv = reste.slice(debutDiv);
     const fermeture = apresDiv.match(/<\/div\s*>/i);
     if (!fermeture || fermeture.index === undefined) {
-      /* div jamais fermé : bloc entier */
+      /* div jamais fermé : bloc entier (découpe tolérante — un div
+       * sans fermeture ne peut pas être rééquilibré en phrases) */
       fragments.push(apresDiv);
       reste = "";
     } else {
       const finDiv = fermeture.index + fermeture[0].length;
-      fragments.push(apresDiv.slice(0, finDiv));
+      /* CORRECTIF 28/11 (M21) : le <div> EXTRAIT passe lui aussi par
+       * decouperParagraphe — un <div> LONG au contenu INLINE (un
+       * paragraphe tapé à l'éditeur, Entrée = <div>) est éclaté en
+       * PHRASES paginables ; un <div> à contenu de BLOC (titre +
+       * description d'un périmètre de proposition, VOLET 23) reste
+       * ENTIER (rendu inchangé). */
+      fragments.push(...decouperParagraphe(apresDiv.slice(0, finDiv)));
       reste = apresDiv.slice(finDiv);
     }
   }
@@ -195,6 +206,18 @@ function decouperSegments(segment: string): string[] {
 
   const fragments: string[] = [];
   for (const brut of bruts) {
+    /* CORRECTIF 28/11 (M21) : un segment TEXTUEL (sans balise de
+     * bloc — l'éditeur laisse le premier paragraphe en texte brut
+     * avant les <div> d'Entrée, un copier-coller aussi) devient UN
+     * PARAGRAPHE coulant, éclaté en phrases paginables s'il est
+     * long — plus jamais UNE rangée géante repoussée en bloc en
+     * laissant un grand vide sous le tableau de la première page
+     * (demande de l'éditeur : « ça doit OBLIGATOIREMENT finir la
+     * première page avant de continuer sur une autre page »). */
+    if (!/^<(p|ul|ol|div|font)\b/i.test(brut)) {
+      fragments.push(...decouperParagraphe(`<p>${brut}</p>`));
+      continue;
+    }
     /* Fragment = UNE liste pure (sans liste imbriquée) → éclater. */
     const m = brut.match(/^<(ul|ol)\b[^>]*>([\s\S]*)<\/\1\s*>$/i);
     if (m) {
@@ -392,18 +415,32 @@ function equilibrerPhrases(phrasesBrutes: string[]): string[] {
   });
 }
 
-/** Éclate un fragment <p> en phrases paginables (p-suite) quand il
- *  est LONG ; les paragraphes courts, les <div>, <font> et listes
- *  imbriquées restent DES BLOCS ENTIERS (rendu inchangé). */
+/** Éclate un fragment <p> OU <div> (l'éditeur produit des <div> à
+ *  chaque Entrée) en phrases paginables (p-suite) quand il est LONG ;
+ * les paragraphes courts, les <div> à contenu de BLOC (blocs de
+ * périmètre des propositions — titre + description, VOLET 23), les
+ * <font> et listes imbriquées restent DES BLOCS ENTIERS (rendu
+ * inchangé).
+ * CORRECTIF 28/11 (M21) : un <div> LONG au contenu INLINE (un
+ * paragraphe tapé à l'éditeur) est désormais éclaté PHRASE PAR
+ * PHRASE comme un <p> — sinon il formait UNE rangée géante et le
+ * tableau laissait un grand vide en bas de première page avant de
+ * continuer sur la suivante (bug reconfirmé par l'éditeur). */
 function decouperParagraphe(brut: string): string[] {
-  const m = /^<p\b[^>]*>([\s\S]*)<\/p\s*>$/i.exec(brut);
+  const m = /^<(p|div)\b[^>]*>([\s\S]*)<\/\1\s*>$/i.exec(brut);
   if (!m) return [brut];
-  const interieur = m[1];
+  const interieur = m[2];
   if (/<(p|div|ul|ol|li|table|h[1-6])\b/i.test(interieur)) return [brut];
   const texte = interieur.replace(/<[^>]+>/g, "");
-  if (texte.length <= SEUIL_PHRASES) return [brut];
+  if (texte.length <= SEUIL_PHRASES) {
+    /* paragraphe court : les <div> de l'éditeur deviennent des <p>
+     * — même rendu (marges) que les autres paragraphes. */
+    return m[1].toLowerCase() === "div" ? [`<p>${interieur}</p>`] : [brut];
+  }
   const phrases = equilibrerPhrases(fragmenterPhrase(interieur).filter((p) => p.trim()));
-  if (phrases.length <= 1) return [brut];
+  if (phrases.length <= 1) {
+    return m[1].toLowerCase() === "div" ? [`<p>${interieur}</p>`] : [brut];
+  }
   return phrases.map(
     (ph, i) =>
       `<p class="p-suite${i === 0 ? " p-suite--debut" : ""}${i === phrases.length - 1 ? " p-suite--fin" : ""}">${ph}</p>`,

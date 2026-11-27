@@ -606,9 +606,15 @@ function FormulaireProjet({
 export function GestionPortfolio({
   stockageConfigure,
   toast,
+  sessionExpiree,
 }: {
   stockageConfigure: boolean;
   toast: TypeToast;
+  /* CORRECTIF 28/11 — remontée du 401 (session expirée) vers
+   * l'écran de connexion de l'espace admin, avec un message clair —
+   * plus JAMAIS de toast rouge « Non autorisé » (retour de
+   * l'éditeur). */
+  sessionExpiree: () => void;
 }) {
   const [projets, setProjets] = useState<ProjetAdmin[]>([]);
   /* VOLET 22 — identifiants des réalisations STATIQUES du site
@@ -635,6 +641,12 @@ export function GestionPortfolio({
     setChargement(true);
     try {
       const res = await fetch("/api/admin/projects", { cache: "no-store" });
+      /* session expirée : écran de connexion + message clair — plus de
+       * toast rouge « Portfolio — Non autorisé. » (correctif 28/11). */
+      if (res.status === 401) {
+        sessionExpiree();
+        return;
+      }
       const data = await res.json().catch(() => null);
       if (res.ok && data?.ok) {
         setProjets((data.projets ?? []) as ProjetAdmin[]);
@@ -647,7 +659,7 @@ export function GestionPortfolio({
     } finally {
       setChargement(false);
     }
-  }, [toast]);
+  }, [toast, sessionExpiree]);
 
   useEffect(() => {
     charger();
@@ -675,6 +687,10 @@ export function GestionPortfolio({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(corps),
     });
+    if (res.status === 401) {
+      sessionExpiree();
+      return;
+    }
     const data = await res.json().catch(() => null);
     if (!res.ok || !data?.ok) {
       toast({
@@ -708,6 +724,10 @@ export function GestionPortfolio({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ projet: { id: projet.id }, statut: "brouillon" }),
       });
+      if (res.status === 401) {
+        sessionExpiree();
+        return;
+      }
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.ok) {
         toast({
@@ -743,6 +763,10 @@ export function GestionPortfolio({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: projet.id, statut: "brouillon" }),
       });
+      if (res.status === 401) {
+        sessionExpiree();
+        return;
+      }
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.ok) {
         toast({
@@ -775,6 +799,10 @@ export function GestionPortfolio({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: projet.id }),
       });
+      if (res.status === 401) {
+        sessionExpiree();
+        return;
+      }
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.ok) {
         toast({ title: "Suppression impossible", description: data?.error ?? "Réessayez.", variant: "destructive" });
@@ -801,6 +829,10 @@ export function GestionPortfolio({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: projet.id, site: true }),
       });
+      if (res.status === 401) {
+        sessionExpiree();
+        return;
+      }
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.ok) {
         toast({ title: "Suppression impossible", description: data?.error ?? "Réessayez.", variant: "destructive" });
@@ -1054,6 +1086,10 @@ export function GestionPortfolio({
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({ projet: { id: projet.id }, statut: "publie" }),
                         });
+                        if (res.status === 401) {
+                          sessionExpiree();
+                          return;
+                        }
                         const data = await res.json().catch(() => null);
                         if (!res.ok || !data?.ok) {
                           toast({ title: "Action impossible", description: data?.error ?? "Réessayez.", variant: "destructive" });

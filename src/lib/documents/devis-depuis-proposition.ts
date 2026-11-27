@@ -25,8 +25,17 @@
  *  - le MONTANT de la proposition devient le prix de la prestation ;
  *  - le périmètre (blocs A, B, C…) est rédigé en texte RICHE mis en
  *    forme : sous-titres en gras, introductions en paragraphes,
- *    points en listes, calendrier en listes — directement dans la
- *    colonne Description du tableau « Détail » du devis.
+ *    points en listes — directement dans la colonne Description du
+ *    tableau « Détail » du devis.
+ *
+ * CORRECTIF DU 28/11/2026 (retour de l'éditeur, répété deux fois) :
+ * « dans la colonne description concernant les périmètres de
+ * prestations, il ne faut JAMAIS considérer le calendrier de
+ * réalisation — ce bloc et ce paragraphe, il faut le supprimer.
+ * Il ne faut jamais mettre de calendrier. » → le paragraphe titré
+ * « Calendrier de réalisation » DISPARAÎT de la description : seul
+ * le PÉRIMÈTRE (blocs) est rédigé. Le délai reste à sa place au
+ * PIED DU TABLEAU (« Délai estimé : », champ du formulaire).
  */
 
 import type { PropositionRecord } from "./proposition";
@@ -74,9 +83,11 @@ export function nomClientDeProposition(p: PropositionRecord): string {
  *    d'amorce issue de l'introduction, points du périmètre intégrés
  *    dans une phrase naturelle à CADRE VARIÉ (jamais deux paragraphes
  *    avec la même formule), condition de clôture conservée ;
- *  - maximum DIX paragraphes (neuf périmètres + le calendrier),
- *    chacun tenu en QUATRE LIGNES (~200 caractères) — le devis
- *    reste dans ses deux pages.
+ *  - maximum NEUF paragraphes (un par périmètre), chacun tenu en
+ *    QUATRE LIGNES (~200 caractères) — le devis reste dans ses deux
+ *    pages. CORRECTIF 28/11 : PLUS AUCUN paragraphe « Calendrier de
+ *    réalisation » (demande explicite de l'éditeur, répétée deux
+ *    fois : « il ne faut jamais mettre de calendrier »).
  * ------------------------------------------------------------------ */
 
 /** Budget du corps d'un paragraphe : QUATRE lignes MESURÉES dans la
@@ -247,16 +258,19 @@ function redigerBloc(
 }
 
 /** Rédaction EXPERTE et CONDENSÉE de la description de la prestation
- *  (VOLET 22 → VOLET 23) : un paragraphe TITRÉ par périmètre
- *  (maximum 9), puis le calendrier condensé en un paragraphe titré —
- *  soit au plus DIX paragraphes de quatre lignes. Le devis reste
- *  lisible en deux pages tout en couvrant tout le périmètre et les
- *  conditions. */
+ *  (VOLET 22 → VOLET 23 → CORRECTIF 28/11) : un paragraphe TITRÉ par
+ *  périmètre (maximum 9), chacun tenu en QUATRE lignes. PLUS AUCUN
+ *  calendrier (demande explicite de l'éditeur : « il ne faut jamais
+ *  mettre de calendrier ») — le délai estimé vit au pied du tableau.
+ *  Le devis reste lisible en deux pages tout en couvrant le
+ *  périmètre et les conditions. */
 function redigerDescription(p: PropositionRecord): string {
   const morceaux: string[] = [];
   const s = p.sections;
 
-  /* ---- Périmètre : un paragraphe titré par bloc (9 max) ---- */
+  /* ---- Périmètre : un paragraphe titré par bloc (9 max) ----
+   *     (CORRECTIF 28/11 : le calendrier de réalisation n'est PLUS
+   *     jamais rédigé ici — aucun paragraphe « Calendrier », jamais.) */
   const perimetre = (s.perimetre ?? []).filter(
     (b) => (b.titre ?? "").trim() || (b.intro ?? "").trim() || (b.points ?? []).length,
   );
@@ -267,39 +281,6 @@ function redigerDescription(p: PropositionRecord): string {
     if (resume) {
       morceaux.push(resume);
       paragraphes++;
-    }
-  }
-
-  /* ---- Calendrier : UN paragraphe titré, condensé ---- */
-  const etapes = (s.calendrierEtapes ?? [])
-    .map((e) => (e ?? "").replace(/\s+/g, " ").trim().replace(/[.;]+$/, ""))
-    .filter(Boolean);
-  const introCal = premierePhrase(s.calendrierIntro ?? "", 80);
-  if (etapes.length || introCal || (p.delai ?? "").trim()) {
-    const retenus = retenirPoints(etapes, BUDGET_CORPS - 46 - 34);
-    const phraseDelai = (p.delai ?? "").trim()
-      ? `Délai estimé de réalisation : ${esc((p.delai ?? "").trim())}.`
-      : "";
-    /* VOLET 23 — pas de redondance : si l'introduction du calendrier
-     * se termine par « : », elle introduit ELLE-MÊME la liste des
-     * étapes ; sinon la formule « Le projet se déroulera par étapes »
-     * ouvre la phrase. */
-    const finitParDeuxPoints = Boolean(introCal) && /[:：]\s*$/.test(introCal);
-    const ouverture = finitParDeuxPoints
-      ? introCal.trim()
-      : introCal
-        ? `${introCal} Le projet se déroulera par étapes :`
-        : "Le projet se déroulera par étapes :";
-    const phraseEtapes = retenus.length
-      ? `${ouverture} ${listeNaturelle(retenus, false, "puis")}.`
-      : `${ouverture.replace(/[:：]\s*$/, "")}.`;
-    const corps = [phraseEtapes, phraseDelai].filter(Boolean).join(" ");
-    if (corps) {
-      /* VOLET 23 — même rangée unique pour le titre et sa description. */
-      morceaux.push(
-        `<div><p><font size="5"><b>Calendrier de réalisation</b></font></p>` +
-          `<p>${esc(capitaliserPhrases(corps))}</p></div>`,
-      );
     }
   }
 

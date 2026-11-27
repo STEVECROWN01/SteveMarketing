@@ -46,7 +46,16 @@ import crypto from "crypto";
  */
 
 const COOKIE_NAME = "stevens_admin_session";
-const SESSION_TTL_MS = 1000 * 60 * 60 * 8; // 8 heures
+/* CORRECTIF 28/11/2026 (retour de l'éditeur : « une toast me dit
+ * “portfolio non autorisé” alors que je n'ai rien fait de mal »).
+ * L'espace admin restait ouvert dans un onglet pendant plus de 8 h ;
+ * à la reprise, CHAQUE appel API répondait 401 « Non autorisé. » avec
+ * des toasts rouges incompréhensibles, sans jamais proposer de se
+ * reconnecter. La session passe à 30 JOURS (l'éditeur est l'unique
+ * utilisateur de cet espace) ET l'interface gère désormais le 401
+ * proprement (voir AdminPage — sessionExpiree) : écran de connexion
+ * + message explicite, plus JAMAIS de toast « Non autorisé ». */
+const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 30; // 30 jours
 
 /** Longueur minimale acceptée pour le secret de signature. */
 const MIN_SECRET_LENGTH = 16;

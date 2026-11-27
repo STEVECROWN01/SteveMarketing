@@ -426,7 +426,17 @@ export function renderDocumentHtml(
    * (paragraphe / liste) et CHAQUE fragment est un bloc paginable —
    * une description plus longue qu'une page se poursuit sur la page
    * suivante, le tableau continue (cellules vides alignées, comme
-   * dans Word). */
+   * dans Word).
+   * CORRECTIF 28/11/2026 (M20 — retour de l'éditeur : « dans le champ
+   * c'est sous forme de paragraphe, mais dans le tableau ça considère
+   * chaque PHRASE comme un PARAGRAPHE et ça met un ESPACE entre les
+   * phrases ») : les rangées qui SE SUIVENT au sein d'un MÊME
+   * paragraphe (phrases p-suite) ou d'une même LISTE (li-suite)
+   * portent suite-apres / suite-avant : la MARGE INTÉRIEURE des
+   * cellules (5 px + 5 px) est ANNULÉE ENTRE elles — les phrases se
+   * suivent AU FIL DE LA LIGNE, comme l'UNIQUE paragraphe du champ
+   * de rédaction. La découpe ne sert qu'à la PAGINATION (remplir la
+   * page), jamais à l'apparence. */
   const lignesTableau = d.items
     .map((it) => {
       const fragments = decouperHtmlRiche(descriptionOuPoints(it));
@@ -445,6 +455,20 @@ export function renderDocumentHtml(
       const parties = fragments.map((fragment, k) => {
         const debut = k === 0 ? " svc-debut" : "";
         const fin = k === fragments.length - 1 ? " svc-fin" : "";
+        /* CORRECTIF 28/11 (M20) : suite d'un MÊME paragraphe / d'une
+         * même liste → marges intérieures annulées entre les rangées
+         * (le fragment POURSUIT le précédent ou se poursuit au-
+         * delà). Détection : classes p-suite / li-suite POSÉES par le
+         * découpage (texte-riche.ts) — --debut marque la PREMIÈRE
+         * rangée du paragraphe, --fin la DERNIÈRE. */
+        const suiteAvant =
+          /(?:p|li)-suite(?!-)/.test(fragment) && !/(?:p|li)-suite--debut/.test(fragment);
+        const suiteApres =
+          /(?:p|li)-suite(?!-)/.test(fragment) && !/(?:p|li)-suite--fin/.test(fragment);
+        const suite =
+          suiteAvant || suiteApres
+            ? `${suiteAvant ? " suite-avant" : ""}${suiteApres ? " suite-apres" : ""}`
+            : "";
         const tete = k === 0
           ? `<div class="cell type-cell">${esc(it.type || L.service)}</div>
     <div class="cell desc-cell"><div class="service-name">${esc(it.designation)}</div><div class="desc-riche">${fragment}</div></div>
@@ -457,7 +481,7 @@ export function renderDocumentHtml(
     <div class="cell cell-vide"></div>
     <div class="cell cell-vide"></div>`;
         return `
-  <div class="svc-part${debut}${fin}" data-bloc>
+  <div class="svc-part${debut}${fin}${suite}" data-bloc>
     ${tete}
   </div>`;
       });
@@ -903,9 +927,20 @@ export function renderDocumentHtml(
      phrases d'un même paragraphe se suivent SANS marge — même
      rendu qu'un paragraphe unique ; la dernière phrase garde la
      marge basse d'origine. Le tableau se remplit jusqu'en bas de
-     page et se poursuit en page suivante (en-tête repris). */
+     page et se poursuit en page suivante (en-tête repris).
+     CORRECTIF 28/11/2026 (M20) — SUITE DE RANGÉES : les rangées qui
+     se suivent au sein d'un MÊME paragraphe (p-suite) ou d'une même
+     liste (li-suite) annulent AUSSI la MARGE INTÉRIEURE des cellules
+     (5 px en haut + 5 px en bas = 10 px d'écart visible — chaque
+     phrase paraissait être un paragraphe séparé). Désormais les
+     phrases se suivent AU FIL DE LA LIGNE : le rendu est celui du
+     PARAGRAPHE UNIQUE du champ de rédaction (demande de l'éditeur :
+     « tant que dans le champ c'est sous forme de paragraphe, dans le
+     devis ça devrait être aussi sous forme de paragraphe »). */
   .desc-riche p.p-suite { margin: 0; }
   .desc-riche p.p-suite--fin { margin-bottom: 1px; }
+  .svc-part.suite-avant .cell { padding-top: 0; }
+  .svc-part.suite-apres .cell { padding-bottom: 0; }
 
   /* ---- Total SOUS le tableau — VOLET 19 : lignes à POINTILLÉS.
      « Total » et « TVA » en GRAS ET GROS à gauche, la valeur

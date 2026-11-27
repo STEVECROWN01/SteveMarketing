@@ -137,6 +137,9 @@ export function GenerateurDocument({
    *  générer une seconde fois le même numéro est REFUSÉ par un
    *  toast (l'édition d'un devis existant reste libre). */
   numerosExistants = [],
+  /* CORRECTIF 28/11 — session expirée : retour propre à l'écran de
+   *  connexion (plus jamais un toast rouge « Non autorisé »). */
+  sessionExpiree,
 }: {
   docType: "devis" | "proposition";
   prochainNumero: number;
@@ -148,6 +151,7 @@ export function GenerateurDocument({
   /** VOLET 16 : pré-remplissage depuis une demande reçue. */
   preRemplissage?: PreRemplissage | null;
   numerosExistants?: string[];
+  sessionExpiree?: () => void;
 }) {
   const [form, setForm] = useState<Formulaire>(() =>
     etatInitial(docType, prochainNumero, initial, preRemplissage),
@@ -258,6 +262,10 @@ export function GenerateurDocument({
           envoyerEmail: true,
         }),
       });
+      if (res.status === 401) {
+        sessionExpiree?.();
+        return;
+      }
       if (!res.ok) {
         const data = await res.json().catch(() => null);
         throw new Error(data?.error ?? "Génération impossible.");
@@ -298,6 +306,10 @@ export function GenerateurDocument({
           document: corpsDocument(),
         }),
       });
+      if (res.status === 401) {
+        sessionExpiree?.();
+        return;
+      }
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.ok) {
         throw new Error(data?.error ?? "Enregistrement impossible.");

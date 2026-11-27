@@ -141,7 +141,28 @@ export function fabriquerScriptPagination(conf: ConfPagination): string {
         bh = b.offsetHeight; /* marge haute annulée → hors capacité */
       }
       var heading = b.hasAttribute('data-heading');
-      var reste = cap - (h + bh);
+      /* CORRECTIF 28/11/2026 (retour de l'éditeur) : « il y a
+         suffisamment d'espace sous le bloc paiement, mais tu as
+         envoyé la validité du document ainsi que la note sur AUTRE
+         PAGE. Tant qu'il y a de l'espace et que ça ne va pas coincer
+         au footer, il faut le mettre là au lieu d'aller sur une
+         autre page. »
+         CAUSE : la réserve basse (VOLET 22 — espace tableau↔pied)
+         était retranchée pour TOUS les blocs : le bloc validité+notes
+         (33 px) manquait la place de 2 px et partait seul sur une
+         page supplémentaire, avec ~250 px de vide sous le bloc
+         PAIEMENT.
+         CORRECTIF : la réserve basse protège le CONTACT TABLEAU↔PIED
+         — elle ne réduit PAS la place des blocs LÉGERS qui suivent
+         le tableau (total, CGV, PAIEMENT, validité et notes) : tant
+         qu'ils tiennent au-dessus de la limite du contenu (elle-même
+         au-dessus du pied), ils RESTENT sur la page. Le tableau garde
+         sa réserve (VOLET 22 inchangé). */
+      var estBlocTableau =
+        b.classList &&
+        (b.classList.contains('svc-part') || b.classList.contains('svc-foot'));
+      var capBloc = estBlocTableau ? cap : cap + RESERVE_BAS;
+      var reste = capBloc - (h + bh);
       /* Garantie anti-orphelin (calée sur l'exemple de l'éditeur) :
          un titre ne reste en bas de page que si lui-même + les DEUX
          blocs suivants tiennent (pastille + intro + appel de liste).

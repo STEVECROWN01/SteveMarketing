@@ -686,12 +686,23 @@ function SelectionDevis({
                  grise chaque cellule SAUF le statut (demande de
                  l'éditeur : « le statut ne doit pas être grisé — le
                  statut seul doit être dégrisé pour faire savoir que
-                 c'est cliquable »). */
+                 c'est cliquable »).
+                 CORRECTIF 28/11/2026 (M22) — retour de l'éditeur : «
+                 lorsqu'on sélectionne un devis, il devait être
+                 possible de le DÉSÉLECTIONNER dans le cas où on a
+                 fait l'erreur de sélectionner le devis. On devra
+                 pouvoir le sélectionner comme le désélectionner » :
+                 cliquer un devis DÉJÀ SÉLECTIONNÉ le désélectionne
+                 (rangée comme radio) — le bouton « Continuer » se
+                 regrise en conséquence. */
               const dejaFacture = Boolean(facture);
               return (
                 <tr
                   key={d.id}
-                  onClick={() => !dejaFacture && setChoisi(d.id)}
+                  onClick={() => {
+                    if (dejaFacture) return;
+                    setChoisi(selectionne ? null : d.id);
+                  }}
                   aria-disabled={dejaFacture || undefined}
                   className={`border-b border-[#e4e4e4]/8 transition-colors ${
                     dejaFacture
@@ -704,7 +715,7 @@ function SelectionDevis({
                       type="radio"
                       name="devis-a-facturer"
                       checked={selectionne}
-                      onChange={() => setChoisi(d.id)}
+                      onChange={() => setChoisi(selectionne ? null : d.id)}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (dejaFacture) e.preventDefault();
@@ -713,7 +724,9 @@ function SelectionDevis({
                       aria-label={
                         dejaFacture
                           ? `Devis ${d.numero} déjà facturé (${facture!.numero}) — non sélectionnable`
-                          : `Sélectionner le devis ${d.numero} de ${d.client.nom}`
+                          : selectionne
+                            ? `Désélectionner le devis ${d.numero} de ${d.client.nom}`
+                            : `Sélectionner le devis ${d.numero} de ${d.client.nom}`
                       }
                       className="h-4 w-4 accent-[#e4e4e4]"
                     />
@@ -755,7 +768,9 @@ function SelectionDevis({
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#e4e4e4]/10 px-5 py-4">
         <p className="text-xs text-[#c8c8c8]">
-          La facture reprendra exactement les prestations et le total du devis sélectionné.
+          {choisi
+            ? "Cliquez de nouveau sur le devis sélectionné pour le désélectionner."
+            : "Cliquez sur un devis pour le sélectionner — la facture reprendra exactement ses prestations et son total."}
         </p>
         <BoutonAction
           variant="principal"
@@ -808,11 +823,41 @@ export function AdminPage() {
   /* VOLET 16 — pré-remplissage d'un nouveau devis depuis une demande. */
   const [preRemplissage, setPreRemplissage] = useState<PreRemplissage | null>(null);
 
+  /* CORRECTIF 28/11/2026 — SESSION EXPIRÉE (retour de l'éditeur : « une
+   *  toast me dit portfolio non autorisé en rouge… corrige-moi ça une
+   *  fois pour toutes et plus jamais ce genre d'erreur ne passe »).
+   *
+   * Quand un appel API de l'espace admin répond 401 (session fermée
+   * depuis trop longtemps — l'onglet est resté ouvert), l'espace ne
+   * montre PLUS un toast rouge « Non autorisé » incompréhensible ni
+   * des compteurs figés : il revient à l'ÉCRAN DE CONNEXION avec un
+   * message clair. La session vit désormais 30 jours (admin-auth),
+   * et ce filet de sécurité garantit qu'aucune réponse 401 ne
+   * s'affiche plus jamais telle quelle. */
+  const sessionExpiree = useCallback(() => {
+    setAuthed(false);
+    setSection("tableau");
+    setVueDocs("liste");
+    toast({
+      title: "Session expirée",
+      description:
+        "Par sécurité, la session de l'espace admin s'est fermée après une longue période — reconnectez-vous, tout est en ordre.",
+      variant: "destructive",
+    });
+  }, [toast]);
+
   const chargerDocuments = useCallback(async () => {
     setDocsChargement(true);
     try {
       const res = await fetch("/api/documents", { cache: "no-store" });
-      if (res.status === 401) return;
+      /* 401 = session expirée : retour PROPRE à l'écran de connexion
+       * (plus jamais de données silencieusement figées — correctif du
+       * 28/11 : le compteur portfolio restait à son ancienne valeur
+       * sans qu'on comprenne pourquoi). */
+      if (res.status === 401) {
+        sessionExpiree();
+        return;
+      }
       const data = await res.json();
       if (data?.ok) {
         setDocuments((data.documents ?? []) as ToutDocument[]);
@@ -824,7 +869,7 @@ export function AdminPage() {
     } finally {
       setDocsChargement(false);
     }
-  }, []);
+  }, [sessionExpiree]);
 
   /* VOLET 24 — PROJETS DU PORTFOLIO : projets administrés (avec leur
    *  statut) + identifiants des réalisations du site supprimées —
@@ -832,7 +877,10 @@ export function AdminPage() {
   const chargerProjets = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/projects", { cache: "no-store" });
-      if (res.status === 401) return;
+      if (res.status === 401) {
+        sessionExpiree();
+        return;
+      }
       const data = await res.json();
       if (data?.ok) {
         setProjetsPortfolio(
@@ -846,14 +894,14 @@ export function AdminPage() {
     } catch {
       /* silencieux : le compteur reste à sa dernière valeur */
     }
-  }, []);
+  }, [sessionExpiree]);
 
   const chargerDemandes = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch("/api/admin/leads", { cache: "no-store" });
       if (res.status === 401) {
-        setAuthed(false);
+        sessionExpiree();
         return;
       }
       const data = await res.json();
@@ -863,7 +911,7 @@ export function AdminPage() {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [toast, sessionExpiree]);
 
   useEffect(() => {
     (async () => {
@@ -893,6 +941,10 @@ export function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
+      if (res.status === 401) {
+        sessionExpiree();
+        return;
+      }
       if (!res.ok) throw new Error();
     } catch {
       setLeads(prev);
@@ -1324,6 +1376,7 @@ export function AdminPage() {
               stockageConfigure={stockageConfigure}
               onEnregistre={chargerDocuments}
               toast={toast}
+              sessionExpiree={sessionExpiree}
               /* VOLET 23 — anti-doublon : numéros de propositions déjà
                   générées. */
               numerosExistants={numerosPropositions}
@@ -1344,6 +1397,7 @@ export function AdminPage() {
               stockageConfigure={stockageConfigure}
               onEnregistre={chargerDocuments}
               toast={toast}
+              sessionExpiree={sessionExpiree}
               initial={docEnEdition}
               numerosExistants={numerosPropositions}
             />
@@ -1365,6 +1419,7 @@ export function AdminPage() {
               stockageConfigure={stockageConfigure}
               onEnregistre={chargerDocuments}
               toast={toast}
+              sessionExpiree={sessionExpiree}
             />
           </>
         )}
@@ -1385,6 +1440,7 @@ export function AdminPage() {
               stockageConfigure={stockageConfigure}
               onRafraichir={chargerDocuments}
               toast={toast}
+              sessionExpiree={sessionExpiree}
               onModifier={modifierDocument}
               /* VOLET 20 — générer un devis pré-rempli depuis la
                   proposition (rédaction experte). */
@@ -1409,6 +1465,7 @@ export function AdminPage() {
               stockageConfigure={stockageConfigure}
               onEnregistre={chargerDocuments}
               toast={toast}
+              sessionExpiree={sessionExpiree}
               preRemplissage={preRemplissage}
               /* VOLET 23 — anti-doublon : numéros de devis déjà
                   générés. */
@@ -1432,6 +1489,7 @@ export function AdminPage() {
               stockageConfigure={stockageConfigure}
               onEnregistre={chargerDocuments}
               toast={toast}
+              sessionExpiree={sessionExpiree}
             />
           </>
         )}
@@ -1450,6 +1508,7 @@ export function AdminPage() {
               stockageConfigure={stockageConfigure}
               onRafraichir={chargerDocuments}
               toast={toast}
+              sessionExpiree={sessionExpiree}
               onModifier={modifierDocument}
               onFacturer={(d) => setFactureCible(d as DocumentRecord)}
               /* VOLET 20 — devis marqué signé : redirection automatique
@@ -1504,6 +1563,7 @@ export function AdminPage() {
               stockageConfigure={stockageConfigure}
               onRafraichir={chargerDocuments}
               toast={toast}
+              sessionExpiree={sessionExpiree}
               onModifier={(f) => setFactureCible(f as DocumentRecord)}
             />
           </>
@@ -1514,7 +1574,7 @@ export function AdminPage() {
             brouillon ou publication directe, images compressées,
             traduction anglaise optionnelle. */}
         {section === "portfolio" && (
-          <GestionPortfolio stockageConfigure={stockageConfigure} toast={toast} />
+          <GestionPortfolio stockageConfigure={stockageConfigure} toast={toast} sessionExpiree={sessionExpiree} />
         )}
 
         {/* Note de bas d'espace — VOLET 15 : message court et
@@ -1541,6 +1601,7 @@ export function AdminPage() {
           }}
           onRafraichir={chargerDocuments}
           toast={toast}
+          sessionExpiree={sessionExpiree}
         />
       ) : null}
     </div>

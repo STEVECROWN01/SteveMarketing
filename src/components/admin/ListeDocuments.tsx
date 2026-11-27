@@ -94,6 +94,9 @@ export function ListeDocuments({
    *  plein écran, sans modale de modification). */
   apercuAutomatique,
   onApercuOuvert,
+  /* CORRECTIF 28/11 — session expirée : retour propre à l'écran de
+   *  connexion (plus jamais un toast rouge « Non autorisé »). */
+  sessionExpiree,
 }: {
   docType: DocType;
   documents: ToutDocument[];
@@ -107,6 +110,7 @@ export function ListeDocuments({
   onGenererDevis?: (p: PropositionRecord) => void;
   apercuAutomatique?: ToutDocument | null;
   onApercuOuvert?: () => void;
+  sessionExpiree?: () => void;
 }) {
   const [apercu, setApercu] = useState<ToutDocument | null>(null);
   /* VOLET 21 — visionneuse du PDF SIGNÉ d'un devis (téléversé). */
@@ -191,6 +195,10 @@ export function ListeDocuments({
           envoyerEmail: avecEnregistrement,
         }),
       });
+      if (res.status === 401) {
+        sessionExpiree?.();
+        return;
+      }
       if (!res.ok) {
         const data = await res.json().catch(() => null);
         throw new Error(data?.error ?? "Génération impossible.");
@@ -533,7 +541,7 @@ export function ListeDocuments({
                           )}
                         </div>
                       ) : (
-                        <MenuStatutProposition doc={d} onRafraichir={onRafraichir} toast={toast} />
+                        <MenuStatutProposition doc={d} onRafraichir={onRafraichir} toast={toast} sessionExpiree={sessionExpiree} />
                       )}
                     </td>
                     <td className="px-5 py-4">
@@ -927,10 +935,12 @@ function MenuStatutProposition({
   doc,
   onRafraichir,
   toast,
+  sessionExpiree,
 }: {
   doc: ToutDocument;
   onRafraichir: () => void;
   toast: (t: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
+  sessionExpiree?: () => void;
 }) {
   const [ouvert, setOuvert] = useState(false);
   const [enCours, setEnCours] = useState(false);
@@ -949,6 +959,10 @@ function MenuStatutProposition({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ document: { ...doc, envoyee: nouvelle } }),
       });
+      if (res.status === 401) {
+        sessionExpiree?.();
+        return;
+      }
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.ok) throw new Error(data?.error ?? "Enregistrement impossible.");
       toast({

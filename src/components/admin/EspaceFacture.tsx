@@ -43,6 +43,9 @@ export function EspaceFacture({
   onFerme,
   onRafraichir,
   toast,
+  /* CORRECTIF 28/11 — session expirée : retour propre à l'écran de
+   *  connexion (plus jamais un toast rouge « Non autorisé »). */
+  sessionExpiree,
 }: {
   /** Devis à facturer OU facture existante à modifier. */
   document: DocumentRecord;
@@ -50,6 +53,7 @@ export function EspaceFacture({
   onFerme: (succes?: boolean) => void;
   onRafraichir: () => void;
   toast: (t: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
+  sessionExpiree?: () => void;
 }) {
   const estDevis = base.docType === "devis";
   const numeroFacture = estDevis ? numeroDevisVersFacture(base.numero) : base.numero;
@@ -95,6 +99,10 @@ export function EspaceFacture({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ document: facture, enregistrer: true, envoyerEmail: true }),
       });
+      if (res.status === 401) {
+        sessionExpiree?.();
+        return;
+      }
       if (!res.ok) {
         const data = await res.json().catch(() => null);
         throw new Error(data?.error ?? "Génération impossible.");
