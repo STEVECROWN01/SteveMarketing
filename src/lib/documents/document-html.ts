@@ -1096,11 +1096,12 @@ export function renderDocumentHtml(
   .validite-notes .vn-lbl { color: #000000; font-weight: 600; }
 
   /* ---- Bloc Paiement (factures) — VOLET 23 : le bloc des DEVIS
-     (« Modalité de paiement ») adopte le MÊME habillage (demande de
-     l'éditeur : « le design de ce bloc paiement me plaît beaucoup —
-     applique-le aux coordonnées bancaires des devis ») ; il prend
-     la place de l'ancien titre de section + bloc bancaire, avec la
-     marge haute d'un titre de section. ---- */
+     (« Paiement » — renommé VOLET 24, affiché « PAIEMENT ») adopte le
+     MÊME habillage (demande de l'éditeur : « le design de ce bloc
+     paiement me plaît beaucoup — applique-le aux coordonnées
+     bancaires des devis ») ; il prend la place de l'ancien titre de
+     section + bloc bancaire, avec la marge haute d'un titre de
+     section. ---- */
   .invoice-payment-block {
     background: rgba(75, 138, 107, 0.08);
     border: 1px solid rgba(75, 138, 107, 0.3);
