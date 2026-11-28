@@ -14,7 +14,7 @@ export const runtime = "nodejs";
  * là, moi je peux par un bouton le traduire en français »).
  *
  * Réservé à la SESSION ADMINISTRATEUR (même garde que /api/documents).
- * Traduction via l'API publique MyMemory (gratuite, sans clé —
+ * Traduction via l'API publique MyMemory (gratuite —
  * limite ~500 caractères par requête) : les textes longs sont
  * découpés PAR PHRASES en morceaux ≤ 450 caractères, traduits en
  * parallèle (16 maximum) puis recollés. Les demandes de devis sont

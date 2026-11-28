@@ -1,8 +1,7 @@
 /**
  * VOLET 27 (28/11/2026) — OUTILS DE SCRAPING POUR LA PROSPECTION.
  *
- * Trois outils « clonés » sur les acteurs du marché (Google Maps,
- * Instagram, LinkedIn), SANS CLÉ D'API NI ABONNEMENT :
+ * Trois outils de prospection (Google Maps, Instagram, LinkedIn) :
  *  - fiches d'entreprises PAR LIEU ET PAR NICHE (outil « Google Maps ») ;
  *  - pages d'entreprises Instagram (bio, catégorie, email, site web…) ;
  *  - pages d'entreprises LinkedIn (industrie, employés, siège, site…).
@@ -25,12 +24,18 @@ export type EntrepriseScraped = {
   nom: string;
   /** Ce que fait l'entreprise : catégorie / industrie / niche. */
   niche: string;
+  /** VOLET 29 — clé de la niche du fichier de prospection quand la
+   *  recherche en partait (ex. « #11 ») : sert à adapter le message
+   *  personnalisé envoyé au prospect. */
+  nicheProspection?: string;
   /** Description / bio (ce que fait l'entreprise). */
   bio?: string;
   /** Localisation : ville, quartier… au minimum le pays. */
   localisation?: string;
   /** Pays seul (quand disponible séparément). */
   pays?: string;
+  /** VOLET 29 — adresse complète de l'entreprise (quand disponible). */
+  adresse?: string;
   /** Numéro de téléphone (si disponible). */
   telephone?: string;
   /** Adresse email (si disponible). */
@@ -39,6 +44,15 @@ export type EntrepriseScraped = {
   siteWeb?: string;
   /** Nombre d'employés (LinkedIn) ou taille d'audience, si connu. */
   employes?: string;
+  /** VOLET 29 — nom du dirigeant / propriétaire de l'entreprise
+   *  (recherché sur son site web — « s'il le trouve » ; sinon absent
+   *  et l'espace affiche « Non trouvé »). */
+  dirigeant?: string;
+  /** VOLET 29 — horaires d'ouverture (quand disponibles). */
+  horaires?: string;
+  /** VOLET 29 — ancienneté de l'entreprise : depuis quand elle
+   *  existe (quand la source la publie). */
+  anciennete?: string;
   /** Identifiant public (username Instagram / slug LinkedIn). */
   contact?: string;
   /** Lien de la fiche d'origine (page publique). */

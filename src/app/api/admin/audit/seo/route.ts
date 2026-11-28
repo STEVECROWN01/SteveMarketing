@@ -6,8 +6,8 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 /**
- * VOLET 28 (28/11/2026) — OUTIL « SEO » DE L'ESPACE AUDIT (cloné sur
- * RankFlow SEO) : audit on-page en un clic — score sur 100, note
+ * VOLET 28 (28/11/2026) — OUTIL « SEO » DE L'ESPACE AUDIT :
+ * audit on-page en un clic — score sur 100, note
  * A-F, verdict, familles de critères et plan d'action priorisé.
  *
  * POST { url } — réservé à l'espace administrateur authentifié.

@@ -1,8 +1,8 @@
 /**
  * VOLET 27 — OUTIL « LINKEDIN » : pages d'entreprises LinkedIn
  * (nom, description, industrie/niche, siège/localisation, taille /
- * nombre d'employés, site web, type), cloné gratuitement sur les
- * scrapers de pages LinkedIn.
+ * nombre d'employés, site web, type) des pages d'entreprises
+ * LinkedIn.
  *
  * Les pages d'entreprises LinkedIn sont PUBLIQUES (visitables sans
  * compte) : l'outil lit directement chaque page

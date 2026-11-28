@@ -1,5 +1,5 @@
 /**
- * VOLET 27 — chaîne de MOTEURS DE RECHERCHE gratuits (sans clé) pour
+ * VOLET 27 — chaîne de MOTEURS DE RECHERCHE pour
  * découvrir les pages d'entreprises (Instagram, LinkedIn) depuis des
  * mots-clés. Un moteur peut être indisponible selon l'environnement
  * d'exécution (réseau du serveur, limitation de débit…) : les moteurs

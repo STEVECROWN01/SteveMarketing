@@ -149,7 +149,10 @@ function findLocalChrome(): string | undefined {
   return undefined;
 }
 
-async function getBrowser(): Promise<Browser> {
+/** Ouvre (une seule fois par processus) le navigateur de rendu des
+ *  PDF — partagé avec les rapports d'AUDIT COMPLET du back-office
+ *  (VOLET 29 : même Chromium, mêmes réglages). */
+export async function getBrowser(): Promise<Browser> {
   if (browserInstance && browserInstance.connected) return browserInstance;
 
   const argsBase = [

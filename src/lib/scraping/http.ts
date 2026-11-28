@@ -1,7 +1,7 @@
 /**
  * VOLET 27 — téléchargement HTTP partagé des outils de scraping :
  * décodage d'entités et timeout — aucune dépendance externe (fetch
- * global), aucune clé d'API.
+ * global).
  *
  * AGENT : identité HONNÊTE d'application (recommandée par la politique
  * d'usage de Nominatim). Un faux User-Agent de navigateur est

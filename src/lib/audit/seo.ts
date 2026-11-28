@@ -1,15 +1,15 @@
 /**
- * VOLET 28 (28/11/2026) — OUTIL « SEO » DE L'AUDIT, cloné sur
- * RankFlow SEO (extension Chrome) : audit on-page en un clic, score
+ * VOLET 28 (28/11/2026) — OUTIL « SEO » DE L'AUDIT : audit on-page
+ * en un clic, score
  * sur 100, note de A à F et verdict (Excellent, Bon, Correct,
  * Médiocre, Mauvais), familles de critères et PLAN D'ACTION
  * priorisé par points.
  *
- * Barème RankFlow : A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 55, E ≥ 40, F
+ * Barème : A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 55, E ≥ 40, F
  * ensuite. Chaque critère a un poids sur 100 ; un critère « moyen »
  * rapporte la moitié de ses points.
  *
- * Analyse (source publique, sans clé) : balises title / meta
+ * Analyse (source publique) : balises title / meta
  * description / Hn, images et textes alternatifs, liens internes et
  * externes, canonical, robots, Open Graph / Twitter, données
  * structurées, HTTPS, viewport, favicon, sitemap et robots.txt,
@@ -262,7 +262,7 @@ export async function auditerSeo(url: string): Promise<ReleveSeo> {
     Math.min(100, tousCriteres.reduce((somme, c) => somme + c.obtenu, 0)),
   );
 
-  /* Barème RankFlow : A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 55, E ≥ 40. */
+  /* Barème : A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 55, E ≥ 40. */
   const note = score >= 90 ? "A" : score >= 80 ? "B" : score >= 70 ? "C" : score >= 55 ? "D" : score >= 40 ? "E" : "F";
   const verdict =
     score >= 90 ? "Excellent" : score >= 80 ? "Bon" : score >= 70 ? "Correct" : score >= 55 ? "Médiocre" : "Mauvais";

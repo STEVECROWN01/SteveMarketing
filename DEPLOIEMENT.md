@@ -57,7 +57,7 @@ Variables spécifiques (toutes OPTIONNELLES pour la génération) :
 
 | Variable | Rôle | Sans elle |
 | --- | --- | --- |
-| `GITHUB_DOCS_TOKEN` | Jeton GitHub (portée « repo ») : archivage des documents en JSON dans le dossier `documents/` du DÉPÔT PRIVÉ `STEVECROWN01/SteveMarketing-Documents` — et, depuis le volet 20 : les DEMANDES du site (devis, audits, messages) dans `demandes/`, les devis SIGNÉS téléversés dans `devis-signes/`, les projets du portfolio dans `portfolio/` | La liste et l'archivage des documents existants attendent ; la GÉNÉRATION (PDF, téléchargement, email) fonctionne déjà |
+| `GITHUB_DOCS_TOKEN` | Jeton GitHub (portée « repo ») : archivage des documents en JSON dans le dossier `documents/` du DÉPÔT PRIVÉ `STEVECROWN01/SteveMarketing-Documents` — et, depuis le volet 20 : les DEMANDES du site (devis, audits, messages) dans `demandes/`, les devis SIGNÉS téléversés dans `devis-signes/`, les projets du portfolio dans `portfolio/` — et, depuis le volet 29 : les PROSPECTS importés du scraping dans `prospects/` (source de vérité `prospects/prospects.json` + le CLASSEUR EXCEL `prospects/prospects.xlsx`, MIS À JOUR à chaque import — jamais un nouveau fichier) et les AUDITS COMPLETS enregistrés dans `audits/` (un JSON par audit, consultables dans l'historique de l'espace Audit) | La liste et l'archivement des documents existants attendent ; la GÉNÉRATION (PDF, téléchargement, email) fonctionne déjà ; les espaces Prospects et l'historique des audits signalent que le stockage n'est pas configuré |
 | `GITHUB_DOCS_REPO` | Dépôt de stockage (défaut : `STEVECROWN01/SteveMarketing-Documents`) | Valeur par défaut utilisée |
 | `GITHUB_DOCS_BRANCH` | Branche (défaut : `main`) | Valeur par défaut utilisée |
 

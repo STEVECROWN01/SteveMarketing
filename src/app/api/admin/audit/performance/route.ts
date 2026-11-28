@@ -7,7 +7,7 @@ export const maxDuration = 60;
 
 /**
  * VOLET 28 (28/11/2026) — OUTIL « PERFORMANCE » DE L'ESPACE AUDIT
- * (cloné sur GTmetrix) : mesure la page dans un vrai Chrome (note
+ * : mesure la page dans un vrai Chrome (note
  * A-F, scores Performance et Structure, Web Vitals LCP/TBT/CLS/FCP,
  * détails de la page, audits et cascade des requêtes).
  *

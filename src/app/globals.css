@@ -218,6 +218,34 @@ html.lenis body {
   background-color: #070707;
   color: #ffffff;
 }
+/* VOLET 29 (28/11/2026) — CURSEUR POINTEUR (main) SUR TOUT CE QUI SE
+   CLIQUE dans le back-office : tous les boutons, le logo (qui joue le
+   rôle du bouton « Tableau de bord »), les liens, les listes
+   déroulantes, les cases à cocher et les onglets — jamais la flèche
+   par défaut du navigateur. Les champs de saisie gardent leur
+   curseur d'édition. `.zone-admin` porte l'écran de CONNEXION. */
+.section-deep button:not(:disabled),
+.section-deep [role="button"]:not(:disabled),
+.section-deep [role="tab"],
+.section-deep a,
+.section-deep label,
+.section-deep select,
+.section-deep summary,
+.section-deep input[type="checkbox"],
+.section-deep input[type="radio"],
+.section-deep input[type="submit"],
+.section-deep input[type="button"],
+.zone-admin button:not(:disabled),
+.zone-admin [role="button"]:not(:disabled),
+.zone-admin a,
+.zone-admin label {
+  cursor: pointer;
+}
+.section-deep button:disabled,
+.section-deep [role="button"]:disabled,
+.zone-admin button:disabled {
+  cursor: default;
+}
 .section-light {
   background-color: #f5f5f5;
   color: #1c1c1c;

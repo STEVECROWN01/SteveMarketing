@@ -1,19 +1,18 @@
 /**
  * VOLET 28 (28/11/2026) — TYPES DES TROIS OUTILS D'AUDIT.
  *
- * Espace « Audit » du back-office, cloné sur les outils du marché
- * demandés par l'éditeur (sans clé d'API, sans abonnement) :
- *  - PERFORMANCE (cloné sur GTmetrix) : note A-F, scores
+ * Espace « Audit » du back-office :
+ *  - PERFORMANCE : note A-F, scores
  *    Performance et Structure, Web Vitals (LCP, TBT, CLS, FCP),
  *    détails de la page (poids, requêtes par type), audits et
  *    cascade des requêtes ;
- *  - SEO (cloné sur RankFlow) : score sur 100, note A-F, verdict,
+ *  - SEO : score sur 100, note A-F, verdict,
  *    familles de critères et plan d'action priorisé ;
  *  - AUDIT COMPLET : design, structure, copywriting et conversion,
  *    avec capture d'écran de la page.
  */
 
-/* ==================== PERFORMANCE (GTmetrix) ==================== */
+/* ==================== PERFORMANCE ==================== */
 
 /** Une métrique Web Vitale mesurée dans un vrai navigateur. */
 export type Vital = {
@@ -37,7 +36,7 @@ export type DetailType = {
   octets: number;
 };
 
-/** Un audit de structure (recommandation), comme GTmetrix. */
+/** Un audit de structure (recommandation). */
 export type AuditPerf = {
   titre: string;
   /** Priorité de la recommandation. */
@@ -64,7 +63,7 @@ export type LigneCascade = {
 export type RelevePerformance = {
   ok: true;
   url: string;
-  /** Note globale GTmetrix (60 % performance + 40 % structure). */
+  /** Note globale (60 % performance + 40 % structure). */
   note: string;
   scorePerformance: number;
   scoreStructure: number;
@@ -82,7 +81,7 @@ export type RelevePerformance = {
   avertissement?: string;
 };
 
-/* ==================== SEO (RankFlow) ==================== */
+/* ==================== SEO ==================== */
 
 /** État d'un critère SEO vérifié. */
 export type EtatCritere = "ok" | "moyen" | "ko";
@@ -101,7 +100,7 @@ export type CritereSeo = {
   conseil: string;
 };
 
-/** Une famille de critères (comme RankFlow : balises, contenu…). */
+/** Une famille de critères (balises, contenu…). */
 export type FamilleSeo = {
   nom: string;
   criteres: CritereSeo[];
@@ -145,7 +144,7 @@ export type ReleveDesign = {
 
 /* ==================== Partagé ==================== */
 
-/** Note A-F (barème GTmetrix : A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 60,
+/** Note A-F (barème : A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 60,
  *  E ≥ 50, F en dessous). */
 export function noteDepuisScore(score: number): string {
   if (score >= 90) return "A";

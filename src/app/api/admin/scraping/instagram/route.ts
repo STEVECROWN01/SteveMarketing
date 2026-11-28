@@ -26,6 +26,13 @@ export async function POST(req: NextRequest) {
   const recherche = typeof body?.recherche === "string" ? body.recherche.trim() : "";
   const filtre = body?.filtreSite === "avec" || body?.filtreSite === "sans" ? body.filtreSite : "tous";
   const limite = Math.min(40, Math.max(3, Number(body?.limite) || 25));
+  /* VOLET 29 — clé de la niche du fichier de prospection d'origine de
+   *  la recherche (ex. « #11 ») : suit chaque entreprise scrapée
+   *  pour adapter son message personnalisé. */
+  const nicheProspection =
+    typeof body?.nicheProspection === "string" && /^#\d{1,2}$/.test(body.nicheProspection.trim())
+      ? body.nicheProspection.trim()
+      : undefined;
   if (!recherche) {
     return NextResponse.json(
       { ok: false, error: "Indiquez une recherche : mots-clés, @comptes ou liens Instagram." },
@@ -35,6 +42,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const { entreprises, avertissement } = await scraperInstagram({ recherche, limite });
+    for (const e of entreprises) e.nicheProspection = nicheProspection;
     const sansSiteWeb = entreprises.filter((e) => !e.siteWebPresent).length;
     const resultats = appliquerFiltreSite(entreprises, filtre);
     const reponse: ResultatScraping & { entreprises: typeof resultats } = {

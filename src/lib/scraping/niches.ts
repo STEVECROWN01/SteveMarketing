@@ -20,6 +20,10 @@ export type CategorieProspection = {
   volume: string;
   /** Nombre de niches analysées dans la catégorie. */
   nbNiches: number;
+  /** VOLET 29 — mot-clé par défaut du scraping de la catégorie
+   *  quand AUCUNE niche n'est précisée (l'éditeur peut scraper sans
+   *  niche : le système utilise alors ce terme sur le lieu choisi). */
+  motCleDefaut: string;
 };
 
 /** Une niche de prospection, avec son prix facturable. */
@@ -53,6 +57,7 @@ export const CATEGORIES_PROSPECTION: CategorieProspection[] = [
     panierMoyen: 4083,
     volume: "≈ 170 000",
     nbNiches: 6,
+    motCleDefaut: "entreprise",
   },
   {
     nom: "Santé / Bien-être",
@@ -60,6 +65,7 @@ export const CATEGORIES_PROSPECTION: CategorieProspection[] = [
     panierMoyen: 4437,
     volume: "≈ 49 000",
     nbNiches: 4,
+    motCleDefaut: "cabinet médical",
   },
   {
     nom: "Services B2B",
@@ -67,6 +73,7 @@ export const CATEGORIES_PROSPECTION: CategorieProspection[] = [
     panierMoyen: 5071,
     volume: "≈ 82 000",
     nbNiches: 7,
+    motCleDefaut: "cabinet",
   },
   {
     nom: "Services aux particuliers",
@@ -74,6 +81,7 @@ export const CATEGORIES_PROSPECTION: CategorieProspection[] = [
     panierMoyen: 4000,
     volume: "≈ 90 000",
     nbNiches: 5,
+    motCleDefaut: "entreprise",
   },
   {
     nom: "Loisirs / Hôtellerie",
@@ -81,6 +89,7 @@ export const CATEGORIES_PROSPECTION: CategorieProspection[] = [
     panierMoyen: 5250,
     volume: "≈ 8 000",
     nbNiches: 2,
+    motCleDefaut: "hôtel",
   },
   {
     nom: "Formation",
@@ -88,6 +97,7 @@ export const CATEGORIES_PROSPECTION: CategorieProspection[] = [
     panierMoyen: 5250,
     volume: "≈ 10 000",
     nbNiches: 1,
+    motCleDefaut: "école",
   },
 ];
 
@@ -506,4 +516,83 @@ export function fourchettePanier(min: number, max: number): string {
 /** Niches d'une catégorie (l'ordre du fichier). */
 export function nichesDeCategorie(categorie: string): NicheProspection[] {
   return NICHES_PROSPECTION.filter((n) => n.categorie === categorie);
+}
+
+/* ------------------------------------------------------------------
+ * VOLET 29 (28/11/2026 soir) — DEMANDES DE L'ÉDITEUR.
+ *
+ * 1) ORDRE DES DROP-DOWNS : les CATÉGORIES sont ordonnées de la
+ *    mieux notée à la moins bien notée (jamais 5 étoiles puis 2 puis
+ *    4), et les NICHES pareil — à l'intérieur d'une catégorie comme
+ *    dans la modale de lancement.
+ * 2) RECOMMANDATIONS AJUSTÉES : la cible idéale de chiffre d'affaires
+ *    et le PANIER VITRINE recommandés affichent la MOITIÉ ENVISAGÉE
+ *    PAR L'ÉDITEUR des montants du fichier (demande : « il faut
+ *    considérer la moitié » — pour un couvreur, le fichier dit
+ *    « > 500k€ de CA » et « 2 500 € – 5 000 € », l'éditeur retient
+ *    « > 300 000 € de CA » et « 2 000 € – 5 000 € »). Ce sont des
+ *    RECOMMANDATIONS de travail, jamais des filtres : le scraping
+ *    n'en tient PAS compte.
+ * ------------------------------------------------------------------ */
+
+/** Catégories triées par étoiles décroissantes (puis score de
+ *  fichier) — l'ordre du drop-down de catégorie. */
+export function categoriesTrieesParEtoiles(): CategorieProspection[] {
+  const parScore = (nom: string) =>
+    Math.max(
+      ...nichesDeCategorie(nom).map((n) => n.score),
+      0,
+    );
+  return [...CATEGORIES_PROSPECTION].sort(
+    (a, b) => b.etoiles - a.etoiles || parScore(b.nom) - parScore(a.nom),
+  );
+}
+
+/** Niches d'une catégorie triées par étoiles décroissantes (puis
+ *  score de fichier) — l'ordre du drop-down de niche et de la modale. */
+export function nichesTrieesParEtoiles(categorie: string): NicheProspection[] {
+  return nichesDeCategorie(categorie).sort((a, b) => b.etoiles - a.etoiles || b.score - a.score);
+}
+
+/** Toutes les niches du fichier, triées par étoiles décroissantes
+ *  (modale de lancement sans catégorie choisie). */
+export function toutesNichesTrieesParEtoiles(): NicheProspection[] {
+  return [...NICHES_PROSPECTION].sort(
+    (a, b) => b.etoiles - a.etoiles || b.score - a.score,
+  );
+}
+
+/** Une recommandation ajustée (la moitié envisagée par l'éditeur). */
+export type RecoAjustee = {
+  /** Cible idéale affichée (montants de CA du fichier × 0,6, arrondis
+   *  au-dessus — « > 500k€ » devient « > 300 000 € »). */
+  cible: string;
+  /** Panier vitrine minimum ajusté (× 0,8, arrondi à 100 €). */
+  panierMin: number;
+  /** Panier vitrine maximum (celui du fichier). */
+  panierMax: number;
+};
+
+/** Ajuste la cible idéale d'une niche : chaque montant « Nk€ de CA »
+ *  du fichier devient N×0,6 en euros complets (500k€ → 300 000 €,
+ *  300k€ → 180 000 €, 400k€ → 240 000 €). */
+export function cibleAjustee(cible: string): string {
+  return cible.replace(/(\d+)\s*k€/g, (_, n: string) => {
+    const ajuste = Math.round(Number(n) * 0.6) * 1000;
+    return `${ajuste.toLocaleString("fr-FR")} €`;
+  });
+}
+
+/** La recommandation ajustée d'une niche (cible + panier). */
+export function recoAjustee(n: NicheProspection): RecoAjustee {
+  return {
+    cible: cibleAjustee(n.cible),
+    panierMin: Math.round((n.panierMin * 0.8) / 100) * 100,
+    panierMax: n.panierMax,
+  };
+}
+
+/** Le panier moyen ajusté d'une catégorie (× 0,8, arrondi à 50 €). */
+export function panierMoyenAjuste(c: CategorieProspection): number {
+  return Math.round((c.panierMoyen * 0.8) / 50) * 50;
 }

@@ -1,61 +1,44 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
+  ChevronDown,
   ChevronRight,
+  Download,
   Gauge,
   Globe,
+  History,
   Loader2,
   MinusCircle,
+  Save,
   Search,
   SearchCheck,
+  Sparkles,
   XCircle,
 } from "lucide-react";
-import { BoutonAction, Carte, Champ, Pastille, TitreSection, styleInput } from "./elements";
+import { BoutonAction, Carte, Champ, ModaleContenu, Pastille, TitreSection, styleInput } from "./elements";
 import type { CritereSeo, ReleveDesign, RelevePerformance, ReleveSeo } from "@/lib/audit/types";
+import type { AuditComplet, AxeAmelioration, AuditResume } from "@/lib/audit/complet";
+import { compilerAxes, construireAudit, scorePerformanceComposite } from "@/lib/audit/complet";
 
 /**
  * VOLET 28 (28/11/2026) — ESPACE « AUDIT » DU BACK-OFFICE.
- *
- * Trois outils d'analyse de sites web (entrer l'URL, tout le travail
- * se fait — sans clé d'API, sans abonnement) :
- *  - PERFORMANCE (cloné sur GTmetrix) : note A-F, scores Performance
- *    et Structure, Web Vitals, détails de la page, recommandations et
- *    cascade des requêtes ;
- *  - SEO (cloné sur RankFlow) : audit on-page avec score sur 100,
- *    note A-F, verdict, familles de critères et plan d'action ;
- *  - AUDIT COMPLET : design, structure, copywriting et conversion,
- *    avec capture d'écran de la page analysée.
+ * VOLET 29 (28/11/2026 soir) — UN SEUL OUTIL, comme demandé par
+ * l'éditeur : plus les trois boutons performance / SEO / audit
+ * complet — on colle l'URL, le bouton analyser fait TOUT à la fois
+ * (vitesse de chargement, SEO on-page, structure / design /
+ * copywriting / conversion) et le RAPPORT COMPLET s'affiche à
+ * l'écran PAR BLOCS : rapport performance, rapport SEO, rapport
+ * structure & design. Le rapport se télécharge en PDF (« AUDIT
+ * COMPLET »), ses AXES D'AMÉLIORATION s'ouvrent dans une modale
+ * (eux aussi en PDF), et l'audit peut être SAUVEGARDÉ dans le dépôt
+ * GitHub de stockage — l'historique des audits précédents reste
+ * consultable à tout moment.
  */
 
 type TypeToast = (t: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
-type Outil = "performance" | "seo" | "design";
-
-const OUTILS: { cle: Outil; libelle: string; description: string; icone: React.ReactNode }[] = [
-  {
-    cle: "performance",
-    libelle: "Performance",
-    description:
-      "Vitesse de chargement de la page (cloné sur GTmetrix) : note A-F, scores Performance et Structure, Web Vitals (LCP, TBT, CLS), poids et requêtes par type, recommandations et cascade.",
-    icone: <Gauge className="h-4 w-4" aria-hidden="true" />,
-  },
-  {
-    cle: "seo",
-    libelle: "SEO",
-    description:
-      "Audit SEO on-page de la page (cloné sur RankFlow) : score sur 100, note et verdict, critères par famille et plan d'action priorisé.",
-    icone: <SearchCheck className="h-4 w-4" aria-hidden="true" />,
-  },
-  {
-    cle: "design",
-    libelle: "Audit complet",
-    description:
-      "Le site est-il bien designé, moderne, bien structuré, écrit pour convertir ? Analyse du design, de la structure, du copywriting et de la conversion, avec capture d'écran.",
-    icone: <Search className="h-4 w-4" aria-hidden="true" />,
-  },
-];
 
 /* ------------------------------------------------------------------
  * Affichages partagés
@@ -82,13 +65,7 @@ function NoteRonde({ note, score, taille = 92 }: { note: string; score: number; 
       <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full -rotate-90">
         <circle cx="50" cy="50" r="42" fill="none" stroke="#2f2f2f" strokeWidth="8" />
         <circle
-          cx="50"
-          cy="50"
-          r="42"
-          fill="none"
-          stroke={couleur}
-          strokeWidth="8"
-          strokeLinecap="round"
+          cx="50" cy="50" r="42" fill="none" stroke={couleur} strokeWidth="8" strokeLinecap="round"
           strokeDasharray={`${(Math.max(0, Math.min(100, score)) / 100) * (2 * Math.PI * 42)} ${2 * Math.PI * 42}`}
         />
       </svg>
@@ -132,15 +109,27 @@ function secondes(ms: number): string {
   return ms >= 1000 ? `${(ms / 1000).toFixed(2)} s` : `${Math.round(ms)} ms`;
 }
 
+/** Le titre d'un bloc du rapport complet. */
+function TitreBloc({ libelle, note }: { libelle: string; note: string }) {
+  return (
+    <div className="mb-4 mt-10 flex items-center gap-3 border-t border-[#e4e4e4]/12 pt-6 first:mt-0">
+      <span className="h-2.5 w-2.5 rounded-full bg-[#e4e4e4]" aria-hidden="true" />
+      <h3 className="font-display text-lg font-semibold text-white sm:text-xl">{libelle}</h3>
+      <span className="ml-1 rounded-full border border-[#e4e4e4]/25 px-2.5 py-0.5 text-[11px] font-medium tracking-wide text-[#c8c8c8]">
+        {note}
+      </span>
+    </div>
+  );
+}
+
 /* ------------------------------------------------------------------
- * RÉSULTAT PERFORMANCE (GTmetrix)
+ * RAPPORT PERFORMANCE
  * ------------------------------------------------------------------ */
 
 function ResultatPerformance({ r }: { r: RelevePerformance }) {
   const [cascadeOuverte, setCascadeOuverte] = useState(false);
   return (
     <div className="space-y-6">
-      {/* Note + scores */}
       <Carte className="flex flex-wrap items-center gap-6 p-5 sm:p-6">
         <div className="flex items-center gap-5">
           <NoteRonde note={r.note} score={Math.round(0.6 * r.scorePerformance + 0.4 * r.scoreStructure)} />
@@ -162,9 +151,7 @@ function ResultatPerformance({ r }: { r: RelevePerformance }) {
       <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-5">
         {r.vitals.map((v) => (
           <Carte key={v.code} className="p-4">
-            <p className="text-[10px] font-semibold tracking-[0.14em] text-[#c8c8c8] uppercase">
-              {v.code === "cls" ? v.libelle : v.libelle}
-            </p>
+            <p className="text-[10px] font-semibold tracking-[0.14em] text-[#c8c8c8] uppercase">{v.libelle}</p>
             <p className="mt-2 font-display text-2xl font-semibold" style={{ color: couleurNote(v.score) }}>
               {v.valeur.toFixed(v.code === "cls" ? 3 : v.valeur >= 10 ? 1 : 2)}
               {v.unite === "s" ? " s" : ""}
@@ -218,7 +205,7 @@ function ResultatPerformance({ r }: { r: RelevePerformance }) {
         </div>
       </Carte>
 
-      {/* Recommandations (Structure) */}
+      {/* Recommandations */}
       <Carte className="p-5 sm:p-6">
         <TitreSection note={`${r.audits.length} recommandation${r.audits.length > 1 ? "s" : ""}`}>
           Recommandations
@@ -250,7 +237,7 @@ function ResultatPerformance({ r }: { r: RelevePerformance }) {
         <button
           type="button"
           onClick={() => setCascadeOuverte((v) => !v)}
-          className="flex w-full items-center justify-between gap-2 text-left"
+          className="flex w-full cursor-pointer items-center justify-between gap-2 text-left"
         >
           <TitreSection note={`${r.cascade.length} requêtes`}>Cascade des requêtes</TitreSection>
           <ChevronRight
@@ -308,7 +295,7 @@ function ResultatPerformance({ r }: { r: RelevePerformance }) {
 }
 
 /* ------------------------------------------------------------------
- * RÉSULTAT SEO (RankFlow)
+ * RAPPORT SEO
  * ------------------------------------------------------------------ */
 
 function IcôneCritère({ etat }: { etat: CritereSeo["etat"] }) {
@@ -398,7 +385,7 @@ function ResultatSeo({ r }: { r: ReleveSeo }) {
 }
 
 /* ------------------------------------------------------------------
- * RÉSULTAT AUDIT COMPLET (design / copywriting)
+ * RAPPORT STRUCTURE / DESIGN / COPYWRITING / CONVERSION
  * ------------------------------------------------------------------ */
 
 function ResultatDesign({ r }: { r: ReleveDesign }) {
@@ -491,73 +478,230 @@ function ResultatDesign({ r }: { r: ReleveDesign }) {
 }
 
 /* ------------------------------------------------------------------
- * L'ESPACE
+ * L'ESPACE AUDIT — un seul outil
  * ------------------------------------------------------------------ */
 
 export function EspaceAudit({
   toast,
   sessionExpiree,
+  urlPreRemplie,
 }: {
   toast: TypeToast;
   sessionExpiree: () => void;
+  /** URL transmise par l'espace Prospects (bouton Analyser) :
+   *  préremplie et auditée dès l'arrivée. */
+  urlPreRemplie?: string;
 }) {
-  const [outil, setOutil] = useState<Outil>("performance");
   const [url, setUrl] = useState("");
+  const [audit, setAudit] = useState<AuditComplet | null>(null);
   const [chargement, setChargement] = useState(false);
-  const [perf, setPerf] = useState<RelevePerformance | null>(null);
-  const [seo, setSeo] = useState<ReleveSeo | null>(null);
-  const [design, setDesign] = useState<ReleveDesign | null>(null);
+  const [etape, setEtape] = useState<string | null>(null);
+  const [historique, setHistorique] = useState<AuditResume[]>([]);
+  const [sauvegardeEnCours, setSauvegardeEnCours] = useState(false);
+  const [dejaSauvegarde, setDejaSauvegarde] = useState(false);
+  const [axesOuverts, setAxesOuverts] = useState(false);
+  const [pdfEnCours, setPdfEnCours] = useState(false);
 
-  const outilActif = OUTILS.find((o) => o.cle === outil) ?? OUTILS[0];
-
-  async function analyser() {
-    if (chargement) return;
-    if (!/^https?:\/\/.+\..+/.test(url.trim())) {
-      toast({
-        title: "URL incomplète",
-        description: "Collez l'adresse complète de la page à analyser (https://…).",
-        variant: "destructive",
-      });
-      return;
-    }
-    setChargement(true);
+  const chargerHistorique = useCallback(async () => {
     try {
-      const res = await fetch(`/api/admin/audit/${outil}`, {
+      const res = await fetch("/api/admin/audits", { cache: "no-store" });
+      if (res.status === 401) {
+        sessionExpiree();
+        return;
+      }
+      const data = (await res.json().catch(() => null)) as { ok?: boolean; audits?: AuditResume[] } | null;
+      if (res.ok && data?.ok) setHistorique(data.audits ?? []);
+    } catch {
+      /* l'historique n'est pas bloquant */
+    }
+  }, [sessionExpiree]);
+
+  useEffect(() => {
+    void chargerHistorique();
+  }, [chargerHistorique]);
+
+  /* L'audit complet : les trois analyses en parallèle, le rapport
+   * complet assemblé bloc par bloc. */
+  const analyser = useCallback(
+    async (urlAnalysee?: string) => {
+      const cible = (urlAnalysee ?? url).trim();
+      if (chargement) return;
+      if (!/^https?:\/\/.+\..+/.test(cible)) {
+        toast({
+          title: "URL incomplète",
+          description: "Collez l'adresse complète de la page à analyser (https://…).",
+          variant: "destructive",
+        });
+        return;
+      }
+      setChargement(true);
+      setAudit(null);
+      setDejaSauvegarde(false);
+      setEtape("Analyse de la performance…");
+      try {
+        const appeler = async (outil: "performance" | "seo" | "design") => {
+          const res = await fetch(`/api/admin/audit/${outil}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: cible }),
+          });
+          if (res.status === 401) throw new Error("session");
+          const data = await res.json();
+          if (!res.ok || !data?.ok) throw new Error(data?.error ?? `Analyse ${outil} impossible.`);
+          return data;
+        };
+        /* La performance est la plus longue (vrai navigateur) : on
+         * la lance, on présente le SEO pendant qu'elle tourne, puis
+         * le design (capture d'écran). */
+        const promessePerformance = appeler("performance").finally(() =>
+          setEtape((e) => (e ? "Analyse du design et du copywriting…" : e)),
+        );
+        setEtape("Analyse du SEO on-page…");
+        const [performance, seo] = await Promise.all([
+          promessePerformance,
+          appeler("seo").finally(() => setEtape("Analyse du design et du copywriting…")),
+        ]);
+        const design = await appeler("design");
+        const complet = construireAudit(cible, performance as RelevePerformance, seo as ReleveSeo, design as ReleveDesign);
+        setAudit(complet);
+        toast({
+          title: `Audit complet terminé — note ${complet.note} (${complet.scoreGlobal}/100)`,
+          description: cible.replace(/^https?:\/\//, ""),
+        });
+      } catch (e) {
+        if (e instanceof Error && e.message === "session") {
+          sessionExpiree();
+          return;
+        }
+        toast({
+          title: "Analyse impossible",
+          description: e instanceof Error ? e.message : "Réessayez dans un instant.",
+          variant: "destructive",
+        });
+      } finally {
+        setEtape(null);
+        setChargement(false);
+      }
+    },
+    [chargement, sessionExpiree, toast, url],
+  );
+
+  /* L'URL préremplie depuis l'espace Prospects (bouton Analyser) :
+   * le champ est rempli et l'audit démarre directement. */
+  useEffect(() => {
+    if (urlPreRemplie) {
+      setUrl(urlPreRemplie);
+      void analyser(urlPreRemplie);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [urlPreRemplie]);
+
+  /** Télécharge le PDF de l'audit complet ou des axes d'amélioration. */
+  async function telechargerPdf(kind: "complet" | "axes") {
+    if (!audit || pdfEnCours) return;
+    setPdfEnCours(true);
+    try {
+      const res = await fetch("/api/admin/audit/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: url.trim() }),
+        body: JSON.stringify({ audit, kind }),
       });
       if (res.status === 401) {
         sessionExpiree();
         return;
       }
-      const data = await res.json().catch(() => null);
-      if (!res.ok || !data?.ok) {
+      if (!res.ok) {
+        const data = (await res.json().catch(() => null)) as { error?: string } | null;
         toast({
-          title: "Analyse impossible",
+          title: "PDF impossible",
           description: data?.error ?? "Réessayez dans un instant.",
           variant: "destructive",
         });
         return;
       }
-      if (outil === "performance") setPerf(data as RelevePerformance);
-      else if (outil === "seo") setSeo(data as ReleveSeo);
-      else setDesign(data as ReleveDesign);
-      const titreNote = data.note ? ` — note ${data.note}` : "";
+      const blob = await res.blob();
+      const lien = document.createElement("a");
+      lien.href = URL.createObjectURL(blob);
+      lien.download = kind === "axes" ? `axes-amelioration-${audit.hote}.pdf` : `audit-complet-${audit.hote}.pdf`;
+      document.body.appendChild(lien);
+      lien.click();
+      lien.remove();
+      URL.revokeObjectURL(lien.href);
       toast({
-        title: `Analyse terminée${titreNote}`,
-        description: new URL(url.trim()).hostname,
+        title: kind === "axes" ? "Axes d'amélioration téléchargés" : "Audit complet téléchargé",
+        description: kind === "axes" ? `Priorités de ${audit.hote} en PDF.` : `Audit complet de ${audit.hote} en PDF.`,
       });
     } catch {
       toast({
-        title: "Analyse indisponible",
+        title: "PDF indisponible",
         description: "Le serveur n'a pas répondu — réessayez dans un instant.",
         variant: "destructive",
       });
     } finally {
-      setChargement(false);
+      setPdfEnCours(false);
     }
   }
+
+  /** Sauvegarde l'audit dans le dépôt GitHub de stockage. */
+  async function sauvegarder() {
+    if (!audit || sauvegardeEnCours || dejaSauvegarde) return;
+    setSauvegardeEnCours(true);
+    try {
+      const res = await fetch("/api/admin/audits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ audit }),
+      });
+      if (res.status === 401) {
+        sessionExpiree();
+        return;
+      }
+      const data = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
+      if (!res.ok || !data?.ok) {
+        toast({
+          title: "Sauvegarde impossible",
+          description: data?.error ?? "Réessayez dans un instant.",
+          variant: "destructive",
+        });
+        return;
+      }
+      setDejaSauvegarde(true);
+      toast({ title: "Audit sauvegardé", description: "Retrouvé à tout moment dans les audits précédents." });
+      void chargerHistorique();
+    } catch {
+      toast({
+        title: "Sauvegarde indisponible",
+        description: "Le serveur n'a pas répondu — réessayez dans un instant.",
+        variant: "destructive",
+      });
+    } finally {
+      setSauvegardeEnCours(false);
+    }
+  }
+
+  /** Recharge un audit précédent dans la vue du rapport complet. */
+  async function voirAuditPrecedent(id: string) {
+    try {
+      const res = await fetch(`/api/admin/audits?id=${encodeURIComponent(id)}`, { cache: "no-store" });
+      if (res.status === 401) {
+        sessionExpiree();
+        return;
+      }
+      const data = (await res.json().catch(() => null)) as { ok?: boolean; audit?: AuditComplet } | null;
+      if (!res.ok || !data?.ok || !data.audit) {
+        toast({ title: "Audit introuvable", variant: "destructive" });
+        return;
+      }
+      setAudit(data.audit);
+      setUrl(data.audit.url);
+      setDejaSauvegarde(true);
+      setAxesOuverts(false);
+    } catch {
+      toast({ title: "Lecture impossible", variant: "destructive" });
+    }
+  }
+
+  const axes = audit ? compilerAxes(audit) : [];
 
   return (
     <div>
@@ -572,31 +716,16 @@ export function EspaceAudit({
         <Pastille ton="valide">Analyse</Pastille>
       </div>
 
-      {/* Onglets des trois outils */}
-      <div className="mb-6 flex flex-wrap items-center gap-2" role="tablist" aria-label="Outils d'audit">
-        {OUTILS.map((o) => (
-          <button
-            key={o.cle}
-            type="button"
-            role="tab"
-            aria-selected={outil === o.cle}
-            onClick={() => setOutil(o.cle)}
-            className={`flex min-h-[38px] items-center gap-2 rounded-full border px-4 py-1.5 text-sm transition-colors ${
-              outil === o.cle
-                ? "border-[#e4e4e4] bg-white font-medium text-[#1c1c1c]"
-                : "border-[#e4e4e4]/25 text-[#c8c8c8] hover:border-[#e4e4e4]/60 hover:text-white"
-            }`}
-          >
-            {o.icone}
-            {o.libelle}
-          </button>
-        ))}
-      </div>
-
-      {/* Formulaire : URL + analyse */}
+      {/* L'outil unique : URL + Analyser */}
       <Carte className="mb-6 p-5 sm:p-6">
-        <TitreSection note="gratuit — aucune clé d'API">{outilActif.libelle}</TitreSection>
-        <p className="mb-4 text-sm leading-relaxed text-[#c8c8c8]">{outilActif.description}</p>
+        <TitreSection note="performance · SEO · structure & design">Audit complet</TitreSection>
+        <p className="mb-4 text-sm leading-relaxed text-[#c8c8c8]">
+          La vitesse de chargement de la page : note A-F, scores Performance et Structure, Web Vitals
+          (LCP, TBT, CLS), poids et requêtes par type, recommandations et cascade. L&apos;audit SEO
+          on-page : score sur 100, note et verdict, critères par famille et plan d&apos;action priorisé.
+          La structure, le design, le copywriting et la conversion : ce qui fonctionne, ce qui doit
+          être amélioré, avec capture de la page.
+        </p>
         <div className="flex flex-wrap items-end gap-3">
           <div className="min-w-[260px] flex-1">
             <Champ label="URL de la page" indicatif="https://…">
@@ -629,25 +758,168 @@ export function EspaceAudit({
         </div>
       </Carte>
 
-      {/* Résultats */}
-      {chargement ? (
-        <Carte className="flex items-center justify-center gap-3 px-6 py-16">
-          <Loader2 className="h-5 w-5 animate-spin text-[#e4e4e4]" aria-hidden="true" />
-          <p className="text-sm text-[#c8c8c8]">
-            {outil === "performance"
-              ? "La page se charge dans un vrai navigateur, chaque requête est mesurée…"
-              : outil === "seo"
-                ? "La page et ses balises sont analysées…"
-                : "La page est chargée et capturée, le design et le texte sont analysés…"}
-          </p>
-        </Carte>
-      ) : outil === "performance" && perf ? (
-        <ResultatPerformance r={perf} />
-      ) : outil === "seo" && seo ? (
-        <ResultatSeo r={seo} />
-      ) : outil === "design" && design ? (
-        <ResultatDesign r={design} />
+      {/* Le rapport complet, présenté par blocs */}
+      {audit ? (
+        <div className="mb-4 flex flex-wrap items-center gap-6 rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-5 sm:p-6">
+          <div className="flex items-center gap-5">
+            <NoteRonde note={audit.note} score={audit.scoreGlobal} />
+            <div>
+              <p className="text-eyebrow">Note globale de l&apos;audit complet</p>
+              <p className="mt-1 font-display text-lg font-semibold text-white">{audit.scoreGlobal}/100</p>
+              <p className="mt-1 max-w-[260px] truncate text-xs text-[#c8c8c8]/70">{audit.url}</p>
+              <p className="mt-0.5 text-[11px] text-[#c8c8c8]/60">
+                {new Date(audit.date).toLocaleString("fr-FR")}
+              </p>
+            </div>
+          </div>
+          <div className="min-w-[230px] flex-1 space-y-3">
+            <BarreScore libelle="Performance" score={scorePerformanceComposite(audit.performance)} />
+            <BarreScore libelle="SEO" score={audit.seo.score} />
+            <BarreScore libelle="Structure / Design" score={audit.design.scoreGlobal} />
+          </div>
+          <div className="flex w-full flex-wrap gap-3 sm:w-auto sm:flex-col">
+            <BoutonAction variant="principal" onClick={() => void telechargerPdf("complet")} disabled={pdfEnCours}>
+              {pdfEnCours ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Download className="h-4 w-4" aria-hidden="true" />}
+              Audit complet en PDF
+            </BoutonAction>
+            <BoutonAction onClick={() => setAxesOuverts(true)}>
+              <Sparkles className="h-4 w-4" aria-hidden="true" />
+              Voir les axes d&apos;amélioration
+            </BoutonAction>
+            <BoutonAction onClick={() => void sauvegarder()} disabled={sauvegardeEnCours || dejaSauvegarde}>
+              {sauvegardeEnCours ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Save className="h-4 w-4" aria-hidden="true" />
+              )}
+              {dejaSauvegarde ? "Sauvegardé" : "Sauvegarder"}
+            </BoutonAction>
+          </div>
+        </div>
       ) : null}
+
+      {chargement ? (
+        <Carte className="flex flex-col items-center justify-center gap-4 px-6 py-16">
+          <Loader2 className="h-6 w-6 animate-spin text-[#e4e4e4]" aria-hidden="true" />
+          <div className="flex flex-col items-center gap-1.5 text-center">
+            <p className="text-sm font-medium text-white">Audit complet en cours</p>
+            <p className="text-sm text-[#c8c8c8]">{etape}</p>
+            <p className="text-xs text-[#c8c8c8]/60">La page se charge dans un vrai navigateur — patientez un instant.</p>
+          </div>
+        </Carte>
+      ) : audit ? (
+        <div>
+          <TitreBloc libelle="Rapport performance" note={`${scorePerformanceComposite(audit.performance)}/100`} />
+          <ResultatPerformance r={audit.performance} />
+          <TitreBloc libelle="Rapport SEO" note={`${audit.seo.score}/100`} />
+          <ResultatSeo r={audit.seo} />
+          <TitreBloc libelle="Rapport structure / design / copywriting / conversion" note={`${audit.design.scoreGlobal}/100`} />
+          <ResultatDesign r={audit.design} />
+        </div>
+      ) : null}
+
+      {/* LES AUDITS PRÉCÉDENTS — l'historique enregistré */}
+      {historique.length > 0 ? (
+        <div className="mt-10">
+          <div className="mb-4 flex items-center gap-2">
+            <History className="h-4 w-4 text-[#c8c8c8]" aria-hidden="true" />
+            <h3 className="font-display text-base font-semibold text-white sm:text-lg">Audits précédents</h3>
+            <span className="text-sm text-[#c8c8c8]">({historique.length})</span>
+          </div>
+          <div className="grid gap-3 lg:grid-cols-2">
+            {historique.map((h) => (
+              <Carte key={h.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
+                <div className="min-w-[190px] flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-white">{h.hote}</p>
+                    <span
+                      className="font-mono text-sm font-semibold"
+                      style={{ color: couleurNote(h.scoreGlobal) }}
+                    >
+                      {h.note} · {h.scoreGlobal}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-xs text-[#c8c8c8]">
+                    {new Date(h.date).toLocaleString("fr-FR")} · {h.nbAxes} axe{h.nbAxes > 1 ? "s" : ""} d&apos;amélioration
+                  </p>
+                  <p className="mt-1 text-[11px] text-[#c8c8c8]/70">
+                    Perf {h.scores.performance} · SEO {h.scores.seo} · Design {h.scores.design}
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <BoutonAction onClick={() => void voirAuditPrecedent(h.id)}>
+                    <Search className="h-4 w-4" aria-hidden="true" />
+                    Voir l&apos;audit
+                  </BoutonAction>
+                  <BoutonAction
+                    onClick={() => {
+                      void voirAuditPrecedent(h.id).then(() => {
+                        /* ouvre ensuite les axes du rapport chargé */
+                        setAxesOuverts(true);
+                      });
+                    }}
+                  >
+                    <Sparkles className="h-4 w-4" aria-hidden="true" />
+                    Axes d&apos;amélioration
+                  </BoutonAction>
+                </div>
+              </Carte>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {/* LA MODALE DES AXES D'AMÉLIORATION — tout ce qu'il faut
+          corriger, par bloc et par priorité, téléchargeable en PDF. */}
+      <ModaleContenu
+        ouvert={axesOuverts && audit !== null}
+        titre="Axes d'amélioration"
+        sousTitre={audit ? `${audit.hote} — ${axes.length} axe${axes.length > 1 ? "s" : ""} priorisé${axes.length > 1 ? "s" : ""} pour amener le site à 100 %` : ""}
+        onClose={() => setAxesOuverts(false)}
+        large="max-w-3xl"
+        pied={
+          <BoutonAction variant="principal" onClick={() => void telechargerPdf("axes")} disabled={pdfEnCours || !audit}>
+            {pdfEnCours ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Download className="h-4 w-4" aria-hidden="true" />}
+            Télécharger les axes d&apos;amélioration (PDF)
+          </BoutonAction>
+        }
+      >
+        {audit && axes.length === 0 ? (
+          <p className="text-sm text-[#c8c8c8]">Aucun axe d&apos;amélioration : le site est déjà en très bonne forme.</p>
+        ) : null}
+        {(["Performance", "SEO", "Structure / Design"] as const).map((bloc) => {
+          const axesBloc = axes.filter((a) => a.bloc === bloc);
+          if (axesBloc.length === 0) return null;
+          return (
+            <div key={bloc} className="mb-6">
+              <div className="mb-3 flex items-center gap-2">
+                {bloc === "Performance" ? (
+                  <Gauge className="h-4 w-4 text-[#c8c8c8]" aria-hidden="true" />
+                ) : bloc === "SEO" ? (
+                  <SearchCheck className="h-4 w-4 text-[#c8c8c8]" aria-hidden="true" />
+                ) : (
+                  <Sparkles className="h-4 w-4 text-[#c8c8c8]" aria-hidden="true" />
+                )}
+                <h4 className="font-display text-sm font-semibold text-white">{bloc}</h4>
+              </div>
+              <div className="space-y-2.5">
+                {axesBloc.map((a: AxeAmelioration, i) => (
+                  <div key={`${a.titre}-${i}`} className="rounded-xl border border-[#e4e4e4]/10 bg-[#1c1c1c] p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-sm font-medium text-white">{a.titre}</p>
+                      <Pastille ton={a.priorite === "élevée" ? "alerte" : a.priorite === "faible" ? "valide" : "neutre"}>
+                        Priorité {a.priorite}
+                      </Pastille>
+                    </div>
+                    <p className="mt-1.5 text-xs leading-relaxed text-[#c8c8c8]">{a.detail}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-[#e4e4e4]">→ {a.conseil}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </ModaleContenu>
     </div>
   );
 }

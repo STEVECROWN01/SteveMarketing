@@ -1,8 +1,6 @@
 /**
  * VOLET 27 — OUTIL « GOOGLE MAPS » : fiches d'entreprises PAR LIEU ET
- * PAR NICHE, cloné gratuitement sur le scraping de fiches
- * d'entreprises : données publiques OpenStreetMap (Nominatim —
- * aucune clé, aucune limite de paiement).
+ * PAR NICHE : données publiques OpenStreetMap (Nominatim).
  *
  * Champs renvoyés : nom, catégorie (niche), adresse complète, ville,
  * pays, téléphone, email, site web, horaires — tout ce qui est
@@ -100,6 +98,25 @@ function nicheFrancaise(type?: string, categorie?: string): string {
   return NICHES_FR[cle] ?? (cle ? cle.replace(/_/g, " ") : "Entreprise");
 }
 
+/** Traduit les horaires d'ouverture OpenStreetMap (« Mo-Su, PH
+ *  06:00-22:00 ») en français lisible (« lun–dim et jours fériés
+ *  06:00-22:00 ») — VOLET 29 : les horaires s'affichent dans le bloc
+ *  de détails du prospect. */
+function horairesFrancais(horaires: string): string {
+  return horaires
+    .replace(/\bMo\b/g, "lun")
+    .replace(/\bTu\b/g, "mar")
+    .replace(/\bWe\b/g, "mer")
+    .replace(/\bTh\b/g, "jeu")
+    .replace(/\bFr\b/g, "ven")
+    .replace(/\bSa\b/g, "sam")
+    .replace(/\bSu\b/g, "dim")
+    .replace(/\bPH\b/g, "jours fériés")
+    .replace(/\bSH\b/g, "vacances scolaires")
+    .replace(/\boff\b/gi, "fermé")
+    .replace(/\s*;\s*/g, " · ");
+}
+
 /** Géocode un lieu (ville, pays…) : nom affiché + cadre (boundingbox). */
 async function geocoderLieu(lieu: string): Promise<{
   nomAffiche: string;
@@ -176,6 +193,11 @@ function versEntreprise(fiche: ReponseNominatim, paysGeocode: string): Entrepris
     bio: nettoyerTexte(extras.description || extras.cuisine || extras.operator, 200) || undefined,
     localisation: localisation || nettoyerTexte(fiche.display_name, 120) || undefined,
     pays: nettoyerTexte(adresse.country, 60) || paysGeocode || undefined,
+    /* VOLET 29 — adresse complète, horaires d'ouverture et ancienneté
+     * (depuis quand l'entreprise existe) quand la fiche les publie. */
+    adresse: nettoyerTexte(fiche.display_name, 180) || undefined,
+    horaires: horairesFrancais(nettoyerTexte(extras.opening_hours, 300)) || undefined,
+    anciennete: nettoyerTexte(extras.start_date, 40) || undefined,
     telephone: telephone || undefined,
     email: (nettoyerTexte(extras.email || extras["contact:email"], 90) || undefined)?.toLowerCase(),
     siteWeb: siteWeb ?? undefined,

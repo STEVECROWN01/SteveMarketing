@@ -1,12 +1,11 @@
 /**
  * VOLET 27 — OUTIL « INSTAGRAM » : pages d'entreprises Instagram
  * (bio, catégorie, email, téléphone, site web, localisation,
- * abonnés), cloné gratuitement sur les scrapers de pages Instagram.
+ * abonnés) des pages d'entreprises Instagram.
  *
  * Deux modes d'entrée (comme l'outil de référence) :
  *  - mots-clés / niche : découverte des comptes d'entreprises via les
- *    moteurs de recherche (chaîne gratuite — aucun compte, aucune
- *    clé), puis enrichissement de chaque profil ;
+ *    moteurs de recherche, puis enrichissement de chaque profil ;
  *  - usernames directs : @comptes ou liens instagram.com/… collés.
  *
  * L'enrichissement essaie D'ABORD les points d'entrée publics

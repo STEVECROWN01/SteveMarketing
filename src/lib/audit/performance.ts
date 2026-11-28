@@ -1,8 +1,7 @@
 /**
- * VOLET 28 (28/11/2026) — OUTIL « PERFORMANCE » DE L'AUDIT, cloné sur
- * GTmetrix (fonctionnement, barème et présentation) :
+ * VOLET 28 (28/11/2026) — OUTIL « PERFORMANCE » DE L'AUDIT :
  *
- *  - NOTE GTmetrix : moyenne pondérée 60 % Performance + 40 %
+ *  - NOTE GLOBALE : moyenne pondérée 60 % Performance + 40 %
  *    Structure → A ≥ 90, B ≥ 80, C ≥ 70, D ≥ 60, E ≥ 50, F ensuite ;
  *  - SCORE PERFORMANCE : les Web Vitals de Lighthouse avec leurs
  *    poids réels — LCP 25 %, TBT 30 %, CLS 25 %, FCP 10 %, SI 10 %
@@ -16,7 +15,7 @@
  *  - CASCADE : chaque requête avec son début, sa durée, son poids.
  *
  * Tout est mesuré dans un VRAI Chrome (Puppeteer) par le protocole
- * DevTools — aucune clé d'API, aucun service externe.
+ * DevTools, directement.
  */
 import type { Page } from "puppeteer-core";
 import { ouvrirNavigateur } from "./navigateur";
@@ -253,7 +252,7 @@ export async function auditerPerformance(url: string): Promise<RelevePerformance
       .map((type) => ({ type, ...(parType.get(type) ?? { nb: 0, octets: 0 }) }))
       .filter((d) => d.nb > 0);
 
-    /* --- audits de STRUCTURE (les recommandations GTmetrix) --- */
+    /* --- audits de STRUCTURE (les recommandations) --- */
     const audits: AuditPerf[] = [];
     const imagesVieilles = listeRequetes.filter((r) => r.type === "Images" && /\.(png|jpe?g|gif|bmp)(\?|$)/i.test(r.url));
     const octetsImagesVieilles = imagesVieilles.reduce((s, r) => s + r.octets, 0);
@@ -338,7 +337,7 @@ export async function auditerPerformance(url: string): Promise<RelevePerformance
     }
     const scoreStructure = Math.max(0, 100 - audits.reduce((s, a) => s + a.points, 0));
 
-    /* --- note GTmetrix : 60 % performance + 40 % structure --- */
+    /* --- note globale : 60 % performance + 40 % structure --- */
     const scoreGlobal = Math.round(0.6 * scorePerformance + 0.4 * scoreStructure);
 
     /* --- cascade (waterfall) --- */

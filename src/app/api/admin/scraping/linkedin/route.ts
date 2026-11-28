@@ -31,6 +31,13 @@ export async function POST(req: NextRequest) {
   const filtre = body?.filtreSite === "avec" || body?.filtreSite === "sans" ? body.filtreSite : "tous";
   const minEmployes = Math.max(0, Math.min(100000, Number(body?.minEmployes) || 0));
   const limite = Math.min(40, Math.max(3, Number(body?.limite) || 25));
+  /* VOLET 29 — clé de la niche du fichier de prospection d'origine de
+   *  la recherche (ex. « #11 ») : suit chaque entreprise scrapée
+   *  pour adapter son message personnalisé. */
+  const nicheProspection =
+    typeof body?.nicheProspection === "string" && /^#\d{1,2}$/.test(body.nicheProspection.trim())
+      ? body.nicheProspection.trim()
+      : undefined;
   if (!recherche) {
     return NextResponse.json(
       { ok: false, error: "Indiquez une recherche : mots-clés, nom d'entreprise ou URL LinkedIn." },
@@ -40,6 +47,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const { entreprises, avertissement } = await scraperLinkedIn({ recherche, limite });
+    for (const e of entreprises) e.nicheProspection = nicheProspection;
     let candidates = entreprises;
     let note = avertissement;
     if (minEmployes > 0) {

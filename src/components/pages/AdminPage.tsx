@@ -22,6 +22,7 @@ import {
   Receipt,
   RefreshCw,
   ShieldCheck,
+  Users,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { LEAD_STATUSES } from "@/lib/validation";
@@ -33,6 +34,7 @@ import { ApercuDocument } from "@/components/admin/ApercuDocument";
 import { EspaceFacture } from "@/components/admin/EspaceFacture";
 import { GestionPortfolio } from "@/components/admin/GestionPortfolio";
 import { EspaceScraping } from "@/components/admin/EspaceScraping";
+import { EspaceProspects } from "@/components/admin/EspaceProspects";
 import { EspaceAudit } from "@/components/admin/EspaceAudit";
 import { BoutonAction, Carte, Pastille } from "@/components/admin/elements";
 import type { DocumentRecord } from "@/lib/documents/types";
@@ -74,7 +76,7 @@ import { preRemplissageDevisDepuisProposition } from "@/lib/documents/devis-depu
  * visible au survol) ; bouton « Ouvrir L'Espace ».
  */
 
-type Section = "tableau" | "demandes" | "propositions" | "devis" | "factures" | "portfolio" | "scraping" | "audit";
+type Section = "tableau" | "demandes" | "propositions" | "devis" | "factures" | "portfolio" | "scraping" | "prospects" | "audit";
 /** Vue courante des rubriques documents : liste / création / édition. */
 type VueDocs = "liste" | "creation" | "edition";
 /** Vue courante de la rubrique factures : liste / sélection du devis. */
@@ -179,7 +181,7 @@ function LoginPanel({ onSuccess }: { onSuccess: () => void }) {
    * cacher le haut du bloc. Le contenu éventuellement SOUS la
    * section (pied de page de l'espace) se découvre au scroll. */
   return (
-    <div className="container-site flex min-h-svh items-center justify-center p-4 sm:p-6">
+    <div className="zone-admin container-site flex min-h-svh items-center justify-center p-4 sm:p-6">
       <div className="flex max-h-[calc(100svh-2rem)] w-full max-w-md flex-col overflow-y-auto rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-6 text-center sm:max-h-[calc(100svh-3rem)] sm:p-8 lg:p-10">
         {/* VOLET 17 : logo DOUBLÉ en taille, espace logo→titre
             réduit. VOLET 19 : hauteur fluide — grande sur bureau,
@@ -825,6 +827,13 @@ export function AdminPage() {
   const [apercuFacture, setApercuFacture] = useState<DocumentRecord | null>(null);
   /* VOLET 16 — pré-remplissage d'un nouveau devis depuis une demande. */
   const [preRemplissage, setPreRemplissage] = useState<PreRemplissage | null>(null);
+  /* VOLET 29 — AMORCE DE L'AUDIT depuis l'espace Prospects (bouton
+   *  « Analyser » d'un prospect) : l'URL est PRÉREMPLIE dans
+   *  l'outil d'audit complet et l'analyse démarre directement. */
+  const [auditAmorce, setAuditAmorce] = useState<{ url: string; cle: number } | null>(null);
+  /* VOLET 29 — chaque arrivée dans l'espace Prospects recharge le
+   *  tableau (notamment après un import depuis le scraping). */
+  const [prospectsRafraichir, setProspectsRafraichir] = useState(0);
 
   /* CORRECTIF 28/11/2026 — SESSION EXPIRÉE (retour de l'éditeur : « une
    *  toast me dit portfolio non autorisé en rouge… corrige-moi ça une
@@ -1001,6 +1010,23 @@ export function AdminPage() {
     setVueDocs("liste");
     setDocEnEdition(null);
     setVueFactures("liste");
+    /* VOLET 29 — arrivée dans Prospects : le tableau se RECHARGE
+     *  (il reflète immédiatement le dernier import du scraping) ;
+     *  arrivée dans Audit par la NAVIGATION (pas par le bouton
+     *  « Analyser », qui passe par amenerVersAudit) : l'amorce est
+     *  oubliée — le champ URL repart vide. */
+    if (s === "prospects") setProspectsRafraichir((n) => n + 1);
+    if (s === "audit") setAuditAmorce(null);
+  }
+
+  /** VOLET 29 — depuis le bouton « Analyser » d'un prospect de
+   *  l'espace Prospects : ouvre l'outil d'AUDIT COMPLET avec l'URL du
+   *  site du prospect PRÉREMPLIE — l'analyse démarre directement. */
+  function amenerVersAudit(url: string) {
+    setAuditAmorce({ url, cle: Date.now() });
+    setSection("audit");
+    setVueDocs("liste");
+    setVueFactures("liste");
   }
 
   /** Raccourci « Créer… » : ouvre directement l'espace de création. */
@@ -1171,6 +1197,10 @@ export function AdminPage() {
      *  Instagram, LinkedIn). */
     { key: "portfolio", label: "Portfolio", icone: <Briefcase className="h-4 w-4" aria-hidden="true" />, compteur: nb.portfolio },
     { key: "scraping", label: "Scraping", icone: <Radar className="h-4 w-4" aria-hidden="true" /> },
+    /* VOLET 29 — nouvelle rubrique « Prospects » : le tableau de tous
+     *  les prospects importés du scraping (par lots, avec leur
+     *  message personnalisé et leur suivi RDV / converti). */
+    { key: "prospects", label: "Prospects", icone: <Users className="h-4 w-4" aria-hidden="true" /> },
     { key: "audit", label: "Audit", icone: <Gauge className="h-4 w-4" aria-hidden="true" /> },
   ];
 
@@ -1287,14 +1317,17 @@ export function AdminPage() {
 
       {/* Navigation (onglets horizontaux) + contenu */}
       <div className="container-site py-8">
-        <nav aria-label="Sections du back-office" className="scroll-slim -mx-1 mb-8 flex gap-2 overflow-x-auto px-1 pb-1">
+        <nav aria-label="Sections du back-office" className="scroll-slim -mx-1 mb-8 flex gap-1.5 overflow-x-auto px-1 pb-1">
+          {/* VOLET 29 — onglets COMPACTS : huit rubriques désormais
+              (Prospects s'ajoute), elles tiennent en une seule ligne
+              sans coupe au bord droit. */}
           {NAV.map((item) => (
             <button
               key={item.key}
               type="button"
               onClick={() => allerA(item.key)}
               aria-current={section === item.key ? "page" : undefined}
-              className={`flex min-h-[44px] shrink-0 items-center gap-2.5 rounded-full border px-5 py-2.5 text-sm transition-colors ${
+              className={`flex min-h-[44px] shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 text-[13px] transition-colors ${
                 section === item.key
                   ? "border-[#e4e4e4] bg-white text-[#1c1c1c] font-medium"
                   : "border-[#e4e4e4]/20 text-[#c8c8c8] hover:border-[#e4e4e4]/50 hover:text-white"
@@ -1304,7 +1337,7 @@ export function AdminPage() {
               {item.label}
               {typeof item.compteur === "number" ? (
                 <span
-                  className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
                     section === item.key ? "bg-[#1c1c1c] text-white" : "bg-[#e4e4e4]/12 text-[#e4e4e4]"
                   }`}
                 >
@@ -1649,15 +1682,47 @@ export function AdminPage() {
             (email, téléphone, site web, localisation, employés…) et
             les filtres avec / sans site web. */}
         {section === "scraping" && (
-          <EspaceScraping stockageConfigure={stockageConfigure} toast={toast} sessionExpiree={sessionExpiree} />
+          <EspaceScraping
+            stockageConfigure={stockageConfigure}
+            toast={toast}
+            sessionExpiree={sessionExpiree}
+            ouvrirProspects={() => allerA("prospects")}
+          />
+        )}
+
+        {/* ---------------- PROSPECTS (VOLET 29) ----------------
+            Le tableau de tous les prospects importés du scraping,
+            par lots d'import (séparés par une ligne en gras plus
+            claire, date et heure d'importation en vertical) :
+            entreprise, dirigeant, email, téléphone, adresse, site
+            web, message email personnalisé, suivi (contacté, RDV
+            accepté, RDV tenu, converti) et bouton Analyser qui
+            ouvre l'audit du site du prospect, URL préremplie. */}
+        {section === "prospects" && (
+          <EspaceProspects
+            stockageConfigure={stockageConfigure}
+            toast={toast}
+            sessionExpiree={sessionExpiree}
+            onAnalyser={(url) => amenerVersAudit(url)}
+            rafraichir={prospectsRafraichir}
+          />
         )}
 
         {/* ---------------- AUDIT (VOLET 28) ----------------
             Analyse de sites web pour qualifier les prospects et les
-            chantiers : performance (cloné sur GTmetrix), SEO (cloné
-            sur RankFlow) et audit complet design / structure /
-            copywriting / conversion. */}
-        {section === "audit" && <EspaceAudit toast={toast} sessionExpiree={sessionExpiree} />}
+            chantiers : VOLET 29 — UN SEUL OUTIL d'audit complet
+            (performance, SEO on-page, structure / design /
+            copywriting / conversion), rapport par blocs, PDF « audit
+            complet », axes d'amélioration en modale et historique
+            des audits précédents. */}
+        {section === "audit" && (
+          <EspaceAudit
+            key={auditAmorce?.cle ?? "audit"}
+            toast={toast}
+            sessionExpiree={sessionExpiree}
+            urlPreRemplie={auditAmorce?.url}
+          />
+        )}
 
         {/* Note de bas d'espace — VOLET 15 : message court et
             professionnel, sans référence technique. */}
