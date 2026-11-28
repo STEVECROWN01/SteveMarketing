@@ -1,27 +1,31 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
   ChevronDown,
   ChevronRight,
+  Copy,
   Download,
   Gauge,
   Globe,
   History,
   Loader2,
+  Mail,
   MinusCircle,
   Save,
   Search,
   SearchCheck,
+  Send,
   Sparkles,
   XCircle,
 } from "lucide-react";
 import { BoutonAction, Carte, Champ, ModaleContenu, Pastille, TitreSection, styleInput } from "./elements";
 import type { CritereSeo, ReleveDesign, RelevePerformance, ReleveSeo } from "@/lib/audit/types";
-import type { AuditComplet, AxeAmelioration, AuditResume } from "@/lib/audit/complet";
+import type { AuditComplet, AxeAmelioration, AuditResume, ProspectAudit } from "@/lib/audit/complet";
 import { compilerAxes, construireAudit, scorePerformanceComposite } from "@/lib/audit/complet";
+import { genererEmailAudit, emailEnTexte } from "@/lib/audit/email";
 
 /**
  * VOLET 28 (28/11/2026) — ESPACE « AUDIT » DU BACK-OFFICE.
@@ -36,6 +40,14 @@ import { compilerAxes, construireAudit, scorePerformanceComposite } from "@/lib/
  * (eux aussi en PDF), et l'audit peut être SAUVEGARDÉ dans le dépôt
  * GitHub de stockage — l'historique des audits précédents reste
  * consultable à tout moment.
+ *
+ * PRÉCISION DU 28/11 (nuit) — L'EMAIL PROPOSÉ : à côté du rapport et
+ * du rapport d'amélioration, un bouton « Proposer l'email » ouvre
+ * l'email PERSONNALISÉ RÉDIGÉ À PARTIR DE L'AUDIT (les axes
+ * d'amélioration deviennent les puces de l'email, reformulées pour
+ * un lecteur non technique) et du prospect (nom de l'entreprise,
+ * dirigeant, email, niche) — prérempli sur l'exemple de l'éditeur,
+ * il n'attend plus que « copier et envoyer ».
  */
 
 type TypeToast = (t: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
@@ -484,13 +496,15 @@ function ResultatDesign({ r }: { r: ReleveDesign }) {
 export function EspaceAudit({
   toast,
   sessionExpiree,
-  urlPreRemplie,
+  amorce,
 }: {
   toast: TypeToast;
   sessionExpiree: () => void;
-  /** URL transmise par l'espace Prospects (bouton Analyser) :
-   *  préremplie et auditée dès l'arrivée. */
-  urlPreRemplie?: string;
+  /** L'amorce transmise par l'espace Prospects (bouton « Analyser ») :
+   *  l'URL est PRÉREMPLIE, l'audit démarre directement, et le
+   *  PROSPECT (entreprise, dirigeant, email, niche) personnalise
+   *  l'email proposé à partir du rapport. */
+  amorce?: { url: string; prospect?: ProspectAudit };
 }) {
   const [url, setUrl] = useState("");
   const [audit, setAudit] = useState<AuditComplet | null>(null);
@@ -501,6 +515,14 @@ export function EspaceAudit({
   const [dejaSauvegarde, setDejaSauvegarde] = useState(false);
   const [axesOuverts, setAxesOuverts] = useState(false);
   const [pdfEnCours, setPdfEnCours] = useState(false);
+
+  /* L'EMAIL proposé : prérempli à partir du rapport et du prospect,
+     modifiable au besoin — puis « copier et envoyer ». */
+  const [emailOuvert, setEmailOuvert] = useState(false);
+  const [emailA, setEmailA] = useState("");
+  const [emailObjet, setEmailObjet] = useState("");
+  const [emailCorps, setEmailCorps] = useState("");
+  const EMAIL_DE = "Stevens Akpovi – stevensakpovi@gmail.com";
 
   const chargerHistorique = useCallback(async () => {
     try {
@@ -523,7 +545,7 @@ export function EspaceAudit({
   /* L'audit complet : les trois analyses en parallèle, le rapport
    * complet assemblé bloc par bloc. */
   const analyser = useCallback(
-    async (urlAnalysee?: string) => {
+    async (urlAnalysee?: string, prospectAnalyse?: ProspectAudit) => {
       const cible = (urlAnalysee ?? url).trim();
       if (chargement) return;
       if (!/^https?:\/\/.+\..+/.test(cible)) {
@@ -562,7 +584,13 @@ export function EspaceAudit({
           appeler("seo").finally(() => setEtape("Analyse du design et du copywriting…")),
         ]);
         const design = await appeler("design");
-        const complet = construireAudit(cible, performance as RelevePerformance, seo as ReleveSeo, design as ReleveDesign);
+        const complet = construireAudit(
+          cible,
+          performance as RelevePerformance,
+          seo as ReleveSeo,
+          design as ReleveDesign,
+          prospectAnalyse,
+        );
         setAudit(complet);
         toast({
           title: `Audit complet terminé — note ${complet.note} (${complet.scoreGlobal}/100)`,
@@ -586,15 +614,17 @@ export function EspaceAudit({
     [chargement, sessionExpiree, toast, url],
   );
 
-  /* L'URL préremplie depuis l'espace Prospects (bouton Analyser) :
-   * le champ est rempli et l'audit démarre directement. */
+  /* L'amorce de l'espace Prospects (bouton « Analyser » d'un
+   *  prospect) : le champ est rempli, l'audit démarre directement,
+   *  et le PROSPECT est retenu pour personnaliser l'email proposé
+   *  à partir du rapport. */
   useEffect(() => {
-    if (urlPreRemplie) {
-      setUrl(urlPreRemplie);
-      void analyser(urlPreRemplie);
+    if (amorce?.url) {
+      setUrl(amorce.url);
+      void analyser(amorce.url, amorce.prospect);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [urlPreRemplie]);
+  }, [amorce?.url, amorce?.prospect?.nom]);
 
   /** Télécharge le PDF de l'audit complet ou des axes d'amélioration. */
   async function telechargerPdf(kind: "complet" | "axes") {
@@ -703,6 +733,43 @@ export function EspaceAudit({
 
   const axes = audit ? compilerAxes(audit) : [];
 
+  /** Ouvre la proposition d'EMAIL : le message est PRÉREMPLI à partir
+   *  du rapport d'audit (les axes d'amélioration deviennent les
+   *  puces) et du prospect (entreprise, dirigeant, email, niche) —
+   *  l'éditeur n'a plus qu'à copier et envoyer. */
+  function ouvrirEmail() {
+    if (!audit) return;
+    const message = genererEmailAudit(audit);
+    setEmailA(message.a);
+    setEmailObjet(message.objet);
+    setEmailCorps(message.corps);
+    setEmailOuvert(true);
+  }
+
+  /** Copie l'email complet (en-têtes compris) dans le presse-papiers. */
+  async function copierEmail() {
+    const texte = emailEnTexte({ a: emailA, objet: emailObjet, de: EMAIL_DE, corps: emailCorps });
+    try {
+      await navigator.clipboard.writeText(texte);
+      toast({ title: "Email copié", description: "Collez-le dans votre messagerie." });
+    } catch {
+      toast({ title: "Copie impossible", description: "Sélectionnez le texte dans la modale.", variant: "destructive" });
+    }
+  }
+
+  /** Ouvre la messagerie avec l'email prérempli (mailto). */
+  function envoyerEmail() {
+    if (!emailA.trim()) {
+      toast({
+        title: "Destinataire manquant",
+        description: "L'email de l'entreprise n'a pas été trouvé — renseignez-le, puis envoyez.",
+        variant: "destructive",
+      });
+      return;
+    }
+    window.location.href = `mailto:${emailA.trim()}?subject=${encodeURIComponent(emailObjet)}&body=${encodeURIComponent(emailCorps)}`;
+  }
+
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
@@ -785,6 +852,12 @@ export function EspaceAudit({
             <BoutonAction onClick={() => setAxesOuverts(true)}>
               <Sparkles className="h-4 w-4" aria-hidden="true" />
               Voir les axes d&apos;amélioration
+            </BoutonAction>
+            {/* L'EMAIL PROPOSÉ : rédigé à partir du rapport et de ses
+                axes d'amélioration, personnalisé pour le prospect. */}
+            <BoutonAction variant="principal" onClick={ouvrirEmail}>
+              <Mail className="h-4 w-4" aria-hidden="true" />
+              Proposer l&apos;email
             </BoutonAction>
             <BoutonAction onClick={() => void sauvegarder()} disabled={sauvegardeEnCours || dejaSauvegarde}>
               {sauvegardeEnCours ? (
@@ -919,6 +992,68 @@ export function EspaceAudit({
             </div>
           );
         })}
+      </ModaleContenu>
+
+      {/* L'EMAIL PROPOSÉ — le message PRÉREMPLI, rédigé à partir du
+          rapport d'audit (les axes d'amélioration en puces) et du
+          prospect : il n'y a plus qu'à COPIER et ENVOYER. */}
+      <ModaleContenu
+        ouvert={emailOuvert}
+        titre="Email proposé"
+        sousTitre={
+          audit
+            ? `Personnalisé à partir de l'audit de ${audit.hote} — ${axes.length} axe${axes.length > 1 ? "s" : ""} d'amélioration mis en avant`
+            : ""
+        }
+        onClose={() => setEmailOuvert(false)}
+        large="max-w-2xl"
+        pied={
+          <>
+            <BoutonAction onClick={() => void copierEmail()}>
+              <Copy className="h-4 w-4" aria-hidden="true" />
+              Copier l&apos;email
+            </BoutonAction>
+            <BoutonAction variant="principal" onClick={envoyerEmail}>
+              <Send className="h-4 w-4" aria-hidden="true" />
+              Envoyer
+            </BoutonAction>
+          </>
+        }
+      >
+        <div className="space-y-4">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Champ label="À" indicatif="email de l'entreprise">
+              <input
+                className={styleInput}
+                value={emailA}
+                onChange={(e) => setEmailA(e.target.value)}
+                placeholder="email de l'entreprise (non trouvé)"
+                type="email"
+              />
+            </Champ>
+            <Champ label="Objet">
+              <input
+                className={styleInput}
+                value={emailObjet}
+                onChange={(e) => setEmailObjet(e.target.value)}
+              />
+            </Champ>
+          </div>
+          <Champ label="De" indicatif="expéditeur">
+            <input className={`${styleInput} opacity-70`} value={EMAIL_DE} readOnly aria-readonly />
+          </Champ>
+          <Champ label="Message" indicatif="prérempli à partir de l'audit — ajustable">
+            <textarea
+              className={`${styleInput} min-h-[340px] resize-y leading-relaxed`}
+              value={emailCorps}
+              onChange={(e) => setEmailCorps(e.target.value)}
+            />
+          </Champ>
+          <p className="text-[11px] text-[#c8c8c8]/60">
+            Les puces du message reprennent les axes d'amélioration identifiés par l&apos;audit du
+            site — relisez et ajustez librement avant l&apos;envoi.
+          </p>
+        </div>
       </ModaleContenu>
     </div>
   );

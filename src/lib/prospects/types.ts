@@ -79,10 +79,6 @@ export type ProspectEnregistre = {
   employes?: string;
   /** Ce que fait l'entreprise (bio). */
   bio?: string;
-  /** L'objet de l'email personnalisé. */
-  objetMessage: string;
-  /** L'email personnalisé prêt à envoyer. */
-  message: string;
   /** Le suivi du prospect. */
   statut: StatutProspect;
   /** Outil d'origine du scraping. */

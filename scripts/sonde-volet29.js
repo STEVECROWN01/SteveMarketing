@@ -176,7 +176,6 @@ function noter(cle, ok, detail = "") {
   const titreProspects = await page.locator("h2").first().innerText();
   noter("9a. l'espace Prospects existe dans la navigation", titreProspects.includes("Prospects"), titreProspects);
   await page.screenshot({ path: "/tmp/render/volet29/06-prospects.png" });
-
   /* ---------- Espace Audit : UN SEUL outil ---------- */
   await page.click('nav button:has-text("Audit")');
   await page.waitForTimeout(1000);
@@ -225,6 +224,62 @@ function noter(cle, ok, detail = "") {
   const taillePdf = fs.statSync(cheminPdf).size;
   const entetePdf = fs.readFileSync(cheminPdf).subarray(0, 5).toString();
   noter("10f. le PDF « AUDIT COMPLET » se télécharge", taillePdf > 5000 && entetePdf === "%PDF-", `${taillePdf} octets`);
+
+  /* 10g. L'EMAIL PROPOSÉ : bouton à côté du rapport, modale
+      préremplie sur l'exemple de l'éditeur, copier + envoyer. */
+  const boutonEmail = page.locator('button:has-text("Proposer l\'email")');
+  noter("10g. bouton « Proposer l'email » à côté du rapport", (await boutonEmail.count()) === 1);
+  await boutonEmail.click();
+  await page.waitForTimeout(500);
+  const modaleEmail = page.locator('[role="dialog"]');
+  const texteModale = (await modaleEmail.innerText()).replace(/[\u00a0\u202f]/g, " ");
+  /* Le contenu prérempli vit dans les CHAMPS (input/textarea), pas
+   *  dans le innerText : on lit leurs valeurs. */
+  const champsSaisie = modaleEmail.locator("input, textarea");
+  const nbChamps = await champsSaisie.count();
+  const valeursChamps = [];
+  for (let i = 0; i < nbChamps; i++) valeursChamps.push(await champsSaisie.nth(i).inputValue());
+  const aVal = valeursChamps[0] ?? "";
+  const objetVal = valeursChamps[1] ?? "";
+  const deVal = valeursChamps[2] ?? "";
+  const corpsVal = valeursChamps.slice(3).join("\n");
+  const emailOuvert = (await modaleEmail.count()) === 1 && texteModale.includes("Email proposé");
+  const champsEmail = {
+    a: await modaleEmail.locator("label:has-text('À')").count(),
+    objet: objetVal.includes("Informations pour"),
+    de: deVal.includes("Stevens Akpovi – stevensakpovi@gmail.com"),
+    corps: corpsVal.includes("J'espère que vous allez bien.") && corpsVal.includes("mon équipe et moi-même avons analysé le site web"),
+    puces: (corpsVal.match(/^- /gm) || []).length,
+    rdv: corpsVal.includes("15 à 20 minutes"),
+    boutons: (await modaleEmail.locator('button:has-text("Copier l\'email")').count()) + (await modaleEmail.locator('button:has-text("Envoyer")').count()),
+    objetValeur: objetVal.slice(0, 60),
+    corpsLongueur: corpsVal.length,
+  };
+  void aVal;
+  noter(
+    "10h. l'email est PRÉREMPLI sur l'exemple de l'éditeur (objet, De, corps, puces d'audit)",
+    emailOuvert && champsEmail.a >= 1 && champsEmail.objet && champsEmail.de && champsEmail.corps && champsEmail.puces >= 3 && champsEmail.rdv,
+    JSON.stringify(champsEmail),
+  );
+  noter("10i. boutons « Copier l'email » et « Envoyer »", champsEmail.boutons >= 2, JSON.stringify(champsEmail.boutons));
+  await page.screenshot({ path: "/tmp/render/volet29/10-email-propose.png" });
+  await modaleEmail.locator('button[aria-label="Fermer"]').click();
+  await page.waitForTimeout(300);
+
+  /* 10j. l'espace Prospects n'a PLUS de colonne « Message » — l'email
+      est proposé au niveau de l'audit désormais. */
+  await page.click('nav button:has-text("Prospects")');
+  await page.waitForTimeout(1200);
+  const corpsProspects = (await page.locator("body").innerText()).replace(/[\u00a0\u202f]/g, " ");
+  const sansColonneMessage = true; // vérifié par l'absence d'en-tête Message dans le tableau
+  const entetesTableau = await page.locator("table thead th").allTextContents();
+  noter(
+    "10j. plus de colonne « Message » dans le tableau des prospects",
+    !entetesTableau.some((t) => t.includes("Message")),
+    entetesTableau.join("|"),
+  );
+  void sansColonneMessage;
+  void corpsProspects;
 
   await browser.close();
   console.log("\n===== RAPPORT =====");

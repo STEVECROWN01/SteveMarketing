@@ -34,8 +34,9 @@ import { ApercuDocument } from "@/components/admin/ApercuDocument";
 import { EspaceFacture } from "@/components/admin/EspaceFacture";
 import { GestionPortfolio } from "@/components/admin/GestionPortfolio";
 import { EspaceScraping } from "@/components/admin/EspaceScraping";
-import { EspaceProspects } from "@/components/admin/EspaceProspects";
+import { EspaceProspects, type ProspectAmorce } from "@/components/admin/EspaceProspects";
 import { EspaceAudit } from "@/components/admin/EspaceAudit";
+import type { ProspectAudit } from "@/lib/audit/complet";
 import { BoutonAction, Carte, Pastille } from "@/components/admin/elements";
 import type { DocumentRecord } from "@/lib/documents/types";
 import { estPropositionV2, type PropositionRecord } from "@/lib/documents/proposition";
@@ -829,8 +830,14 @@ export function AdminPage() {
   const [preRemplissage, setPreRemplissage] = useState<PreRemplissage | null>(null);
   /* VOLET 29 — AMORCE DE L'AUDIT depuis l'espace Prospects (bouton
    *  « Analyser » d'un prospect) : l'URL est PRÉREMPLIE dans
-   *  l'outil d'audit complet et l'analyse démarre directement. */
-  const [auditAmorce, setAuditAmorce] = useState<{ url: string; cle: number } | null>(null);
+   *  l'outil d'audit complet, l'analyse démarre directement, et le
+   *  PROSPECT est retenu pour personnaliser l'email proposé à
+   *  partir du rapport. */
+  const [auditAmorce, setAuditAmorce] = useState<{
+    url: string;
+    cle: number;
+    prospect?: ProspectAudit;
+  } | null>(null);
   /* VOLET 29 — chaque arrivée dans l'espace Prospects recharge le
    *  tableau (notamment après un import depuis le scraping). */
   const [prospectsRafraichir, setProspectsRafraichir] = useState(0);
@@ -1021,9 +1028,20 @@ export function AdminPage() {
 
   /** VOLET 29 — depuis le bouton « Analyser » d'un prospect de
    *  l'espace Prospects : ouvre l'outil d'AUDIT COMPLET avec l'URL du
-   *  site du prospect PRÉREMPLIE — l'analyse démarre directement. */
-  function amenerVersAudit(url: string) {
-    setAuditAmorce({ url, cle: Date.now() });
+   *  site du prospect PRÉREMPLIE — l'analyse démarre directement, et
+   *  le prospect est retenu pour personnaliser l'email proposé. */
+  function amenerVersAudit(prospect: ProspectAmorce) {
+    setAuditAmorce({
+      url: prospect.url,
+      cle: Date.now(),
+      prospect: {
+        nom: prospect.nom,
+        email: prospect.email,
+        dirigeant: prospect.dirigeant,
+        nicheProspection: prospect.nicheProspection,
+        niche: prospect.niche,
+      },
+    });
     setSection("audit");
     setVueDocs("liste");
     setVueFactures("liste");
@@ -1720,7 +1738,11 @@ export function AdminPage() {
             key={auditAmorce?.cle ?? "audit"}
             toast={toast}
             sessionExpiree={sessionExpiree}
-            urlPreRemplie={auditAmorce?.url}
+            amorce={
+              auditAmorce
+                ? { url: auditAmorce.url, prospect: auditAmorce.prospect }
+                : undefined
+            }
           />
         )}
 

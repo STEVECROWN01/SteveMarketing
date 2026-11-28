@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifySessionToken, SESSION_COOKIE } from "@/lib/admin-auth";
 import { enregistrerFichier, lireFichier, isStorageConfigured } from "@/lib/documents/github";
 import { genererXlsx } from "@/lib/xlsx/minimal";
-import { genererMessageProspect } from "@/lib/scraping/message-prospect";
 import type { EntrepriseScraped } from "@/lib/scraping/types";
 import type { ClasseurProspects, LotProspects, ProspectEnregistre, StatutProspect } from "@/lib/prospects/types";
 import { statutLibelle } from "@/lib/prospects/types";
@@ -79,7 +78,6 @@ function construireXlsx(classeur: ClasseurProspects): Buffer {
     "Employés",
     "Ancienneté",
     "Importé le",
-    "Message",
   ];
   const lignes: (string | number | { v: string | number; gras?: boolean; fond?: boolean })[][] = [enTete];
   /* Du lot le plus RÉCENT au plus ancien : le classeur s'ouvre sur
@@ -108,7 +106,6 @@ function construireXlsx(classeur: ClasseurProspects): Buffer {
         p.employes ?? "Non trouvé",
         p.anciennete ?? "Non trouvé",
         dateFr(p.importeLe),
-        `${p.objetMessage}\n\n${p.message}`,
       ]);
     }
   }
@@ -116,7 +113,7 @@ function construireXlsx(classeur: ClasseurProspects): Buffer {
     {
       nom: "Prospects",
       lignes,
-      largeurs: [28, 22, 28, 18, 34, 18, 14, 30, 24, 16, 28, 12, 16, 18, 70],
+      largeurs: [28, 22, 28, 18, 34, 18, 14, 30, 24, 16, 28, 12, 16, 18],
     },
   ]);
 }
@@ -137,10 +134,10 @@ async function sauvegarderClasseur(classeur: ClasseurProspects): Promise<void> {
   );
 }
 
-/** Construit le prospect enregistré : toutes les données scrapées +
- *  le MESSAGE EMAIL PERSONNALISÉ adapté à la niche. */
+/** Construit le prospect enregistré : toutes les données scrapées
+ *  (le MESSAGE EMAIL, lui, est proposé au niveau de l'AUDIT du site
+ *  du prospect — plus dans le tableau). */
 function versProspectEnregistre(e: EntrepriseScraped, importeLe: string, id: string): ProspectEnregistre {
-  const message = genererMessageProspect(e);
   return {
     id,
     nom: e.nom,
@@ -157,8 +154,6 @@ function versProspectEnregistre(e: EntrepriseScraped, importeLe: string, id: str
     anciennete: e.anciennete,
     employes: e.employes,
     bio: e.bio,
-    objetMessage: message.objet,
-    message: message.corps,
     statut: "non-contacte",
     source: e.source,
     urlSource: e.urlSource,

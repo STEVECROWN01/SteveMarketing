@@ -15,6 +15,23 @@
 import type { ReleveDesign, RelevePerformance, ReleveSeo } from "./types";
 import { noteDepuisScore } from "./types";
 
+/** Le prospect à l'origine d'un audit (transmis par l'espace
+ *  Prospects, bouton « Analyser ») : il personnalise l'EMAIL proposé
+ *  à partir du rapport — nom de l'entreprise, dirigeant, email,
+ *  niche du fichier de prospection. */
+export type ProspectAudit = {
+  /** Nom de l'entreprise prospectée. */
+  nom: string;
+  /** Email de l'entreprise (si connu). */
+  email?: string;
+  /** Nom du dirigeant / propriétaire (s'il a été trouvé). */
+  dirigeant?: string;
+  /** Clé de la niche du fichier de prospection (ex. « #11 »). */
+  nicheProspection?: string;
+  /** La niche scrapée (libellé) — repli pour deviner la niche. */
+  niche?: string;
+};
+
 /** Un audit complet enregistré (les trois relevés + identité). */
 export type AuditComplet = {
   /** Identifiant du fichier (audit-20261128-154201-example-fr). */
@@ -35,6 +52,9 @@ export type AuditComplet = {
   scoreGlobal: number;
   /** Note A-F du score global. */
   note: string;
+  /** Le prospect à l'origine de l'audit (bouton « Analyser » de
+   *  l'espace Prospects) — personnalise l'email proposé. */
+  prospect?: ProspectAudit;
 };
 
 /** Le bloc d'un axe d'amélioration. */
@@ -67,6 +87,7 @@ export function construireAudit(
   performance: RelevePerformance,
   seo: ReleveSeo,
   design: ReleveDesign,
+  prospect?: ProspectAudit,
 ): AuditComplet {
   const scoreGlobal = Math.round(
     (scorePerformanceComposite(performance) + seo.score + design.scoreGlobal) / 3,
@@ -97,6 +118,7 @@ export function construireAudit(
     design,
     scoreGlobal,
     note: noteDepuisScore(scoreGlobal),
+    prospect,
   };
 }
 

@@ -1,47 +1,41 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  Building2,
-  Copy,
-  ExternalLink,
-  Globe,
-  Loader2,
-  Mail,
-  MapPin,
-  Phone,
-  RefreshCw,
-  Send,
-  Users,
-} from "lucide-react";
-import { BoutonAction, Carte, ModaleContenu, Pastille } from "./elements";
+import { Globe, Loader2, RefreshCw, Users } from "lucide-react";
+import { BoutonAction, Carte, Pastille } from "./elements";
 import type { LotProspects, ProspectEnregistre, StatutProspect } from "@/lib/prospects/types";
-import { STATUTS_PROSPECT, statutCouleur, statutLibelle } from "@/lib/prospects/types";
+import { STATUTS_PROSPECT, statutCouleur } from "@/lib/prospects/types";
 
 /**
  * VOLET 29 (28/11/2026) — ESPACE « PROSPECTS » DU BACK-OFFICE.
+ * Précision du 28/11 (nuit) : l'option d'email N'EST PLUS une colonne
+ * du tableau — l'email personnalisé est désormais PROPOSÉ AU NIVEAU
+ * DE L'AUDIT du site du prospect (bouton « Proposer l'email », à
+ * côté du rapport d'audit et du rapport d'amélioration).
  *
- * Demande de l'éditeur : quand le scraping a fini, les prospects
- * sélectionnés sont IMPORTÉS dans CET espace, présenté comme un
- * tableau façon Excel. Chaque ensemble importé en un clic forme un
- * LOT : la dernière ligne du lot précédent est un SÉPARATEUR en gras,
- * plus clair que les autres lignes, et la DATE et l'HEURE
- * d'importation du lot s'affichent VERTICALEMENT à son début.
- *
- * Colonnes : entreprise, dirigeant (le nom du propriétaire — « Non
- * trouvé » quand le scraping ne l'a pas trouvé), email, téléphone,
- * adresse, site web, MESSAGE (l'email personnalisé adapté à la
- * niche — un clic l'affiche en entier dans une modale), le SUIVI
- * (non contacté → contacté → RDV accepté → RDV tenu → converti) et
- * le bouton ANALYSER qui ouvre l'outil d'audit du site du prospect
- * avec l'URL déjà préremplie.
+ * Le tableau présente donc : entreprise, dirigeant, email,
+ * téléphone, adresse, site web, le SUIVI (non contacté → contacté →
+ * RDV accepté → RDV tenu → converti) et le bouton ANALYSER qui
+ * ouvre l'audit complet du site du prospect, URL préremplie — et
+ * l'email personnalisé y est proposé à partir du rapport.
  *
  * Les données sont enregistrées dans le dépôt GitHub privé de
- * stockage (prospects/prospects.json + prospects/prospects.xlsx mis
- * à jour) : on ne les perd jamais.
+ * stockage du back-office : prospects/prospects.json (source de
+ * vérité) et prospects/prospects.xlsx, MIS À JOUR à chaque
+ * import — on ne les perd jamais.
  */
 
 type TypeToast = (t: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
+
+/** Le prospect passé à l'audit (pour l'email personnalisé). */
+export type ProspectAmorce = {
+  url: string;
+  nom: string;
+  dirigeant?: string;
+  email?: string;
+  nicheProspection?: string;
+  niche?: string;
+};
 
 /** La date du lot, en écriture VERTICALE. */
 function dateLotFr(iso: string): string {
@@ -65,15 +59,15 @@ export function EspaceProspects({
   stockageConfigure: boolean;
   toast: TypeToast;
   sessionExpiree: () => void;
-  /** Ouvre l'outil d'audit du back-office avec l'URL préremplie. */
-  onAnalyser: (url: string) => void;
+  /** Ouvre l'audit du site du prospect — l'URL est PRÉREMPLIE et
+   *  l'email personnalisé y sera proposé à partir du rapport. */
+  onAnalyser: (prospect: ProspectAmorce) => void;
   /** Clé changée par l'appelant pour forcer le rechargement. */
   rafraichir: number;
 }) {
   const [lots, setLots] = useState<LotProspects[]>([]);
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState<string | null>(null);
-  const [prospectMessage, setProspectMessage] = useState<ProspectEnregistre | null>(null);
 
   const charger = useCallback(async () => {
     setChargement(true);
@@ -144,16 +138,8 @@ export function EspaceProspects({
     }
   }
 
-  /** Copie le message personnalisé dans le presse-papiers. */
-  async function copierMessage(p: ProspectEnregistre) {
-    const texte = `Objet : ${p.objetMessage}\n\n${p.message}`;
-    try {
-      await navigator.clipboard.writeText(texte);
-      toast({ title: "Message copié", description: "Collez-le dans votre email." });
-    } catch {
-      toast({ title: "Copie impossible", description: "Sélectionnez le texte dans la modale.", variant: "destructive" });
-    }
-  }
+  /** Copie le message personnalisé dans le presse-papiers. — retiré :
+   *  l'email est désormais proposé au niveau de l'AUDIT. */
 
   return (
     <div>
@@ -225,7 +211,6 @@ export function EspaceProspects({
                     <th className="px-3 py-3">Téléphone</th>
                     <th className="px-3 py-3">Adresse</th>
                     <th className="px-3 py-3">Site web</th>
-                    <th className="px-3 py-3">Message</th>
                     <th className="px-3 py-3">Suivi</th>
                     <th className="px-3 py-3 text-right">Audit</th>
                   </tr>
@@ -325,19 +310,6 @@ export function EspaceProspects({
                             <span className="text-[#c8c8c8]/50">Sans site web</span>
                           )}
                         </td>
-                        {/* Message : la colonne montre le début du
-                            message ; un clic l'affiche ENTIÈREMENT. */}
-                        <td className="max-w-[220px] px-3 py-3">
-                          <button
-                            type="button"
-                            onClick={() => setProspectMessage(p)}
-                            className="cursor-pointer text-left text-xs leading-relaxed text-[#c8c8c8] hover:text-white"
-                          >
-                            {p.objetMessage.slice(0, 64)}
-                            {p.objetMessage.length > 64 ? "…" : ""}
-                          </button>
-                          <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-[#c8c8c8]/60">{p.message}</p>
-                        </td>
                         {/* Suivi (contacté, RDV, converti…) */}
                         <td className="whitespace-nowrap px-3 py-3">
                           <div className="inline-flex items-center gap-2">
@@ -360,12 +332,25 @@ export function EspaceProspects({
                             </select>
                           </div>
                         </td>
-                        {/* Audit du site web du prospect */}
+                        {/* Audit du site web du prospect — l'audit
+                            complet s'ouvre, URL préremplie, et
+                            l'EMAIL PERSONNALISÉ y est proposé à
+                            partir du rapport et de ses axes
+                            d'amélioration. */}
                         <td className="px-3 py-3 text-right">
                           {p.siteWeb ? (
                             <BoutonAction
                               variant="principal"
-                              onClick={() => onAnalyser(p.siteWeb as string)}
+                              onClick={() =>
+                                onAnalyser({
+                                  url: p.siteWeb as string,
+                                  nom: p.nom,
+                                  dirigeant: p.dirigeant,
+                                  email: p.email,
+                                  nicheProspection: p.nicheProspection,
+                                  niche: p.niche,
+                                })
+                              }
                               titre={`Analyser le site de ${p.nom} (audit complet)`}
                             >
                               <Globe className="h-4 w-4" aria-hidden="true" />
@@ -384,84 +369,6 @@ export function EspaceProspects({
           </Carte>
         </>
       )}
-
-      {/* LE MESSAGE EN ENTIÈRETÉ — la modale du prospect : l'email
-          personnalisé complet, à copier ou à envoyer tel quel. */}
-      <ModaleContenu
-        ouvert={prospectMessage !== null}
-        titre={prospectMessage ? `Message pour ${prospectMessage.nom}` : ""}
-        sousTitre={prospectMessage?.objetMessage}
-        onClose={() => setProspectMessage(null)}
-        large="max-w-2xl"
-        pied={
-          prospectMessage ? (
-            <>
-              <BoutonAction onClick={() => void copierMessage(prospectMessage)}>
-                <Copy className="h-4 w-4" aria-hidden="true" />
-                Copier le message
-              </BoutonAction>
-              {prospectMessage.email ? (
-                <BoutonAction
-                  variant="principal"
-                  onClick={() => {
-                    const p = prospectMessage;
-                    window.location.href = `mailto:${p.email}?subject=${encodeURIComponent(p.objetMessage)}&body=${encodeURIComponent(p.message)}`;
-                  }}
-                >
-                  <Send className="h-4 w-4" aria-hidden="true" />
-                  Envoyer par email
-                </BoutonAction>
-              ) : null}
-            </>
-          ) : null
-        }
-      >
-        {prospectMessage ? (
-          <div>
-            <div className="mb-4 space-y-1 rounded-xl border border-[#e4e4e4]/10 bg-[#1c1c1c] px-4 py-3 text-xs text-[#c8c8c8]">
-              <p className="flex items-center gap-2">
-                <Building2 className="h-3.5 w-3.5" aria-hidden="true" />
-                {prospectMessage.nom} · {prospectMessage.niche}
-              </p>
-              <p className="flex items-center gap-2">
-                <Users className="h-3.5 w-3.5" aria-hidden="true" />
-                Dirigeant : {texteOu(prospectMessage.dirigeant)}
-              </p>
-              {prospectMessage.email ? (
-                <p className="flex items-center gap-2">
-                  <Mail className="h-3.5 w-3.5" aria-hidden="true" />
-                  {prospectMessage.email}
-                </p>
-              ) : null}
-              {prospectMessage.telephone ? (
-                <p className="flex items-center gap-2">
-                  <Phone className="h-3.5 w-3.5" aria-hidden="true" />
-                  {prospectMessage.telephone}
-                </p>
-              ) : null}
-              {prospectMessage.localisation || prospectMessage.pays ? (
-                <p className="flex items-center gap-2">
-                  <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-                  {[prospectMessage.localisation, prospectMessage.pays].filter(Boolean).join(", ")}
-                </p>
-              ) : null}
-              {prospectMessage.siteWeb ? (
-                <p className="flex items-center gap-2">
-                  <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                  {prospectMessage.siteWeb}
-                </p>
-              ) : null}
-            </div>
-            <p className="text-sm font-semibold text-white">Objet : {prospectMessage.objetMessage}</p>
-            <div className="mt-3 whitespace-pre-line rounded-xl border border-[#e4e4e4]/10 bg-[#1c1c1c] px-5 py-4 text-sm leading-relaxed text-[#e4e4e4]">
-              {prospectMessage.message}
-            </div>
-            <p className="mt-3 text-[11px] text-[#c8c8c8]/60">
-              Message suggéré, adapté à la niche — relisez et personnalisez-le avant l&apos;envoi.
-            </p>
-          </div>
-        ) : null}
-      </ModaleContenu>
     </div>
   );
 }
