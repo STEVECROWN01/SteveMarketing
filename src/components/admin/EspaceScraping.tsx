@@ -4,13 +4,28 @@ import React, { useState } from "react";
 import { Download, ExternalLink, Globe, Loader2, Mail, MapPin, Phone, Radar, Search, Users } from "lucide-react";
 import { BoutonAction, Carte, Champ, Pastille, TitreSection, styleInput } from "./elements";
 import type { EntrepriseScraped } from "@/lib/scraping/types";
+import {
+  CATEGORIES_PROSPECTION,
+  NICHES_PROSPECTION,
+  etoilesAffichees,
+  fourchettePanier,
+  nichesDeCategorie,
+  type NicheProspection,
+} from "@/lib/scraping/niches";
 
 /**
  * VOLET 27 (28/11/2026) — ESPACE « SCRAPING » DU BACK-OFFICE.
+ * CORRECTIF 28/11 (soir) — CIBLAGE PAR FICHIER DE PROSPECTION :
+ * le formulaire demande la CATÉGORIE puis la NICHE (drop-downs liés
+ * du fichier « Pack_Prospection_2026.xlsx » : la niche se dégrise
+ * après le choix de la catégorie et ne présente que les niches
+ * qu'elle contient, chacune avec son ÉTOILE de classement et le PRIX
+ * facturable du site entre parenthèses ; la niche choisie affiche sa
+ * cible idéale et ses upsells). Les autres filtres (employés
+ * minimum, complément libre) restent OPTIONNELS.
  *
  * Trois outils de prospection d'entreprises pour le service de web
- * design, clonés gratuitement sur les outils du marché (aucune clé
- * d'API, aucun abonnement) :
+ * design, sans clé d'API ni abonnement :
  *
  *  - GOOGLE MAPS : fiches d'entreprises par LIEU et par NICHE — nom,
  *    catégorie, adresse, ville, pays, téléphone, email, site web ;
@@ -20,9 +35,7 @@ import type { EntrepriseScraped } from "@/lib/scraping/types";
  *    siège, nombre d'employés, site web, type.
  *
  * Chaque outil porte le FILTRE « avec site web / sans site web »
- * (c'est en fonction de ce filtre qu'il scrape — les entreprises
- * SANS site web sont les prospects du service de création de sites)
- * et l'export CSV de la liste affichée.
+ * (c'est en fonction de ce filtre qu'il scrape) et l'export CSV.
  */
 
 type TypeToast = (t: { title: string; description?: string; variant?: "default" | "destructive" }) => void;
@@ -226,50 +239,76 @@ export function EspaceScraping({
   const [chargement, setChargement] = useState(false);
   const [resultats, setResultats] = useState<ReponseScraping | null>(null);
 
-  /* champs des trois outils */
-  const [niche, setNiche] = useState("");
+  /* CORRECTIF 28/11 (soir) — CIBLAGE PAR CATÉGORIE PUIS NICHE (le
+   * fichier de prospection de l'éditeur) : le drop-down de niche
+   * reste GRISEÉ jusqu'au choix de la catégorie, puis présente les
+   * niches QUE de cette catégorie, avec leur ÉTOILE de classement
+   * et le PRIX facturable entre parenthèses. La niche choisie
+   * affiche sa cible idéale et ses upsells (du fichier). « Autre »
+   * laisse préciser librement. Les autres filtres restent
+   * OPTIONNELS : sans rien remplir de plus, le scraping ramène tous
+   * les prospects de la niche. */
+  const [categorie, setCategorie] = useState("");
+  const [nicheCle, setNicheCle] = useState("");
+  const [nicheAutre, setNicheAutre] = useState("");
   const [lieu, setLieu] = useState("");
-  const [rechercheIg, setRechercheIg] = useState("");
-  const [rechercheLi, setRechercheLi] = useState("");
+  const [complementIg, setComplementIg] = useState("");
+  const [complementLi, setComplementLi] = useState("");
   const [filtreSite, setFiltreSite] = useState<FiltreSite>("tous");
   const [minEmployes, setMinEmployes] = useState(0);
 
   const outilActif = OUTILS.find((o) => o.cle === outil) ?? OUTILS[0];
+  const nicheObjet: NicheProspection | null = NICHES_PROSPECTION.find((n) => n.cle === nicheCle) ?? null;
+  /* Le mot-clé réel envoyé aux outils : celui de la niche choisie
+   * (le fichier donne le terme qui trouve ces entreprises), ou la
+   * saisie libre « Autre ». */
+  const motCleNiche = nicheObjet ? nicheObjet.motsCles : nicheAutre.trim();
+
+  function choisirCategorie(nom: string) {
+    setCategorie(nom);
+    setNicheCle("");
+    setNicheAutre("");
+  }
 
   async function scraper() {
     if (chargement) return;
     const cible = outil;
     let corps: Record<string, unknown>;
     if (cible === "google-maps") {
-      if (!niche.trim() || !lieu.trim()) {
+      if (!motCleNiche || !lieu.trim()) {
         toast({
           title: "Recherche incomplète",
-          description: "Indiquez la niche (ex. « salon de coiffure ») et le lieu (ex. « Cotonou, Bénin »).",
+          description:
+            "Choisissez la catégorie puis la niche (ou précisez-la librement), et indiquez le lieu (ex. « Cotonou, Bénin »).",
           variant: "destructive",
         });
         return;
       }
-      corps = { niche: niche.trim(), lieu: lieu.trim(), filtreSite };
+      corps = { niche: motCleNiche, lieu: lieu.trim(), filtreSite };
     } else if (cible === "instagram") {
-      if (!rechercheIg.trim()) {
+      const recherche = [motCleNiche, complementIg.trim()].filter(Boolean).join(" ");
+      if (!recherche) {
         toast({
           title: "Recherche vide",
-          description: "Indiquez des mots-clés (ex. « restaurant Cotonou ») ou collez des comptes @entreprise.",
+          description:
+            "Choisissez une niche — ou indiquez des comptes @entreprise / liens / mots-clés libres.",
           variant: "destructive",
         });
         return;
       }
-      corps = { recherche: rechercheIg.trim(), filtreSite };
+      corps = { recherche, filtreSite };
     } else {
-      if (!rechercheLi.trim()) {
+      const recherche = [motCleNiche, complementLi.trim()].filter(Boolean).join(" ");
+      if (!recherche) {
         toast({
           title: "Recherche vide",
-          description: "Indiquez des mots-clés (ex. « clinique Bénin »), un nom d'entreprise ou une URL LinkedIn.",
+          description:
+            "Choisissez une niche — ou indiquez un nom d'entreprise, une URL LinkedIn ou des mots-clés libres.",
           variant: "destructive",
         });
         return;
       }
-      corps = { recherche: rechercheLi.trim(), filtreSite, minEmployes };
+      corps = { recherche, filtreSite, minEmployes };
     }
     setChargement(true);
     try {
@@ -322,7 +361,7 @@ export function EspaceScraping({
             « avec / sans site web » — les entreprises sans site web sont vos prospects.
           </p>
         </div>
-        <Pastille ton="valide">Aucune clé d&apos;API</Pastille>
+        <Pastille ton="valide">Prospection</Pastille>
       </div>
 
       {/* Onglets des trois outils */}
@@ -348,56 +387,129 @@ export function EspaceScraping({
         ))}
       </div>
 
-      {/* Formulaire de l'outil actif */}
+      {/* Formulaire de l'outil actif — ciblage CATÉGORIE → NICHE du
+          fichier de prospection (drop-downs liés : la niche se
+          dégrise après la catégorie et ne présente que les niches
+          qu'elle contient, avec étoiles et prix entre parenthèses) ;
+          lieu pour Google Maps, complément optionnel pour Instagram /
+          LinkedIn, filtre employés étendu (2+, 3+, 5+…). */}
       <Carte className="mb-6 p-5 sm:p-6">
         <TitreSection note="gratuit — aucune clé d'API">{outilActif.libelle}</TitreSection>
         <p className="mb-4 text-sm leading-relaxed text-[#c8c8c8]">{outilActif.description}</p>
 
-        {outil === "google-maps" ? (
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Champ label="Niche / catégorie" indicatif="ce que font les entreprises">
+        {/* Catégorie puis niche — les deux drop-downs du ciblage */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Champ label="Catégorie" indicatif="le secteur des entreprises">
+            <select
+              className={styleInput}
+              value={categorie}
+              onChange={(e) => choisirCategorie(e.target.value)}
+            >
+              <option value="" className="bg-[#232323]">
+                Choisir une catégorie…
+              </option>
+              {CATEGORIES_PROSPECTION.map((c) => (
+                <option key={c.nom} value={c.nom} className="bg-[#232323]">
+                  {etoilesAffichees(c.etoiles)} {c.nom} (panier ≈ {c.panierMoyen.toLocaleString("fr-FR")} €)
+                </option>
+              ))}
+            </select>
+          </Champ>
+          <Champ label="Niche" indicatif={categorie ? "niches de la catégorie choisie" : "s'active après la catégorie"}>
+            <select
+              className={styleInput}
+              value={nicheCle || (nicheAutre ? "autre" : "")}
+              onChange={(e) => {
+                setNicheCle(e.target.value === "autre" ? "" : e.target.value);
+                if (e.target.value !== "autre") setNicheAutre("");
+              }}
+              disabled={!categorie}
+            >
+              <option value="" className="bg-[#232323]">
+                {categorie ? "Choisir une niche…" : "Choisissez d'abord une catégorie"}
+              </option>
+              {nichesDeCategorie(categorie).map((n) => (
+                <option key={n.cle} value={n.cle} className="bg-[#232323]">
+                  {etoilesAffichees(n.etoiles)} {n.nom} ({fourchettePanier(n.panierMin, n.panierMax)})
+                </option>
+              ))}
+              <option value="autre" className="bg-[#232323]">
+                Autre — préciser librement
+              </option>
+            </select>
+          </Champ>
+        </div>
+
+        {/* Saisie libre quand la niche n'est pas dans le fichier */}
+        {!nicheCle && (categorie !== "" || nicheAutre) ? (
+          <div className="mt-4">
+            <Champ label="Précisez la niche" indicatif="ce que font les entreprises">
               <input
                 className={styleInput}
-                value={niche}
-                onChange={(e) => setNiche(e.target.value)}
+                value={nicheAutre}
+                onChange={(e) => setNicheAutre(e.target.value)}
                 placeholder="Ex. salon de coiffure, restaurant, pharmacie…"
               />
             </Champ>
+          </div>
+        ) : null}
+
+        {/* La niche choisie : cible idéale, prix facturable et
+            upsells — tels quels du fichier de prospection */}
+        {nicheObjet ? (
+          <div className="mt-4 rounded-xl border border-[#e4e4e4]/10 bg-[#1c1c1c] px-4 py-3">
+            <p className="text-xs leading-relaxed text-[#c8c8c8]">
+              <span className="font-medium text-white">Cible idéale :</span> {nicheObjet.cible}
+              <span className="mx-2 text-[#c8c8c8]/40">·</span>
+              <span className="font-medium text-white">Panier vitrine :</span>{" "}
+              {fourchettePanier(nicheObjet.panierMin, nicheObjet.panierMax)}
+            </p>
+            <p className="mt-1.5 text-xs leading-relaxed text-[#c8c8c8]">
+              <span className="font-medium text-white">Upsells recommandés :</span>{" "}
+              {nicheObjet.upsells.join(" · ")}
+            </p>
+          </div>
+        ) : null}
+
+        {outil === "google-maps" ? (
+          <div className="mt-4">
             <Champ label="Lieu" indicatif="ville, pays">
               <input
                 className={styleInput}
                 value={lieu}
                 onChange={(e) => setLieu(e.target.value)}
-                placeholder="Ex. Cotonou, Bénin"
+                placeholder="Ex. Cotonou, Bénin — ou Paris, France"
               />
             </Champ>
           </div>
         ) : outil === "instagram" ? (
-          <Champ label="Recherche" indicatif="mots-clés ou comptes @entreprise / liens">
-            <input
-              className={styleInput}
-              value={rechercheIg}
-              onChange={(e) => setRechercheIg(e.target.value)}
-              placeholder="Ex. restaurant Cotonou — ou @entreprise, instagram.com/entreprise…"
-            />
-          </Champ>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Champ label="Recherche" indicatif="mots-clés, nom d'entreprise ou URL LinkedIn">
+          <div className="mt-4">
+            <Champ label="Comptes ou mots-clés libres" indicatif="optionnel — complète la niche">
               <input
                 className={styleInput}
-                value={rechercheLi}
-                onChange={(e) => setRechercheLi(e.target.value)}
-                placeholder="Ex. clinique Bénin — ou linkedin.com/company/entreprise"
+                value={complementIg}
+                onChange={(e) => setComplementIg(e.target.value)}
+                placeholder="Ex. @entreprise, instagram.com/entreprise — ou « restaurant Cotonou »"
               />
             </Champ>
-            <Champ label="Employés minimum" indicatif="filtre LinkedIn (ex. 5)">
+          </div>
+        ) : (
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <Champ label="Entreprise ou mots-clés libres" indicatif="optionnel — complète la niche">
+              <input
+                className={styleInput}
+                value={complementLi}
+                onChange={(e) => setComplementLi(e.target.value)}
+                placeholder="Ex. linkedin.com/company/entreprise — ou un nom, « clinique Bénin »"
+              />
+            </Champ>
+            <Champ label="Employés minimum" indicatif="optionnel — pour mieux cibler">
               <select
                 className={styleInput}
                 value={minEmployes}
                 onChange={(e) => setMinEmployes(Number(e.target.value) || 0)}
               >
-                {[0, 5, 10, 50, 200].map((n) => (
+                {[0, 2, 3, 5, 10, 50, 200].map((n) => (
                   <option key={n} value={n} className="bg-[#232323]">
                     {n === 0 ? "Toutes les tailles" : `${n} employés et plus`}
                   </option>
@@ -423,11 +535,6 @@ export function EspaceScraping({
             )}
           </BoutonAction>
         </div>
-        <p className="mt-3 text-xs leading-relaxed text-[#c8c8c8]/80">
-          Le filtre « site web » pilote le scraping : « Sans site web » ne renvoie que les
-          entreprises sans site — vos prospects. Les données viennent de sources publiques
-          (fiches d&apos;entreprises, pages Instagram et LinkedIn accessibles publiquement).
-        </p>
       </Carte>
 
       {/* Résultats */}

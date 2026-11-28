@@ -11,10 +11,10 @@ import {
   EyeOff,
   FilePlus2,
   FileText,
+  Gauge,
   Handshake,
   Inbox,
   Languages,
-  LayoutDashboard,
   Loader2,
   LogOut,
   Plus,
@@ -33,6 +33,7 @@ import { ApercuDocument } from "@/components/admin/ApercuDocument";
 import { EspaceFacture } from "@/components/admin/EspaceFacture";
 import { GestionPortfolio } from "@/components/admin/GestionPortfolio";
 import { EspaceScraping } from "@/components/admin/EspaceScraping";
+import { EspaceAudit } from "@/components/admin/EspaceAudit";
 import { BoutonAction, Carte, Pastille } from "@/components/admin/elements";
 import type { DocumentRecord } from "@/lib/documents/types";
 import { estPropositionV2, type PropositionRecord } from "@/lib/documents/proposition";
@@ -73,7 +74,7 @@ import { preRemplissageDevisDepuisProposition } from "@/lib/documents/devis-depu
  * visible au survol) ; bouton « Ouvrir L'Espace ».
  */
 
-type Section = "tableau" | "demandes" | "propositions" | "devis" | "factures" | "portfolio" | "scraping";
+type Section = "tableau" | "demandes" | "propositions" | "devis" | "factures" | "portfolio" | "scraping" | "audit";
 /** Vue courante des rubriques documents : liste / création / édition. */
 type VueDocs = "liste" | "creation" | "edition";
 /** Vue courante de la rubrique factures : liste / sélection du devis. */
@@ -1152,9 +1153,15 @@ export function AdminPage() {
    * l'espace admin (brouillon / publication), demande de
    * l'éditeur du 26/11/2026. */
   const NAV: { key: Section; label: string; icone: React.ReactNode; compteur?: number }[] = [
-    { key: "tableau", label: "Tableau de bord", icone: <LayoutDashboard className="h-4 w-4" aria-hidden="true" /> },
+    /* CORRECTIF 28/11 (soir) — le bouton « Tableau de bord » est
+     * RETIRÉ de la navigation : le LOGO du header joue désormais ce
+     * rôle (demande de l'éditeur). L'option « propositions » porte
+     * le libellé court « Propositions » (l'éditeur) — le contenu et
+     * les titres de l'espace restent inchangés. VOLET 28 — nouvelle
+     * rubrique « Audit » : analyse de sites web (performance, SEO,
+     * design & copywriting). */
     { key: "demandes", label: "Demandes", icone: <Inbox className="h-4 w-4" aria-hidden="true" />, compteur: nb.demandes },
-    { key: "propositions", label: "Propositions commerciales", icone: <Handshake className="h-4 w-4" aria-hidden="true" />, compteur: nb.propositions },
+    { key: "propositions", label: "Propositions", icone: <Handshake className="h-4 w-4" aria-hidden="true" />, compteur: nb.propositions },
     { key: "devis", label: "Devis", icone: <FileText className="h-4 w-4" aria-hidden="true" />, compteur: nb.devis },
     { key: "factures", label: "Factures", icone: <Receipt className="h-4 w-4" aria-hidden="true" />, compteur: nb.factures },
     /* CORRECTIF 28/11 — l'option s'appelle « Portfolio » (demande de
@@ -1164,6 +1171,7 @@ export function AdminPage() {
      *  Instagram, LinkedIn). */
     { key: "portfolio", label: "Portfolio", icone: <Briefcase className="h-4 w-4" aria-hidden="true" />, compteur: nb.portfolio },
     { key: "scraping", label: "Scraping", icone: <Radar className="h-4 w-4" aria-hidden="true" /> },
+    { key: "audit", label: "Audit", icone: <Gauge className="h-4 w-4" aria-hidden="true" /> },
   ];
 
   /* En-tête commun des rubriques de liste (titre + bouton créer). */
@@ -1234,13 +1242,24 @@ export function AdminPage() {
             verticalement (demande de l'éditeur). */}
         <div className="container-site flex flex-wrap items-center justify-between gap-4 py-2">
           <div className="flex items-center gap-4">
-            <img
-              src={ASSETS.logoLight}
-              alt="Stevens Akpovi"
-              width={55}
-              height={44}
-              className="h-[75px] w-auto self-center"
-            />
+            {/* CORRECTIF 28/11 (soir) — le LOGO joue le rôle du bouton
+                « Tableau de bord » : un clic ramène au tableau de bord
+                (demande de l'éditeur). */}
+            <button
+              type="button"
+              onClick={() => allerA("tableau")}
+              aria-label="Tableau de bord"
+              title="Tableau de bord"
+              className="group/logo flex shrink-0 items-center rounded-xl outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-[#e4e4e4]/60"
+            >
+              <img
+                src={ASSETS.logoLight}
+                alt="Stevens Akpovi"
+                width={55}
+                height={44}
+                className="h-[75px] w-auto self-center transition-opacity group-hover/logo:opacity-85"
+              />
+            </button>
             <h1 className="self-center text-[13px] font-semibold tracking-[0.24em] text-[#c8c8c8] uppercase">
               Back-office
             </h1>
@@ -1632,6 +1651,13 @@ export function AdminPage() {
         {section === "scraping" && (
           <EspaceScraping stockageConfigure={stockageConfigure} toast={toast} sessionExpiree={sessionExpiree} />
         )}
+
+        {/* ---------------- AUDIT (VOLET 28) ----------------
+            Analyse de sites web pour qualifier les prospects et les
+            chantiers : performance (cloné sur GTmetrix), SEO (cloné
+            sur RankFlow) et audit complet design / structure /
+            copywriting / conversion. */}
+        {section === "audit" && <EspaceAudit toast={toast} sessionExpiree={sessionExpiree} />}
 
         {/* Note de bas d'espace — VOLET 15 : message court et
             professionnel, sans référence technique. */}
