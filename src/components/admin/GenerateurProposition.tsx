@@ -247,9 +247,12 @@ export function GenerateurProposition({
     `${sommeLignes(lignes)}/${B.presentation.maxTotal} car. · ${lignes.length}/${B.presentation.maxLignes} paragraphes · ${lignesEstimeesPresentation(lignes)}/10 lignes`;
 
   return (
+    /* VOLET 31 — min-w-0 sur les DEUX colonnes : sans lui, la piste
+       de grille (auto) ne descend jamais sous la largeur min. de
+       l'aperçu — le formulaire débordait de 35px sur mobile. */
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_470px]">
       {/* ---------------- Formulaire ---------------- */}
-      <div className="space-y-6">
+      <div className="min-w-0 space-y-6">
         {/* VOLET 24 — note des budgets : chaque champ porte son maximum. */}
         <p className="rounded-xl border border-[#e4e4e4]/10 bg-[#1c1c1c] px-4 py-3 text-xs leading-relaxed text-[#c8c8c8]/85">
           Chaque champ affiche son maximum de caractères — la capacité de son espace
@@ -592,7 +595,7 @@ export function GenerateurProposition({
       </div>
 
       {/* ---------------- Aperçu ---------------- */}
-      <div className="xl:sticky xl:top-6 xl:h-[calc(100vh-3rem)]">
+      <div className="min-w-0 xl:sticky xl:top-6 xl:h-[calc(100vh-3rem)]">
         <ApercuDocument document={pourApercu} />
       </div>
     </div>

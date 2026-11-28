@@ -56,6 +56,16 @@ export async function GET(req: NextRequest) {
   for (const d of demandesGithub) parId.set(d.id, d);
   for (const d of demandesBase) parId.set(d.id, { ...parId.get(d.id), ...d });
 
+  /* VOLET 31 — CORRECTIF : la base Prisma renvoie createdAt en
+   * objet Date (pas une chaîne) — la fusion avec les demandes
+   * GitHub (chaînes ISO) faisait échouer le tri (localeCompare
+   * introuvable sur Date) et renvoyait un 500 dès QU'UNE base est
+   * connectée. Normalisation : chaque date devient une chaîne ISO. */
+  for (const d of parId.values()) {
+    if (d.createdAt instanceof Date) d.createdAt = d.createdAt.toISOString();
+    else if (typeof d.createdAt !== "string") d.createdAt = String(d.createdAt ?? "");
+  }
+
   const leads = Array.from(parId.values()).sort((a, b) =>
     (b.createdAt || "").localeCompare(a.createdAt || ""),
   );

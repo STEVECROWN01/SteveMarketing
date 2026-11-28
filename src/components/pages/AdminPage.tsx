@@ -373,6 +373,80 @@ function PanneauDemandes({
     URL.revokeObjectURL(url);
   }
 
+  /* VOLET 31 — DÉTAILS D'UNE DEMANDE : bloc partagé entre la ligne
+   * dépliée du tableau (≥ lg) et la carte mobile/tablette (< lg). */
+  const detailsDemande = (lead: (typeof leads)[number]) => (
+    <dl className="grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2">
+      {[
+        ["Email", lead.email],
+        ["Téléphone", lead.phone ?? "—"],
+        ["Entreprise", lead.company ?? "—"],
+        ["Site concerné", lead.website ?? "—"],
+        ["Activité", lead.activity ?? "—"],
+        ["Service souhaité", lead.serviceType ?? "—"],
+        ["Budget", lead.budget ?? "—"],
+        ["Échéance", lead.timeline ?? "—"],
+        ["Source", lead.source ?? "—"],
+        ["Notification email", lead.emailSent ? "Envoyée" : "Non envoyée"],
+      ].map(([label, value]) => (
+        <div key={label}>
+          <dt className="text-[11px] tracking-widest text-[#c8c8c8] uppercase">{label}</dt>
+          <dd className="mt-1 break-words text-white">{value}</dd>
+        </div>
+      ))}
+      <div className="sm:col-span-2">
+        <dt className="text-[11px] tracking-widest text-[#c8c8c8] uppercase">Message</dt>
+        <dd className="mt-1 whitespace-pre-line leading-relaxed text-[#d9d9d9]">{lead.message}</dd>
+        {/* VOLET 18 — bloc de traduction : affiché SOUS l'original,
+            jamais à sa place ; le bouton apparaît quand le message
+            semble anglais (mais reste accessible pour tout message). */}
+        <div className="mt-3">
+          {!traductions[lead.id] ? (
+            <button
+              type="button"
+              onClick={() => traduireDemande(lead)}
+              disabled={traductionEnCours === lead.id}
+              className="flex min-h-[36px] items-center gap-1.5 rounded-full border border-[#e4e4e4]/25 px-3.5 text-xs font-medium text-white transition-colors hover:border-[#e4e4e4] disabled:opacity-50"
+            >
+              {traductionEnCours === lead.id ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+              ) : (
+                <Languages className="h-3.5 w-3.5" aria-hidden="true" />
+              )}
+              {messageSembleAnglais(lead.message)
+                ? "Traduire en français"
+                : "Traduire en français (message français détecté — traduction de contrôle)"}
+            </button>
+          ) : (
+            <div className="rounded-xl border border-[#e4e4e4]/12 bg-[#232323] p-4">
+              <p className="flex items-center gap-2 text-[11px] font-medium tracking-widest text-[#c8c8c8] uppercase">
+                <Languages className="h-3.5 w-3.5" aria-hidden="true" />
+                Traduction française (automatique)
+              </p>
+              <p className="mt-2 whitespace-pre-line leading-relaxed text-white">{traductions[lead.id]}</p>
+              <button
+                type="button"
+                onClick={() =>
+                  setTraductions((prec) => {
+                    const copie = { ...prec };
+                    delete copie[lead.id];
+                    return copie;
+                  })
+                }
+                className="mt-3 text-xs text-[#c8c8c8] underline underline-offset-4 transition-colors hover:text-white"
+              >
+                Masquer la traduction
+              </button>
+            </div>
+          )}
+          {erreurTraduction && traductionEnCours === null && (
+            <p className="mt-2 text-xs text-[#ff8080]" role="alert">{erreurTraduction}</p>
+          )}
+        </div>
+      </div>
+    </dl>
+  );
+
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -442,7 +516,11 @@ function PanneauDemandes({
           <p className="text-sm text-[#c8c8c8]">Aucune demande ne correspond à ces filtres.</p>
         </div>
       ) : (
-        <div className="scroll-slim mt-8 overflow-x-auto rounded-2xl border border-[#e4e4e4]/12 bg-[#232323]">
+        <>
+        <div className="scroll-slim mt-8 hidden overflow-x-auto rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] lg:block">
+          {/* VOLET 31 — le tableau des demandes ne vit que sur grand
+              écran (≥ lg) ; en dessous, chaque demande devient une
+              carte complète (voir sous le tableau). */}
           <table className="w-full min-w-[900px] text-left text-sm">
             <thead>
               <tr className="border-b border-[#e4e4e4]/10 text-[11px] tracking-widest text-[#c8c8c8] uppercase">
@@ -528,78 +606,7 @@ function PanneauDemandes({
                   </tr>
                   {expanded === lead.id && (
                     <tr className="border-b border-[#e4e4e4]/8 bg-[#1c1c1c]">
-                      <td colSpan={6} className="px-5 py-6">
-                        <dl className="grid gap-x-8 gap-y-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
-                          {[
-                            ["Email", lead.email],
-                            ["Téléphone", lead.phone ?? "—"],
-                            ["Entreprise", lead.company ?? "—"],
-                            ["Site concerné", lead.website ?? "—"],
-                            ["Activité", lead.activity ?? "—"],
-                            ["Service souhaité", lead.serviceType ?? "—"],
-                            ["Budget", lead.budget ?? "—"],
-                            ["Échéance", lead.timeline ?? "—"],
-                            ["Source", lead.source ?? "—"],
-                            ["Notification email", lead.emailSent ? "Envoyée" : "Non envoyée"],
-                          ].map(([label, value]) => (
-                            <div key={label}>
-                              <dt className="text-[11px] tracking-widest text-[#c8c8c8] uppercase">{label}</dt>
-                              <dd className="mt-1 break-words text-white">{value}</dd>
-                            </div>
-                          ))}
-                          <div className="sm:col-span-2 lg:col-span-3">
-                            <dt className="text-[11px] tracking-widest text-[#c8c8c8] uppercase">Message</dt>
-                            <dd className="mt-1 whitespace-pre-line leading-relaxed text-[#d9d9d9]">{lead.message}</dd>
-                            {/* VOLET 18 — bloc de traduction : affiché SOUS
-                                l'original, jamais à sa place ; le bouton
-                                apparaît quand le message semble anglais
-                                (mais reste accessible pour tout message). */}
-                            <div className="mt-3">
-                              {!traductions[lead.id] ? (
-                                <button
-                                  type="button"
-                                  onClick={() => traduireDemande(lead)}
-                                  disabled={traductionEnCours === lead.id}
-                                  className="flex min-h-[36px] items-center gap-1.5 rounded-full border border-[#e4e4e4]/25 px-3.5 text-xs font-medium text-white transition-colors hover:border-[#e4e4e4] disabled:opacity-50"
-                                >
-                                  {traductionEnCours === lead.id ? (
-                                    <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
-                                  ) : (
-                                    <Languages className="h-3.5 w-3.5" aria-hidden="true" />
-                                  )}
-                                  {messageSembleAnglais(lead.message)
-                                    ? "Traduire en français"
-                                    : "Traduire en français (message français détecté — traduction de contrôle)"}
-                                </button>
-                              ) : (
-                                <div className="rounded-xl border border-[#e4e4e4]/12 bg-[#232323] p-4">
-                                  <p className="flex items-center gap-2 text-[11px] font-medium tracking-widest text-[#c8c8c8] uppercase">
-                                    <Languages className="h-3.5 w-3.5" aria-hidden="true" />
-                                    Traduction française (automatique)
-                                  </p>
-                                  <p className="mt-2 whitespace-pre-line leading-relaxed text-white">{traductions[lead.id]}</p>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setTraductions((prec) => {
-                                        const copie = { ...prec };
-                                        delete copie[lead.id];
-                                        return copie;
-                                      })
-                                    }
-                                    className="mt-3 text-xs text-[#c8c8c8] underline underline-offset-4 transition-colors hover:text-white"
-                                  >
-                                    Masquer la traduction
-                                  </button>
-                                </div>
-                              )}
-                              {erreurTraduction && traductionEnCours === null && (
-                                <p className="mt-2 text-xs text-[#ff8080]" role="alert">{erreurTraduction}</p>
-                              )}
-                            </div>
-                          </div>
-                        </dl>
-                      </td>
+                      <td colSpan={6} className="px-5 py-6">{detailsDemande(lead)}</td>
                     </tr>
                   )}
                 </React.Fragment>
@@ -607,6 +614,73 @@ function PanneauDemandes({
             </tbody>
           </table>
         </div>
+
+        {/* ---------- CARTES MOBILE / TABLETTE (< lg) — VOLET 31 ----------
+            Chaque demande devient une carte : type, date, contact,
+            statut, actions et détails dépliables — AUCUN défilement
+            horizontal, mêmes fonctionnalités que la table. */}
+        <div className="mt-8 space-y-3 lg:hidden">
+          {filtered.map((lead) => (
+            <div key={lead.id} className="rounded-2xl border border-[#e4e4e4]/12 bg-[#232323] p-4 sm:p-5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full bg-[#e4e4e4]/12 px-3 py-1 text-xs font-medium text-[#e4e4e4]">
+                  {lead.type === "audit" ? "Audit" : lead.type === "contact" ? "Message" : "Devis"}
+                </span>
+                <span className="text-xs text-[#c8c8c8]">{formatDateHeure(lead.createdAt)}</span>
+              </div>
+              <p className="mt-2 font-medium text-white">{lead.name}</p>
+              <p className="mt-0.5 line-clamp-1 text-xs text-[#c8c8c8]">
+                {lead.serviceType ?? lead.website ?? lead.message.slice(0, 60) + "…"}
+              </p>
+              <p className="mt-1 break-all text-sm text-[#c8c8c8]">{lead.email}</p>
+              {lead.phone ? <p className="mt-0.5 text-xs text-[#c8c8c8]">{lead.phone}</p> : null}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <label className="sr-only" htmlFor={`status-carte-${lead.id}`}>
+                  Statut de la demande de {lead.name}
+                </label>
+                <select
+                  id={`status-carte-${lead.id}`}
+                  value={lead.status}
+                  onChange={(e) => onMajStatut(lead.id, e.target.value)}
+                  className={`min-h-[40px] rounded-full px-3 py-1.5 text-xs font-medium focus:outline-none ${STATUS_STYLES[lead.status] ?? ""}`}
+                >
+                  {LEAD_STATUSES.map((s) => (
+                    <option key={s} value={s} className="bg-[#232323] text-white">
+                      {STATUS_LABELS[s]}
+                    </option>
+                  ))}
+                </select>
+                {lead.type === "quote" ? (
+                  <button
+                    type="button"
+                    onClick={() => onCreerDevis(lead, traductions[lead.id])}
+                    className="flex min-h-[40px] items-center gap-1.5 rounded-full border border-[#e4e4e4]/25 px-3.5 text-xs font-medium text-white transition-colors hover:border-[#e4e4e4]"
+                    aria-label={`Créer un devis pour la demande de ${lead.name}`}
+                  >
+                    <FilePlus2 className="h-3.5 w-3.5" aria-hidden="true" />
+                    Créer un devis
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => setExpanded(expanded === lead.id ? null : lead.id)}
+                  aria-expanded={expanded === lead.id}
+                  aria-label={`Détails de la demande de ${lead.name}`}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e4e4e4]/20 text-[#c8c8c8] transition-colors hover:border-[#e4e4e4] hover:text-[#e4e4e4]"
+                >
+                  <ChevronRight
+                    className={`h-4 w-4 transition-transform ${expanded === lead.id ? "rotate-90" : ""}`}
+                    aria-hidden="true"
+                  />
+                </button>
+              </div>
+              {expanded === lead.id && (
+                <div className="mt-4 border-t border-[#e4e4e4]/10 pt-4">{detailsDemande(lead)}</div>
+              )}
+            </div>
+          ))}
+        </div>
+        </>
       )}
     </div>
   );

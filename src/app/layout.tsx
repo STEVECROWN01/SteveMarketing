@@ -246,6 +246,16 @@ export default function RootLayout({
           media="(min-width: 1024px)"
           fetchPriority="high"
         />
+        {/* VOLET 31 (29/11/2026) — PRÉCONNEXION CALENDLY : le widget
+            de rendez-vous ne se charge qu'AU CLIC sur un CTA (aucun
+            script au premier rendu) ; la préconnexion DNS + TLS des
+            deux origines (le script assets.calendly.com et l'iframe
+            calendly.com) démarre AU PARSE du HTML : le premier clic
+            n'attend plus l'établissement de la connexion
+            (~100-300 ms gagnés sur mobile). Aucun octet téléchargé
+            avant l'interaction. */}
+        <link rel="preconnect" href="https://assets.calendly.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://calendly.com" crossOrigin="anonymous" />
         {/* ÉCRAN D'AMORÇAGE DES LIENS PROFONDS (volet 7 de l'audit,
             19/11/2026 — LCP ≤ 1 s). Le routage par fragment ne donne
             au serveur AUCUNE indication de page : un chargement direct

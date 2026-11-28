@@ -397,8 +397,8 @@ export function ListeDocuments({
         <p className="max-w-xl text-sm leading-relaxed text-[#c8c8c8]">
           Les documents existants sont conservés dans un stockage privé dédié. Pour les lister,
           définissez la variable d&apos;environnement <code className="rounded bg-[#1c1c1c] px-1.5 py-0.5 text-white">GITHUB_DOCS_TOKEN</code> côté
-          serveur (jeton d&apos;accès GitHub) — voir DEPLOIEMENT.md. La GÉNÉRATION (PDF, téléchargement,
-          email) fonctionne déjà sans cette variable ; seul l&apos;archivage l&apos;attend.
+          serveur (jeton d&apos;accès GitHub) — voir DEPLOIEMENT.md. La GÉNÉRATION (PDF, téléchargement)
+          fonctionne déjà sans cette variable ; seul l&apos;archivage l&apos;attend.
         </p>
       </Carte>
     );
@@ -407,6 +407,154 @@ export function ListeDocuments({
   /* Libellés des filtres par rubrique. */
   const nbSignes = visibles.filter((d) => statutSignature(d as DocumentRecord).signe).length;
   const nbPayees = visibles.filter((d) => (d as DocumentRecord).statutPaiement === "Payé").length;
+
+  /* ---------- VOLET 31 — RENDU PARTAGÉ TABLEAU (≥ lg) / CARTES (< lg) ----------
+     Statut et Actions sont factorisés : la table desktop et les
+     cartes mobiles/tablettes portent EXACTEMENT les mêmes contrôles
+     (aucune fonctionnalité retirée sur petit écran). */
+  const identiteDoc = (d: ToutDocument) => {
+    const prop = estPropositionV2(d) ? (d as PropositionRecord) : null;
+    const doc = d as DocumentRecord;
+    return prop ? (
+      <>
+        <p className="truncate font-medium text-white" title={prop.projet}>{prop.projet}</p>
+        <p className="truncate text-xs text-[#c8c8c8]" title={prop.titre}>{prop.titre}</p>
+      </>
+    ) : (
+      <>
+        <p className="truncate font-medium text-white" title={doc.client.nom}>{doc.client.nom}</p>
+        {doc.client.entreprise ? (
+          <p className="truncate text-xs text-[#c8c8c8]" title={doc.client.entreprise}>{doc.client.entreprise}</p>
+        ) : null}
+      </>
+    );
+  };
+
+  const statutDoc = (d: ToutDocument) => {
+    const facture = d.docType === "devis" ? factureExistante(d.numero) : undefined;
+    const doc = d as DocumentRecord;
+    const stSignature = d.docType === "devis" ? statutSignature(doc) : null;
+    const payee = d.docType === "facture" && doc.statutPaiement === "Payé";
+    if (d.docType === "facture") {
+      return <Pastille ton={payee ? "valide" : "neutre"}>{doc.statutPaiement ?? "En attente"}</Pastille>;
+    }
+    if (d.docType === "devis") {
+      /* VOLET 21 — les DEUX statuts du devis, empilés (demande de
+         l'éditeur) : signature en haut, facturation en bas ;
+         « Facturé » s'affiche SEUL et « Non facturé » revient dès
+         que la facture est supprimée. */
+      return (
+        <div className="flex flex-col items-start gap-1.5">
+          {stSignature?.signe ? (
+            <Pastille ton="valide">Signé</Pastille>
+          ) : stSignature?.expire ? (
+            <Pastille ton="alerte">Non signé — expiré</Pastille>
+          ) : (
+            <Pastille>Non signé</Pastille>
+          )}
+          {facture ? <Pastille ton="valide">Facturé</Pastille> : <Pastille>Non facturé</Pastille>}
+        </div>
+      );
+    }
+    return <MenuStatutProposition doc={d} onRafraichir={onRafraichir} toast={toast} sessionExpiree={sessionExpiree} />;
+  };
+
+  const actionsDoc = (d: ToutDocument, alignement: string) => {
+    const facture = d.docType === "devis" ? factureExistante(d.numero) : undefined;
+    const prop = estPropositionV2(d) ? (d as PropositionRecord) : null;
+    const doc = d as DocumentRecord;
+    const stSignature = d.docType === "devis" ? statutSignature(doc) : null;
+    const payee = d.docType === "facture" && doc.statutPaiement === "Payé";
+    return (
+      /* VOLET 23 — les boutons d'action passent à la ligne si
+         nécessaire : aucune colonne ne force le tableau au-delà de
+         sa carte. */
+      <div className={`flex flex-wrap items-center gap-2 ${alignement}`}>
+        {/* VOLET 21 — TOUS les boutons d'action portent une
+            INFO-BULLE au survol (demande de l'éditeur). */}
+        {/* VOLET 20 — aperçu : le PANNEAU s'ouvre directement en
+            PLEIN ÉCRAN (plus de modale au nom du client). */}
+        <BoutonIcone titre="Aperçu plein écran" onClick={() => setApercu(d)}>
+          <Eye className="h-4 w-4" />
+        </BoutonIcone>
+        {/* VOLET 20 — une facture EN ATTENTE ne peut PAS être
+            téléchargée : bouton INDISPONIBLE jusqu'au statut
+            « Payé ». */}
+        {d.docType === "facture" && !payee ? (
+          <BoutonIcone titre="Facture en attente — téléchargement disponible une fois payée" disabled>
+            <Download className="h-4 w-4" />
+          </BoutonIcone>
+        ) : (
+          <BoutonIcone
+            titre="Télécharger le PDF"
+            onClick={() => (d.docType === "proposition" ? telechargerExistant(d) : setChoixLangue(doc))}
+            disabled={enCours === `${d.numero}-pdf`}
+          >
+            {enCours === `${d.numero}-pdf` ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
+          </BoutonIcone>
+        )}
+        {/* VOLET 21 — devis SIGNÉ : le bouton ne TÉLÉCHARGE plus,
+            il OUVRE la VISIONNEUSE plein écran du PDF signé (le
+            téléchargement vit DANS l'aperçu). */}
+        {d.docType === "devis" && stSignature?.signe ? (
+          <BoutonIcone titre="Voir le devis signé" ton="valide" onClick={() => setApercuSigne(doc)}>
+            <FileSignature className="h-4 w-4" />
+          </BoutonIcone>
+        ) : null}
+        <BoutonIcone titre="Modifier" onClick={() => onModifier(d)}>
+          <Pencil className="h-4 w-4" />
+        </BoutonIcone>
+        {/* VOLET 20 — MARQUER SIGNÉ (devis non signés seulement) :
+            téléverse le devis signé, le range dans les devis signés
+            puis ouvre la génération de facture. */}
+        {d.docType === "devis" && !stSignature?.signe && onSigne ? (
+          <BoutonIcone
+            titre="Marquer signé (téléverser le devis signé)"
+            onClick={() => {
+              setSignature(doc);
+              setFichierSignature(null);
+              setAnalyseSigne({ phase: "attente", manques: [] });
+              setProgressionAnalyse(0);
+            }}
+          >
+            <FileSignature className="h-4 w-4" />
+          </BoutonIcone>
+        ) : null}
+        {/* VOLET 20 — proposition : GÉNÉRER LE DEVIS pré-rempli
+            depuis cette proposition. */}
+        {d.docType === "proposition" && onGenererDevis && prop ? (
+          <BoutonIcone titre="Générer le devis (pré-rempli)" onClick={() => onGenererDevis(prop)}>
+            <FilePlus2 className="h-4 w-4" />
+          </BoutonIcone>
+        ) : null}
+        {/* VOLET 21 — le bouton « générer la facture » n'apparaît
+            que si le devis N'EST PAS déjà facturé (demande de
+            l'éditeur) ; il REVIENT dès que la facture est
+            supprimée. */}
+        {d.docType === "devis" && onFacturer && !facture ? (
+          <BoutonIcone titre="Générer la facture" onClick={() => onFacturer(doc)}>
+            <Receipt className="h-4 w-4" />
+          </BoutonIcone>
+        ) : null}
+        <BoutonIcone
+          titre="Supprimer du stockage"
+          ton="danger"
+          onClick={() => setSuppression(d)}
+          disabled={enCours === `${d.numero}-suppr`}
+        >
+          {enCours === `${d.numero}-suppr` ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Trash2 className="h-4 w-4" />
+          )}
+        </BoutonIcone>
+      </div>
+    );
+  };
 
   return (
     <div>
@@ -462,209 +610,80 @@ export function ListeDocuments({
           </p>
         </Carte>
       ) : (
-        <Carte className="overflow-x-clip">
-          {/* VOLET 23 — PLUS DE DÉFILEMENT HORIZONTAL : le tableau
-              s'arrête sur la colonne Action (demande de l'éditeur : « il
-              n'y a pas d'options extra quand on défile — il faut que le
-              tableau soit arrêté sur la colonne action, enlève la barre
-              de scroll horizontal »). Les boutons d'action passent à la
-              ligne si besoin : le tableau ne dépasse JAMAIS sa carte. */}
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-[#e4e4e4]/10 text-[11px] tracking-widest text-[#c8c8c8] uppercase">
-                <th className="px-5 py-4">Numéro</th>
-                <th className="px-5 py-4">{docType === "proposition" ? "Projet" : "Client"}</th>
-                <th className="px-5 py-4">Date</th>
-                <th className="px-5 py-4">Total</th>
-                <th className="px-5 py-4">Statut</th>
-                <th className="px-5 py-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtres.map((d) => {
-                const facture = d.docType === "devis" ? factureExistante(d.numero) : undefined;
-                /* La proposition (enregistrement v2), ou null pour les
-                   autres types. */
-                const prop = estPropositionV2(d) ? (d as PropositionRecord) : null;
-                const doc = d as DocumentRecord;
-                const stSignature = d.docType === "devis" ? statutSignature(doc) : null;
-                const payee = d.docType === "facture" && doc.statutPaiement === "Payé";
-                return (
-                  <tr key={d.id} className="border-b border-[#e4e4e4]/8 transition-colors hover:bg-[#2f2f2f]/40">
-                    <td className="whitespace-nowrap px-5 py-4 font-medium text-white">{d.numero}</td>
-                    <td className="max-w-[240px] px-5 py-4">
-                      {prop ? (
-                        <>
-                          <p className="truncate font-medium text-white">{prop.projet}</p>
-                          <p className="truncate text-xs text-[#c8c8c8]">{prop.titre}</p>
-                        </>
-                      ) : (
-                        <>
-                          <p className="truncate font-medium text-white">{doc.client.nom}</p>
-                          {doc.client.entreprise ? <p className="truncate text-xs text-[#c8c8c8]">{doc.client.entreprise}</p> : null}
-                        </>
-                      )}
-                    </td>
-                    <td className="whitespace-nowrap px-5 py-4 text-[#c8c8c8]">{formatDate(d.date)}</td>
-                    <td className="whitespace-nowrap px-5 py-4 font-medium text-white">
-                      {prop
-                        ? fmtMontantSimple(prop.montant, prop.devise)
-                        : formatCurrency(totalDocument(doc.items), d.devise)}
-                    </td>
-                    <td className="px-5 py-4">
-                      {d.docType === "facture" ? (
-                        <Pastille ton={payee ? "valide" : "neutre"}>
-                          {doc.statutPaiement ?? "En attente"}
-                        </Pastille>
-                      ) : d.docType === "devis" ? (
-                        /* VOLET 21 — les DEUX statuts du devis, empilés
-                           (demande de l'éditeur) : signature en haut,
-                           facturation en bas ; « Facturé » s'affiche
-                           SEUL (sans numéro de facture entre
-                           parenthèses) et « Non facturé » apparaît
-                           tant qu'aucune facture n'existe (le
-                           bouton « générer la facture » revient
-                           aussi dès que la facture est supprimée). */
-                        <div className="flex flex-col items-start gap-1.5">
-                          {stSignature?.signe ? (
-                            <Pastille ton="valide">Signé</Pastille>
-                          ) : stSignature?.expire ? (
-                            <Pastille ton="alerte">Non signé — expiré</Pastille>
-                          ) : (
-                            <Pastille>Non signé</Pastille>
-                          )}
-                          {facture ? (
-                            <Pastille ton="valide">Facturé</Pastille>
-                          ) : (
-                            <Pastille>Non facturé</Pastille>
-                          )}
-                        </div>
-                      ) : (
-                        <MenuStatutProposition doc={d} onRafraichir={onRafraichir} toast={toast} sessionExpiree={sessionExpiree} />
-                      )}
-                    </td>
-                    <td className="px-5 py-4">
-                      {/* VOLET 23 — les boutons d'action passent à la
-                          ligne si nécessaire : aucune colonne ne force
-                          le tableau au-delà de sa carte. */}
-                      <div className="flex flex-wrap items-center justify-end gap-2">
-                        {/* VOLET 21 — TOUS les boutons d'action portent
-                            une INFO-BULLE au survol (demande de
-                            l'éditeur). */}
-                        {/* VOLET 20 — aperçu : le PANNEAU s'ouvre
-                            directement en PLEIN ÉCRAN (plus de modale
-                            au nom du client). */}
-                        <BoutonIcone
-                          titre="Aperçu plein écran"
-                          onClick={() => setApercu(d)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </BoutonIcone>
-                        {/* VOLET 20 — une facture EN ATTENTE ne peut
-                            PAS être téléchargée : bouton
-                            INDISPONIBLE jusqu'au statut « Payé ». */}
-                        {d.docType === "facture" && !payee ? (
-                          <BoutonIcone
-                            titre="Facture en attente — téléchargement disponible une fois payée"
-                            disabled
-                          >
-                            <Download className="h-4 w-4" />
-                          </BoutonIcone>
-                        ) : (
-                          <BoutonIcone
-                            titre="Télécharger le PDF"
-                            onClick={() =>
-                              d.docType === "proposition"
-                                ? telechargerExistant(d)
-                                : setChoixLangue(doc)
-                            }
-                            disabled={enCours === `${d.numero}-pdf`}
-                          >
-                            {enCours === `${d.numero}-pdf` ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Download className="h-4 w-4" />
-                            )}
-                          </BoutonIcone>
-                        )}
-                        {/* VOLET 21 — devis SIGNÉ : le bouton ne
-                            TÉLÉCHARGE plus, il OUVRE la VISIONNEUSE
-                            plein écran du PDF signé (le
-                            téléchargement vit DANS l'aperçu). La
-                            version générée reste visualisable par le
-                            bouton « œil ». */}
-                        {d.docType === "devis" && stSignature?.signe ? (
-                          <BoutonIcone
-                            titre="Voir le devis signé"
-                            ton="valide"
-                            onClick={() => setApercuSigne(doc)}
-                          >
-                            <FileSignature className="h-4 w-4" />
-                          </BoutonIcone>
-                        ) : null}
-                        <BoutonIcone titre="Modifier" onClick={() => onModifier(d)}>
-                          <Pencil className="h-4 w-4" />
-                        </BoutonIcone>
-                        {/* VOLET 20 — MARQUER SIGNÉ (devis non signés
-                            seulement) : téléverse le devis signé,
-                            le range dans les devis signés puis
-                            ouvre la génération de facture. */}
-                        {d.docType === "devis" && !stSignature?.signe && onSigne ? (
-                          <BoutonIcone
-                            titre="Marquer signé (téléverser le devis signé)"
-                            onClick={() => {
-                              setSignature(doc);
-                              setFichierSignature(null);
-                              setAnalyseSigne({ phase: "attente", manques: [] });
-                              setProgressionAnalyse(0);
-                            }}
-                          >
-                            <FileSignature className="h-4 w-4" />
-                          </BoutonIcone>
-                        ) : null}
-                        {/* VOLET 20 — proposition : GÉNÉRER LE DEVIS
-                            pré-rempli depuis cette proposition. */}
-                        {d.docType === "proposition" && onGenererDevis && prop ? (
-                          <BoutonIcone
-                            titre="Générer le devis (pré-rempli)"
-                            onClick={() => onGenererDevis(prop)}
-                          >
-                            <FilePlus2 className="h-4 w-4" />
-                          </BoutonIcone>
-                        ) : null}
-                        {/* VOLET 21 — le bouton « générer la facture »
-                            n'apparaît que si le devis N'EST PAS déjà
-                            facturé (demande de l'éditeur) ; il
-                            REVIENT dès que la facture est supprimée
-                            (statut « Non facturé »). */}
-                        {d.docType === "devis" && onFacturer && !facture ? (
-                          <BoutonIcone
-                            titre="Générer la facture"
-                            onClick={() => onFacturer(doc)}
-                          >
-                            <Receipt className="h-4 w-4" />
-                          </BoutonIcone>
-                        ) : null}
-                        <BoutonIcone
-                          titre="Supprimer du stockage"
-                          ton="danger"
-                          onClick={() => setSuppression(d)}
-                          disabled={enCours === `${d.numero}-suppr`}
-                        >
-                          {enCours === `${d.numero}-suppr` ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-4 w-4" />
-                          )}
-                        </BoutonIcone>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </Carte>
+        <>
+          {/* ---------- TABLEAU DESKTOP (≥ lg) ----------
+              VOLET 23 — PLUS DE DÉFILEMENT HORIZONTAL : le tableau
+              s'arrête sur la colonne Action (demande de l'éditeur).
+              VOLET 31 — le tableau ne vit plus QUE sur grand écran :
+              en dessous, chaque document devient une CARTE complète
+              (mêmes statuts, mêmes actions). */}
+          <Carte className="hidden overflow-x-clip lg:block">
+            <table className="w-full text-left text-sm">
+              <thead>
+                <tr className="border-b border-[#e4e4e4]/10 text-[11px] tracking-widest text-[#c8c8c8] uppercase">
+                  <th className="px-5 py-4">Numéro</th>
+                  <th className="px-5 py-4">{docType === "proposition" ? "Projet" : "Client"}</th>
+                  <th className="px-5 py-4">Date</th>
+                  <th className="px-5 py-4">Total</th>
+                  <th className="px-5 py-4">Statut</th>
+                  <th className="px-5 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtres.map((d) => {
+                  const prop = estPropositionV2(d) ? (d as PropositionRecord) : null;
+                  const doc = d as DocumentRecord;
+                  return (
+                    <tr key={d.id} className="border-b border-[#e4e4e4]/8 transition-colors hover:bg-[#2f2f2f]/40">
+                      <td className="whitespace-nowrap px-5 py-4 font-medium text-white">{d.numero}</td>
+                      <td className="max-w-[240px] px-5 py-4">{identiteDoc(d)}</td>
+                      <td className="whitespace-nowrap px-5 py-4 text-[#c8c8c8]">{formatDate(d.date)}</td>
+                      <td className="whitespace-nowrap px-5 py-4 font-medium text-white">
+                        {prop
+                          ? fmtMontantSimple(prop.montant, prop.devise)
+                          : formatCurrency(totalDocument(doc.items), d.devise)}
+                      </td>
+                      <td className="px-5 py-4">{statutDoc(d)}</td>
+                      <td className="px-5 py-4">{actionsDoc(d, "justify-end")}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </Carte>
+
+          {/* ---------- CARTES MOBILE / TABLETTE (< lg) — VOLET 31 ----------
+              Mêmes informations, mêmes statuts, mêmes actions que la
+              table : chaque document tient sur une carte empilée,
+              AUCUN défilement horizontal, boutons à hauteur de
+              pouce. */}
+          <div className="space-y-3 lg:hidden">
+            {filtres.map((d) => {
+              const prop = estPropositionV2(d) ? (d as PropositionRecord) : null;
+              const doc = d as DocumentRecord;
+              return (
+                <Carte key={d.id} className="p-4 sm:p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] font-semibold tracking-[0.22em] text-[#c8c8c8] uppercase">{d.numero}</p>
+                      <div className="mt-1">{identiteDoc(d)}</div>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="whitespace-nowrap font-medium text-white">
+                        {prop
+                          ? fmtMontantSimple(prop.montant, prop.devise)
+                          : formatCurrency(totalDocument(doc.items), d.devise)}
+                      </p>
+                      <p className="mt-0.5 whitespace-nowrap text-xs text-[#c8c8c8]">{formatDate(d.date)}</p>
+                    </div>
+                  </div>
+                  <div className="mt-3">{statutDoc(d)}</div>
+                  <div className="mt-3 border-t border-[#e4e4e4]/10 pt-3">{actionsDoc(d, "justify-start")}</div>
+                </Carte>
+              );
+            })}
+          </div>
+        </>
       )}
 
       {/* ---------- VOLET 18 : version du PDF (devis/factures) ---------- */}
