@@ -192,7 +192,6 @@ export function ListeDocuments({
         body: JSON.stringify({
           document: record,
           enregistrer: avecEnregistrement,
-          envoyerEmail: avecEnregistrement,
         }),
       });
       if (res.status === 401) {

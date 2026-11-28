@@ -28,7 +28,10 @@ export async function GET(req: NextRequest) {
      (stockageConfigure / emailConfigure) : quand le stockage n'est
      pas encore configuré, le back-office affiche sa bande
      d'explication au lieu d'une erreur, et la GÉNÉRATION de
-     documents reste pleinement opérationnelle. */
+     documents reste pleinement opérationnelle.
+     VOLET 30 : emailConfigure ne sert plus aux documents (plus de
+     copie email — voir /api/documents/pdf) : il renseigne l'état
+     des emails des DEMANDES DES VISITEURS (RESEND_API_KEY). */
   if (!isStorageConfigured()) {
     return NextResponse.json({
       ok: true,

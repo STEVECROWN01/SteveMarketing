@@ -1411,15 +1411,15 @@ export function AdminPage() {
                 </div>
                 <div className="rounded-xl border border-[#e4e4e4]/10 bg-[#1c1c1c] p-4">
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-sm font-medium text-white">Copie email des documents</p>
+                    <p className="text-sm font-medium text-white">Emails du site (visiteurs)</p>
                     <Pastille ton={emailConfigure ? "valide" : "alerte"}>
-                      {emailConfigure ? "Active" : "Non configurée"}
+                      {emailConfigure ? "Actifs" : "Non configurés"}
                     </Pastille>
                   </div>
                   <p className="mt-2 text-xs leading-relaxed text-[#c8c8c8]">
                     {emailConfigure
-                      ? "Chaque document généré est envoyé en pièce jointe à votre boîte mail privée."
-                      : "Définissez RESEND_API_KEY pour recevoir une copie de chaque document par email (pièce jointe PDF) — voir DEPLOIEMENT.md."}
+                      ? "Seules les demandes des visiteurs du site (devis, audit, contact) partent par email. Les documents, prospects et audits du back-office ne sont plus envoyés par email : tout est archivé dans le dépôt GitHub privé."
+                      : "Définissez RESEND_API_KEY pour recevoir par email les demandes des visiteurs du site (devis, audit, contact) — voir DEPLOIEMENT.md. Les documents du back-office ne sont jamais envoyés par email : ils sont archivés dans GitHub."}
                   </p>
                 </div>
               </div>

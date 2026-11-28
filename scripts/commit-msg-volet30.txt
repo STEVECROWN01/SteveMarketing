@@ -1,0 +1,13 @@
+VOLET 30 (29/11/2026) — PLUS AUCUN EMAIL POUR LE BACK-OFFICE : TOUT CE QUI EST SAUVEGARDÉ DANS GITHUB N'EST PLUS ENVOYÉ PAR EMAIL — SEULES LES DEMANDES DES VISITEURS DU SITE PARTENT PAR EMAIL
+
+LA DEMANDE : « tout ce que j'ai sauvegardé dans le GitHub, n'envoie plus par email puisque c'est déjà sauvegardé dans le back-office... sinon la boîte mail va être remplie de documents. Seules les demandes que les visiteurs vont effectuer sur le site web seront envoyées par email. »
+
+CE QUI DISPARAÎT (l'ancienne copie email du VOLET 14) : plus AUCUN document du back-office — proposition, devis, facture — n'est envoyé en pièce jointe par email à l'éditeur. La fonction sendDocumentCopy est SUPPRIMÉE, la route /api/documents/pdf ne lit plus le champ envoyerEmail, ne sert plus les en-têtes X-Email-Sent/X-Email-Error et n'appelle plus Resend : le PDF est téléchargé normalement et le document est archivé dans le dépôt GitHub privé (comme avant) — c'est la sauvegarde de référence. Les générateurs (devis, propositions, facture, liste) ne demandent plus la copie et les toasts n'en parlent plus (« Enregistré dans le stockage et disponible dans la liste. Téléchargez-le depuis la liste. »).
+
+CE QUI RESTE PAR EMAIL (et rien d'autre) : les DEMANDES DES VISITEURS du site public — devis, audit, contact — notifiées à stevensakpovi@gmail.com avec accusé de réception au visiteur (notifyOwner + sendReceipt intacts dans /api/leads). La carte « État du système » du tableau de bord devient « Emails du site (visiteurs) » : elle affiche l'état de Resend et rappelle la règle — seulement les demandes visiteurs, jamais les documents, prospects et audits (archivés dans GitHub).
+
+INCHANGÉ : l'archivage GitHub des documents, prospects (prospects/prospects.json + prospects/prospects.xlsx) et audits (audits/) ; la génération et le téléchargement des PDF ; la fonctionnalité « Proposer l'email » de l'audit (mailto au PROSPECT, demandée au volet 29) ; le stockage GitHub des demandes visiteurs en parallèle de leur email.
+
+DOCUMENTATION : DEPLOIEMENT.md et .env.example mis à jour (RESEND_API_KEY = emails des visiteurs uniquement).
+
+SONDE LOCALE VOLET 30 : 23/23 (sendDocumentCopy supprimée, en-têtes email absents, plus de champ envoyerEmail nulle part, notifyOwner/sendReceipt conservés, carte du tableau de bord à jour, mailto prospect conservé, documentation à jour) + SONDE VOLET 29 REPASSÉE : 33/33 (aucune régression) + test d'exécution réel : génération d'un devis → PDF servi (200), AUCUN en-tête email, stockage signalé non configuré localement (attendu sans GITHUB_DOCS_TOKEN) + build de production complet.

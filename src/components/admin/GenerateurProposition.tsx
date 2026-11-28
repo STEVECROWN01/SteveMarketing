@@ -150,9 +150,11 @@ export function GenerateurProposition({
   );
 
   /* VOLET 20 — GÉNÉRATION SANS TÉLÉCHARGEMENT AUTOMATIQUE (demande de
-   * l'éditeur) : la génération ENREGISTRE la proposition (stockage
-   * privé + copie email) — le téléchargement passe UNIQUEMENT par le
-   * bouton dédié de la liste.
+   * l'éditeur) : la génération ENREGISTRE la proposition dans le
+   * stockage privé (VOLET 30 — plus de copie email : tout est
+   * archivé dans GitHub, la boîte mail reste libre) — le
+   * téléchargement passe UNIQUEMENT par le bouton dédié de la
+   * liste.
    * VOLET 23 — ANTI-DOUBLON (demande de l'éditeur : « une fois que
    * c'est enregistré, si on clique encore sur générer, ça doit
    * REFUSER par un toast et dire que le document existe déjà ») : le
@@ -180,7 +182,6 @@ export function GenerateurProposition({
         body: JSON.stringify({
           document: { ...form, docType: "proposition", numero, ...(initial ? { id: initial.id, createdAt: initial.createdAt } : {}) },
           enregistrer: true,
-          envoyerEmail: true,
         }),
       });
       if (res.status === 401) {
@@ -191,16 +192,14 @@ export function GenerateurProposition({
         const data = await res.json().catch(() => null);
         throw new Error(data?.error ?? "Génération impossible.");
       }
-      /* Le PDF renvoyé est simplement consommé (copie email) — aucun
+      /* Le PDF renvoyé est simplement consommé — aucun
        * téléchargement automatique sur l'appareil. */
       await res.blob();
-      const emailOk = res.headers.get("X-Email-Sent") === "1";
       const stockageOk = res.headers.get("X-Stockage-Ok") === "1";
       toast({
         title: `Proposition ${numero} ${enEdition ? "mise à jour" : "générée"}`,
         description: [
           stockageOk ? "Enregistrée dans le stockage et disponible dans la liste." : "Stockage non effectué (non configuré).",
-          emailOk ? "Copie envoyée par email." : "Copie email non envoyée (Resend non configuré).",
           "Téléchargez-la depuis la liste (bouton dédié).",
         ].join(" "),
       });

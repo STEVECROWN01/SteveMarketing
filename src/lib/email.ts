@@ -9,6 +9,15 @@ import { ASSETS, SITE } from "@/lib/site";
  * Tant que la clé n'est pas configurée, les demandes restent
  * enregistrées de manière fiable en base de données et le
  * module journalise l'email non envoyé (emailSent = false).
+ *
+ * POLITIQUE EMAIL (VOLET 30, 29/11/2026) : seules les DEMANDES
+ * des VISITEURS du site public (devis, audit, contact) partent
+ * par email (notification à l'éditeur + accusé de réception au
+ * visiteur). AUCUN document du back-office (proposition, devis,
+ * facture, prospects, audits…) n'est plus envoyé par email :
+ * tout est déjà archivé dans le dépôt GitHub privé de stockage —
+ * l'ancienne « copie email » des documents est SUPPRIMÉE pour ne
+ * pas remplir la boîte mail.
  */
 
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
@@ -134,45 +143,4 @@ export async function sendReceipt(lead: LeadPayload): Promise<boolean> {
     </div>
   </div>`;
   return sendEmail(lead.email, subject, html);
-}
-
-
-/* ---------- VOLET 14 (24/11/2026) — COPIE DES DOCUMENTS
- * COMMERCIAUX (back-office) ----------
- * Système K.Quotes : à chaque document généré (proposition,
- * devis, facture), un exemplaire du PDF est envoyé en pièce jointe
- * à l'adresse personnelle de l'éditeur (SITE.email), en plus du
- * téléchargement automatique dans le navigateur. Resend accepte
- * les pièces jointes en base64 (API REST). */
-
-export async function sendDocumentCopy(opts: {
-  subject: string;
-  html: string;
-  text: string;
-  filename: string;
-  contenuBase64: string;
-}): Promise<boolean> {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return false;
-  try {
-    const res = await fetch(RESEND_ENDPOINT, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: FROM_LABEL,
-        to: [SITE.email],
-        subject: opts.subject,
-        html: opts.html,
-        text: opts.text,
-        attachments: [{ filename: opts.filename, content: opts.contenuBase64 }],
-      }),
-    });
-    return res.ok;
-  } catch {
-    console.error("[email] Échec d'envoi de la copie document via Resend");
-    return false;
-  }
 }

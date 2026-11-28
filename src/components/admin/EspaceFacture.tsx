@@ -32,8 +32,10 @@ import { formatCurrency, totalDocument, numeroDevisVersFacture } from "@/lib/doc
  *    (« c’est à moi de marquer le statut payé quand ce sera payé ») ;
  *    une facture EXISTANTE conserve son statut enregistré ;
  *  - PLUS AUCUN TÉLÉCHARGEMENT AUTOMATIQUE : la génération
- *    ENREGISTRE la facture (stockage privé + copie email) et c’est
- *    TOUT — le téléchargement passe par le bouton dédié de la liste
+ *    ENREGISTRE la facture dans le stockage privé (VOLET 30 —
+ *    plus de copie email : tout est archivé dans GitHub, la
+ *    boîte mail reste libre) et c’est TOUT — le téléchargement
+ *    passe par le bouton dédié de la liste
  *    (uniquement pour les factures PAYÉES, demande de l’éditeur) ;
  *  - toast : « La facture est enregistrée et liée au devis D… »
  *    (sans mention de téléchargement).
@@ -97,7 +99,7 @@ export function EspaceFacture({
       const res = await fetch("/api/documents/pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ document: facture, enregistrer: true, envoyerEmail: true }),
+        body: JSON.stringify({ document: facture, enregistrer: true }),
       });
       if (res.status === 401) {
         sessionExpiree?.();
@@ -108,10 +110,11 @@ export function EspaceFacture({
         throw new Error(data?.error ?? "Génération impossible.");
       }
       /* VOLET 20 — PLUS DE TÉLÉCHARGEMENT AUTOMATIQUE : la génération
-       * enregistre la facture (stockage privé + copie email) ; le
-       * téléchargement passe par le bouton dédié de la liste
-       * (factures PAYÉES uniquement). Le PDF renvoyé est simplement
-       * consommé (aucun fichier posé sur l'appareil). */
+       * enregistre la facture dans le stockage privé (VOLET 30 —
+       * plus de copie email) ; le téléchargement passe par le bouton
+       * dédié de la liste (factures PAYÉES uniquement). Le PDF
+       * renvoyé est simplement consommé (aucun fichier posé sur
+       * l'appareil). */
       await res.blob();
       toast({
         title: `Facture ${numeroFacture} ${base.docType === "facture" ? "mise à jour" : "générée"}`,

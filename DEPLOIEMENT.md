@@ -32,7 +32,7 @@ GitHub `STEVECROWN01/SteveMarketing` (branche `main`).
 | Variable | Obligatoire | Rôle |
 |---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | Oui | URL canonique finale (canonical, sitemap, Open Graph, JSON-LD). **Format obligatoire : `https://…`** (protocole inclus, sans guillemets ni espaces). Ex. : `https://stevensakpovi.vercel.app`. Depuis la correction du 12/11, une valeur mal saisie ne casse plus le build : protocole manquant ajouté automatiquement, guillemets/espaces retirés, valeur invalide remplacée par le défaut. |
-| `RESEND_API_KEY` | Recommandée | Active la notification des demandes à `stevensakpovi@gmail.com` **et** l'accusé de réception au visiteur. Clé gratuite sur https://resend.com — domaine d'envoi à vérifier dans Resend, l'expéditeur par défaut `onboarding@resend.dev` permet d'envoyer uniquement vers l'adresse du compte Resend : créer le compte avec `stevensakpovi@gmail.com`. |
+| `RESEND_API_KEY` | Recommandée | **Emails des visiteurs uniquement (volet 30, 29/11/2026)** : chaque DEMANDE d'un visiteur du site public (devis, audit, contact) envoie la notification à `stevensakpovi@gmail.com` et l'accusé de réception au visiteur. Les documents, prospects et audits du back-office ne sont PLUS envoyés par email — tout est archivé dans le dépôt GitHub privé. Clé gratuite sur https://resend.com — domaine d'envoi à vérifier dans Resend, l'expéditeur par défaut `onboarding@resend.dev` permet d'envoyer uniquement vers l'adresse du compte Resend : créer le compte avec `stevensakpovi@gmail.com`. |
 | `ADMIN_PASSWORD` | Oui | Mot de passe de l'espace administrateur `#/admin`. Générer une valeur forte (fournie dans le fichier de configuration remis, ou `openssl rand -base64 18`). |
 | `ADMIN_SESSION_SECRET` | Oui | Secret de signature des sessions admin (HMAC-SHA256). Générer via `openssl rand -hex 32`. |
 | `NEXT_PUBLIC_CALENDLY_URL` | Non | Rendez-vous de 30 minutes confirmé par l'éditeur — défaut : `https://calendly.com/stevensakpovi/30min` (l'URL `/20min` du cahier des charges renvoie 404). |
@@ -50,14 +50,14 @@ demandes, et GÉNÉRATION des documents commerciaux — proposition
 commerciale, devis et facture (la facture se génère DEPUIS un devis
 enregistré, avec cachet « PAYÉ »). Le système est celui du projet
 K.Quotes de l'éditeur : PDF A4 produit par le serveur (Puppeteer),
-téléchargement automatique dans le navigateur, copie du PDF par
-email (Resend) et archivage.
+téléchargement automatique dans le navigateur et archivage (volet 30 :
+plus de copie email — la boîte mail ne reçoit plus les documents).
 
 Variables spécifiques (toutes OPTIONNELLES pour la génération) :
 
 | Variable | Rôle | Sans elle |
 | --- | --- | --- |
-| `GITHUB_DOCS_TOKEN` | Jeton GitHub (portée « repo ») : archivage des documents en JSON dans le dossier `documents/` du DÉPÔT PRIVÉ `STEVECROWN01/SteveMarketing-Documents` — et, depuis le volet 20 : les DEMANDES du site (devis, audits, messages) dans `demandes/`, les devis SIGNÉS téléversés dans `devis-signes/`, les projets du portfolio dans `portfolio/` — et, depuis le volet 29 : les PROSPECTS importés du scraping dans `prospects/` (source de vérité `prospects/prospects.json` + le CLASSEUR EXCEL `prospects/prospects.xlsx`, MIS À JOUR à chaque import — jamais un nouveau fichier) et les AUDITS COMPLETS enregistrés dans `audits/` (un JSON par audit, consultables dans l'historique de l'espace Audit) | La liste et l'archivement des documents existants attendent ; la GÉNÉRATION (PDF, téléchargement, email) fonctionne déjà ; les espaces Prospects et l'historique des audits signalent que le stockage n'est pas configuré |
+| `GITHUB_DOCS_TOKEN` | Jeton GitHub (portée « repo ») : archivage des documents en JSON dans le dossier `documents/` du DÉPÔT PRIVÉ `STEVECROWN01/SteveMarketing-Documents` — et, depuis le volet 20 : les DEMANDES du site (devis, audits, messages) dans `demandes/`, les devis SIGNÉS téléversés dans `devis-signes/`, les projets du portfolio dans `portfolio/` — et, depuis le volet 29 : les PROSPECTS importés du scraping dans `prospects/` (source de vérité `prospects/prospects.json` + le CLASSEUR EXCEL `prospects/prospects.xlsx`, MIS À JOUR à chaque import — jamais un nouveau fichier) et les AUDITS COMPLETS enregistrés dans `audits/` (un JSON par audit, consultables dans l'historique de l'espace Audit) | La liste et l'archivement des documents existants attendent ; la GÉNÉRATION (PDF, téléchargement) fonctionne déjà ; les espaces Prospects et l'historique des audits signalent que le stockage n'est pas configuré |
 | `GITHUB_DOCS_REPO` | Dépôt de stockage (défaut : `STEVECROWN01/SteveMarketing-Documents`) | Valeur par défaut utilisée |
 | `GITHUB_DOCS_BRANCH` | Branche (défaut : `main`) | Valeur par défaut utilisée |
 

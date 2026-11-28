@@ -228,11 +228,12 @@ export function GenerateurDocument({
 
   /* VOLET 20 — GÉNÉRATION SANS TÉLÉCHARGEMENT AUTOMATIQUE (demande
    * de l'éditeur : le document généré est ENREGISTRÉ dans le
-   * stockage privé (et envoyé par copie email) ; le téléchargement
-   * sur l'appareil passe UNIQUEMENT par le bouton dédié de la
-   * liste — avec choix FR/EN pour les devis). La langue du document
-   * reste celle du formulaire (bouton FR/EN) : plus de menu de
-   * version au moment de la génération. */
+   * stockage privé ; VOLET 30 — plus de copie email : tout est
+   * archivé dans GitHub, la boîte mail reste libre) ; le
+   * téléchargement sur l'appareil passe UNIQUEMENT par le bouton
+   * dédié de la liste — avec choix FR/EN pour les devis. La langue
+   * du document reste celle du formulaire (bouton FR/EN) : plus de
+   * menu de version au moment de la génération. */
   async function genererDocument() {
     if (generation) return;
     if (!form.client.nom.trim()) {
@@ -258,7 +259,6 @@ export function GenerateurDocument({
         body: JSON.stringify({
           document: corpsDocument(),
           enregistrer: true,
-          envoyerEmail: true,
         }),
       });
       if (res.status === 401) {
@@ -269,16 +269,14 @@ export function GenerateurDocument({
         const data = await res.json().catch(() => null);
         throw new Error(data?.error ?? "Génération impossible.");
       }
-      /* Le PDF renvoyé est simplement consommé (copie email) — aucun
+      /* Le PDF renvoyé est simplement consommé — aucun
        * téléchargement automatique sur l'appareil. */
       await res.blob();
-      const emailOk = res.headers.get("X-Email-Sent") === "1";
       const stockageOk = res.headers.get("X-Stockage-Ok") === "1";
       toast({
         title: `${libelle} ${numero} ${enEdition ? "mis à jour" : "généré"}`,
         description: [
           stockageOk ? "Enregistré dans le stockage et disponible dans la liste." : "Stockage non effectué (non configuré).",
-          emailOk ? "Copie envoyée par email." : "Copie email non envoyée (Resend non configuré).",
           "Téléchargez-le depuis la liste (bouton dédié).",
         ].join(" "),
       });
