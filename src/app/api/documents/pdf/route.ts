@@ -54,21 +54,16 @@ export async function POST(req: NextRequest) {
      * une CRÉATION (aucun identifiant fourni) d'un numéro déjà
      * enregistré est REFUSÉE ; la mise à jour d'un document existant
      * (identifiant fourni — c'est le cas des factures régénérées)
-     * reste libre. */
-    if (enregistrer && !brut?.id && isStorageConfigured()) {
-      const existant = await getDocument(
-        buildIdDocument(document.docType, document.numero),
-      ).catch(() => null);
-      if (existant) {
-        return NextResponse.json(
-          {
-            ok: false,
-            error: `Le document ${document.numero} existe déjà — il est disponible dans la liste (ouvrez-le ou modifiez-le depuis la liste).`,
-          },
-          { status: 409 },
-        );
-      }
-    }
+     * reste libre.
+     * CORRECTIF 28/11 — VITESSE (retour de l'éditeur : « la génération
+     * prend trop de temps ») : la vérification anti-doublon (lecture
+     * GitHub) et la GÉNÉRATION DU PDF partent EN PARALLÈLE — le PDF
+     * ne dépend pas de la vérification ; en cas de doublon le PDF
+     * simplement n'est pas utilisé. */
+    const verificationDoublon =
+      enregistrer && !brut?.id && isStorageConfigured()
+        ? getDocument(buildIdDocument(document.docType, document.numero)).catch(() => null)
+        : Promise.resolve(null);
     /* VOLET 18 — le PDF (et sa copie email) est rendu dans la langue
      * CHOISIE ; le document ENREGISTRÉ garde sa propre langue.
      * Les propositions commerciales ignorent la langue (template
@@ -77,7 +72,19 @@ export async function POST(req: NextRequest) {
       langueSortie && !estPropositionV2(document)
         ? ({ ...document, langue: langueSortie } as ToutDocument)
         : document;
-    const pdf = await generatePdf(documentPdf, LOGO_DOC_DATA_URI);
+    const [existant, pdf] = await Promise.all([
+      verificationDoublon,
+      generatePdf(documentPdf, LOGO_DOC_DATA_URI),
+    ]);
+    if (existant) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: `Le document ${document.numero} existe déjà — il est disponible dans la liste (ouvrez-le ou modifiez-le depuis la liste).`,
+        },
+        { status: 409 },
+      );
+    }
     const estProp = estPropositionV2(document);
     /* Proposition v2 : pas de fiche client — le nom de fichier et le
        libellé email portent le PROJET ; les autres documents gardent
@@ -88,50 +95,35 @@ export async function POST(req: NextRequest) {
     const nomFichier = buildNomFichier(document.docType, document.numero, nomPourFichier);
     const label = LABELS_DOC[document.docType];
 
-    /* Effet 1 : stockage GitHub (dépôt privé dédié) — non bloquant,
-       le téléchargement réussit même si le stockage échoue. */
-    let stockageOk = false;
-    let stockageErreur: string | null = null;
-    if (enregistrer) {
-      if (!isStorageConfigured()) {
-        stockageErreur = "Stockage GitHub non configuré (GITHUB_DOCS_TOKEN).";
-      } else {
-        try {
-          await saveDocument(document);
-          stockageOk = true;
-        } catch (e) {
-          stockageErreur = e instanceof Error ? e.message : "Stockage impossible.";
-          console.warn("[documents/pdf] Enregistrement échoué (PDF renvoyé) :", stockageErreur);
-        }
-      }
-    }
-
-    /* Effet 2 : copie email à l'éditeur — non bloquant. */
-    let emailOk = false;
-    let emailErreur: string | null = null;
-    if (envoyerEmail) {
+    /* Effets 1 + 2 (CORRECTIF 28/11 — VITESSE) : stockage GitHub ET
+       copie email partent EN PARALLÈLE (ils étaient enchaînés : le
+       temps de l'un s'ajoutait à l'autre) — tous deux restent non
+       bloquants, le PDF est renvoyé même si l'un échoue. */
+    const envoyerCopieEmail = async (): Promise<boolean> => {
+      if (!envoyerEmail) return false;
       if (!isEmailServiceConfigured()) {
         emailErreur = "Email non configuré (RESEND_API_KEY).";
-      } else {
-        try {
-          const dateLabel = formatDate(document.date);
-          const sujet = estProp
-            ? `${label} ${document.numero} — ${document.projet}`
-            : `${label} ${document.numero} — ${document.client.nom}`;
-          const lignesResume: [string, string][] = estProp
-            ? [
-                ["Projet", document.projet],
-                ["Titre", document.titre],
-                ["Date", dateLabel],
-                ["Total", fmtMontantSimple(document.montant, document.devise)],
-              ]
-            : [
-                ["Client", `${document.client.nom}${document.client.entreprise ? " — " + document.client.entreprise : ""}`],
-                ["Date", dateLabel],
-                ["Objet", document.objet],
-                ["Total", formatCurrency(totalDocument(document.items), document.devise)],
-              ];
-          const html = `
+        return false;
+      }
+      try {
+        const dateLabel = formatDate(document.date);
+        const sujet = estProp
+          ? `${label} ${document.numero} — ${document.projet}`
+          : `${label} ${document.numero} — ${document.client.nom}`;
+        const lignesResume: [string, string][] = estProp
+          ? [
+              ["Projet", document.projet],
+              ["Titre", document.titre],
+              ["Date", dateLabel],
+              ["Total", fmtMontantSimple(document.montant, document.devise)],
+            ]
+          : [
+              ["Client", `${document.client.nom}${document.client.entreprise ? " — " + document.client.entreprise : ""}`],
+              ["Date", dateLabel],
+              ["Objet", document.objet],
+              ["Total", formatCurrency(totalDocument(document.items), document.devise)],
+            ];
+        const html = `
           <div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:560px;margin:0 auto;color:#1f2937;">
             <div style="background:#070707;padding:16px 24px;border-radius:4px 4px 0 0;">
               <div style="font-size:18px;font-weight:700;color:#e4e4e4;letter-spacing:0.06em;">${label.toUpperCase()} ${document.numero}</div>
@@ -144,21 +136,42 @@ export async function POST(req: NextRequest) {
               <p style="margin:16px 0 0;font-size:12px;color:#6b7280;">— Back-office Stevens Akpovi</p>
             </div>
           </div>`;
-          const texte = `${label} ${document.numero}\n${sujet.split(" — ").slice(1).join(" — ")}\nDate : ${dateLabel}\n\nUn exemplaire est joint.`;
-          emailOk = await sendDocumentCopy({
-            subject: sujet,
-            html,
-            text: texte,
-            filename: nomFichier,
-            contenuBase64: pdf.toString("base64"),
-          });
-          if (!emailOk) emailErreur = "Envoi de la copie refusé par Resend.";
-        } catch (e) {
-          emailErreur = e instanceof Error ? e.message : "Envoi impossible.";
-          console.warn("[documents/pdf] Copie email échouée (PDF renvoyé) :", emailErreur);
-        }
+        const texte = `${label} ${document.numero}\n${sujet.split(" — ").slice(1).join(" — ")}\nDate : ${dateLabel}\n\nUn exemplaire est joint.`;
+        const envoye = await sendDocumentCopy({
+          subject: sujet,
+          html,
+          text: texte,
+          filename: nomFichier,
+          contenuBase64: pdf.toString("base64"),
+        });
+        if (!envoye) emailErreur = "Envoi de la copie refusé par Resend.";
+        return envoye;
+      } catch (e) {
+        emailErreur = e instanceof Error ? e.message : "Envoi impossible.";
+        console.warn("[documents/pdf] Copie email échouée (PDF renvoyé) :", emailErreur);
+        return false;
       }
-    }
+    };
+    const enregistrerStockage = async (): Promise<boolean> => {
+      if (!enregistrer) return false;
+      if (!isStorageConfigured()) {
+        stockageErreur = "Stockage GitHub non configuré (GITHUB_DOCS_TOKEN).";
+        return false;
+      }
+      try {
+        await saveDocument(document);
+        return true;
+      } catch (e) {
+        stockageErreur = e instanceof Error ? e.message : "Stockage impossible.";
+        console.warn("[documents/pdf] Enregistrement échoué (PDF renvoyé) :", stockageErreur);
+        return false;
+      }
+    };
+    let stockageOk = false;
+    let emailOk = false;
+    let stockageErreur: string | null = null;
+    let emailErreur: string | null = null;
+    [stockageOk, emailOk] = await Promise.all([enregistrerStockage(), envoyerCopieEmail()]);
 
     return new NextResponse(new Uint8Array(pdf), {
       status: 200,

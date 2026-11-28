@@ -642,7 +642,17 @@ export function GestionPortfolio({
    * supprimées DÉFINITIVEMENT (elles ne s'affichent plus ici). */
   const [siteSupprimes, setSiteSupprimes] = useState<string[]>([]);
   const [chargement, setChargement] = useState(true);
-  const [actionRapide, setActionRapide] = useState<string | null>(null);
+  /* CORRECTIF 28/11 (retour de l'éditeur : « quand on clique sur le
+   * bouton publier, le bouton supprimer aussi se charge — je veux que
+   * tu me règles ça ; rassure-toi que tous les boutons agissent
+   * seulement à le clic ») — l'action en cours porte le N° du projet
+   * ET le NOM de l'action : SEUL le bouton cliqué affiche son
+   * chargement ; les autres boutons du projet restent immobiles
+   * (simplement inactifs le temps de l'action). */
+  const [actionRapide, setActionRapide] = useState<{
+    id: string;
+    action: "publier" | "depublier" | "supprimer";
+  } | null>(null);
   const [enCreation, setEnCreation] = useState(false);
   const [enEdition, setEnEdition] = useState<ProjetAdmin | null>(null);
   /* Conversion (édition) d'une réalisation du site : chargement des
@@ -780,7 +790,7 @@ export function GestionPortfolio({
   async function confirmerDepublication() {
     const projet = depublication;
     if (!projet) return;
-    setActionRapide(projet.id);
+    setActionRapide({ id: projet.id, action: "depublier" });
     try {
       const res = await fetch("/api/admin/projects", {
         method: "POST",
@@ -820,7 +830,7 @@ export function GestionPortfolio({
   async function confirmerDepublicationSite() {
     const projet = depublicationSite;
     if (!projet) return;
-    setActionRapide(projet.id);
+    setActionRapide({ id: projet.id, action: "depublier" });
     try {
       const res = await fetch("/api/admin/projects/site", {
         method: "POST",
@@ -858,7 +868,7 @@ export function GestionPortfolio({
   async function confirmerSuppression() {
     const projet = suppression;
     if (!projet) return;
-    setActionRapide(projet.id);
+    setActionRapide({ id: projet.id, action: "supprimer" });
     try {
       const res = await fetch("/api/admin/projects", {
         method: "DELETE",
@@ -889,7 +899,7 @@ export function GestionPortfolio({
   async function confirmerSuppressionSite() {
     const projet = suppressionSite;
     if (!projet) return;
-    setActionRapide(projet.id);
+    setActionRapide({ id: projet.id, action: "supprimer" });
     try {
       const res = await fetch("/api/admin/projects", {
         method: "DELETE",
@@ -1037,9 +1047,11 @@ export function GestionPortfolio({
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">
-            Portfolio du site
-          </h2>
+          {/* CORRECTIF 28/11 — l'espace s'appelle « Portfolio » (demande
+           *  de l'éditeur : « renomme l'espace “Portfolio du site” en
+           *  “Portfolio” ») ; les filtres « X projets publiés » /
+           *  « Y brouillons » restent cliquables. */}
+          <h2 className="font-display text-xl font-semibold text-white sm:text-2xl">Portfolio</h2>
           {/* CORRECTIF M28 — les compteurs entre parenthèses deviennent
               des FILTRES cliquables (basculer = filtrer ; recliquer =
               tout afficher). */}
@@ -1187,13 +1199,15 @@ export function GestionPortfolio({
                 </BoutonIcone>
                 {projet.statut === "publie" ? (
                   /* VOLET 22 — DÉPUBLICATION avec confirmation (le
-                     projet quitte le site, il reste dans l'espace). */
+                     projet quitte le site, il reste dans l'espace).
+                     CORRECTIF 28/11 — le chargement n'apparaît QUE sur
+                     le bouton de l'ACTION en cours (ici « dépublier »). */
                   <BoutonIcone
                     titre="Dépublier (retirer du site)"
                     onClick={() => setDepublication(projet)}
-                    disabled={actionRapide === projet.id}
+                    disabled={actionRapide?.id === projet.id}
                   >
-                    {actionRapide === projet.id ? (
+                    {actionRapide?.id === projet.id && actionRapide.action === "depublier" ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <EyeOff className="h-4 w-4" />
@@ -1203,8 +1217,11 @@ export function GestionPortfolio({
                   <BoutonIcone
                     titre="Publier sur le site"
                     onClick={async () => {
-                      if (actionRapide) return;
-                      setActionRapide(projet.id);
+                      /* CORRECTIF 28/11 — le clic n'agit que si AUCUNE
+                       * action n'est déjà en cours SUR CE projet ; les
+                       * autres projets restent utilisables. */
+                      if (actionRapide?.id === projet.id) return;
+                      setActionRapide({ id: projet.id, action: "publier" });
                       try {
                         const res = await fetch("/api/admin/projects", {
                           method: "POST",
@@ -1226,9 +1243,9 @@ export function GestionPortfolio({
                         setActionRapide(null);
                       }
                     }}
-                    disabled={actionRapide === projet.id}
+                    disabled={actionRapide?.id === projet.id}
                   >
-                    {actionRapide === projet.id ? (
+                    {actionRapide?.id === projet.id && actionRapide.action === "publier" ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <Eye className="h-4 w-4" />
@@ -1239,9 +1256,9 @@ export function GestionPortfolio({
                   titre="Supprimer définitivement"
                   ton="danger"
                   onClick={() => setSuppression(projet)}
-                  disabled={actionRapide === projet.id}
+                  disabled={actionRapide?.id === projet.id}
                 >
-                  {actionRapide === projet.id ? (
+                  {actionRapide?.id === projet.id && actionRapide.action === "supprimer" ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <Trash2 className="h-4 w-4" />
@@ -1317,9 +1334,9 @@ export function GestionPortfolio({
                 <BoutonIcone
                   titre="Dépublier (retirer du site)"
                   onClick={() => setDepublicationSite(projet)}
-                  disabled={actionRapide === projet.id}
+                  disabled={actionRapide?.id === projet.id}
                 >
-                  {actionRapide === projet.id ? (
+                  {actionRapide?.id === projet.id && actionRapide.action === "depublier" ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <EyeOff className="h-4 w-4" />
@@ -1329,9 +1346,9 @@ export function GestionPortfolio({
                   titre="Supprimer définitivement (site et espace)"
                   ton="danger"
                   onClick={() => setSuppressionSite(projet)}
-                  disabled={actionRapide === projet.id}
+                  disabled={actionRapide?.id === projet.id}
                 >
-                  {actionRapide === projet.id ? (
+                  {actionRapide?.id === projet.id && actionRapide.action === "supprimer" ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     <Trash2 className="h-4 w-4" />
@@ -1364,7 +1381,7 @@ export function GestionPortfolio({
           ) : null
         }
         libelleConfirmer="Supprimer définitivement"
-        enCours={Boolean(suppression && actionRapide === suppression.id)}
+        enCours={Boolean(suppression && actionRapide?.id === suppression.id && actionRapide.action === "supprimer")}
         onAnnuler={() => setSuppression(null)}
         onConfirmer={() => void confirmerSuppression()}
       />
@@ -1390,15 +1407,19 @@ export function GestionPortfolio({
           ) : null
         }
         libelleConfirmer="Supprimer définitivement"
-        enCours={Boolean(suppressionSite && actionRapide === suppressionSite.id)}
+        enCours={Boolean(suppressionSite && actionRapide?.id === suppressionSite.id && actionRapide.action === "supprimer")}
         onAnnuler={() => setSuppressionSite(null)}
         onConfirmer={() => void confirmerSuppressionSite()}
       />
 
       {/* VOLET 22 — DÉPUBLICATION d'un projet administré : il quitte
-          le site public mais reste dans cet espace (brouillon). */}
+          le site public mais reste dans cet espace (brouillon).
+          CORRECTIF 28/11 — alerte JAUNE (demande de l'éditeur) : la
+          dépublication ne supprime RIEN ; le rouge reste réservé aux
+          suppressions. */}
       <ModaleConfirmation
         ouvert={Boolean(depublication)}
+        ton="jaune"
         titre={`Dépublier « ${depublication?.nom ?? ""} » ?`}
         message={
           depublication ? (
@@ -1408,7 +1429,7 @@ export function GestionPortfolio({
                 <strong className="text-white">retiré du site public</strong> : les visiteurs
                 ne le verront plus au portfolio ni sur sa page projet.
               </p>
-              <p className="mt-3 rounded-lg border border-[#ea384c]/30 bg-[#ea384c]/10 px-3.5 py-2.5 text-[13px] text-[#ffdede]">
+              <p className="mt-3 rounded-lg border border-[#f5b700]/30 bg-[#f5b700]/10 px-3.5 py-2.5 text-[13px] text-[#ffe9a3]">
                 Attention : tant qu&apos;il restera dépublié, cette réalisation sera invisible
                 pour vos futurs clients.
               </p>
@@ -1419,15 +1440,17 @@ export function GestionPortfolio({
           ) : null
         }
         libelleConfirmer="Dépublier du site"
-        enCours={Boolean(depublication && actionRapide === depublication.id)}
+        enCours={Boolean(depublication && actionRapide?.id === depublication.id && actionRapide.action === "depublier")}
         onAnnuler={() => setDepublication(null)}
         onConfirmer={() => void confirmerDepublication()}
       />
 
       {/* VOLET 22 — DÉPUBLICATION d'une réalisation du site
-          (conversion en brouillon administré). */}
+          (conversion en brouillon administré) — alerte JAUNE comme
+          toute dépublication (correctif 28/11). */}
       <ModaleConfirmation
         ouvert={Boolean(depublicationSite)}
+        ton="jaune"
         titre={`Dépublier « ${depublicationSite?.name ?? ""} » ?`}
         message={
           depublicationSite ? (
@@ -1437,7 +1460,7 @@ export function GestionPortfolio({
                 sera <strong className="text-white">retirée du site public</strong> : les
                 visiteurs ne la verront plus au portfolio ni sur sa page projet.
               </p>
-              <p className="mt-3 rounded-lg border border-[#ea384c]/30 bg-[#ea384c]/10 px-3.5 py-2.5 text-[13px] text-[#ffdede]">
+              <p className="mt-3 rounded-lg border border-[#f5b700]/30 bg-[#f5b700]/10 px-3.5 py-2.5 text-[13px] text-[#ffe9a3]">
                 Attention : tant qu&apos;elle restera dépubliée, cette réalisation sera
                 invisible pour vos futurs clients.
               </p>
@@ -1449,7 +1472,7 @@ export function GestionPortfolio({
           ) : null
         }
         libelleConfirmer="Dépublier du site"
-        enCours={Boolean(depublicationSite && actionRapide === depublicationSite.id)}
+        enCours={Boolean(depublicationSite && actionRapide?.id === depublicationSite.id && actionRapide.action === "depublier")}
         onAnnuler={() => setDepublicationSite(null)}
         onConfirmer={() => void confirmerDepublicationSite()}
       />

@@ -359,14 +359,9 @@ export function GenerateurProposition({
               onChange={(e) => majSection("presentation", bornerPresentation(e.target.value.split("\n")))}
             />
           </Champ>
-          {/* VOLET 24 — la présentation ne DÉPASSE JAMAIS la première
-              page (budget mesuré) : 4 paragraphes, 215 car./paragraphe,
-              750 au total, 10 lignes. */}
-          <p className="mt-3 text-xs leading-relaxed text-[#c8c8c8]/80">
-            La présentation peut remplir la première page jusqu'au pied — sans jamais la
-            dépasser&nbsp;: la saisie s'arrête au maximum affiché (4 paragraphes, 750
-            caractères, 10 lignes — la quantité du modèle par défaut).
-          </p>
+          {/* CORRECTIF 28/11 — le texte d'aide sous le champ de
+              présentation est SUPPRIMÉ (demande de l'éditeur) : le
+              compteur du champ suffit. */}
         </Carte>
 
         {/* 02 Objectifs */}

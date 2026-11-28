@@ -95,7 +95,7 @@ export function BoutonAction({
 }: {
   children: React.ReactNode;
   onClick?: () => void;
-  variant?: "principal" | "secondaire" | "danger";
+  variant?: "principal" | "secondaire" | "danger" | "attention";
   disabled?: boolean;
   titre?: string;
   className?: string;
@@ -107,6 +107,11 @@ export function BoutonAction({
       "border-[#e4e4e4]/25 text-white hover:border-[#e4e4e4] font-normal",
     danger:
       "border-[#ea384c]/40 text-[#ffdede] hover:border-[#ea384c] font-normal",
+    /* CORRECTIF 28/11 — variante JAUNE pour les confirmations de
+     * DÉPUBLICATION (alerte sans gravité — rien n'est supprimé) : la
+     * couleur rouge reste réservée aux suppressions. */
+    attention:
+      "border-[#f5b700]/45 text-[#ffe9a3] hover:border-[#f5b700] font-normal",
   };
   return (
     <button
@@ -209,6 +214,12 @@ export function BoutonIcone({
  * occupe sa propre ligne AU-DESSUS du titre, centrée ; le titre est
  * centré lui aussi, le message reste aligné à gauche (lisibilité des
  * avertissements en cascade).
+ * CORRECTIF 28/11 — `ton="jaune"` : la modale de DÉPUBLICATION
+ * devient une alerte JAUNE (demande de l'éditeur : « lorsqu'on
+ * clique sur le bouton Dépublier, le modal qui s'ouvre a une couleur
+ * d'alerte rouge. Non, je veux que ça soit une couleur d'alerte
+ * jaune »). La suppression (rouge, irréversible) reste `ton` par
+ * défaut ; le bouton de confirmation suit le ton.
  * ------------------------------------------------------------------ */
 export function ModaleConfirmation({
   ouvert,
@@ -217,6 +228,7 @@ export function ModaleConfirmation({
   libelleAnnuler = "Annuler",
   libelleConfirmer = "Supprimer",
   enCours = false,
+  ton = "rouge",
   onAnnuler,
   onConfirmer,
 }: {
@@ -228,10 +240,14 @@ export function ModaleConfirmation({
   libelleAnnuler?: string;
   libelleConfirmer?: string;
   enCours?: boolean;
+  /** Couleur d'alerte : "rouge" (suppression — défaut) ou "jaune"
+   *  (dépublication : rien n'est effacé). */
+  ton?: "rouge" | "jaune";
   onAnnuler: () => void;
   onConfirmer: () => void;
 }) {
   if (!ouvert) return null;
+  const jaune = ton === "jaune";
   return (
     <div
       className="fixed inset-0 z-[90] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
@@ -241,10 +257,19 @@ export function ModaleConfirmation({
       onClick={(e) => e.target === e.currentTarget && !enCours && onAnnuler()}
     >
       <div className="w-full max-w-md rounded-2xl border border-[#e4e4e4]/15 bg-[#232323] p-6 sm:p-7">
-        {/* Icône d'alerte — ROUGE, CENTRÉE horizontalement (VOLET 22). */}
+        {/* Icône d'alerte — CENTRÉE horizontalement (VOLET 22) ;
+            ROUGE (suppression) ou JAUNE (dépublication — correctif
+            28/11 : le retrait du site n'efface rien). */}
         <div className="flex justify-center">
-          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#ea384c]/12">
-            <AlertTriangle className="h-7 w-7 text-[#ea384c]" aria-hidden="true" />
+          <span
+            className={`flex h-14 w-14 items-center justify-center rounded-full ${
+              jaune ? "bg-[#f5b700]/12" : "bg-[#ea384c]/12"
+            }`}
+          >
+            <AlertTriangle
+              className={`h-7 w-7 ${jaune ? "text-[#f5b700]" : "text-[#ea384c]"}`}
+              aria-hidden="true"
+            />
           </span>
         </div>
         <h3 className="mt-4 text-center font-display text-lg font-semibold text-white">{titre}</h3>
@@ -253,7 +278,7 @@ export function ModaleConfirmation({
           <BoutonAction onClick={onAnnuler} disabled={enCours}>
             {libelleAnnuler}
           </BoutonAction>
-          <BoutonAction variant="danger" onClick={onConfirmer} disabled={enCours}>
+          <BoutonAction variant={jaune ? "attention" : "danger"} onClick={onConfirmer} disabled={enCours}>
             {enCours ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : null}
             {libelleConfirmer}
           </BoutonAction>

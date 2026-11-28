@@ -114,32 +114,41 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    /* ---- 1. Lecture du HTML du site (timeout 20 s, 3 Mo max) ---- */
-    const controle = new AbortController();
-    const minuteur = setTimeout(() => controle.abort(), 20000);
-    let html = "";
-    try {
-      const res = await fetch(destination.toString(), {
-        signal: controle.signal,
-        redirect: "follow",
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
-          Accept: "text/html,application/xhtml+xml",
-          "Accept-Language": "fr,en;q=0.8",
-        },
-      });
-      html = (await res.text()).slice(0, 3_000_000);
-    } finally {
-      clearTimeout(minuteur);
-    }
+    /* ---- 1 + 3. EN PARALLÈLE (CORRECTIF 28/11 — le scraping prenait
+         trop de temps : la page était chargée DEUX FOIS de suite,
+         d'abord pour lire le HTML, puis pour les captures) : la
+         lecture du HTML et la capture des aperçus partent EN MÊME
+         TEMPS ; l'extraction des informations se fait sur le HTML
+         pendant que les captures se préparent. ---- */
+    const [htmlOuErreur, captures] = await Promise.all([
+      (async (): Promise<string> => {
+        const controle = new AbortController();
+        const minuteur = setTimeout(() => controle.abort(), 20000);
+        try {
+          const res = await fetch(destination.toString(), {
+            signal: controle.signal,
+            redirect: "follow",
+            headers: {
+              "User-Agent":
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
+              Accept: "text/html,application/xhtml+xml",
+              "Accept-Language": "fr,en;q=0.8",
+            },
+          });
+          return (await res.text()).slice(0, 3_000_000);
+        } finally {
+          clearTimeout(minuteur);
+        }
+      })().catch(() => ""),
+      capturerMockups(destination.toString()),
+    ]);
+    const html = htmlOuErreur;
 
     /* ---- 2. Extraction des informations ---- */
     const titreBalise = nettoyer(html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1], 140);
     const h1 = nettoyer(html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1]?.replace(/<[^>]+>/g, " "), 140);
     const ogSiteName = lireMeta(html, ["og:site_name", "twitter:site_name"]);
     const ogTitre = lireMeta(html, ["og:title", "twitter:title"]);
-
     /* Nom du projet : nom du SITE (og:site_name → <title> → hôte). */
     const hote = destination.hostname.replace(/^www\./, "");
     const nomBrut = ogSiteName || titreBalise || hote;
@@ -167,9 +176,6 @@ export async function POST(req: NextRequest) {
       titre = nettoyer(description.split(/[.!?]/)[0], 70);
     }
     if (!titre) titre = "Site web professionnel";
-
-    /* ---- 3. Captures ordinateur + mobile (même moteur que les PDF) ---- */
-    const captures = await capturerMockups(destination.toString());
 
     return NextResponse.json({
       ok: true,

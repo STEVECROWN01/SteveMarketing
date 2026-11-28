@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { FileCheck2, Inbox, Languages, Loader2, Plus, Save, Sparkles, Trash2 } from "lucide-react";
+import { FileCheck2, Inbox, Languages, Loader2, Plus, Sparkles, Trash2 } from "lucide-react";
 import { ApercuDocument } from "./ApercuDocument";
 import { EditeurTexteRiche } from "./EditeurTexteRiche";
 import { BoutonAction, Carte, Champ, Pastille, TitreSection, styleInput, styleInputDate } from "./elements";
@@ -157,7 +157,6 @@ export function GenerateurDocument({
     etatInitial(docType, prochainNumero, initial, preRemplissage),
   );
   const [generation, setGeneration] = useState(false);
-  const [enregistrement, setEnregistrement] = useState(false);
 
   const enEdition = Boolean(initial);
   const libelle = docType === "proposition" ? "Proposition" : "Devis";
@@ -292,41 +291,6 @@ export function GenerateurDocument({
       });
     } finally {
       setGeneration(false);
-    }
-  }
-
-  async function enregistrerSeul() {
-    if (enregistrement) return;
-    setEnregistrement(true);
-    try {
-      const res = await fetch("/api/documents", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          document: corpsDocument(),
-        }),
-      });
-      if (res.status === 401) {
-        sessionExpiree?.();
-        return;
-      }
-      const data = await res.json().catch(() => null);
-      if (!res.ok || !data?.ok) {
-        throw new Error(data?.error ?? "Enregistrement impossible.");
-      }
-      toast({
-        title: `${enEdition ? "Mis à jour" : "Enregistré"} : ${numero}`,
-        description: "Le document est disponible dans les listes.",
-      });
-      onEnregistre();
-    } catch (e) {
-      toast({
-        title: "Enregistrement impossible",
-        description: e instanceof Error ? e.message : undefined,
-        variant: "destructive",
-      });
-    } finally {
-      setEnregistrement(false);
     }
   }
 
@@ -584,9 +548,12 @@ export function GenerateurDocument({
           </div>
         </Carte>
 
-        {/* Actions — VOLET 20 : la génération ENREGISTRE le document
-            (stockage + copie email) SANS le télécharger ; le
-            téléchargement vit dans la liste (bouton dédié). */}
+        {/* Actions — CORRECTIF 28/11 (retour de l'éditeur) : UN SEUL
+            bouton d'action. « Générer le devis » fait TOUT le travail :
+            il génère le document, l'enregistre dans le dossier du
+            stockage (GitHub), envoie une copie par email et l'ajoute à
+            l'espace admin. Le bouton « Enregistrer seulement » est
+            SUPPRIMÉ ; reste aussi « Charger l'exemple-modèle ». */}
         <div className="flex flex-wrap items-center gap-3">
           <BoutonAction
             variant="principal"
@@ -601,13 +568,9 @@ export function GenerateurDocument({
             ) : (
               <>
                 <FileCheck2 className="h-4 w-4" aria-hidden="true" />
-                Générer le document
+                {docType === "devis" ? "Générer le devis" : `Générer la ${libelle.toLowerCase()}`}
               </>
             )}
-          </BoutonAction>
-          <BoutonAction onClick={enregistrerSeul} disabled={enregistrement || !stockageConfigure} titre={stockageConfigure ? undefined : "Stockage non configuré (GITHUB_DOCS_TOKEN)"}>
-            {enregistrement ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="h-4 w-4" aria-hidden="true" />}
-            Enregistrer seulement
           </BoutonAction>
           <BoutonAction onClick={chargerExemple}>
             <Sparkles className="h-4 w-4" aria-hidden="true" />
@@ -618,9 +581,10 @@ export function GenerateurDocument({
           </Pastille>
         </div>
         <p className="text-xs leading-relaxed text-[#c8c8c8]/80">
-          « Générer le document » l&apos;enregistre dans votre back-office et vous en
-          envoie une copie par email — le téléchargement se fait depuis la liste
-          (bouton dédié, avec choix de la version pour les devis).
+          « Générer le devis » fait tout le travail : il génère le document, l&apos;enregistre
+          dans le dossier du stockage, vous en envoie une copie par email et l&apos;ajoute à
+          votre espace admin — le téléchargement se fait depuis la liste (bouton dédié,
+          avec choix de la version pour les devis).
         </p>
       </div>
 

@@ -18,6 +18,7 @@ import {
   Loader2,
   LogOut,
   Plus,
+  Radar,
   Receipt,
   RefreshCw,
   ShieldCheck,
@@ -31,6 +32,7 @@ import { ListeDocuments } from "@/components/admin/ListeDocuments";
 import { ApercuDocument } from "@/components/admin/ApercuDocument";
 import { EspaceFacture } from "@/components/admin/EspaceFacture";
 import { GestionPortfolio } from "@/components/admin/GestionPortfolio";
+import { EspaceScraping } from "@/components/admin/EspaceScraping";
 import { BoutonAction, Carte, Pastille } from "@/components/admin/elements";
 import type { DocumentRecord } from "@/lib/documents/types";
 import { estPropositionV2, type PropositionRecord } from "@/lib/documents/proposition";
@@ -71,7 +73,7 @@ import { preRemplissageDevisDepuisProposition } from "@/lib/documents/devis-depu
  * visible au survol) ; bouton « Ouvrir L'Espace ».
  */
 
-type Section = "tableau" | "demandes" | "propositions" | "devis" | "factures" | "portfolio";
+type Section = "tableau" | "demandes" | "propositions" | "devis" | "factures" | "portfolio" | "scraping";
 /** Vue courante des rubriques documents : liste / création / édition. */
 type VueDocs = "liste" | "creation" | "edition";
 /** Vue courante de la rubrique factures : liste / sélection du devis. */
@@ -1081,11 +1083,12 @@ export function AdminPage() {
     devis: documents.filter((d) => d.docType === "devis").length,
     factures: documents.filter((d) => d.docType === "facture").length,
     propositions: documents.filter((d) => d.docType === "proposition").length,
-    /* VOLET 24 — PORTFOLIO : nombre TOTAL de projets PRÉSENTÉS SUR LE
-     *  SITE = projets administrés PUBLIÉS + réalisations du site
-     *  encore en place (mêmes règles que l'espace Portfolio). */
+    /* CORRECTIF 28/11 — le compteur de l'option « Portfolio » est le
+     *  TOTAL des projets CONTENUS DANS L'ESPACE (publiés ET
+     *  brouillons — demande de l'éditeur) : projets administrés
+     *  (tous statuts) + réalisations du site encore en place. */
     portfolio:
-      projetsPortfolio.filter((p) => p.statut === "publie").length +
+      projetsPortfolio.length +
       (PROJETS_SITE as readonly { id: string }[]).filter(
         (p) =>
           !projetsPortfolio.some((x) => x.id === p.id) &&
@@ -1154,7 +1157,13 @@ export function AdminPage() {
     { key: "propositions", label: "Propositions commerciales", icone: <Handshake className="h-4 w-4" aria-hidden="true" />, compteur: nb.propositions },
     { key: "devis", label: "Devis", icone: <FileText className="h-4 w-4" aria-hidden="true" />, compteur: nb.devis },
     { key: "factures", label: "Factures", icone: <Receipt className="h-4 w-4" aria-hidden="true" />, compteur: nb.factures },
-    { key: "portfolio", label: "Portfolio du site", icone: <Briefcase className="h-4 w-4" aria-hidden="true" />, compteur: nb.portfolio },
+    /* CORRECTIF 28/11 — l'option s'appelle « Portfolio » (demande de
+     *  l'éditeur) ; son compteur est le TOTAL des projets de l'espace
+     *  (publiés + brouillons). VOLET 27 — nouvelle rubrique
+     *  « Scraping » : prospection d'entreprises (Google Maps,
+     *  Instagram, LinkedIn). */
+    { key: "portfolio", label: "Portfolio", icone: <Briefcase className="h-4 w-4" aria-hidden="true" />, compteur: nb.portfolio },
+    { key: "scraping", label: "Scraping", icone: <Radar className="h-4 w-4" aria-hidden="true" /> },
   ];
 
   /* En-tête commun des rubriques de liste (titre + bouton créer). */
@@ -1611,6 +1620,17 @@ export function AdminPage() {
             onMajProjet={majProjetPortfolio}
             onSupprimeProjet={supprimerProjetPortfolio}
           />
+        )}
+
+        {/* ---------------- SCRAPING (VOLET 27) ----------------
+            Prospection d'entreprises pour le service de web design :
+            trois outils de scraping (fiches d'entreprises par lieu et
+            niche « Google Maps », pages d'entreprises Instagram,
+            pages d'entreprises LinkedIn) avec les coordonnées
+            (email, téléphone, site web, localisation, employés…) et
+            les filtres avec / sans site web. */}
+        {section === "scraping" && (
+          <EspaceScraping stockageConfigure={stockageConfigure} toast={toast} sessionExpiree={sessionExpiree} />
         )}
 
         {/* Note de bas d'espace — VOLET 15 : message court et
