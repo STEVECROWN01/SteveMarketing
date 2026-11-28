@@ -5,6 +5,7 @@ import { genererXlsx } from "@/lib/xlsx/minimal";
 import type { EntrepriseScraped } from "@/lib/scraping/types";
 import type { ClasseurProspects, LotProspects, ProspectEnregistre, StatutProspect } from "@/lib/prospects/types";
 import { statutLibelle } from "@/lib/prospects/types";
+import { VERDICTS_LIBELLES } from "@/lib/scraping/qualite-site";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -72,6 +73,7 @@ function construireXlsx(classeur: ClasseurProspects): Buffer {
     "Ville",
     "Pays",
     "Site web",
+    "Qualité du site",
     "Niche",
     "Statut",
     "Horaires",
@@ -100,6 +102,13 @@ function construireXlsx(classeur: ClasseurProspects): Buffer {
         p.localisation ?? "",
         p.pays ?? "",
         p.siteWeb ?? "Sans site web",
+        /* VOLET 32 — le diagnostic du site au moment du scraping :
+           score, verdict, plateforme et année. */
+        p.qualiteSite
+          ? `${p.qualiteSite.score}/100 — ${VERDICTS_LIBELLES[p.qualiteSite.verdict].replace(/^Site /, "")}${p.qualiteSite.plateforme ? ` (${p.qualiteSite.plateforme}` : ""}${p.qualiteSite.anneeMiseAJour ? `, ${p.qualiteSite.anneeMiseAJour}` : ""}${p.qualiteSite.plateforme ? ")" : ""}`
+          : p.siteWeb
+            ? "Diagnostic indisponible"
+            : "Sans site web",
         p.niche ?? "",
         statutLibelle(p.statut),
         p.horaires ?? "",
@@ -113,7 +122,7 @@ function construireXlsx(classeur: ClasseurProspects): Buffer {
     {
       nom: "Prospects",
       lignes,
-      largeurs: [28, 22, 28, 18, 34, 18, 14, 30, 24, 16, 28, 12, 16, 18],
+      largeurs: [28, 22, 28, 18, 34, 18, 14, 30, 30, 24, 16, 28, 12, 16, 18],
     },
   ]);
 }
@@ -154,6 +163,8 @@ function versProspectEnregistre(e: EntrepriseScraped, importeLe: string, id: str
     anciennete: e.anciennete,
     employes: e.employes,
     bio: e.bio,
+    /* VOLET 32 — le diagnostic du site suit le prospect. */
+    qualiteSite: e.qualiteSite,
     statut: "non-contacte",
     source: e.source,
     urlSource: e.urlSource,

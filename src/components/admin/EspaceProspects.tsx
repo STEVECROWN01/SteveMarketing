@@ -5,6 +5,7 @@ import { Globe, Loader2, RefreshCw, Users } from "lucide-react";
 import { BoutonAction, Carte, Pastille } from "./elements";
 import type { LotProspects, ProspectEnregistre, StatutProspect } from "@/lib/prospects/types";
 import { STATUTS_PROSPECT, statutCouleur } from "@/lib/prospects/types";
+import { VERDICTS_LIBELLES } from "@/lib/scraping/qualite-site";
 
 /**
  * VOLET 29 (28/11/2026) — ESPACE « PROSPECTS » DU BACK-OFFICE.
@@ -295,17 +296,38 @@ export function EspaceProspects({
                         <td className="max-w-[200px] px-3 py-3 text-xs leading-snug text-[#c8c8c8]">
                           {texteOu(p.adresse, "—")}
                         </td>
-                        {/* Site web */}
+                        {/* Site web — VOLET 32 : le diagnostic de la
+                            qualité du site suit le prospect (score,
+                            verdict, plateforme). */}
                         <td className="max-w-[160px] px-3 py-3 text-xs">
                           {p.siteWeb ? (
-                            <a
-                              href={p.siteWeb}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 break-all text-[#e4e4e4] underline decoration-[#e4e4e4]/40 underline-offset-2 hover:decoration-[#e4e4e4]"
-                            >
-                              {p.siteWeb.replace(/^https?:\/\//, "").replace(/\/$/, "").slice(0, 30)}
-                            </a>
+                            <>
+                              <a
+                                href={p.siteWeb}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 break-all text-[#e4e4e4] underline decoration-[#e4e4e4]/40 underline-offset-2 hover:decoration-[#e4e4e4]"
+                              >
+                                {p.siteWeb.replace(/^https?:\/\//, "").replace(/\/$/, "").slice(0, 30)}
+                              </a>
+                              {p.qualiteSite ? (
+                                <span
+                                  className="mt-1 block text-[10px] font-medium"
+                                  style={{
+                                    color:
+                                      p.qualiteSite.verdict === "a-refaire"
+                                        ? "#ff8080"
+                                        : p.qualiteSite.verdict === "moyen"
+                                          ? "#ffe9a3"
+                                          : "#86efac",
+                                  }}
+                                  title={p.qualiteSite.problemes.join(" · ")}
+                                >
+                                  {p.qualiteSite.score}/100 — {VERDICTS_LIBELLES[p.qualiteSite.verdict].replace(/^Site /, "")}
+                                  {p.qualiteSite.plateforme ? ` · ${p.qualiteSite.plateforme}` : ""}
+                                </span>
+                              ) : null}
+                            </>
                           ) : (
                             <span className="text-[#c8c8c8]/50">Sans site web</span>
                           )}

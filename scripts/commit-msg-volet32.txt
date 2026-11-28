@@ -1,0 +1,28 @@
+VOLET 32 (29/11/2026) — LE SCRAPING « GOOGLE MAPS » TROUVE AUSSI LES ENTREPRISES DONT LE SITE A DE VRAIS PROBLÈMES : DIAGNOSTIC DE QUALITÉ DU SITE WEB DE CHAQUE PROSPECT (SCORE, VERDICT, PLATEFORME, ANNÉE, PROBLÈMES) + FILTRES ET TRI DES RÉSULTATS
+
+LA DEMANDE : analyser un outil de scraping qui trouve des clients par les sites « moches » — « comprends ce que ça fait, les fonctionnalités, comment ça obtient les données, comment ça présente les informations — et copie ça pour améliorer notre scraping Google Maps. Je ne t'ai pas dit de supprimer les autres systèmes, mais de voir comment eux ils ont fait pour améliorer le nôtre, que ce soit encore plus fort ».
+
+CE QUE FAIT L'OUTIL ANALYSÉ (méthode relevée, fonctionnalité par fonctionnalité) : il scanne les entreprises locales par ville et industrie pour trouver celles dont le SITE A DE VRAIS PROBLÈMES (sites obsolètes, mauvais SEO) — chaque résultat porte le contact, la PLATEFORME du site, l'ANNÉE de dernière mise à jour, un SCORE DE QUALITÉ (« à refaire » ou correct) et la liste des ERREURS à résoudre — plus le SÉLECTEUR de « qui contacter d'abord » (avec/sans site, avec email, les plus moches d'abord). Notre outil copie cette méthode, dans notre design et en français.
+
+LE DIAGNOSTIC DE QUALITÉ (nouveau fichier src/lib/scraping/qualite-site.ts) : pour chaque entreprise qui a un site web, UNE SEULE lecture de sa page d'accueil (la même lecture sert AUSSI au nom du dirigeant et à l'email — plus de double chargement) détermine :
+ - la PLATEFORME du site : WordPress, Wix, Shopify, Squarespace, Webflow, Joomla, Drupal, PrestaShop, GoDaddy, Jimdo, Weebly, Duda, Odoo, E-monsite, SiteW, Blogger, Carrd, Tilda, Ghost (ou la balise generator) ;
+ - l'ANNÉE de dernière mise à jour (dernière année de copyright) ;
+ - ce qui MANQUE : HTTPS (navigateur « non sécurisé »), version MOBILE (viewport), titre de page, description Google, titre principal H1 ;
+ - le POIDS de la page, les technologies mortes (Flash, frames) ;
+ - le SCORE 0-100 et le VERDICT : « À refaire » (< 55), « Moyen » (< 75), « Correct » — et la LISTE DES PROBLÈMES en français, dans l'ordre d'importance, prête pour la prospection ;
+ - l'EMAIL de l'entreprise s'il figure sur la page (mailto ou texte — les emails d'images et techniques ignorés).
+ Tout est borné : au plus 12 sites, par vagues de 4, dans un budget de temps — un site muet reste sans diagnostic, JAMAIS d'échec du scraping.
+
+LA VUE RÉSULTATS DE L'OUTIL « GOOGLE MAPS » :
+ - chaque prospect avec un site porte un BADGE de qualité (score /100 + verdict, vert/orange/rouge) à côté du badge « Site web » ;
+ - « Voir les détails » déplie en plus : Qualité du site web, Plateforme du site, Dernière mise à jour du site, et le BLOC « Diagnostic du site web — ce que vous pouvez résoudre » avec la liste des problèmes ;
+ - FILTRES de résultats (jeu fixe, comptés) : Tous · Sans site web · À refaire (sites à refaire + sans site — les meilleurs prospects) · Avec email ;
+ - TRI : Ordre de la recherche · Qualité du site — la pire d'abord · Nom (A → Z) ;
+ - le compteur « X sites à refaire » est affiché en tête ; « Tout sélectionner » porte sur la liste AFFICHÉE (l'index d'origine suit chaque prospect : la sélection ne se perd jamais au filtre) ;
+ - le CSV exporte les NOUVELLES colonnes : Plateforme du site, Dernière mise à jour, Score du site, Verdict du site, Problèmes du site.
+
+LE DIAGNOSTIC SUIT LE PROSPECT : l'import vers l'espace Prospects emmène le diagnostic (prospects.json), le classeur Excel gagne la colonne « Qualité du site » (score, verdict, plateforme, année), et le tableau des prospects l'affiche sous le lien du site (score coloré + info-bulle des problèmes).
+
+AU PASSAGE — CORRECTIF TypeScript (route /api/admin/leads) : la normalisation des dates Prisma (objet Date → chaîne ISO) passe par un cast explicite (instanceof sur un champ typé chaîne refusé par tsc).
+
+VÉRIFICATIONS : TESTS QUALITÉ SITE : 23/23 (vieux site HTTP/frameset/Flash/2014 → « à refaire » ; site moderne HTTPS/viewport/description/2026 → « correct » 95-100 ; site moyen sans description/H1/2021/WordPress → « moyen » ; emails d'images et Sentry ignorés ; hiérarchie des scores) + RECHERCHE RÉELLE : hôtels à Paris — scores réels, WordPress détecté, années réelles, emails trouvés, problèmes réels listés (ex. « Le Robinet d'Or » : 55/100, pas de HTTPS, description Google manquante) + SONDE VOLET 32 : 13/13 (interface DÉTERMINISTE : la réponse de l'API est interceptée par un jeu de données fixe de 8 entreprises — badges, filtres, tri, diagnostic déplié, compteurs) + SONDE VOLET 29 REPASSÉE : 33/33 + SONDE VOLET 30 : 23/23 + AUDIT RESPONSIF REPASSÉ : 143/143 + contrôle visuel des captures.

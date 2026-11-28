@@ -57,6 +57,11 @@ export type EntrepriseScraped = {
   contact?: string;
   /** Lien de la fiche d'origine (page publique). */
   urlSource?: string;
+  /** VOLET 32 — diagnostic de la qualité du site web (quand la
+   *  page d'accueil a pu être lue) : plateforme, année de mise à
+   *  jour, HTTPS, mobile, score 0-100, verdict et problèmes —
+   *  c'est le « pourquoi ce prospect a besoin de vous ». */
+  qualiteSite?: import("./qualite-site").QualiteSite;
   /** Le site web est-il présent ? (calculé par l'outil) */
   siteWebPresent: boolean;
 };

@@ -138,8 +138,15 @@ function chercherDansTexte(html: string): string | undefined {
 }
 
 /** Cherche le nom du dirigeant sur le site web d'une entreprise.
- *  Retourne undefined si le site ne le révèle pas (ce n'est pas grave). */
-export async function chercherDirigeant(siteWeb: string | undefined): Promise<string | undefined> {
+ *  Retourne undefined si le site ne le révèle pas (ce n'est pas grave).
+ *  VOLET 32 — `htmlAccueil` : le HTML de la page d'accueil DÉJÀ
+ *  téléchargé (le diagnostic du site le lit) — évite de la
+ *  télécharger deux fois ; les pages « équipe » restent
+ *  explorées ensuite seulement si l'accueil n'a rien donné. */
+export async function chercherDirigeant(
+  siteWeb: string | undefined,
+  htmlAccueil?: string,
+): Promise<string | undefined> {
   if (!siteWeb) return undefined;
   let base: URL;
   try {
@@ -147,8 +154,14 @@ export async function chercherDirigeant(siteWeb: string | undefined): Promise<st
   } catch {
     return undefined;
   }
-  /* La page d'accueil d'abord — puis au plus 4 pages d'équipe. */
-  const pages: string[] = [base.toString()];
+  /* L'accueil (fourni ou téléchargé) — puis au plus 4 pages d'équipe. */
+  const pages: string[] = [];
+  if (htmlAccueil !== undefined) {
+    const trouve = chercherDansTexte(htmlAccueil.slice(0, 400_000));
+    if (trouve) return trouve;
+  } else {
+    pages.push(base.toString());
+  }
   for (const chemin of CHEMINS_EQUIPE) {
     if (pages.length >= 5) break;
     pages.push(new URL(chemin, base).toString());

@@ -2,12 +2,15 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
+  AlertTriangle,
   Building2,
   CalendarDays,
   CheckSquare,
   ChevronDown,
   Download,
+  Gauge,
   Globe,
+  Layers,
   Loader2,
   Mail,
   MapPin,
@@ -18,6 +21,7 @@ import {
 } from "lucide-react";
 import { BoutonAction, Carte, Champ, ModaleContenu, Pastille, TitreSection, styleInput } from "./elements";
 import type { EntrepriseScraped } from "@/lib/scraping/types";
+import { VERDICTS_LIBELLES, VERDICTS_TONS, type VerdictSite } from "@/lib/scraping/qualite-site";
 import {
   CATEGORIES_PROSPECTION,
   NICHES_PROSPECTION,
@@ -65,6 +69,8 @@ type ReponseScraping = {
   entreprises: EntrepriseScraped[];
   totalTrouvees: number;
   sansSiteWeb: number;
+  /* VOLET 32 — combien de sites jugés « à refaire » (score < 55). */
+  sitesARefaire?: number;
   avertissement?: string;
   error?: string;
 };
@@ -325,6 +331,15 @@ function CarteEntreprise({
             ) : (
               <Pastille ton="alerte">Sans site web</Pastille>
             )}
+            {/* VOLET 32 — LE DIAGNOSTIC DU SITE : score 0-100 + verdict
+                (À refaire / Moyen / Correct) — le prospect idéal d'un
+                service de création de sites est l'entreprise DONT LE
+                SITE A DE VRAIS PROBLÈMES. */}
+            {entreprise.qualiteSite ? (
+              <Pastille ton={VERDICTS_TONS[entreprise.qualiteSite.verdict]}>
+                {VERDICTS_LIBELLES[entreprise.qualiteSite.verdict]} · {entreprise.qualiteSite.score}/100
+              </Pastille>
+            ) : null}
           </div>
           <p className="mt-1 text-xs text-[#c8c8c8]">{entreprise.niche}</p>
           {entreprise.localisation || entreprise.pays ? (
@@ -402,12 +417,64 @@ function CarteEntreprise({
               libelle="Heures de travail"
               valeur={entreprise.horaires}
             />
+            {/* VOLET 32 — le diagnostic du site web du prospect. */}
+            <Donnee
+              icone={<Gauge className="h-3.5 w-3.5" aria-hidden="true" />}
+              libelle="Qualité du site web"
+              valeur={
+                entreprise.qualiteSite
+                  ? `${entreprise.qualiteSite.score}/100 — ${VERDICTS_LIBELLES[entreprise.qualiteSite.verdict].replace(/^Site /, "")}`
+                  : entreprise.siteWebPresent
+                    ? "Diagnostic indisponible (site muet)"
+                    : null
+              }
+            />
+            <Donnee
+              icone={<Layers className="h-3.5 w-3.5" aria-hidden="true" />}
+              libelle="Plateforme du site"
+              valeur={entreprise.qualiteSite?.plateforme}
+            />
+            <Donnee
+              icone={<CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />}
+              libelle="Dernière mise à jour du site"
+              valeur={entreprise.qualiteSite?.anneeMiseAJour ? String(entreprise.qualiteSite.anneeMiseAJour) : null}
+            />
             <Donnee
               icone={<Building2 className="h-3.5 w-3.5" aria-hidden="true" />}
               libelle="Ce qu'ils font"
               valeur={entreprise.bio ?? entreprise.niche}
             />
           </div>
+          {/* VOLET 32 — LE DIAGNOSTIC DU SITE : les problèmes trouvés,
+              en français, dans l'ordre d'importance — ce que VOUS
+              pouvez résoudre pour ce prospect. */}
+          {entreprise.qualiteSite ? (
+            <div className="mt-3 rounded-xl border border-[#e4e4e4]/10 bg-[#1c1c1c] p-3.5">
+              <p className="flex items-center gap-2 text-[11px] font-semibold tracking-[0.12em] text-[#c8c8c8]/70 uppercase">
+                <AlertTriangle className="h-3.5 w-3.5" aria-hidden="true" />
+                Diagnostic du site web — ce que vous pouvez résoudre
+              </p>
+              {entreprise.qualiteSite.problemes.length > 0 ? (
+                <ul className="mt-2 space-y-1.5">
+                  {entreprise.qualiteSite.problemes.map((p) => (
+                    <li key={p} className="flex items-start gap-2 text-xs leading-relaxed text-[#d9d9d9]">
+                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#ff8080]" aria-hidden="true" />
+                      {p}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-xs leading-relaxed text-[#86efac]">
+                  Aucun problème détecté sur la page d'accueil — un site déjà bien tenu.
+                </p>
+              )}
+              <p className="mt-2.5 text-[10px] leading-relaxed text-[#c8c8c8]/50">
+                Page d'accueil uniquement : {entreprise.qualiteSite.poidsKo} Ko de HTML
+                {entreprise.qualiteSite.plateforme ? ` · construit avec ${entreprise.qualiteSite.plateforme}` : ""}
+                {entreprise.qualiteSite.anneeMiseAJour ? ` · dernière mise à jour visible : ${entreprise.qualiteSite.anneeMiseAJour}` : ""}.
+              </p>
+            </div>
+          ) : null}
           {entreprise.urlSource ? (
             <p className="mt-3 text-[11px] text-[#c8c8c8]/60">
               Source :{" "}
@@ -439,6 +506,12 @@ function exporterCsv(nomOutil: string, entreprises: EntrepriseScraped[]) {
     ["Email", (e) => e.email ?? ""],
     ["Site web", (e) => e.siteWeb ?? ""],
     ["Site web present", (e) => (e.siteWebPresent ? "oui" : "non")],
+    /* VOLET 32 — le diagnostic du site rejoint l'export. */
+    ["Plateforme du site", (e) => e.qualiteSite?.plateforme ?? ""],
+    ["Derniere mise a jour", (e) => (e.qualiteSite?.anneeMiseAJour ? String(e.qualiteSite.anneeMiseAJour) : "")],
+    ["Score du site", (e) => (e.qualiteSite ? `${e.qualiteSite.score}/100` : "")],
+    ["Verdict du site", (e) => (e.qualiteSite ? VERDICTS_LIBELLES[e.qualiteSite.verdict] : "")],
+    ["Problemes du site", (e) => e.qualiteSite?.problemes.join(" | ") ?? ""],
     ["Employes", (e) => e.employes ?? ""],
     ["Horaires", (e) => e.horaires ?? ""],
     ["Anciennete", (e) => e.anciennete ?? ""],
@@ -499,6 +572,11 @@ export function EspaceScraping({
   const [complementIg, setComplementIg] = useState("");
   const [complementLi, setComplementLi] = useState("");
   const [filtreSite, setFiltreSite] = useState<FiltreSite>("tous");
+  /* VOLET 32 — FILTRES ET TRI DES RÉSULTATS : trouver vite les
+   * prospects les plus intéressants (sans site, avec email, ou le
+   * site le plus « à refaire » d'abord). */
+  const [filtreResultat, setFiltreResultat] = useState<"tous" | "sans-site" | "avec-email" | "a-refaire">("tous");
+  const [triResultat, setTriResultat] = useState<"defaut" | "score-croissant" | "nom">("defaut");
   const [minEmployes, setMinEmployes] = useState(0);
 
   /* Sélection des prospects à importer dans l'espace Prospects. */
@@ -622,6 +700,8 @@ export function EspaceScraping({
       setVueResultats(true);
       setSelection(new Set());
       setDetailOuvert(null);
+      setFiltreResultat("tous");
+      setTriResultat("defaut");
       const nb = data.entreprises.length;
       toast({
         title: nb > 0 ? `${nb} entreprise${nb > 1 ? "s" : ""} trouvée${nb > 1 ? "s" : ""}` : "Aucune entreprise",
@@ -651,10 +731,33 @@ export function EspaceScraping({
     });
   }
 
+  /** VOLET 32 — un prospect passe-t-il le FILTRE de la vue
+   *  résultats ? (sans site web, avec email, ou site « à refaire »). */
+  function passeFiltreResultat(e: EntrepriseScraped): boolean {
+    if (filtreResultat === "sans-site") return !e.siteWebPresent;
+    if (filtreResultat === "avec-email") return Boolean(e.email);
+    if (filtreResultat === "a-refaire") return e.qualiteSite?.verdict === "a-refaire" || !e.siteWebPresent;
+    return true;
+  }
+
   function toutSelectionner() {
-    const liste = resultats?.entreprises ?? [];
-    if (selection.size === liste.length) setSelection(new Set());
-    else setSelection(new Set(liste.map((_, i) => i)));
+    /* VOLET 32 — « Tout sélectionner » porte sur la liste AFFICHÉE
+     * (après filtres) : ce qu'on voit, c'est ce qu'on sélectionne. */
+    const toutes = resultats?.entreprises ?? [];
+    const affichees = toutes
+      .map((e, i) => ({ e, i }))
+      .filter(({ e }) => passeFiltreResultat(e))
+      .map(({ i }) => i);
+    const toutesAfficheesSelectionnees = affichees.length > 0 && affichees.every((i) => selection.has(i));
+    if (toutesAfficheesSelectionnees) {
+      setSelection((s) => {
+        const copie = new Set(s);
+        for (const i of affichees) copie.delete(i);
+        return copie;
+      });
+    } else {
+      setSelection((s) => new Set([...s, ...affichees]));
+    }
   }
 
   /** Importe les prospects sélectionnés dans l'espace Prospects
@@ -715,7 +818,22 @@ export function EspaceScraping({
   /* ================= LA VUE RÉSULTATS (espace dédié) ================= */
   if (vueResultats && resultats) {
     const nb = resultats.entreprises.length;
-    const tous = selection.size === nb && nb > 0;
+    /* VOLET 32 — la liste AFFICHÉE : filtre + tri, l'index d'origine
+     * suit chaque prospect (la sélection ne se perd jamais). */
+    const listeAffichee = resultats.entreprises
+      .map((e, i) => ({ e, i }))
+      .filter(({ e }) => passeFiltreResultat(e));
+    if (triResultat === "score-croissant") {
+      listeAffichee.sort((a, b) => (a.e.qualiteSite?.score ?? 999) - (b.e.qualiteSite?.score ?? 999));
+    } else if (triResultat === "nom") {
+      listeAffichee.sort((a, b) => a.e.nom.localeCompare(b.e.nom, "fr"));
+    }
+    const toutesAfficheesSelectionnees =
+      listeAffichee.length > 0 && listeAffichee.every(({ i }) => selection.has(i));
+    const nbSansSite = resultats.entreprises.filter((e) => !e.siteWebPresent).length;
+    const nbAvecEmail = resultats.entreprises.filter((e) => e.email).length;
+    const nbARefaire =
+      resultats.sitesARefaire ?? resultats.entreprises.filter((e) => e.qualiteSite?.verdict === "a-refaire").length;
     return (
       <div>
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -736,9 +854,9 @@ export function EspaceScraping({
           <div className="flex flex-wrap items-center gap-3">
             <BoutonAction onClick={toutSelectionner}>
               <CheckSquare className="h-4 w-4" aria-hidden="true" />
-              {tous ? "Tout désélectionner" : "Tout sélectionner"}
+              {toutesAfficheesSelectionnees ? "Tout désélectionner" : "Tout sélectionner"}
             </BoutonAction>
-            <BoutonAction onClick={() => exporterCsv(outil, resultats.entreprises)} disabled={nb === 0}>
+            <BoutonAction onClick={() => exporterCsv(outil, listeAffichee.map(({ e }) => e))} disabled={listeAffichee.length === 0}>
               <Download className="h-4 w-4" aria-hidden="true" />
               CSV
             </BoutonAction>
@@ -749,13 +867,54 @@ export function EspaceScraping({
           </div>
         </div>
 
+        {/* VOLET 32 — FILTRES + TRI DES RÉSULTATS : cibler tout de suite
+            les prospects les plus intéressants. */}
+        <div className="mb-4 flex flex-wrap items-center gap-2.5">
+          {([
+            { cle: "tous", libelle: `Tous (${nb})` },
+            { cle: "sans-site", libelle: `Sans site web (${nbSansSite})` },
+            { cle: "a-refaire", libelle: `À refaire (${nbARefaire + nbSansSite})` },
+            { cle: "avec-email", libelle: `Avec email (${nbAvecEmail})` },
+          ] as const).map((f) => (
+            <button
+              key={f.cle}
+              type="button"
+              onClick={() => setFiltreResultat(f.cle)}
+              aria-pressed={filtreResultat === f.cle}
+              className={`min-h-[40px] cursor-pointer rounded-full px-4 py-2 text-xs font-medium transition-colors ${
+                filtreResultat === f.cle
+                  ? "border border-[#e4e4e4] bg-white text-[#1c1c1c]"
+                  : "border border-[#e4e4e4]/20 text-[#c8c8c8] hover:border-[#e4e4e4]/40"
+              }`}
+            >
+              {f.libelle}
+            </button>
+          ))}
+          <span className="mx-1 hidden h-4 w-px bg-[#e4e4e4]/20 sm:block" aria-hidden="true" />
+          <label className="flex items-center gap-2 text-xs text-[#c8c8c8]">
+            Trier par
+            <select
+              value={triResultat}
+              onChange={(ev) => setTriResultat(ev.target.value as "defaut" | "score-croissant" | "nom")}
+              className="min-h-[40px] cursor-pointer rounded-full border border-[#e4e4e4]/20 bg-[#1c1c1c] px-3 py-2 text-xs text-white focus:border-[#e4e4e4] focus:outline-none"
+            >
+              <option value="defaut">Ordre de la recherche</option>
+              <option value="score-croissant">Qualité du site — la pire d'abord</option>
+              <option value="nom">Nom (A → Z)</option>
+            </select>
+          </label>
+        </div>
+
         <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[#c8c8c8]">
           <span>
-            <strong className="text-white">{nb}</strong> entreprise{nb > 1 ? "s" : ""} affichée{nb > 1 ? "s" : ""}
+            <strong className="text-white">{listeAffichee.length}</strong> affichée{listeAffichee.length > 1 ? "s" : ""}
             {resultats.totalTrouvees > nb ? ` (sur ${resultats.totalTrouvees} trouvées)` : ""}
           </span>
           <span>
-            <strong className="text-white">{resultats.sansSiteWeb}</strong> sans site web
+            <strong className="text-white">{nbSansSite}</strong> sans site web
+          </span>
+          <span>
+            <strong className="text-white">{nbARefaire}</strong> site{nbARefaire > 1 ? "s" : ""} à refaire
           </span>
           <span>
             <strong className="text-white">{selection.size}</strong> sélectionnée{selection.size > 1 ? "s" : ""}
@@ -769,12 +928,12 @@ export function EspaceScraping({
         ) : null}
 
         <div className="space-y-3">
-          {nb === 0 ? (
+          {listeAffichee.length === 0 ? (
             <Carte className="p-6 text-center text-sm text-[#c8c8c8]">
-              Aucune entreprise — élargissez la recherche ou changez le filtre « site web ».
+              Aucune entreprise ne passe ce filtre — changez de filtre ou relancez la recherche.
             </Carte>
           ) : (
-            resultats.entreprises.map((e, i) => (
+            listeAffichee.map(({ e, i }) => (
               <CarteEntreprise
                 key={`${e.nom}-${e.urlSource ?? i}`}
                 entreprise={e}

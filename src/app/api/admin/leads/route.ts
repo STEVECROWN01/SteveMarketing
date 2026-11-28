@@ -62,8 +62,9 @@ export async function GET(req: NextRequest) {
    * introuvable sur Date) et renvoyait un 500 dès QU'UNE base est
    * connectée. Normalisation : chaque date devient une chaîne ISO. */
   for (const d of parId.values()) {
-    if (d.createdAt instanceof Date) d.createdAt = d.createdAt.toISOString();
-    else if (typeof d.createdAt !== "string") d.createdAt = String(d.createdAt ?? "");
+    const c = d.createdAt as unknown;
+    if (c instanceof Date) d.createdAt = c.toISOString();
+    else if (typeof c !== "string") d.createdAt = String(c ?? "");
   }
 
   const leads = Array.from(parId.values()).sort((a, b) =>

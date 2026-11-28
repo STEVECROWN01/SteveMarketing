@@ -17,6 +17,7 @@
  */
 
 import type { EntrepriseScraped } from "@/lib/scraping/types";
+import type { QualiteSite } from "@/lib/scraping/qualite-site";
 
 /** Le suivi d'un prospect : contacté, rendez-vous, conversion. */
 export type StatutProspect =
@@ -85,6 +86,11 @@ export type ProspectEnregistre = {
   source: EntrepriseScraped["source"];
   /** Fiche d'origine. */
   urlSource?: string;
+  /** VOLET 32 — diagnostic de la qualité du site web au moment du
+   *  scraping (plateforme, année, score, verdict, problèmes) : le
+   *  « pourquoi ce prospect a besoin de vous » suit le prospect
+   *  jusque dans le classeur Excel. */
+  qualiteSite?: QualiteSite;
   /** Date d'import dans l'espace (ISO). */
   importeLe: string;
 };
